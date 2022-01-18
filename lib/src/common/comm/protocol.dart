@@ -1,0 +1,4 @@
+enum Protocol {
+  http,
+  https,
+}

@@ -1,22 +1,24 @@
 import 'dart:typed_data';
 
+import 'package:aliyun_oss_dart_sdk/src/model/web_service_request.dart';
+
 import 'progress_listener.dart';
 import 'request_progress_input_stream.dart';
 import 'response_progress_input_stream.dart';
 
 class ProgressInputStream extends InputStream {
   static InputStream inputStreamForRequest(
-      InputStream inputStream, WebServiceRequest req) {
+      InputStream inputStream, WebServiceRequest? req) {
     return req == null
         ? inputStream
-        : RequestProgressInputStream(inputStream, req.getProgressListener());
+        : RequestProgressInputStream(inputStream, req.progressListener);
   }
 
   static InputStream inputStreamForResponse(
-      InputStream inputStream, WebServiceRequest req) {
+      InputStream inputStream, WebServiceRequest? req) {
     return req == null
         ? inputStream
-        : ResponseProgressInputStream(inputStream, req.getProgressListener());
+        : ResponseProgressInputStream(inputStream, req.progressListener);
   }
 
   static const defaultNotificationThreshold = 8 * 1024;
@@ -128,6 +130,10 @@ class InputStream {
   void close() {}
 
   void reset() {}
+
+  bool markSupported() {
+    return false;
+  }
 
   int read(Uint8List list, int off, int length) {
     return 0;

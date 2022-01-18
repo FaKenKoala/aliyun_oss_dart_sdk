@@ -1,10 +1,12 @@
+import 'package:aliyun_oss_dart_sdk/src/event/progress_listener.dart';
+
 abstract class WebServiceRequest {
   static final WebServiceRequest noop = _Noop();
 
-  ProgressListener _progressListener = ProgressListener.NOOP;
+  ProgressListener _progressListener = ProgressListener.noop;
 
   set progressListener(ProgressListener? progressListener) {
-    this.progressListener = progressListener ?? ProgressListener.NOOP;
+    _progressListener = progressListener ?? ProgressListener.noop;
   }
 
   ProgressListener get progressListener => _progressListener;
