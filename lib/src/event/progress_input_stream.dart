@@ -139,3 +139,15 @@ class InputStream {
     return 0;
   }
 }
+
+class BufferedInputStream extends InputStream {
+  BufferedInputStream(InputStream inputStream) : super(inputStream);
+}
+
+class FilterInputStream extends InputStream {
+  FilterInputStream(InputStream inputStream) : super(inputStream);
+}
+
+class CheckedInputStream extends FilterInputStream {
+  CheckedInputStream(InputStream inputStream) : super(inputStream);
+}
