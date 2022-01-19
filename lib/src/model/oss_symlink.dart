@@ -1,12 +1,8 @@
 import 'generic_result.dart';
+import 'object_metadata.dart';
 
 class OSSSymlink extends GenericResult {
   OSSSymlink(this.symlink, this.target);
-
-  @override
-  String toString() {
-    return "OSSSymlink [symlink=$symlink, target=$target]";
-  }
 
   // symlink file key
   String symlink;
@@ -16,4 +12,9 @@ class OSSSymlink extends GenericResult {
 
   // The symlink file's metadata.
   ObjectMetadata? metadata;
+
+  @override
+  String toString() {
+    return "OSSSymlink [symlink=$symlink, target=$target]";
+  }
 }

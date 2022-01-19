@@ -19,11 +19,11 @@
 /// </p>
 ///
 class ClientException implements Exception {
-  ClientException({
+  ClientException([
     this.errorMessage,
     this.errorCode,
     this.requestId,
-  });
+  ]);
 
   String? errorMessage;
   String? requestId;

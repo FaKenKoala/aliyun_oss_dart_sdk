@@ -5,6 +5,7 @@ import 'dart:collection';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/http_headers.dart';
 import 'package:aliyun_oss_dart_sdk/src/internal/oss_headers.dart';
 
+import 'canned_access_control_list.dart';
 import 'storage_class.dart';
 
 /// OSS Object's metadata. It has the user's custom metadata, as well as some
@@ -150,7 +151,7 @@ class ObjectMetadata {
     return metadata[OSSHeaders.ossObjectType] as String?;
   }
 
-  void setObjectAcl(CannedAccessControlList cannedAcl) {
+  void setObjectAcl(CannedAccessControlList? cannedAcl) {
     metadata[OSSHeaders.ossObjectAcl] =
         cannedAcl != null ? cannedAcl.toString() : "";
   }
