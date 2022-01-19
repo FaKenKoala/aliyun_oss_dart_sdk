@@ -151,3 +151,12 @@ class FilterInputStream extends InputStream {
 class CheckedInputStream extends FilterInputStream {
   CheckedInputStream(InputStream inputStream) : super(inputStream);
 }
+
+class BoundedInputStream extends InputStream {
+  BoundedInputStream(
+    InputStream inputStream,
+    this.partSize,
+  ) : super(inputStream);
+
+  final int partSize;
+}

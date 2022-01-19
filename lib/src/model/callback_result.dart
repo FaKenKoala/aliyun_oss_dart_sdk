@@ -6,7 +6,7 @@ abstract class CallbackResult {
   /// it after usage.
   ///
   /// @return The {@link InputStream} instance of the response body.
-  InputStream getCallbackResponseBody();
+  InputStream? getCallbackResponseBody();
 
   /// Sets the callback response body.
   ///
