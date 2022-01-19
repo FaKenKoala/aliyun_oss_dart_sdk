@@ -3,24 +3,15 @@ import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
 import 'callback_result.dart';
 import 'generic_result.dart';
 
-/// The result of a multipart upload.
-class CompleteMultipartUploadResult extends GenericResult
-    implements CallbackResult {
-  /// The name of the bucket containing the completed multipart upload.
-  String? bucketName;
-
-  /// The key by which the object is stored.
-  String? key;
-
-  /// The URL identifying the new multipart object.
-  String? location;
-
+/// The result class of a Put Object request.
+class PutObjectResult extends GenericResult implements CallbackResult {
+  // Object ETag
   String? eTag;
 
-  /// Object Version Id.
+  // Object Version Id
   String? versionId;
 
-  /// The callback request's response body
+  // The callback response body. Caller needs to close it.
   InputStream? _callbackResponseBody;
 
   @override

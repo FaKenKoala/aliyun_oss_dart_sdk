@@ -1,5 +1,5 @@
 import 'generic_result.dart';
-import 'oos_object_summary.dart';
+import 'oss_object_summary.dart';
 
 class ObjectListing extends GenericResult {
   /// A list of summary information describing the objects stored in the bucket
