@@ -1,64 +1,25 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
-package com.aliyun.oss.internal;
+ import 'package:aliyun_oss_dart_sdk/src/common/comm/request_message.dart';
 
-import static com.aliyun.oss.common.utils.CodingUtils.assertTrue;
-import static com.aliyun.oss.internal.RequestParameters.*;
+import 'sign_parameters.dart';
 
-import java.util.Arrays;
-import java.util.Map;
-import static com.aliyun.oss.internal.OSSConstants.DEFAULT_CHARSET_NAME;
-import static com.aliyun.oss.internal.OSSUtils.populateResponseHeaderParameters;
-import static com.aliyun.oss.internal.RequestParameters.SIGNATURE;
-import static com.aliyun.oss.internal.SignParameters.AUTHORIZATION_PREFIX;
+class SignUtils {
 
-import java.net.URI;
-import java.util.*;
-import java.util.Map.Entry;
-
-import com.aliyun.oss.ClientConfiguration;
-import com.aliyun.oss.HttpMethod;
-import com.aliyun.oss.common.auth.Credentials;
-import com.aliyun.oss.common.auth.ServiceSignature;
-import com.aliyun.oss.common.comm.RequestMessage;
-import com.aliyun.oss.common.utils.HttpHeaders;
-import com.aliyun.oss.common.utils.HttpUtil;
-import com.aliyun.oss.model.GeneratePresignedUrlRequest;
-
-public class SignUtils {
-
-    public static String composeRequestAuthorization(String accessKeyId, String signature) {
+     static String composeRequestAuthorization(String accessKeyId, String signature) {
         return AUTHORIZATION_PREFIX + accessKeyId + ":" + signature;
     }
 
-    public static String buildCanonicalString(String method, String resourcePath, RequestMessage request,
+     static String buildCanonicalString(String method, String resourcePath, RequestMessage request,
             String expires) {
 
-        StringBuilder canonicalString = new StringBuilder();
-        canonicalString.append(method).append(SignParameters.NEW_LINE);
+        StringBuffer canonicalString = StringBuffer();
+        canonicalString..write(method)..write(SignParameters.NEW_LINE);
 
-        Map<String, String> headers = request.getHeaders();
-        TreeMap<String, String> headersToSign = new TreeMap<String, String>();
+        Map<String, String> headers = request.headers;
+        Map<String, String> headersToSign = <String, String>{};
 
         if (headers != null) {
-            for (Entry<String, String> header : headers.entrySet()) {
+            for (Entry<String, String> header in headers.entrySet()) {
                 if (header.getKey() == null) {
                     continue;
                 }
@@ -100,10 +61,10 @@ public class SignUtils {
         return canonicalString.toString();
     }
 
-    public static String buildRtmpCanonicalString(String canonicalizedResource, RequestMessage request,
+     static String buildRtmpCanonicalString(String canonicalizedResource, RequestMessage request,
             String expires) {
 
-        StringBuilder canonicalString = new StringBuilder();
+        StringBuffer canonicalString = StringBuffer();
 
         // Append expires
         canonicalString.append(expires + SignParameters.NEW_LINE);
@@ -122,7 +83,7 @@ public class SignUtils {
         return canonicalString.toString();
     }
 
-    public static String buildSignedURL(GeneratePresignedUrlRequest request, Credentials currentCreds, ClientConfiguration config, URI endpoint) {
+     static String buildSignedURL(GeneratePresignedUrlRequest request, Credentials currentCreds, ClientConfiguration config, URI endpoint) {
         String bucketName = request.getBucketName();
         String accessId = currentCreds.getAccessKeyId();
         String accessKey = currentCreds.getSecretAccessKey();
@@ -133,7 +94,7 @@ public class SignUtils {
         String key = request.getKey();
         String resourcePath = OSSUtils.determineResourcePath(bucketName, key, config.isSLDEnabled());
 
-        RequestMessage requestMessage = new RequestMessage(bucketName, key);
+        RequestMessage requestMessage = RequestMessage(bucketName, key);
         requestMessage.setEndpoint(OSSUtils.determineFinalEndpoint(endpoint, bucketName, config));
         requestMessage.setMethod(method);
         requestMessage.setResourcePath(resourcePath);
@@ -150,7 +111,7 @@ public class SignUtils {
             requestMessage.addHeader(OSSHeaders.OSS_USER_METADATA_PREFIX + h.getKey(), h.getValue());
         }
 
-        Map<String, String> responseHeaderParams = new HashMap<String, String>();
+        Map<String, String> responseHeaderParams = HashMap<String, String>();
         populateResponseHeaderParameters(responseHeaderParams, request.getResponseHeaders());
         populateTrafficLimitParams(responseHeaderParams, request.getTrafficLimit());
         if (responseHeaderParams.size() > 0) {
@@ -176,7 +137,7 @@ public class SignUtils {
                 expires);
         String signature = ServiceSignature.create().computeSignature(accessKey, canonicalString);
 
-        Map<String, String> params = new LinkedHashMap<String, String>();
+        Map<String, String> params = LinkedHashMap<String, String>();
         params.put(HttpHeaders.EXPIRES, expires);
         params.put(OSS_ACCESS_KEY_ID, accessId);
         params.put(SIGNATURE, signature);
@@ -193,14 +154,14 @@ public class SignUtils {
         return url;
     }
 
-    public static String buildCanonicalizedResource(String resourcePath, Map<String, String> parameters) {
+     static String buildCanonicalizedResource(String resourcePath, Map<String, String> parameters) {
         assertTrue(resourcePath.startsWith("/"), "Resource path should start with slash character");
 
-        StringBuilder builder = new StringBuilder();
+        StringBuffer builder = StringBuffer();
         builder.append(resourcePath);
 
         if (parameters != null) {
-            String[] parameterNames = parameters.keySet().toArray(new String[parameters.size()]);
+            String[] parameterNames = parameters.keySet().toArray(String[parameters.size()]);
             Arrays.sort(parameterNames);
 
             char separator = '?';
@@ -223,12 +184,12 @@ public class SignUtils {
         return builder.toString();
     }
 
-    public static String buildSignature(String secretAccessKey, String httpMethod, String resourcePath, RequestMessage request) {
+     static String buildSignature(String secretAccessKey, String httpMethod, String resourcePath, RequestMessage request) {
         String canonicalString = buildCanonicalString(httpMethod, resourcePath, request, null);
         return ServiceSignature.create().computeSignature(secretAccessKey, canonicalString);
     }
 
-    private static void populateTrafficLimitParams(Map<String, String> params, int limit) {
+     static void populateTrafficLimitParams(Map<String, String> params, int limit) {
         if (limit > 0) {
             params.put(OSS_TRAFFIC_LIMIT, String.valueOf(limit));
         }
