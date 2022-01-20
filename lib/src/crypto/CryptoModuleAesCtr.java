@@ -73,7 +73,7 @@ class CryptoModuleAesCtr extends CryptoModuleBase {
         String cekAlgo = cekMaterial.getContentCryptoAlgorithm();
         CryptoScheme tmpContentCryptoScheme = CryptoScheme.fromCEKAlgo(cekAlgo);
         // Adjust the IV if needed
-        boolean isRangeGet = (cryptoRange != null);
+        bool isRangeGet = (cryptoRange != null);
         if (isRangeGet) {
             iv = tmpContentCryptoScheme.adjustIV(iv, cryptoRange[0]);
         } else if (skipBlock > 0) {

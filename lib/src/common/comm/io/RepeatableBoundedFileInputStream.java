@@ -47,7 +47,7 @@ public class RepeatableBoundedFileInputStream extends InputStream {
         getLog().trace("Reset to position " + markPos);
     }
 
-    public boolean markSupported() {
+    public bool markSupported() {
         return true;
     }
 

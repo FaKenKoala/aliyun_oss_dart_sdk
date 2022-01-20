@@ -4,7 +4,7 @@ import 'tag_set.dart';
 class SetTaggingRequest extends GenericRequest {
   TagSet tagSet;
 
-  SetTaggingRequest(String bucketName, String key,
+  SetTaggingRequest(String bucketName, String? key,
       {TagSet? tagSet, Map<String, String>? tags})
       : tagSet = tagSet ?? TagSet(tags),
         super(bucketName: bucketName, key: key);

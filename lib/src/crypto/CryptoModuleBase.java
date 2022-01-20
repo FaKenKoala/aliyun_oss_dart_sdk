@@ -177,7 +177,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
     /**
      * Checks there an encryption info in the metadata.
      */
-    public static boolean hasEncryptionInfo(ObjectMetadata metadata) {
+    public static bool hasEncryptionInfo(ObjectMetadata metadata) {
         Map<String, String> userMeta = metadata.getUserMetadata();
         return userMeta != null && userMeta.containsKey(CryptoHeaders.CRYPTO_KEY)
                 && userMeta.containsKey(CryptoHeaders.CRYPTO_IV);

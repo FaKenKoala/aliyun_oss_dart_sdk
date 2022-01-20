@@ -60,7 +60,7 @@ public class OSSUtils {
     /**
      * Validate endpoint.
      */
-    public static boolean validateEndpoint(String endpoint) {
+    public static bool validateEndpoint(String endpoint) {
         if (endpoint == null) {
             return false;
         }
@@ -77,7 +77,7 @@ public class OSSUtils {
     /**
      * Validate bucket name.
      */
-    public static boolean validateBucketName(String bucketName) {
+    public static bool validateBucketName(String bucketName) {
 
         if (bucketName == null) {
             return false;
@@ -96,7 +96,7 @@ public class OSSUtils {
     /**
      * Validate bucket creation name.
      */
-    public static boolean validateBucketNameCreation(String bucketName) {
+    public static bool validateBucketNameCreation(String bucketName) {
 
         if (bucketName == null) {
             return false;
@@ -115,7 +115,7 @@ public class OSSUtils {
     /**
      * Validate object name.
      */
-    public static boolean validateObjectKey(String key) {
+    public static bool validateObjectKey(String key) {
 
         if (key == null || key.length() == 0) {
             return false;
@@ -172,7 +172,7 @@ public class OSSUtils {
     private static String buildCanonicalHost(URI endpoint, String bucket, ClientConfiguration clientConfig) {
         String host = endpoint.getHost();
 
-        boolean isCname = false;
+        bool isCname = false;
         if (clientConfig.isSupportCname()) {
             isCname = cnameExcludeFilter(host, clientConfig.getCnameExcludeList());
         }
@@ -187,7 +187,7 @@ public class OSSUtils {
         return cannonicalHost.toString();
     }
 
-    private static boolean cnameExcludeFilter(String hostToFilter, List<String> excludeList) {
+    private static bool cnameExcludeFilter(String hostToFilter, List<String> excludeList) {
         if (hostToFilter != null && !hostToFilter.trim().isEmpty()) {
             String canonicalHost = hostToFilter.toLowerCase();
             for (String excl : excludeList) {
@@ -200,7 +200,7 @@ public class OSSUtils {
         throw ArgumentError("Host name can not be null.");
     }
 
-    public static String determineResourcePath(String bucket, String key, boolean sldEnabled) {
+    public static String determineResourcePath(String bucket, String key, bool sldEnabled) {
         return sldEnabled ? makeResourcePath(bucket, key) : makeResourcePath(key);
     }
 
@@ -317,7 +317,7 @@ public class OSSUtils {
     public static String join(List<String> strings) {
 
         StringBuilder sb = new StringBuilder();
-        boolean first = true;
+        bool first = true;
 
         for (String s : strings) {
             if (!first) {
@@ -404,7 +404,7 @@ public class OSSUtils {
         return hintLength;
     }
 
-    public static long determineInputStreamLength(InputStream instream, long hintLength, boolean useChunkEncoding) {
+    public static long determineInputStreamLength(InputStream instream, long hintLength, bool useChunkEncoding) {
 
         if (useChunkEncoding) {
             return -1;
@@ -420,7 +420,7 @@ public class OSSUtils {
     public static String joinETags(List<String> eTags) {
 
         StringBuilder sb = new StringBuilder();
-        boolean first = true;
+        bool first = true;
 
         for (String eTag : eTags) {
             if (!first) {

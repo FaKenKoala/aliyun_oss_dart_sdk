@@ -1045,7 +1045,7 @@ public final class ResponseParsers {
 
                 // Occurs when deleting multiple objects in quiet mode.
                 if (response.getContentLength() == 0) {
-                    result = new DeleteVersionsResult(new ArrayList<DeletedVersion>());
+                    result = new DeleteVersionsResult([]);
                 } else {
                     result = parseDeleteVersionsResult(response.getContent());
                 }
@@ -1267,7 +1267,7 @@ public final class ResponseParsers {
             ObjectListing objectListing = new ObjectListing();
             objectListing.setBucketName(root.getChildText("Name"));
             objectListing.setMaxKeys(Integer.valueOf(root.getChildText("MaxKeys")));
-            objectListing.setTruncated(Boolean.valueOf(root.getChildText("IsTruncated")));
+            objectListing.setTruncated(bool.valueOf(root.getChildText("IsTruncated")));
 
             if (root.getChild("Prefix") != null) {
                 String prefix = root.getChildText("Prefix");
@@ -1345,7 +1345,7 @@ public final class ResponseParsers {
             ListObjectsV2Result result = new ListObjectsV2Result();
             result.setBucketName(root.getChildText("Name"));
             result.setMaxKeys(Integer.valueOf(root.getChildText("MaxKeys")));
-            result.setTruncated(Boolean.valueOf(root.getChildText("IsTruncated")));
+            result.setTruncated(bool.valueOf(root.getChildText("IsTruncated")));
             result.setKeyCount(Integer.valueOf(root.getChildText("KeyCount")));
 
             if (root.getChild("Prefix") != null) {
@@ -1428,11 +1428,11 @@ public final class ResponseParsers {
         try {
             Element root = getXmlRootElement(responseBody);
 
-            boolean shouldSDKDecode = false;
+            bool shouldSDKDecode = false;
             VersionListing versionListing = new VersionListing();
             versionListing.setBucketName(root.getChildText("Name"));
             versionListing.setMaxKeys(Integer.valueOf(root.getChildText("MaxKeys")));
-            versionListing.setTruncated(Boolean.valueOf(root.getChildText("IsTruncated")));
+            versionListing.setTruncated(bool.valueOf(root.getChildText("IsTruncated")));
 
             if (root.getChild("EncodingType") != null) {
                 String encodingType = root.getChildText("EncodingType");
@@ -1534,7 +1534,7 @@ public final class ResponseParsers {
     /**
      * Perform an url decode on the given value if specified.
      */
-    private static String decodeIfSpecified(String value, boolean decode) {
+    private static String decodeIfSpecified(String value, bool decode) {
         return decode ? HttpUtil.urlDecode(value, StringUtils.DEFAULT_ENCODING) : value;
     }
 
@@ -1611,8 +1611,8 @@ public final class ResponseParsers {
         try {
             Element root = getXmlRootElement(responseBody);
 
-            boolean allowEmptyReferer = Boolean.valueOf(root.getChildText("AllowEmptyReferer"));
-            List<String> refererList = new ArrayList<String>();
+            bool allowEmptyReferer = bool.valueOf(root.getChildText("AllowEmptyReferer"));
+            List<String> refererList = [];
             if (root.getChild("RefererList") != null) {
                 Element refererListElem = root.getChild("RefererList");
                 List<Element> refererElems = refererListElem.getChildren("Referer");
@@ -1667,7 +1667,7 @@ public final class ResponseParsers {
             }
             if (root.getChild("IsTruncated") != null) {
                 String value = root.getChildText("IsTruncated");
-                bucketList.setTruncated(isNullOrEmpty(value) ? false : Boolean.valueOf(value));
+                bucketList.setTruncated(isNullOrEmpty(value) ? false : bool.valueOf(value));
             }
             if (root.getChild("NextMarker") != null) {
                 bucketList.setNextMarker(root.getChildText("NextMarker"));
@@ -1678,7 +1678,7 @@ public final class ResponseParsers {
             String displayName = ownerElem.getChildText("DisplayName");
             Owner owner = new Owner(id, displayName);
 
-            List<Bucket> buckets = new ArrayList<Bucket>();
+            List<Bucket> buckets = [];
             if (root.getChild("Buckets") != null) {
                 List<Element> bucketElems = root.getChild("Buckets").getChildren("Bucket");
                 for (Element e : bucketElems) {
@@ -1724,7 +1724,7 @@ public final class ResponseParsers {
         try {
             Element root = getXmlRootElement(responseBody);
 
-            List<Style> styleList = new ArrayList<Style>();
+            List<Style> styleList = [];
             List<Element> styleElems = root.getChildren("Style");
             for (Element e : styleElems) {
                 Style style = new Style();
@@ -1922,7 +1922,7 @@ public final class ResponseParsers {
             MultipartUploadListing multipartUploadListing = new MultipartUploadListing();
             multipartUploadListing.setBucketName(root.getChildText("Bucket"));
             multipartUploadListing.setMaxUploads(Integer.valueOf(root.getChildText("MaxUploads")));
-            multipartUploadListing.setTruncated(Boolean.valueOf(root.getChildText("IsTruncated")));
+            multipartUploadListing.setTruncated(bool.valueOf(root.getChildText("IsTruncated")));
 
             if (root.getChild("Delimiter") != null) {
                 String delimiter = root.getChildText("Delimiter");
@@ -2011,7 +2011,7 @@ public final class ResponseParsers {
             partListing.setUploadId(root.getChildText("UploadId"));
             partListing.setStorageClass(root.getChildText("StorageClass"));
             partListing.setMaxParts(Integer.valueOf(root.getChildText("MaxParts")));
-            partListing.setTruncated(Boolean.valueOf(root.getChildText("IsTruncated")));
+            partListing.setTruncated(bool.valueOf(root.getChildText("IsTruncated")));
 
             if (root.getChild("PartNumberMarker") != null) {
                 String partNumberMarker = root.getChildText("PartNumberMarker");
@@ -2150,7 +2150,7 @@ public final class ResponseParsers {
             Element root = getXmlRootElement(responseBody);
 
             String compliedHost = root.getChildText("CompliedHost");
-            boolean sourceFileProtect = false;
+            bool sourceFileProtect = false;
             if (root.getChildText("SourceFileProtect").equals("Enabled")) {
                 sourceFileProtect = true;
             }
@@ -2185,7 +2185,7 @@ public final class ResponseParsers {
             if (indexDocument != null) {
                 result.setIndexDocument(root.getChild("IndexDocument").getChildText("Suffix"));
                 if (indexDocument.getChild("SupportSubDir") != null) {
-                    result.setSupportSubDir(Boolean.valueOf(indexDocument.getChildText("SupportSubDir")));
+                    result.setSupportSubDir(bool.valueOf(indexDocument.getChildText("SupportSubDir")));
                 }
 
                 if (indexDocument.getChild("Type") != null) {
@@ -2215,7 +2215,7 @@ public final class ResponseParsers {
                         }
                         List<Element> includeHeadersElem = condElem.getChildren("IncludeHeader");
                         if (includeHeadersElem != null && includeHeadersElem.size() > 0) {
-                            List<RoutingRule.IncludeHeader> includeHeaders = new ArrayList<RoutingRule.IncludeHeader>();
+                            List<RoutingRule.IncludeHeader> includeHeaders = [];
                             for (Element includeHeaderElem : includeHeadersElem) {
                                 RoutingRule.IncludeHeader includeHeader = new RoutingRule.IncludeHeader();
                                 includeHeader.setKey(includeHeaderElem.getChildText("Key"));
@@ -2252,28 +2252,28 @@ public final class ResponseParsers {
                     rule.getRedirect().setMirrorProbeURL(redirectElem.getChildText("MirrorURLProbe"));
                     if (redirectElem.getChildText("MirrorPassQueryString") != null) {
                         rule.getRedirect().setMirrorPassQueryString(
-                                Boolean.valueOf(redirectElem.getChildText("MirrorPassQueryString")));
+                                bool.valueOf(redirectElem.getChildText("MirrorPassQueryString")));
                     }
                     if (redirectElem.getChildText("MirrorPassOriginalSlashes") != null) {
                         rule.getRedirect().setPassOriginalSlashes(
-                                Boolean.valueOf(redirectElem.getChildText("MirrorPassOriginalSlashes")));
+                                bool.valueOf(redirectElem.getChildText("MirrorPassOriginalSlashes")));
                     }
 
                     if (redirectElem.getChildText("PassQueryString") != null) {
                         rule.getRedirect().setPassQueryString(
-                                Boolean.valueOf(redirectElem.getChildText("PassQueryString")));
+                                bool.valueOf(redirectElem.getChildText("PassQueryString")));
                     }
                     if (redirectElem.getChildText("MirrorFollowRedirect") != null) {
                         rule.getRedirect().setMirrorFollowRedirect(
-                                Boolean.valueOf(redirectElem.getChildText("MirrorFollowRedirect")));
+                                bool.valueOf(redirectElem.getChildText("MirrorFollowRedirect")));
                     }
                     if (redirectElem.getChildText("MirrorUserLastModified") != null) {
                         rule.getRedirect().setMirrorUserLastModified(
-                                Boolean.valueOf(redirectElem.getChildText("MirrorUserLastModified")));
+                                bool.valueOf(redirectElem.getChildText("MirrorUserLastModified")));
                     }
                     if (redirectElem.getChildText("MirrorIsExpressTunnel") != null) {
                         rule.getRedirect().setMirrorIsExpressTunnel(
-                                Boolean.valueOf(redirectElem.getChildText("MirrorIsExpressTunnel")));
+                                bool.valueOf(redirectElem.getChildText("MirrorIsExpressTunnel")));
                     }
                     if (redirectElem.getChildText("MirrorDstRegion") != null) {
                         rule.getRedirect().setMirrorDstRegion(
@@ -2284,7 +2284,7 @@ public final class ResponseParsers {
                                 redirectElem.getChildText("MirrorDstVpcId"));
                     }
                     if (redirectElem.getChildText("MirrorUsingRole") != null) {
-                        rule.getRedirect().setMirrorUsingRole(Boolean.valueOf(redirectElem.getChildText("MirrorUsingRole")));
+                        rule.getRedirect().setMirrorUsingRole(bool.valueOf(redirectElem.getChildText("MirrorUsingRole")));
                     }
 
                     if (redirectElem.getChildText("MirrorRole") != null) {
@@ -2293,22 +2293,22 @@ public final class ResponseParsers {
 
                     // EnableReplacePrefix and MirrorSwitchAllErrors
                     if (redirectElem.getChild("EnableReplacePrefix") != null) {
-                        rule.getRedirect().setEnableReplacePrefix(Boolean.valueOf(redirectElem.getChildText("EnableReplacePrefix")));
+                        rule.getRedirect().setEnableReplacePrefix(bool.valueOf(redirectElem.getChildText("EnableReplacePrefix")));
                     }
 
                     if (redirectElem.getChild("MirrorSwitchAllErrors") != null) {
-                        rule.getRedirect().setMirrorSwitchAllErrors(Boolean.valueOf(redirectElem.getChildText("MirrorSwitchAllErrors")));
+                        rule.getRedirect().setMirrorSwitchAllErrors(bool.valueOf(redirectElem.getChildText("MirrorSwitchAllErrors")));
                     }
 
                     if (redirectElem.getChild("MirrorCheckMd5") != null) {
-                        rule.getRedirect().setMirrorCheckMd5(Boolean.valueOf(redirectElem.getChildText("MirrorCheckMd5")));
+                        rule.getRedirect().setMirrorCheckMd5(bool.valueOf(redirectElem.getChildText("MirrorCheckMd5")));
                     }
 
                     Element mirrorURLsElem = redirectElem.getChild("MirrorMultiAlternates");
                     if (mirrorURLsElem != null) {
                         List<Element> mirrorURLElementList = mirrorURLsElem.getChildren("MirrorMultiAlternate");
                         if (mirrorURLElementList != null && mirrorURLElementList.size() > 0) {
-                            List<RoutingRule.Redirect.MirrorMultiAlternate> mirrorURLsList = new ArrayList<RoutingRule.Redirect.MirrorMultiAlternate>();
+                            List<RoutingRule.Redirect.MirrorMultiAlternate> mirrorURLsList = [];
                             for (Element setElement : mirrorURLElementList) {
                                 RoutingRule.Redirect.MirrorMultiAlternate mirrorMultiAlternate = new RoutingRule.Redirect.MirrorMultiAlternate();
                                 mirrorMultiAlternate.setPrior(Integer.parseInt(setElement.getChildText("MirrorMultiAlternateNumber")));
@@ -2322,12 +2322,12 @@ public final class ResponseParsers {
                     Element mirrorHeadersElem = redirectElem.getChild("MirrorHeaders");
                     if (mirrorHeadersElem != null) {
                         RoutingRule.MirrorHeaders mirrorHeaders = new RoutingRule.MirrorHeaders();
-                        mirrorHeaders.setPassAll(Boolean.valueOf(mirrorHeadersElem.getChildText("PassAll")));
+                        mirrorHeaders.setPassAll(bool.valueOf(mirrorHeadersElem.getChildText("PassAll")));
                         mirrorHeaders.setPass(parseStringListFromElemet(mirrorHeadersElem.getChildren("Pass")));
                         mirrorHeaders.setRemove(parseStringListFromElemet(mirrorHeadersElem.getChildren("Remove")));
                         List<Element> setElementList = mirrorHeadersElem.getChildren("Set");
                         if (setElementList != null && setElementList.size() > 0) {
-                            List<Map<String, String>> setList = new ArrayList<Map<String, String>>();
+                            List<Map<String, String>> setList = [];
                             for (Element setElement : setElementList) {
                                 Map<String, String> map = new HashMap<String, String>();
                                 map.put("Key", setElement.getChildText("Key"));
@@ -2360,7 +2360,7 @@ public final class ResponseParsers {
      */
     private static List<String> parseStringListFromElemet(List<Element> elementList) {
         if (elementList != null && elementList.size() > 0) {
-            List<String> list = new ArrayList<String>();
+            List<String> list = [];
             for (Element element : elementList) {
                 list.add(element.getText());
             }
@@ -2401,7 +2401,7 @@ public final class ResponseParsers {
                 deleteObjectsResult.setEncodingType(isNullOrEmpty(encodingType) ? null : encodingType);
             }
 
-            List<String> deletedObjects = new ArrayList<String>();
+            List<String> deletedObjects = [];
             List<Element> deletedElements = root.getChildren("Deleted");
             for (Element elem : deletedElements) {
                 deletedObjects.add(elem.getChildText("Key"));
@@ -2422,7 +2422,7 @@ public final class ResponseParsers {
     @SuppressWarnings("unchecked")
     public static DeleteVersionsResult parseDeleteVersionsResult(InputStream responseBody)
         throws ResponseParseException {
-        boolean shouldSDKDecodeResponse = false;
+        bool shouldSDKDecodeResponse = false;
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2432,7 +2432,7 @@ public final class ResponseParsers {
                 shouldSDKDecodeResponse = OSSConstants.URL_ENCODING.equals(encodingType);
             }
 
-            List<DeletedVersion> deletedVersions = new ArrayList<DeletedVersion>();
+            List<DeletedVersion> deletedVersions = [];
             List<Element> deletedElements = root.getChildren("Deleted");
             for (Element elem : deletedElements) {
                 DeletedVersion key = new DeletedVersion();
@@ -2448,7 +2448,7 @@ public final class ResponseParsers {
                 }
 
                 if (elem.getChild("DeleteMarker") != null) {
-                    key.setDeleteMarker(Boolean.parseBoolean(elem.getChildText("DeleteMarker")));
+                    key.setDeleteMarker(bool.parsebool(elem.getChildText("DeleteMarker")));
                 }
 
                 if (elem.getChild("DeleteMarkerVersionId") != null) {
@@ -2509,7 +2509,7 @@ public final class ResponseParsers {
 
             Element responseVaryElems = root.getChild("ResponseVary");
             if (responseVaryElems != null) {
-                result.setResponseVary(Boolean.parseBoolean(responseVaryElems.getValue()));
+                result.setResponseVary(bool.parsebool(responseVaryElems.getValue()));
             }
 
             return result;
@@ -2563,7 +2563,7 @@ public final class ResponseParsers {
             throws ResponseParseException {
 
         try {
-            List<ReplicationRule> repRules = new ArrayList<ReplicationRule>();
+            List<ReplicationRule> repRules = [];
 
             Element root = getXmlRootElement(responseBody);
             List<Element> ruleElems = root.getChildren("Rule");
@@ -2589,7 +2589,7 @@ public final class ResponseParsers {
                 }
 
                 if (ruleElem.getChild("PrefixSet") != null) {
-                    List<String> objectPrefixes = new ArrayList<String>();
+                    List<String> objectPrefixes = [];
                     List<Element> prefixElems = ruleElem.getChild("PrefixSet").getChildren("Prefix");
                     for (Element prefixElem : prefixElems) {
                         objectPrefixes.add(prefixElem.getText());
@@ -2599,7 +2599,7 @@ public final class ResponseParsers {
 
                 if (ruleElem.getChild("Action") != null) {
                     String[] actionStrs = ruleElem.getChildText("Action").split(",");
-                    List<ReplicationAction> repActions = new ArrayList<ReplicationAction>();
+                    List<ReplicationAction> repActions = [];
                     for (String actionStr : actionStrs) {
                         repActions.add(ReplicationAction.parse(actionStr));
                     }
@@ -2686,7 +2686,7 @@ public final class ResponseParsers {
         try {
             Element root = getXmlRootElement(responseBody);
 
-            List<String> locationList = new ArrayList<String>();
+            List<String> locationList = [];
             List<Element> locElements = root.getChildren("Location");
 
             for (Element locElem : locElements) {
@@ -2824,14 +2824,14 @@ public final class ResponseParsers {
             Element root = getXmlRootElement(responseBody);
             CreateLiveChannelResult result = new CreateLiveChannelResult();
 
-            List<String> publishUrls = new ArrayList<String>();
+            List<String> publishUrls = [];
             List<Element> publishElems = root.getChild("PublishUrls").getChildren("Url");
             for (Element urlElem : publishElems) {
                 publishUrls.add(urlElem.getText());
             }
             result.setPublishUrls(publishUrls);
 
-            List<String> playUrls = new ArrayList<String>();
+            List<String> playUrls = [];
             List<Element> playElems = root.getChild("PlayUrls").getChildren("Url");
             for (Element urlElem : playElems) {
                 playUrls.add(urlElem.getText());
@@ -2934,7 +2934,7 @@ public final class ResponseParsers {
         try {
             Element root = getXmlRootElement(responseBody);
 
-            List<LiveRecord> liveRecords = new ArrayList<LiveRecord>();
+            List<LiveRecord> liveRecords = [];
             List<Element> recordElements = root.getChildren("LiveRecord");
 
             for (Element recordElem : recordElements) {
@@ -2964,7 +2964,7 @@ public final class ResponseParsers {
             Element root = getXmlRootElement(responseBody);
 
             LiveChannelListing liveChannelListing = new LiveChannelListing();
-            liveChannelListing.setTruncated(Boolean.valueOf(root.getChildText("IsTruncated")));
+            liveChannelListing.setTruncated(bool.valueOf(root.getChildText("IsTruncated")));
 
             if (root.getChild("Prefix") != null) {
                 String prefix = root.getChildText("Prefix");
@@ -2995,14 +2995,14 @@ public final class ResponseParsers {
                 liveChannel.setStatus(LiveChannelStatus.parse(elem.getChildText("Status")));
                 liveChannel.setLastModified(DateUtil.parseIso8601Date(elem.getChildText("LastModified")));
 
-                List<String> publishUrls = new ArrayList<String>();
+                List<String> publishUrls = [];
                 List<Element> publishElems = elem.getChild("PublishUrls").getChildren("Url");
                 for (Element urlElem : publishElems) {
                     publishUrls.add(urlElem.getText());
                 }
                 liveChannel.setPublishUrls(publishUrls);
 
-                List<String> playUrls = new ArrayList<String>();
+                List<String> playUrls = [];
                 List<Element> playElems = elem.getChild("PlayUrls").getChildren("Url");
                 for (Element urlElem : playElems) {
                     playUrls.add(urlElem.getText());
@@ -3206,7 +3206,7 @@ public final class ResponseParsers {
         }
 
         if (configElem.getChildText("IsEnabled") != null) {
-            inventoryConfiguration.setEnabled(Boolean.valueOf(configElem.getChildText("IsEnabled")));
+            inventoryConfiguration.setEnabled(bool.valueOf(configElem.getChildText("IsEnabled")));
         }
 
         if (configElem.getChild("Filter") != null) {
@@ -3228,7 +3228,7 @@ public final class ResponseParsers {
 
         if (configElem.getChild("OptionalFields") != null) {
             Element OptionalFieldsElem = configElem.getChild("OptionalFields");
-            List<String> optionalFields = new ArrayList<String>();
+            List<String> optionalFields = [];
             List<Element> fieldElems = OptionalFieldsElem.getChildren("Field");
             for (Element e : fieldElems) {
                 optionalFields.add(e.getText());
@@ -3309,7 +3309,7 @@ public final class ResponseParsers {
             List<InventoryConfiguration> inventoryConfigurationList = null;
 
             if (root.getChild("InventoryConfiguration") != null) {
-                inventoryConfigurationList = new ArrayList<InventoryConfiguration>();
+                inventoryConfigurationList = [];
                 List<Element> configurationElems = root.getChildren("InventoryConfiguration");
                 for (Element elem : configurationElems) {
                     InventoryConfiguration configuration = parseInventoryConfigurationElem(elem);
@@ -3323,7 +3323,7 @@ public final class ResponseParsers {
             }
 
             if (root.getChild("IsTruncated") != null) {
-                result.setTruncated(Boolean.valueOf(root.getChildText("IsTruncated")));
+                result.setTruncated(bool.valueOf(root.getChildText("IsTruncated")));
             }
 
             if (root.getChild("NextContinuationToken") != null) {
@@ -3347,7 +3347,7 @@ public final class ResponseParsers {
         try {
             Element root = getXmlRootElement(responseBody);
 
-            List<LifecycleRule> lifecycleRules = new ArrayList<LifecycleRule>();
+            List<LifecycleRule> lifecycleRules = [];
             List<Element> ruleElements = root.getChildren("Rule");
 
             for (Element ruleElem : ruleElements) {
@@ -3394,7 +3394,7 @@ public final class ResponseParsers {
                                 .parseIso8601Date(ruleElem.getChild("Expiration").getChildText("CreatedBeforeDate"));
                         rule.setCreatedBeforeDate(createdBeforeDate);
                     } else if (ruleElem.getChild("Expiration").getChild("ExpiredObjectDeleteMarker") != null) {
-                        rule.setExpiredDeleteMarker(Boolean.valueOf(ruleElem.getChild("Expiration").getChildText("ExpiredObjectDeleteMarker")));
+                        rule.setExpiredDeleteMarker(bool.valueOf(ruleElem.getChild("Expiration").getChildText("ExpiredObjectDeleteMarker")));
                     }
                 }
 
@@ -3412,7 +3412,7 @@ public final class ResponseParsers {
                 }
 
                 List<Element> transitionElements = ruleElem.getChildren("Transition");
-                List<StorageTransition> storageTransitions = new ArrayList<StorageTransition>();
+                List<StorageTransition> storageTransitions = [];
                 for (Element transitionElem : transitionElements) {
                     LifecycleRule.StorageTransition storageTransition = new LifecycleRule.StorageTransition();
                     if (transitionElem.getChild("Days") != null) {
@@ -3439,7 +3439,7 @@ public final class ResponseParsers {
                 }
 
                 List<Element> versionTansitionElements = ruleElem.getChildren("NoncurrentVersionTransition");
-                List<NoncurrentVersionStorageTransition> noncurrentVersionTransitions = new ArrayList<NoncurrentVersionStorageTransition>();
+                List<NoncurrentVersionStorageTransition> noncurrentVersionTransitions = [];
                 for (Element transitionElem : versionTansitionElements) {
                     NoncurrentVersionStorageTransition transition = new NoncurrentVersionStorageTransition();
                     if (transitionElem.getChild("NoncurrentDays") != null) {
@@ -3472,7 +3472,7 @@ public final class ResponseParsers {
         try {
             Element root = getXmlRootElement(responseBody);
 
-            List<CnameConfiguration> cnames = new ArrayList<CnameConfiguration>();
+            List<CnameConfiguration> cnames = [];
             List<Element> cnameElements = root.getChildren("Cname");
 
             for (Element cnameElem : cnameElements) {
@@ -3483,7 +3483,7 @@ public final class ResponseParsers {
                 cname.setLastMofiedTime(DateUtil.parseIso8601Date(cnameElem.getChildText("LastModified")));
 
                 if (cnameElem.getChildText("IsPurgeCdnCache") != null) {
-                    boolean purgeCdnCache = Boolean.valueOf(cnameElem.getChildText("IsPurgeCdnCache"));
+                    bool purgeCdnCache = bool.valueOf(cnameElem.getChildText("IsPurgeCdnCache"));
                     cname.setPurgeCdnCache(purgeCdnCache);
                 }
 
@@ -3534,7 +3534,7 @@ public final class ResponseParsers {
         configuration.setContentMd5(taskInfoEle.getChildText("ContentMD5"));
         configuration.setCallback(taskInfoEle.getChildText("Callback"));
         if (taskInfoEle.getChild("IgnoreSameKey") != null) {
-            configuration.setIgnoreSameKey(Boolean.valueOf(taskInfoEle.getChildText("IgnoreSameKey")));
+            configuration.setIgnoreSameKey(bool.valueOf(taskInfoEle.getChildText("IgnoreSameKey")));
         }
 
         return configuration;
@@ -3641,7 +3641,7 @@ public final class ResponseParsers {
         try {
             Element root = getXmlRootElement(responseBody);
 
-            List<Vpcip> vpcipList = new ArrayList<Vpcip>();
+            List<Vpcip> vpcipList = [];
             List<Element> vpcips = root.getChildren("Vpcip");
 
             for (Element e : vpcips) {
@@ -3670,7 +3670,7 @@ public final class ResponseParsers {
 
         try {
             Element root = getXmlRootElement(responseBody);
-            List<VpcPolicy> vpcipList = new ArrayList<VpcPolicy>();
+            List<VpcPolicy> vpcipList = [];
             List<Element> vpcips = root.getChildren("Vpcip");
 
             for (Element e : vpcips) {
@@ -3795,7 +3795,7 @@ public final class ResponseParsers {
         }
 
         private TransferAcceleration parseTransferAcceleration(InputStream inputStream) throws ResponseParseException {
-            TransferAcceleration transferAcceleration = new TransferAcceleration(Boolean.FALSE);
+            TransferAcceleration transferAcceleration = new TransferAcceleration(bool.FALSE);
             if (inputStream == null) {
                 return transferAcceleration;
             }
@@ -3804,7 +3804,7 @@ public final class ResponseParsers {
                 Element root = getXmlRootElement(inputStream);
 
                 if (root.getChildText("Enabled") != null) {
-                    transferAcceleration.setEnabled(Boolean.valueOf(root.getChildText("Enabled")));
+                    transferAcceleration.setEnabled(bool.valueOf(root.getChildText("Enabled")));
                 }
 
                 return transferAcceleration;

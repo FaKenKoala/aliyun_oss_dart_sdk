@@ -29,7 +29,7 @@ public class CipherInputStream extends SdkFilterInputStream {
     private static final int MAX_RETRY = 1000;
     private static final int DEFAULT_IN_BUFFER_SIZE = 512;
     private CryptoCipher cryptoCipher;
-    private boolean eof;
+    private bool eof;
     private byte[] bufin;
     private byte[] bufout;
     private int curr_pos;
@@ -136,7 +136,7 @@ public class CipherInputStream extends SdkFilterInputStream {
     }
 
     @Override
-    public boolean markSupported() {
+    public bool markSupported() {
         abortIfNeeded();
         return false;
 

@@ -52,17 +52,17 @@ public class InstanceProfileCredentials extends BasicCredentials {
     }
 
     @Override
-    public boolean willSoonExpire() {        
+    public bool willSoonExpire() {        
         long now = System.currentTimeMillis();
         return expiredDurationSeconds * (1.0 - expiredFactor) > (expirationInMilliseconds - now) / 1000.0;
     }
 
-    public boolean isExpired() {
+    public bool isExpired() {
         long now = System.currentTimeMillis();
         return now >= expirationInMilliseconds - refreshIntervalInMillSeconds;
     }
 
-    public boolean shouldRefresh() {
+    public bool shouldRefresh() {
         long now = System.currentTimeMillis();
         if (now - lastFailedRefreshTime > refreshIntervalInMillSeconds) {
             return true;

@@ -31,7 +31,7 @@ import com.aliyun.oss.ClientException;
  * Base class for OSS Java SDK specific {@link FilterInputStream}.
  */
 public class SdkFilterInputStream extends FilterInputStream {
-    private volatile boolean aborted = false;
+    private volatile bool aborted = false;
 
     public SdkFilterInputStream(InputStream in) {
         super(in);
@@ -65,7 +65,7 @@ public class SdkFilterInputStream extends FilterInputStream {
         aborted = true;
     }
 
-    public boolean isAborted() {
+    public bool isAborted() {
         return aborted;
     }
 
@@ -112,7 +112,7 @@ public class SdkFilterInputStream extends FilterInputStream {
     }
 
     @Override
-    public boolean markSupported() {
+    public bool markSupported() {
         abortIfNeeded();
         return in.markSupported();
     }

@@ -554,7 +554,7 @@ public interface OSS {
      *            Bucket name.
      * @return Returns true if the bucket exists and false if not.
      */
-    public boolean doesBucketExist(String bucketName) throws OSSException, ClientException;
+    public bool doesBucketExist(String bucketName) throws OSSException, ClientException;
 
     /**
      * Checks if the {@link Bucket} exists。
@@ -563,7 +563,7 @@ public interface OSS {
      *            {@link GenericRequest} instance that has the bucket name.
      * @return Returns true if the bucket exists and false if not.
      */
-    public boolean doesBucketExist(GenericRequest genericRequest) throws OSSException, ClientException;
+    public bool doesBucketExist(GenericRequest genericRequest) throws OSSException, ClientException;
 
     /**
      * Lists all objects under the specified {@link Bucket}
@@ -678,7 +678,7 @@ public interface OSS {
      * @throws ClientException
      */
     public ListObjectsV2Result listObjectsV2(String bucketName, String prefix, String continuationToken,
-            String startAfter, String delimiter, Integer maxKeys, String encodingType, boolean fetchOwner)
+            String startAfter, String delimiter, Integer maxKeys, String encodingType, bool fetchOwner)
             throws OSSException, ClientException;
 
     /**
@@ -1057,7 +1057,7 @@ public interface OSS {
      * @return A {@link PutObjectResult} instance.
      */
     public PutObjectResult putObject(URL signedUrl, String filePath, Map<String, String> requestHeaders,
-            boolean useChunkEncoding) throws OSSException, ClientException;
+            bool useChunkEncoding) throws OSSException, ClientException;
 
     /**
      * Uploads the file from a InputStream instance to the signed URL with
@@ -1100,7 +1100,7 @@ public interface OSS {
      * @return A {@link PutObjectResult} instance.
      */
     public PutObjectResult putObject(URL signedUrl, InputStream requestContent, long contentLength,
-            Map<String, String> requestHeaders, boolean useChunkEncoding) throws OSSException, ClientException;
+            Map<String, String> requestHeaders, bool useChunkEncoding) throws OSSException, ClientException;
 
     /**
      * Copies an existing file in OSS from source bucket to the target bucket.
@@ -1445,7 +1445,7 @@ public interface OSS {
      *            Object Key.
      * @return True if exists; false if not.
      */
-    public boolean doesObjectExist(String bucketName, String key) throws OSSException, ClientException;
+    public bool doesObjectExist(String bucketName, String key) throws OSSException, ClientException;
 
     /**
      * Checks if a specific {@link OSSObject} exists under the specific
@@ -1457,7 +1457,7 @@ public interface OSS {
      *            and object key.
      * @return True if exists; false if not.
      */
-    public boolean doesObjectExist(GenericRequest genericRequest) throws OSSException, ClientException;
+    public bool doesObjectExist(GenericRequest genericRequest) throws OSSException, ClientException;
 
     /**
      * Checks if a specific {@link OSSObject} exists under the specific
@@ -1475,7 +1475,7 @@ public interface OSS {
      *            in OSS yet.
      * @return True if the file exists; false if not.
      */
-    public boolean doesObjectExist(String bucketName, String key, boolean isOnlyInOSS);
+    public bool doesObjectExist(String bucketName, String key, bool isOnlyInOSS);
 
     /**
      * Checks if a specific {@link OSSObject} exists under the specific
@@ -1492,7 +1492,7 @@ public interface OSS {
      *            in OSS yet.        
      * @return True if exists; false if not.
      */
-    public boolean doesObjectExist(GenericRequest genericRequest, boolean isOnlyInOSS) throws OSSException, ClientException;
+    public bool doesObjectExist(GenericRequest genericRequest, bool isOnlyInOSS) throws OSSException, ClientException;
 
     /**
      * Checks if a specific {@link OSSObject} exists.
@@ -1503,7 +1503,7 @@ public interface OSS {
      * @return True if the file exists; false if not.
      */
     @Deprecated
-    public boolean doesObjectExist(HeadObjectRequest headObjectRequest) throws OSSException, ClientException;
+    public bool doesObjectExist(HeadObjectRequest headObjectRequest) throws OSSException, ClientException;
 
     /**
      * Sets the Access Control List (ACL) on a {@link OSSObject} instance.
@@ -4078,7 +4078,7 @@ public interface OSS {
      * @return A {@link DeleteDirectoryResult} instance contains delete number and next delete token.
      */
     public DeleteDirectoryResult deleteDirectory(String bucketName, String dirName,
-                        boolean deleteRecursive, String nextDeleteToken) throws OSSException, ClientException;
+                        bool deleteRecursive, String nextDeleteToken) throws OSSException, ClientException;
 
     /**
      * Delete a directory
@@ -4204,7 +4204,7 @@ public interface OSS {
      * @throws OSSException
      * @throws ClientException
      */
-    VoidResult setBucketTransferAcceleration(String bucketName, boolean enable) throws OSSException, ClientException;
+    VoidResult setBucketTransferAcceleration(String bucketName, bool enable) throws OSSException, ClientException;
 
     /**
      * Get transferAcceleration configuration from the OSS Server

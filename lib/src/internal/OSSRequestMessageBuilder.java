@@ -54,7 +54,7 @@ public class OSSRequestMessageBuilder {
     private InputStream inputStream;
     private long inputSize = 0;
     private ServiceClient innerClient;
-    private boolean useChunkEncoding = false;
+    private bool useChunkEncoding = false;
 
     private WebServiceRequest originalRequest;
 
@@ -152,11 +152,11 @@ public class OSSRequestMessageBuilder {
         return this;
     }
 
-    public boolean isUseChunkEncoding() {
+    public bool isUseChunkEncoding() {
         return useChunkEncoding;
     }
 
-    public OSSRequestMessageBuilder setUseChunkEncoding(boolean useChunkEncoding) {
+    public OSSRequestMessageBuilder setUseChunkEncoding(bool useChunkEncoding) {
         this.useChunkEncoding = useChunkEncoding;
         return this;
     }

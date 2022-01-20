@@ -32,7 +32,7 @@ import com.aliyun.oss.ClientException;
 public class AdjustedRangeInputStream extends InputStream {
     private InputStream decryptedContents;
     private long virtualAvailable;
-    private boolean closed;
+    private bool closed;
 
     /**
      * Creates a new DecryptedContentsInputStream object.

@@ -154,7 +154,7 @@ public class SignV2Utils {
         String bucketName = request.getBucketName();
         String accessId = currentCreds.getAccessKeyId();
         String accessKey = currentCreds.getSecretAccessKey();
-        boolean useSecurityToken = currentCreds.useSecurityToken();
+        bool useSecurityToken = currentCreds.useSecurityToken();
         HttpMethod method = request.getMethod() != null ? request.getMethod() : HttpMethod.GET;
 
         String expires = String.valueOf(request.getExpiration().getTime() / 1000L);

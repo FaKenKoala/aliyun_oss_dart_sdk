@@ -52,7 +52,7 @@ public class RepeatableInputStream extends InputStream {
         }
     }
 
-    public boolean markSupported() {
+    public bool markSupported() {
         return true;
     }
 

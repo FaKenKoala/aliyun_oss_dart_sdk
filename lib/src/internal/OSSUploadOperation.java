@@ -126,7 +126,7 @@ public class OSSUploadOperation {
          * 
          * @throws IOException
          */
-        public synchronized void update(int partIndex, PartETag partETag, boolean completed) throws IOException {
+        public synchronized void update(int partIndex, PartETag partETag, bool completed) throws IOException {
             partETags.add(partETag);
             uploadParts.get(partIndex).isCompleted = completed;
         }
@@ -134,7 +134,7 @@ public class OSSUploadOperation {
         /**
          * Check if the local file matches the checkpoint.
          */
-        public synchronized boolean isValid(String uploadFile) {
+        public synchronized bool isValid(String uploadFile) {
             // 比较checkpoint的magic和md5
             // Compares the magic field in checkpoint and the file's md5.
             if (this.magic == null || !this.magic.equals(UPLOAD_MAGIC) || this.md5 != hashCode()) {
@@ -240,7 +240,7 @@ public class OSSUploadOperation {
         public int number; // part number
         public long offset; // the offset in the file
         public long size; // part size
-        public boolean isCompleted; // upload completeness flag.
+        public bool isCompleted; // upload completeness flag.
         public long crc; //part crc
     }
 
@@ -283,11 +283,11 @@ public class OSSUploadOperation {
             this.length = length;
         }
 
-        public boolean isFailed() {
+        public bool isFailed() {
             return failed;
         }
 
-        public void setFailed(boolean failed) {
+        public void setFailed(bool failed) {
             this.failed = failed;
         }
 
@@ -310,7 +310,7 @@ public class OSSUploadOperation {
         private int number; // part number
         private long offset; // offset in the file
         private long length; // part size
-        private boolean failed; // part upload failure flag
+        private bool failed; // part upload failure flag
         private Exception exception; // part upload exception
         private Long partCRC;
     }
@@ -426,7 +426,7 @@ public class OSSUploadOperation {
         uploadCheckPoint.key = uploadFileRequest.getKey();
         uploadCheckPoint.uploadFileStat = FileStat.getFileStat(uploadCheckPoint.uploadFile);
         uploadCheckPoint.uploadParts = splitFile(uploadCheckPoint.uploadFileStat.size, uploadFileRequest.getPartSize());
-        uploadCheckPoint.partETags = new ArrayList<PartETag>();
+        uploadCheckPoint.partETags = [];
         uploadCheckPoint.originPartSize = uploadFileRequest.getPartSize();
 
         ObjectMetadata metadata = uploadFileRequest.getObjectMetadata();
@@ -455,9 +455,9 @@ public class OSSUploadOperation {
 
     private ArrayList<PartResult> upload(UploadCheckPoint uploadCheckPoint, UploadFileRequest uploadFileRequest)
             throws Throwable {
-        ArrayList<PartResult> taskResults = new ArrayList<PartResult>();
+        ArrayList<PartResult> taskResults = [];
         ExecutorService service = Executors.newFixedThreadPool(uploadFileRequest.getTaskNum());
-        ArrayList<Future<PartResult>> futures = new ArrayList<Future<PartResult>>();
+        ArrayList<Future<PartResult>> futures = [];
         ProgressListener listener = uploadFileRequest.getProgressListener();
 
         // Compute the size of the data pending upload.
@@ -623,7 +623,7 @@ public class OSSUploadOperation {
     }
 
     private ArrayList<UploadPart> splitFile(long fileSize, long partSize) {
-        ArrayList<UploadPart> parts = new ArrayList<UploadPart>();
+        ArrayList<UploadPart> parts = [];
 
         long partNum = fileSize / partSize;
         if (partNum >= 10000) {
@@ -652,8 +652,8 @@ public class OSSUploadOperation {
         return parts;
     }
 
-    private boolean remove(String filePath) {
-        boolean flag = false;
+    private bool remove(String filePath) {
+        bool flag = false;
         File file = new File(filePath);
 
         if (file.isFile() && file.exists()) {

@@ -47,7 +47,7 @@ public class BoundedInputStream extends InputStream {
     private long mark = -1;
 
     /** flag if close shoud be propagated */
-    private boolean propagateClose = true;
+    private bool propagateClose = true;
 
     /**
      * Creates a new <code>BoundedInputStream</code> that wraps the given input
@@ -222,7 +222,7 @@ public class BoundedInputStream extends InputStream {
      * @return true if mark is supported, otherwise false
      */
     @Override
-    public boolean markSupported() {
+    public bool markSupported() {
         return in.markSupported();
     }
 
@@ -234,7 +234,7 @@ public class BoundedInputStream extends InputStream {
      *         <code>close()</code> method of the underlying stream or
      *         {@code false} if it does not.
      */
-    public boolean isPropagateClose() {
+    public bool isPropagateClose() {
         return propagateClose;
     }
 
@@ -247,7 +247,7 @@ public class BoundedInputStream extends InputStream {
      *            <code>close()</code> method of the underlying stream or
      *            {@code false} if it does not.
      */
-    public void setPropagateClose(boolean propagateClose) {
+    public void setPropagateClose(bool propagateClose) {
         this.propagateClose = propagateClose;
     }
 

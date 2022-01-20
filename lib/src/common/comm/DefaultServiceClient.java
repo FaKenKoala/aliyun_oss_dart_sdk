@@ -188,7 +188,7 @@ public class DefaultServiceClient extends ServiceClient {
     private static class DefaultRetryStrategy extends RetryStrategy {
 
         @Override
-        public boolean shouldRetry(Exception ex, RequestMessage request, ResponseMessage response, int retries) {
+        public bool shouldRetry(Exception ex, RequestMessage request, ResponseMessage response, int retries) {
             if (ex instanceof ClientException) {
                 String errorCode = ((ClientException) ex).getErrorCode();
                 if (errorCode.equals(ClientErrorCode.CONNECTION_TIMEOUT)
@@ -239,7 +239,7 @@ public class DefaultServiceClient extends ServiceClient {
     protected HttpClientConnectionManager createHttpClientConnectionManager() {
         SSLConnectionSocketFactory sslSocketFactory = null;
         try {
-            List<TrustManager> trustManagerList = new ArrayList<TrustManager>();
+            List<TrustManager> trustManagerList = [];
             X509TrustManager[] trustManagers = config.getX509TrustManagers();
 
             if (null != trustManagers) {
@@ -251,7 +251,7 @@ public class DefaultServiceClient extends ServiceClient {
             tmf.init((KeyStore) null);
             trustManagerList.addAll(Arrays.asList(tmf.getTrustManagers()));
 
-            final List<X509TrustManager> finalTrustManagerList = new ArrayList<X509TrustManager>();
+            final List<X509TrustManager> finalTrustManagerList = [];
             for (TrustManager tm : trustManagerList) {
                 if (tm instanceof X509TrustManager) {
                     finalTrustManagerList.add((X509TrustManager) tm);
@@ -358,13 +358,13 @@ public class DefaultServiceClient extends ServiceClient {
     private class CompositeX509TrustManager implements X509TrustManager {
 
         private final List<X509TrustManager> trustManagers;
-        private boolean verifySSL = true;
+        private bool verifySSL = true;
 
-        public boolean isVerifySSL() {
+        public bool isVerifySSL() {
             return this.verifySSL;
         }
 
-        public void setVerifySSL(boolean verifySSL) {
+        public void setVerifySSL(bool verifySSL) {
             this.verifySSL = verifySSL;
         }
 
@@ -395,7 +395,7 @@ public class DefaultServiceClient extends ServiceClient {
 
         @Override
         public X509Certificate[] getAcceptedIssuers() {
-            List<X509Certificate> certificates = new ArrayList<X509Certificate>();
+            List<X509Certificate> certificates = [];
             for (X509TrustManager trustManager : trustManagers) {
                 X509Certificate[] accepts = trustManager.getAcceptedIssuers();
                 if(accepts != null && accepts.length > 0) {
@@ -407,7 +407,7 @@ public class DefaultServiceClient extends ServiceClient {
         }
     }
 
-    protected static String resolveStringValue(String value, String key, boolean flag) {
+    protected static String resolveStringValue(String value, String key, bool flag) {
         if (value == null && flag) {
             try {
                 return System.getProperty(key);
@@ -418,7 +418,7 @@ public class DefaultServiceClient extends ServiceClient {
         return value;
     }
 
-    protected static int resolveIntValue(int value, String key, boolean flag) {
+    protected static int resolveIntValue(int value, String key, bool flag) {
         if (value == -1 && flag) {
             try {
                 return Integer.parseInt(System.getProperty(key));

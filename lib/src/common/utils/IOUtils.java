@@ -106,14 +106,14 @@ public class IOUtils {
         }
     }
 
-    public static boolean checkFile(File file) {
+    public static bool checkFile(File file) {
         if (file == null) {
             return false;
         }
 
-        boolean exists = false;
-        boolean isFile = false;
-        boolean canRead = false;
+        bool exists = false;
+        bool isFile = false;
+        bool canRead = false;
         try {
             exists = file.exists();
             isFile = file.isFile();

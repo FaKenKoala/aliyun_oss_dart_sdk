@@ -113,14 +113,14 @@ public class OSSDownloadOperation {
          * 
          * @throws IOException
          */
-        public synchronized void update(int index, boolean completed) throws IOException {
+        public synchronized void update(int index, bool completed) throws IOException {
             downloadParts.get(index).isCompleted = completed;
         }
 
         /**
          * Check if the object matches the checkpoint information.
          */
-        public synchronized boolean isValid(OSSObjectOperation objectOperation, DownloadFileRequest downloadFileRequest) {
+        public synchronized bool isValid(OSSObjectOperation objectOperation, DownloadFileRequest downloadFileRequest) {
             // 比较checkpoint的magic和md5
             if (this.magic == null || !this.magic.equals(DOWNLOAD_MAGIC) || this.md5 != hashCode()) {
                 return false;
@@ -248,7 +248,7 @@ public class OSSDownloadOperation {
         public int index; // part index (starting from 0).
         public long start; // start index;
         public long end; // end index;
-        public boolean isCompleted; // flag of part download finished or not;
+        public bool isCompleted; // flag of part download finished or not;
         public long length; // length of part
         public long crc; // part crc.
         public long fileStart;  // start index in file, for range get
@@ -290,11 +290,11 @@ public class OSSDownloadOperation {
             return number;
         }
 
-        public boolean isFailed() {
+        public bool isFailed() {
             return failed;
         }
 
-        public void setFailed(boolean failed) {
+        public void setFailed(bool failed) {
             this.failed = failed;
         }
 
@@ -328,7 +328,7 @@ public class OSSDownloadOperation {
         private int number; // part number, starting from 1.
         private long start; // start index in the part.
         private long end; // end index in the part.
-        private boolean failed; // flag of part upload failure.
+        private bool failed; // flag of part upload failure.
         private Exception exception; // Exception during part upload.
         private Long clientCRC; // client crc of this part
         private Long serverCRC; // server crc of this file
@@ -517,10 +517,10 @@ public class OSSDownloadOperation {
     private DownloadResult download(DownloadCheckPoint downloadCheckPoint, DownloadFileRequest downloadFileRequest)
             throws Throwable {
         DownloadResult downloadResult = new DownloadResult();
-        ArrayList<PartResult> taskResults = new ArrayList<PartResult>();
+        ArrayList<PartResult> taskResults = [];
         ExecutorService service = Executors.newFixedThreadPool(downloadFileRequest.getTaskNum());
-        ArrayList<Future<PartResult>> futures = new ArrayList<Future<PartResult>>();
-        List<Task> tasks = new ArrayList<Task>();
+        ArrayList<Future<PartResult>> futures = [];
+        List<Task> tasks = [];
         ProgressListener listener = downloadFileRequest.getProgressListener();
 
         // Compute the size of data pending download.
@@ -584,7 +584,7 @@ public class OSSDownloadOperation {
         return downloadResult;
     }
 
-    private boolean hasRangeInRequest(DownloadFileRequest downloadFileRequest) {
+    private bool hasRangeInRequest(DownloadFileRequest downloadFileRequest) {
         return downloadFileRequest.getRange() != null;
     }
 
@@ -695,7 +695,7 @@ public class OSSDownloadOperation {
     }
 
     private ArrayList<DownloadPart> splitFile(long start, long objectSize, long partSize) {
-        ArrayList<DownloadPart> parts = new ArrayList<DownloadPart>();
+        ArrayList<DownloadPart> parts = [];
 
         long partNum = objectSize / partSize;
         long alignSize = 4 * KB;
@@ -725,7 +725,7 @@ public class OSSDownloadOperation {
     }
 
     private ArrayList<DownloadPart> splitOneFile() {
-        ArrayList<DownloadPart> parts = new ArrayList<DownloadPart>();
+        ArrayList<DownloadPart> parts = [];
         DownloadPart part = new DownloadPart();
         part.index = 0;
         part.start = 0;
@@ -763,8 +763,8 @@ public class OSSDownloadOperation {
         return new long[]{start, size};
     }
 
-    private boolean remove(String filePath) {
-        boolean flag = false;
+    private bool remove(String filePath) {
+        bool flag = false;
         File file = new File(filePath);
 
         if (file.isFile() && file.exists()) {
@@ -802,7 +802,7 @@ public class OSSDownloadOperation {
             }
         }
 
-        final boolean rename = srcFile.renameTo(destFile);
+        final bool rename = srcFile.renameTo(destFile);
         if (!rename) {
             copyFile(srcFile, destFile);
             if (!srcFile.delete()) {

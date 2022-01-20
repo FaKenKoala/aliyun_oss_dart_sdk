@@ -104,7 +104,7 @@ public class LiveChannelOperation extends OSSOperation {
                 .setInputStream(new ByteArrayInputStream(rawContent)).setOriginalRequest(createLiveChannelRequest)
                 .build();
 
-        List<ResponseHandler> reponseHandlers = new ArrayList<ResponseHandler>();
+        List<ResponseHandler> reponseHandlers = [];
         reponseHandlers.add(new OSSCallbackErrorResponseHandler());
 
         return doOperation(request, createLiveChannelResponseParser, bucketName, liveChannelName, true);
@@ -344,7 +344,7 @@ public class LiveChannelOperation extends OSSOperation {
         Credentials currentCreds = this.credsProvider.getCredentials();
         String accessId = currentCreds.getAccessKeyId();
         String accessKey = currentCreds.getSecretAccessKey();
-        boolean useSecurityToken = currentCreds.useSecurityToken();
+        bool useSecurityToken = currentCreds.useSecurityToken();
 
         // Endpoint
         RequestMessage requestMessage = new RequestMessage(bucketName, liveChannelName);

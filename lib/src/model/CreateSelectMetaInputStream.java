@@ -47,7 +47,7 @@ public class CreateSelectMetaInputStream extends FilterInputStream {
     private byte[] currentFrameHeaderChecksumBytes;
     private byte[] scannedDataBytes;
     private byte[] currentFramePayloadChecksumBytes;
-    private boolean finished;
+    private bool finished;
     private ProgressListener selectProgressListener;
     private long nextNotificationScannedSize;
     private CRC32 crc32;
@@ -57,7 +57,7 @@ public class CreateSelectMetaInputStream extends FilterInputStream {
      * payload checksum is the last 4 bytes in one frame, we use this flag to indicate whether we
      * need read the 4 bytes before we advance to next frame.
      */
-    private boolean firstReadFrame;
+    private bool firstReadFrame;
 
     public CreateSelectMetaInputStream(InputStream in, SelectContentMetadataBase selectContentMetadataBase, ProgressListener selectProgressListener) {
         super(in);

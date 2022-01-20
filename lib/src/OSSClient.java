@@ -265,7 +265,7 @@ public class OSSClient implements OSS {
      * @param uri
      *            URI。
      */
-    private boolean isIpOrLocalhost(URI uri) {
+    private bool isIpOrLocalhost(URI uri) {
         if (uri.getHost().equals("localhost")) {
             return true;
         }
@@ -421,12 +421,12 @@ public class OSSClient implements OSS {
     }
 
     @Override
-    public boolean doesBucketExist(String bucketName) throws OSSException, ClientException {
+    public bool doesBucketExist(String bucketName) throws OSSException, ClientException {
         return this.doesBucketExist(new GenericRequest(bucketName));
     }
 
     @Override
-    public boolean doesBucketExist(GenericRequest genericRequest) throws OSSException, ClientException {
+    public bool doesBucketExist(GenericRequest genericRequest) throws OSSException, ClientException {
         return bucketOperation.doesBucketExists(genericRequest);
     }
 
@@ -434,7 +434,7 @@ public class OSSClient implements OSS {
      * Deprecated. Please use {@link OSSClient#doesBucketExist(String)} instead.
      */
     @Deprecated
-    public boolean isBucketExist(String bucketName) throws OSSException, ClientException {
+    public bool isBucketExist(String bucketName) throws OSSException, ClientException {
         return this.doesBucketExist(bucketName);
     }
 
@@ -471,7 +471,7 @@ public class OSSClient implements OSS {
     @Override
     public ListObjectsV2Result listObjectsV2(String bucketName, String prefix, String continuationToken,
                                 String startAfter, String delimiter, Integer maxKeys,
-                                String encodingType, boolean fetchOwner) throws OSSException, ClientException {
+                                String encodingType, bool fetchOwner) throws OSSException, ClientException {
         return bucketOperation.listObjectsV2(new ListObjectsV2Request(bucketName, prefix, continuationToken, startAfter,
                 delimiter, maxKeys, encodingType, fetchOwner));
     }
@@ -535,7 +535,7 @@ public class OSSClient implements OSS {
 
     @Override
     public PutObjectResult putObject(URL signedUrl, String filePath, Map<String, String> requestHeaders,
-            boolean useChunkEncoding) throws OSSException, ClientException {
+            bool useChunkEncoding) throws OSSException, ClientException {
 
         FileInputStream requestContent = null;
         try {
@@ -567,7 +567,7 @@ public class OSSClient implements OSS {
 
     @Override
     public PutObjectResult putObject(URL signedUrl, InputStream requestContent, long contentLength,
-            Map<String, String> requestHeaders, boolean useChunkEncoding) throws OSSException, ClientException {
+            Map<String, String> requestHeaders, bool useChunkEncoding) throws OSSException, ClientException {
         return objectOperation.putObject(signedUrl, requestContent, contentLength, requestHeaders, useChunkEncoding);
     }
 
@@ -684,12 +684,12 @@ public class OSSClient implements OSS {
     }
 
     @Override
-    public boolean doesObjectExist(String bucketName, String key) throws OSSException, ClientException {
+    public bool doesObjectExist(String bucketName, String key) throws OSSException, ClientException {
         return doesObjectExist(new GenericRequest(bucketName, key));
     }
 
     @Override
-    public boolean doesObjectExist(String bucketName, String key, boolean isOnlyInOSS) {
+    public bool doesObjectExist(String bucketName, String key, bool isOnlyInOSS) {
         if (isOnlyInOSS) {
             return doesObjectExist(bucketName, key);
         } else {
@@ -699,17 +699,17 @@ public class OSSClient implements OSS {
 
     @Deprecated
     @Override
-    public boolean doesObjectExist(HeadObjectRequest headObjectRequest) throws OSSException, ClientException {
+    public bool doesObjectExist(HeadObjectRequest headObjectRequest) throws OSSException, ClientException {
         return doesObjectExist(new GenericRequest(headObjectRequest.getBucketName(), headObjectRequest.getKey()));
     }
 
     @Override
-    public boolean doesObjectExist(GenericRequest genericRequest) throws OSSException, ClientException {
+    public bool doesObjectExist(GenericRequest genericRequest) throws OSSException, ClientException {
         return objectOperation.doesObjectExist(genericRequest);
     }
 
     @Override
-    public boolean doesObjectExist(GenericRequest genericRequest, boolean isOnlyInOSS) throws OSSException, ClientException {
+    public bool doesObjectExist(GenericRequest genericRequest, bool isOnlyInOSS) throws OSSException, ClientException {
     	if (isOnlyInOSS) {
     	    return objectOperation.doesObjectExist(genericRequest);	
     	} else {
@@ -1702,7 +1702,7 @@ public class OSSClient implements OSS {
 
     @Override
     public DeleteDirectoryResult deleteDirectory(String bucketName, String dirName,
-                        boolean deleteRecursive, String nextDeleteToken) throws OSSException, ClientException {
+                        bool deleteRecursive, String nextDeleteToken) throws OSSException, ClientException {
         return this.deleteDirectory(new DeleteDirectoryRequest(bucketName, dirName, deleteRecursive, nextDeleteToken));
     }
 
@@ -1807,7 +1807,7 @@ public class OSSClient implements OSS {
     }
 
     @Override
-    public VoidResult setBucketTransferAcceleration(String bucketName, boolean enable) throws OSSException, ClientException {
+    public VoidResult setBucketTransferAcceleration(String bucketName, bool enable) throws OSSException, ClientException {
         return this.bucketOperation.setBucketTransferAcceleration(new SetBucketTransferAccelerationRequest(bucketName, enable));
     }
 

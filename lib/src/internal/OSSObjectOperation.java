@@ -143,7 +143,7 @@ public class OSSObjectOperation extends OSSOperation {
      * Upload input stream to oss by using url signature.
      */
     public PutObjectResult putObject(URL signedUrl, InputStream requestContent, long contentLength,
-            Map<String, String> requestHeaders, boolean useChunkEncoding) throws OSSException, ClientException {
+            Map<String, String> requestHeaders, bool useChunkEncoding) throws OSSException, ClientException {
 
         assertParameterNotNull(signedUrl, "signedUrl");
         assertParameterNotNull(requestContent, "requestContent");
@@ -300,7 +300,7 @@ public class OSSObjectOperation extends OSSOperation {
             OSSObject ossObject = doOperation(request, new GetObjectResponseParser(bucketName, key), bucketName, key, true);
             publishProgress(selectProgressListener, ProgressEventType.SELECT_STARTED_EVENT);
             InputStream inputStream = ossObject.getObjectContent();
-            if (!Boolean.parseBoolean(ossObject.getObjectMetadata().getRawMetadata().get(OSS_SELECT_OUTPUT_RAW).toString())) {
+            if (!bool.parsebool(ossObject.getObjectMetadata().getRawMetadata().get(OSS_SELECT_OUTPUT_RAW).toString())) {
                 SelectInputStream selectInputStream = new SelectInputStream(inputStream, selectProgressListener,
                         selectObjectRequest.getOutputSerialization().isPayloadCrcEnabled());
                 selectInputStream.setRequestId(ossObject.getRequestId());
@@ -936,7 +936,7 @@ public class OSSObjectOperation extends OSSOperation {
         return doOperation(request, ResponseParsers.processObjectResponseParser, bucketName, key, true);
     }
 
-    public boolean doesObjectExist(GenericRequest genericRequest) throws OSSException, ClientException {
+    public bool doesObjectExist(GenericRequest genericRequest) throws OSSException, ClientException {
         try {
             this.getSimplifiedObjectMeta(genericRequest);
             return true;
@@ -949,7 +949,7 @@ public class OSSObjectOperation extends OSSOperation {
         }
     }
 
-    public boolean doesObjectExistWithRedirect(GenericRequest genericRequest) throws OSSException, ClientException {
+    public bool doesObjectExistWithRedirect(GenericRequest genericRequest) throws OSSException, ClientException {
         OSSObject ossObject = null;
         try {
             String bucketName = genericRequest.getBucketName();
@@ -1184,7 +1184,7 @@ public class OSSObjectOperation extends OSSOperation {
                 .setInputSize(determineInputStreamLength(repeatableInputStream, metadata.getContentLength()))
                 .setOriginalRequest(originalRequest).build();
 
-        List<ResponseHandler> reponseHandlers = new ArrayList<ResponseHandler>();
+        List<ResponseHandler> reponseHandlers = [];
         reponseHandlers.add(new OSSCallbackErrorResponseHandler());
 
         final ProgressListener listener = originalRequest.getProgressListener();
@@ -1204,11 +1204,11 @@ public class OSSObjectOperation extends OSSOperation {
         return result;
     }
 
-    private boolean isCrcCheckEnabled() {
+    private bool isCrcCheckEnabled() {
         return getInnerClient().getClientConfiguration().isCrcCheckEnabled();
     }
 
-    private boolean hasRangeInRequest(GetObjectRequest getObjectRequest) {
+    private bool hasRangeInRequest(GetObjectRequest getObjectRequest) {
         return getObjectRequest.getHeaders().get(OSSHeaders.RANGE) != null;
     }
 
@@ -1334,7 +1334,7 @@ public class OSSObjectOperation extends OSSOperation {
         }
     }
 
-    private static boolean isNeedReturnResponse(PutObjectRequest putObjectRequest) {
+    private static bool isNeedReturnResponse(PutObjectRequest putObjectRequest) {
         if (putObjectRequest.getCallback() != null || putObjectRequest.getProcess() != null) {
             return true;
         }

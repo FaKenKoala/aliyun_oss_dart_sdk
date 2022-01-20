@@ -358,7 +358,7 @@ public class OSSBucketOperation extends OSSOperation {
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.HEAD).setBucket(bucketName).setOriginalRequest(genericRequest).build();
 
-        List<ResponseHandler> reponseHandlers = new ArrayList<ResponseHandler>();
+        List<ResponseHandler> reponseHandlers = [];
         reponseHandlers.add(new ResponseHandler() {
             @Override
             public void handle(ResponseMessage response) throws ServiceException, ClientException {
@@ -447,7 +447,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Determine whether a bucket exists or not.
      */
-    public boolean doesBucketExists(GenericRequest genericRequest) throws OSSException, ClientException {
+    public bool doesBucketExists(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -1994,7 +1994,7 @@ public class OSSBucketOperation extends OSSOperation {
         }
 
         if (listObjectsV2Request.isFetchOwner()) {
-            params.put(FETCH_OWNER, Boolean.toString(listObjectsV2Request.isFetchOwner()));
+            params.put(FETCH_OWNER, bool.toString(listObjectsV2Request.isFetchOwner()));
         }
 
         if (listObjectsV2Request.getContinuationToken() != null) {

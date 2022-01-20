@@ -43,19 +43,19 @@ public class SelectInputStream extends FilterInputStream {
     private byte[] currentFrameHeaderChecksumBytes;
     private byte[] scannedDataBytes;
     private byte[] currentFramePayloadChecksumBytes;
-    private boolean finished;
+    private bool finished;
     private ProgressListener selectProgressListener;
     private long nextNotificationScannedSize;
-    private boolean payloadCrcEnabled;
+    private bool payloadCrcEnabled;
     private CRC32 crc32;
     private String requestId;
     /**
      * payload checksum is the last 4 bytes in one frame, we use this flag to indicate whether we
      * need read the 4 bytes before we advance to next frame.
      */
-    private boolean firstReadFrame;
+    private bool firstReadFrame;
 
-    public SelectInputStream(InputStream in, ProgressListener selectProgressListener, boolean payloadCrcEnabled) {
+    public SelectInputStream(InputStream in, ProgressListener selectProgressListener, bool payloadCrcEnabled) {
         super(in);
         currentFrameOffset = 0;
         currentFramePayloadLength = 0;

@@ -103,7 +103,7 @@ public class OSSMultipartOperation extends OSSOperation {
     }
 
     @Override
-    protected boolean isRetryablePostRequest(WebServiceRequest request) {
+    protected bool isRetryablePostRequest(WebServiceRequest request) {
         if (request instanceof InitiateMultipartUploadRequest) {
             return true;
         }
@@ -189,7 +189,7 @@ public class OSSMultipartOperation extends OSSOperation {
                 .setInputStreamWithLength(requestInstream)
                 .setOriginalRequest(completeMultipartUploadRequest).build();
 
-        List<ResponseHandler> reponseHandlers = new ArrayList<ResponseHandler>();
+        List<ResponseHandler> reponseHandlers = [];
         reponseHandlers.add(new OSSCallbackErrorResponseHandler());
 
         CompleteMultipartUploadResult result = null;
@@ -240,7 +240,7 @@ public class OSSMultipartOperation extends OSSOperation {
         Map<String, String> params = new HashMap<String, String>();
         params.put(SUBRESOURCE_UPLOADS, null);
 
-        Boolean sequentialMode = initiateMultipartUploadRequest.getSequentialMode();
+        bool sequentialMode = initiateMultipartUploadRequest.getSequentialMode();
         if (sequentialMode != null && sequentialMode.equals(true)) {
             params.put(SEQUENTIAL, null);
         }
@@ -587,7 +587,7 @@ public class OSSMultipartOperation extends OSSOperation {
         return new Long(crc);
     }
 
-    private static boolean isNeedReturnResponse(CompleteMultipartUploadRequest completeMultipartUploadRequest) {
+    private static bool isNeedReturnResponse(CompleteMultipartUploadRequest completeMultipartUploadRequest) {
         if (completeMultipartUploadRequest.getCallback() != null
                 || completeMultipartUploadRequest.getProcess() != null) {
             return true;

@@ -33,20 +33,20 @@ import org.apache.http.conn.HttpClientConnectionManager;
  */
 public final class IdleConnectionReaper extends Thread {
     private static final int REAP_INTERVAL_MILLISECONDS = 5 * 1000;
-    private static final ArrayList<HttpClientConnectionManager> connectionManagers = new ArrayList<HttpClientConnectionManager>();
+    private static final ArrayList<HttpClientConnectionManager> connectionManagers = [];
 
     private static IdleConnectionReaper instance;
 
     private static long idleConnectionTime = 60 * 1000;
 
-    private volatile boolean shuttingDown;
+    private volatile bool shuttingDown;
 
     private IdleConnectionReaper() {
         super("idle_connection_reaper");
         setDaemon(true);
     }
 
-    public static synchronized boolean registerConnectionManager(HttpClientConnectionManager connectionManager) {
+    public static synchronized bool registerConnectionManager(HttpClientConnectionManager connectionManager) {
         if (instance == null) {
             instance = new IdleConnectionReaper();
             instance.start();
@@ -54,8 +54,8 @@ public final class IdleConnectionReaper extends Thread {
         return connectionManagers.add(connectionManager);
     }
 
-    public static synchronized boolean removeConnectionManager(HttpClientConnectionManager connectionManager) {
-        boolean b = connectionManagers.remove(connectionManager);
+    public static synchronized bool removeConnectionManager(HttpClientConnectionManager connectionManager) {
+        bool b = connectionManagers.remove(connectionManager);
         if (connectionManagers.isEmpty())
             shutdown();
         return b;
@@ -99,7 +99,7 @@ public final class IdleConnectionReaper extends Thread {
         }
     }
 
-    public static synchronized boolean shutdown() {
+    public static synchronized bool shutdown() {
         if (instance != null) {
             instance.markShuttingDown();
             instance.interrupt();

@@ -62,7 +62,7 @@ public class ClientConfiguration {
     public static final int DEFAULT_REQUEST_TIMEOUT = 5 * 60 * 1000;
     public static final long DEFAULT_SLOW_REQUESTS_THRESHOLD = 5 * 60 * 1000;
 
-    public static final boolean DEFAULT_USE_REAPER = true;
+    public static final bool DEFAULT_USE_REAPER = true;
 
     public static final String DEFAULT_CNAME_EXCLUDE_LIST = "aliyuncs.com,aliyun-inc.com,aliyun.com";
 
@@ -75,7 +75,7 @@ public class ClientConfiguration {
     protected int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
     protected int maxConnections = DEFAULT_MAX_CONNECTIONS;
     protected long connectionTTL = DEFAULT_CONNECTION_TTL;
-    protected boolean useReaper = DEFAULT_USE_REAPER;
+    protected bool useReaper = DEFAULT_USE_REAPER;
     protected long idleConnectionTime = DEFAULT_IDLE_CONNECTION_TIME;
 
     protected Protocol protocol = Protocol.HTTP;
@@ -87,19 +87,19 @@ public class ClientConfiguration {
     protected String proxyDomain = null;
     protected String proxyWorkstation = null;
 
-    protected boolean supportCname = true;
-    protected List<String> cnameExcludeList = new ArrayList<String>();
+    protected bool supportCname = true;
+    protected List<String> cnameExcludeList = [];
     protected Lock rlock = new ReentrantLock();
 
-    protected boolean sldEnabled = false;
+    protected bool sldEnabled = false;
 
     protected int requestTimeout = DEFAULT_REQUEST_TIMEOUT;
-    protected boolean requestTimeoutEnabled = false;
+    protected bool requestTimeoutEnabled = false;
     protected long slowRequestsThreshold = DEFAULT_SLOW_REQUESTS_THRESHOLD;
 
     protected Map<String, String> defaultHeaders = new LinkedHashMap<String, String>();
 
-    protected boolean crcCheckEnabled = true;
+    protected bool crcCheckEnabled = true;
 
     protected List<RequestSigner> signerHandlers = new LinkedList<RequestSigner>();
 
@@ -109,17 +109,17 @@ public class ClientConfiguration {
 
     private RetryStrategy retryStrategy;
 
-    private boolean redirectEnable = true;
+    private bool redirectEnable = true;
 
-    private boolean verifySSLEnable = true;
+    private bool verifySSLEnable = true;
     private KeyManager[] keyManagers = null;
     private X509TrustManager[] x509TrustManagers = null;
     private SecureRandom secureRandom = null;
     private HostnameVerifier hostnameVerifier = null;
 
-    protected boolean logConnectionPoolStats = false;
+    protected bool logConnectionPoolStats = false;
 
-    protected boolean useSystemPropertyValues = false;
+    protected bool useSystemPropertyValues = false;
 
     public ClientConfiguration() {
         super();
@@ -393,7 +393,7 @@ public class ClientConfiguration {
      * Gets the flag of using {@link IdleConnectionReaper} to manage expired
      * connection.
      */
-    public boolean isUseReaper() {
+    public bool isUseReaper() {
         return useReaper;
     }
 
@@ -401,7 +401,7 @@ public class ClientConfiguration {
      * Sets the flag of using {@link IdleConnectionReaper} to manage expired
      * connection.
      */
-    public void setUseReaper(boolean useReaper) {
+    public void setUseReaper(bool useReaper) {
         this.useReaper = useReaper;
     }
 
@@ -492,7 +492,7 @@ public class ClientConfiguration {
      *
      * @return True if supporting Cname; False if not.
      */
-    public boolean isSupportCname() {
+    public bool isSupportCname() {
         return supportCname;
     }
 
@@ -510,7 +510,7 @@ public class ClientConfiguration {
      * @param supportCname
      *            The flag if supporting CName.
      */
-    public ClientConfiguration setSupportCname(boolean supportCname) {
+    public ClientConfiguration setSupportCname(bool supportCname) {
         this.supportCname = supportCname;
         return this;
     }
@@ -522,7 +522,7 @@ public class ClientConfiguration {
      *
      * @return True if it's enabled; False if it's disabled.
      */
-    public boolean isSLDEnabled() {
+    public bool isSLDEnabled() {
         return sldEnabled;
     }
 
@@ -533,7 +533,7 @@ public class ClientConfiguration {
      * @param enabled
      *            True if it's enabled; False if it's disabled.
      */
-    public ClientConfiguration setSLDEnabled(boolean enabled) {
+    public ClientConfiguration setSLDEnabled(bool enabled) {
         this.sldEnabled = enabled;
         return this;
     }
@@ -553,7 +553,7 @@ public class ClientConfiguration {
      *
      * @return true enabled; false disabled.
      */
-    public boolean isRequestTimeoutEnabled() {
+    public bool isRequestTimeoutEnabled() {
         return requestTimeoutEnabled;
     }
 
@@ -563,7 +563,7 @@ public class ClientConfiguration {
      * @param requestTimeoutEnabled
      *            true to enable; false to disable.
      */
-    public void setRequestTimeoutEnabled(boolean requestTimeoutEnabled) {
+    public void setRequestTimeoutEnabled(bool requestTimeoutEnabled) {
         this.requestTimeoutEnabled = requestTimeoutEnabled;
     }
 
@@ -636,7 +636,7 @@ public class ClientConfiguration {
      *
      * @return true enable CRC;false disable CRC.
      */
-    public boolean isCrcCheckEnabled() {
+    public bool isCrcCheckEnabled() {
         return crcCheckEnabled;
     }
 
@@ -647,7 +647,7 @@ public class ClientConfiguration {
      * @param crcCheckEnabled
      *            True to enable CRC; False to disable CRC.
      */
-    public void setCrcCheckEnabled(boolean crcCheckEnabled) {
+    public void setCrcCheckEnabled(bool crcCheckEnabled) {
         this.crcCheckEnabled = crcCheckEnabled;
     }
 
@@ -747,7 +747,7 @@ public class ClientConfiguration {
      *
      * @return the flag of http redirection.
      */
-    public boolean isRedirectEnable() {
+    public bool isRedirectEnable() {
         return redirectEnable;
     }
 
@@ -757,7 +757,7 @@ public class ClientConfiguration {
      * @param redirectEnable
      *          Determines whether redirects should be handled automatically.
      */
-    public void setRedirectEnable(boolean redirectEnable) {
+    public void setRedirectEnable(bool redirectEnable) {
         this.redirectEnable = redirectEnable;
     }
 
@@ -766,7 +766,7 @@ public class ClientConfiguration {
      *
      * @return true verify SSL certificate;false ignore SSL certificate.
      */
-    public boolean isVerifySSLEnable() {
+    public bool isVerifySSLEnable() {
         return verifySSLEnable;
     }
 
@@ -776,7 +776,7 @@ public class ClientConfiguration {
      * @param verifySSLEnable
      *            True to verify SSL certificate; False to ignore SSL certificate.
      */
-    public void setVerifySSLEnable(boolean verifySSLEnable) {
+    public void setVerifySSLEnable(bool verifySSLEnable) {
         this.verifySSLEnable = verifySSLEnable;
     }
 
@@ -866,7 +866,7 @@ public class ClientConfiguration {
      * @param enabled
      *            True if it's enabled; False if it's disabled.
      */
-    public void setLogConnectionPoolStats(boolean enabled) {
+    public void setLogConnectionPoolStats(bool enabled) {
         this.logConnectionPoolStats = enabled;
     }
 
@@ -875,7 +875,7 @@ public class ClientConfiguration {
      *
      * @return true enabled; false disabled.
      */
-    public boolean isLogConnectionPoolStatsEnable() {
+    public bool isLogConnectionPoolStatsEnable() {
         return logConnectionPoolStats;
     }
 
@@ -886,7 +886,7 @@ public class ClientConfiguration {
      *
      * @param enabled True if it's enabled; False if it's disabled.
      */
-    public void setUseSystemPropertyValues(boolean enabled) {
+    public void setUseSystemPropertyValues(bool enabled) {
         this.useSystemPropertyValues = enabled;
     }
 
@@ -895,7 +895,7 @@ public class ClientConfiguration {
      *
      * @return true enabled; false disabled.
      */
-    public boolean isUseSystemPropertyValues() {
+    public bool isUseSystemPropertyValues() {
         return useSystemPropertyValues;
     }
 

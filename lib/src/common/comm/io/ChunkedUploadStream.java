@@ -37,8 +37,8 @@ public class ChunkedUploadStream extends InputStream {
     private int outputBufferDataLen = -1;
 
     private final int innerStreamBufferSize;
-    private boolean innerStreamConsumed = false;
-    private boolean isTerminatingChunk = false;
+    private bool innerStreamConsumed = false;
+    private bool isTerminatingChunk = false;
 
     public ChunkedUploadStream(InputStream innerStream, int innerStreamBufferSize) {
         if (innerStream == null) {

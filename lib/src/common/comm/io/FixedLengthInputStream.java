@@ -40,7 +40,7 @@ public class FixedLengthInputStream extends InputStream {
         wrappedInputStream.reset();
     }
 
-    public boolean markSupported() {
+    public bool markSupported() {
         return wrappedInputStream.markSupported();
     }
 

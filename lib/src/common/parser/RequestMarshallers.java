@@ -145,7 +145,7 @@ public final class RequestMarshallers {
             xmlBody.append("<BucketProcessConfiguration>");
             xmlBody.append("<CompliedHost>" + imageProcessConf.getCompliedHost() + "</CompliedHost>");
             if (imageProcessConf.isSourceFileProtect() != null
-                    && imageProcessConf.isSourceFileProtect().booleanValue()) {
+                    && imageProcessConf.isSourceFileProtect().boolValue()) {
                 xmlBody.append("<SourceFileProtect>Enabled</SourceFileProtect>");
             } else {
                 xmlBody.append("<SourceFileProtect>Disabled</SourceFileProtect>");
@@ -153,7 +153,7 @@ public final class RequestMarshallers {
             xmlBody.append("<SourceFileProtectSuffix>" + imageProcessConf.getSourceFileProtectSuffix()
                     + "</SourceFileProtectSuffix>");
             xmlBody.append("<StyleDelimiters>" + imageProcessConf.getStyleDelimiters() + "</StyleDelimiters>");
-            if (imageProcessConf.isSupportAtStyle() != null && imageProcessConf.isSupportAtStyle().booleanValue()) {
+            if (imageProcessConf.isSupportAtStyle() != null && imageProcessConf.isSupportAtStyle().boolValue()) {
                 xmlBody.append("<OssDomainSupportAtProcess>Enabled</OssDomainSupportAtProcess>");
             } else {
                 xmlBody.append("<OssDomainSupportAtProcess>Disabled</OssDomainSupportAtProcess>");
@@ -806,7 +806,7 @@ public final class RequestMarshallers {
         @Override
         public byte[] marshall(DeleteObjectsRequest request) {
             StringBuffer xmlBody = new StringBuffer();
-            boolean quiet = request.isQuiet();
+            bool quiet = request.isQuiet();
             List<String> keysToDelete = request.getKeys();
 
             xmlBody.append("<Delete>");
@@ -835,7 +835,7 @@ public final class RequestMarshallers {
         @Override
         public byte[] marshall(DeleteVersionsRequest request) {
             StringBuffer xmlBody = new StringBuffer();
-            boolean quiet = request.getQuiet();
+            bool quiet = request.getQuiet();
             List<KeyVersion> keysToDelete = request.getKeys();
 
             xmlBody.append("<Delete>");
@@ -1798,7 +1798,7 @@ public final class RequestMarshallers {
 
     private static String joinRepliationAction(List<ReplicationAction> actions) {
         StringBuilder sb = new StringBuilder();
-        boolean first = true;
+        bool first = true;
 
         for (ReplicationAction action : actions) {
             if (!first) {

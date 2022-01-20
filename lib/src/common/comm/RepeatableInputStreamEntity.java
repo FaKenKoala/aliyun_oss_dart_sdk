@@ -30,7 +30,7 @@ import com.aliyun.oss.common.utils.HttpHeaders;
 
 public class RepeatableInputStreamEntity extends BasicHttpEntity {
 
-    private boolean firstAttempt = true;
+    private bool firstAttempt = true;
 
     private NoAutoClosedInputStreamEntity innerEntity;
 
@@ -52,12 +52,12 @@ public class RepeatableInputStreamEntity extends BasicHttpEntity {
     }
 
     @Override
-    public boolean isChunked() {
+    public bool isChunked() {
         return false;
     }
 
     @Override
-    public boolean isRepeatable() {
+    public bool isRepeatable() {
         return content.markSupported() || innerEntity.isRepeatable();
     }
 
@@ -93,7 +93,7 @@ public class RepeatableInputStreamEntity extends BasicHttpEntity {
             this.length = length;
         }
 
-        public boolean isRepeatable() {
+        public bool isRepeatable() {
             return false;
         }
 
@@ -133,7 +133,7 @@ public class RepeatableInputStreamEntity extends BasicHttpEntity {
 
         }
 
-        public boolean isStreaming() {
+        public bool isStreaming() {
             return true;
         }
     }

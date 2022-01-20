@@ -68,7 +68,7 @@ public class HttpUtil {
         }
 
         StringBuilder paramString = new StringBuilder();
-        boolean first = true;
+        bool first = true;
         for (Entry<String, String> p : params.entrySet()) {
             String key = p.getKey();
             String value = p.getValue();

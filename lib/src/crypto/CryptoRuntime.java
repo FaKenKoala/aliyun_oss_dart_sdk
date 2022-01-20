@@ -68,7 +68,7 @@ public class CryptoRuntime {
         }
     }
 
-    private static synchronized boolean isBouncyCastleAvailable() {
+    private static synchronized bool isBouncyCastleAvailable() {
         return Security.getProvider(BOUNCY_CASTLE_PROVIDER) != null;
     }
 

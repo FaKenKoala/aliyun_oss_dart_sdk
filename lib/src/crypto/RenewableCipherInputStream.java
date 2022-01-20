@@ -29,7 +29,7 @@ import java.io.InputStream;
  * the very beginning of the stream (but not anywhere else).
  */
 public final class RenewableCipherInputStream extends CipherInputStream {
-    private boolean hasBeenAccessed;
+    private bool hasBeenAccessed;
 
     public RenewableCipherInputStream(InputStream is, CryptoCipher cryptoCipher) {
         super(is, cryptoCipher);
@@ -46,7 +46,7 @@ public final class RenewableCipherInputStream extends CipherInputStream {
      * not anywhere else).
      */
     @Override
-    public boolean markSupported() {
+    public bool markSupported() {
         abortIfNeeded();
         return in.markSupported();
     }

@@ -224,9 +224,9 @@ public abstract class ServiceClient {
          * payload, we put the encoded params directly in the URI, otherwise,
          * we'll put them in the POST request's payload.
          */
-        boolean requestHasNoPayload = requestMessage.getContent() != null;
-        boolean requestIsPost = requestMessage.getMethod() == HttpMethod.POST;
-        boolean putParamsInUri = !requestIsPost || requestHasNoPayload;
+        bool requestHasNoPayload = requestMessage.getContent() != null;
+        bool requestIsPost = requestMessage.getMethod() == HttpMethod.POST;
+        bool putParamsInUri = !requestIsPost || requestHasNoPayload;
         if (paramString != null && putParamsInUri) {
             uri += "?" + paramString;
         }
@@ -281,7 +281,7 @@ public abstract class ServiceClient {
         }
     }
 
-    private boolean shouldRetry(Exception exception, RequestMessage request, ResponseMessage response, int retries,
+    private bool shouldRetry(Exception exception, RequestMessage request, ResponseMessage response, int retries,
             RetryStrategy retryStrategy) {
 
         if (retries >= config.getMaxErrorRetry()) {
@@ -331,8 +331,8 @@ public abstract class ServiceClient {
     public static class Request extends HttpMesssage {
         private String uri;
         private HttpMethod method;
-        private boolean useUrlSignature = false;
-        private boolean useChunkEncoding = false;
+        private bool useUrlSignature = false;
+        private bool useChunkEncoding = false;
 
         public String getUri() {
             return this.uri;
@@ -350,19 +350,19 @@ public abstract class ServiceClient {
             this.method = method;
         }
 
-        public boolean isUseUrlSignature() {
+        public bool isUseUrlSignature() {
             return useUrlSignature;
         }
 
-        public void setUseUrlSignature(boolean useUrlSignature) {
+        public void setUseUrlSignature(bool useUrlSignature) {
             this.useUrlSignature = useUrlSignature;
         }
 
-        public boolean isUseChunkEncoding() {
+        public bool isUseChunkEncoding() {
             return useChunkEncoding;
         }
 
-        public void setUseChunkEncoding(boolean useChunkEncoding) {
+        public void setUseChunkEncoding(bool useChunkEncoding) {
             this.useChunkEncoding = useChunkEncoding;
         }
     }

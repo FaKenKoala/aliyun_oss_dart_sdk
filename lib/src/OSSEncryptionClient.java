@@ -226,15 +226,15 @@ public class OSSEncryptionClient extends OSSClient {
      *  
      * @deprecated please use normal oss client method
      *     {@link OSSClient}#putObject(URL signedUrl, InputStream requestContent, long contentLength,
-     *           Map<String, String> requestHeaders, boolean useChunkEncoding).
+     *           Map<String, String> requestHeaders, bool useChunkEncoding).
      */
     @Override
     @Deprecated
     public PutObjectResult putObject(URL signedUrl, InputStream requestContent, long contentLength,
-            Map<String, String> requestHeaders, boolean useChunkEncoding) throws ClientException {
+            Map<String, String> requestHeaders, bool useChunkEncoding) throws ClientException {
         throw new ClientException("Encryption client error, this method is disabled in encryption client." + 
                 "Please use normal oss client method {@link OSSClient#putObject(URL signedUrl, InputStream requestContent, "
-                + "long contentLength, Map<String, String> requestHeaders, boolean useChunkEncoding)");
+                + "long contentLength, Map<String, String> requestHeaders, bool useChunkEncoding)");
     }
 
 

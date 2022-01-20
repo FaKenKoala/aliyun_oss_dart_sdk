@@ -117,13 +117,13 @@ import java.util.*;
  */
 public class IniEditor {
 
-    private static boolean DEFAULT_CASE_SENSITIVITY = false;
+    private static bool DEFAULT_CASE_SENSITIVITY = false;
 
     private Map<String, Section> sections;
     private List<String> sectionOrder;
     private String commonName;
     private char[] commentDelims;
-    private boolean isCaseSensitive;
+    private bool isCaseSensitive;
     private OptionFormat optionFormat;
 
     /**
@@ -139,7 +139,7 @@ public class IniEditor {
      * @param isCaseSensitive
      *            section and option names are case-sensitive if this is true
      */
-    public IniEditor(boolean isCaseSensitive) {
+    public IniEditor(bool isCaseSensitive) {
         this(null, null, isCaseSensitive);
     }
 
@@ -163,7 +163,7 @@ public class IniEditor {
      * @param isCaseSensitive
      *            section and option names are case-sensitive if this is true
      */
-    public IniEditor(String commonName, boolean isCaseSensitive) {
+    public IniEditor(String commonName, bool isCaseSensitive) {
         this(commonName, null, isCaseSensitive);
     }
 
@@ -189,7 +189,7 @@ public class IniEditor {
      * @param isCaseSensitive
      *            section and option names are case-sensitive if this is true
      */
-    public IniEditor(char[] delims, boolean isCaseSensitive) {
+    public IniEditor(char[] delims, bool isCaseSensitive) {
         this(null, delims, isCaseSensitive);
     }
 
@@ -221,7 +221,7 @@ public class IniEditor {
      *            lines; the first of them will be used for newly created
      *            comments
      */
-    public IniEditor(String commonName, char[] delims, boolean isCaseSensitive) {
+    public IniEditor(String commonName, char[] delims, bool isCaseSensitive) {
         this.sections = new HashMap<String, Section>();
         this.sectionOrder = new LinkedList<String>();
         this.isCaseSensitive = isCaseSensitive;
@@ -345,7 +345,7 @@ public class IniEditor {
      * @throws IniEditor.NoSuchSectionException
      *             no section with the given name exists
      */
-    public boolean remove(String section, String option) {
+    public bool remove(String section, String option) {
         if (hasSection(section)) {
             return getSection(section).remove(option);
         } else {
@@ -364,7 +364,7 @@ public class IniEditor {
      *            the option's name
      * @return true if the given section has the option
      */
-    public boolean hasOption(String section, String option) {
+    public bool hasOption(String section, String option) {
         return hasSection(section) && getSection(section).hasOption(option);
     }
 
@@ -375,7 +375,7 @@ public class IniEditor {
      *            the name of the section
      * @return true if the section exists
      */
-    public boolean hasSection(String name) {
+    public bool hasSection(String name) {
         return this.sections.containsKey(normSection(name));
     }
 
@@ -389,7 +389,7 @@ public class IniEditor {
      *             the name is illegal, ie contains one of the characters '['
      *             and ']' or consists only of white space
      */
-    public boolean addSection(String name) {
+    public bool addSection(String name) {
         String normName = normSection(name);
         if (!hasSection(normName)) {
             // Section constructor might throw IllegalArgumentException
@@ -412,7 +412,7 @@ public class IniEditor {
      * @throws IllegalArgumentException
      *             when trying to remove the common section
      */
-    public boolean removeSection(String name) {
+    public bool removeSection(String name) {
         String normName = normSection(name);
         if (this.commonName != null && this.commonName.equals(normName)) {
             throw ArgumentError("Can't remove common section");
@@ -678,13 +678,13 @@ public class IniEditor {
         private char[] optionDelimsSorted;
         private char[] commentDelims;
         private char[] commentDelimsSorted;
-        private boolean isCaseSensitive;
+        private bool isCaseSensitive;
         private OptionFormat optionFormat;
 
         private static final char[] DEFAULT_OPTION_DELIMS = new char[] { '=', ':' };
         private static final char[] DEFAULT_COMMENT_DELIMS = new char[] { '#', ';' };
         private static final char[] OPTION_DELIMS_WHITESPACE = new char[] { ' ', '\t' };
-        private static final boolean DEFAULT_CASE_SENSITIVITY = false;
+        private static final bool DEFAULT_CASE_SENSITIVITY = false;
         public static final String DEFAULT_OPTION_FORMAT = "%s %s %s";
 
         public static final char HEADER_START = '[';
@@ -714,7 +714,7 @@ public class IniEditor {
          * @throws IllegalArgumentException
          *             the section's name is illegal
          */
-        public Section(String name, boolean isCaseSensitive) {
+        public Section(String name, bool isCaseSensitive) {
             this(name, null, isCaseSensitive);
         }
 
@@ -748,7 +748,7 @@ public class IniEditor {
          * @throws IllegalArgumentException
          *             the section's name is illegal
          */
-        public Section(String name, char[] delims, boolean isCaseSensitive) {
+        public Section(String name, char[] delims, bool isCaseSensitive) {
             if (!validName(name)) {
                 throw ArgumentError("Illegal section name:" + name);
             }
@@ -829,7 +829,7 @@ public class IniEditor {
          *            the name of the option to test for
          * @return true if the option exists in this section
          */
-        public boolean hasOption(String name) {
+        public bool hasOption(String name) {
             return this.options.containsKey(normOption(name));
         }
 
@@ -896,7 +896,7 @@ public class IniEditor {
          *            the name of the option
          * @return <code>true</code> if the option was actually removed
          */
-        public boolean remove(String option) {
+        public bool remove(String option) {
             String normed = normOption(option);
             if (hasOption(normed)) {
                 this.lines.remove(getOption(normed));
@@ -985,7 +985,7 @@ public class IniEditor {
                         if (delimNum >= 0) {
                             delimIndex = i;
                         } else {
-                            boolean isSpace = Arrays.binarySearch(Section.OPTION_DELIMS_WHITESPACE, line.charAt(i)) >= 0;
+                            bool isSpace = Arrays.binarySearch(Section.OPTION_DELIMS_WHITESPACE, line.charAt(i)) >= 0;
                             if (!isSpace && lastSpaceIndex >= 0) {
                                 break;
                             } else if (isSpace) {
@@ -1064,7 +1064,7 @@ public class IniEditor {
          *            the name to validate
          * @return true if the name validates as a section name
          */
-        private static boolean validName(String name) {
+        private static bool validName(String name) {
             if (name.trim().equals("")) {
                 return false;
             }
@@ -1149,7 +1149,7 @@ public class IniEditor {
             return this.format.format(this.name, this.value, this.separator);
         }
 
-        private static boolean validName(String name, char separator) {
+        private static bool validName(String name, char separator) {
             if (name.trim().equals("")) {
                 return false;
             }
@@ -1195,7 +1195,7 @@ public class IniEditor {
         private String[] compileFormat(String formatString) {
             String[] tokens = { "", "", "", "" };
             int tokenCount = 0;
-            boolean seenPercent = false;
+            bool seenPercent = false;
             StringBuffer token = new StringBuffer();
             for (int i = 0; i < formatString.length(); i++) {
                 switch (formatString.charAt(i)) {

@@ -44,15 +44,15 @@ public class CaseInsensitiveMap<V> implements Map<String, V> {
         return wrappedMap.size();
     }
 
-    public boolean isEmpty() {
+    public bool isEmpty() {
         return wrappedMap.isEmpty();
     }
 
-    public boolean containsKey(Object key) {
+    public bool containsKey(Object key) {
         return wrappedMap.containsKey(key.toString().toLowerCase());
     }
 
-    public boolean containsValue(Object value) {
+    public bool containsValue(Object value) {
         return wrappedMap.containsValue(value);
     }
 

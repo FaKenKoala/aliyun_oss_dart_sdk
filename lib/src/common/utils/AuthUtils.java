@@ -195,7 +195,7 @@ public class AuthUtils {
         ListPublicKeysRequest listPublicKeysRequest = new ListPublicKeysRequest();
         ListPublicKeysResponse listPublicKeysResponse = client.getAcsResponse(listPublicKeysRequest);
 
-        List<PublicKey> publicKeys = new ArrayList<PublicKey>();
+        List<PublicKey> publicKeys = [];
         for (com.aliyuncs.ram.model.v20150501.ListPublicKeysResponse.PublicKey publicKey : listPublicKeysResponse
                 .getPublicKeys()) {
             publicKeys.add(new PublicKey(publicKey));

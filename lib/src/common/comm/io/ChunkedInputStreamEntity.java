@@ -40,7 +40,7 @@ import com.aliyun.oss.common.utils.HttpHeaders;
  */
 public class ChunkedInputStreamEntity extends BasicHttpEntity {
 
-    private boolean firstAttempt = true;
+    private bool firstAttempt = true;
     private ReleasableInputStreamEntity notClosableRequestEntity;
     private InputStream content;
 
@@ -70,12 +70,12 @@ public class ChunkedInputStreamEntity extends BasicHttpEntity {
     }
 
     @Override
-    public boolean isChunked() {
+    public bool isChunked() {
         return true;
     }
 
     @Override
-    public boolean isRepeatable() {
+    public bool isRepeatable() {
         return content.markSupported() || notClosableRequestEntity.isRepeatable();
     }
 
@@ -98,7 +98,7 @@ public class ChunkedInputStreamEntity extends BasicHttpEntity {
         private final InputStream content;
         private final long length;
 
-        private boolean closeDisabled;
+        private bool closeDisabled;
 
         public ReleasableInputStreamEntity(final InputStream instream) {
             this(instream, -1);
@@ -124,7 +124,7 @@ public class ChunkedInputStreamEntity extends BasicHttpEntity {
         }
 
         @Override
-        public boolean isRepeatable() {
+        public bool isRepeatable() {
             return this.content.markSupported();
         }
 
@@ -168,7 +168,7 @@ public class ChunkedInputStreamEntity extends BasicHttpEntity {
         }
 
         @Override
-        public boolean isStreaming() {
+        public bool isStreaming() {
             return true;
         }
 
@@ -190,11 +190,11 @@ public class ChunkedInputStreamEntity extends BasicHttpEntity {
             }
         }
 
-        public boolean isCloseDisabled() {
+        public bool isCloseDisabled() {
             return closeDisabled;
         }
 
-        public void setCloseDisabled(boolean closeDisabled) {
+        public void setCloseDisabled(bool closeDisabled) {
             this.closeDisabled = closeDisabled;
         }
     }

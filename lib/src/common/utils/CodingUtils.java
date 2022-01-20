@@ -56,18 +56,18 @@ public class CodingUtils {
         }
     }
 
-    public static boolean isNullOrEmpty(String value) {
+    public static bool isNullOrEmpty(String value) {
         return value == null || value.length() == 0;
     }
 
-    public static void assertTrue(boolean condition, String message) {
+    public static void assertTrue(bool condition, String message) {
         if (!condition) {
             throw ArgumentError(message);
         }
     }
 
-    public static boolean checkParamRange(long param, long from, boolean leftInclusive, long to,
-            boolean rightInclusive) {
+    public static bool checkParamRange(long param, long from, bool leftInclusive, long to,
+            bool rightInclusive) {
 
         if (leftInclusive && rightInclusive) { // [from, to]
             if (from <= param && param <= to) {
