@@ -280,11 +280,11 @@ public abstract class CryptoModuleBase implements CryptoModule {
 
     private void checkMultipartContext(MultipartUploadCryptoContext context) {
         if (context == null) {
-            throw new IllegalArgumentException("MultipartUploadCryptoContext should not be null.");
+            throw ArgumentError("MultipartUploadCryptoContext should not be null.");
         }
 
         if (0 != (context.getPartSize() % CryptoScheme.BLOCK_SIZE) || context.getPartSize() <= 0) {
-            throw new IllegalArgumentException("MultipartUploadCryptoContext part size is not 16 bytes alignment.");
+            throw ArgumentError("MultipartUploadCryptoContext part size is not 16 bytes alignment.");
         }
     }
 

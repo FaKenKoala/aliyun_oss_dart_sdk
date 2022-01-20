@@ -13,7 +13,7 @@ public class InputSerialization implements Serializable {
 
     public void setJsonInputFormat(JsonFormat jsonInputFormat) {
         if (jsonInputFormat.getJsonType() == null) {
-            throw new IllegalArgumentException("Please set json type for this input, valid types are DOCUMENT and LINES");
+            throw ArgumentError("Please set json type for this input, valid types are DOCUMENT and LINES");
         }
         setSelectContentFormat(SelectContentFormat.JSON);
         this.jsonInputFormat = jsonInputFormat;

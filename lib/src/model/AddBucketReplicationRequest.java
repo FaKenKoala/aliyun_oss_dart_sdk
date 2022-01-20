@@ -70,7 +70,7 @@ public class AddBucketReplicationRequest extends GenericRequest {
                 }
             }
 
-            throw new IllegalArgumentException("Unable to parse " + replicationAction);
+            throw ArgumentError("Unable to parse " + replicationAction);
         }
     }
 

@@ -415,7 +415,7 @@ public class IniEditor {
     public boolean removeSection(String name) {
         String normName = normSection(name);
         if (this.commonName != null && this.commonName.equals(normName)) {
-            throw new IllegalArgumentException("Can't remove common section");
+            throw ArgumentError("Can't remove common section");
         }
         if (hasSection(normName)) {
             this.sections.remove(normName);
@@ -750,7 +750,7 @@ public class IniEditor {
          */
         public Section(String name, char[] delims, boolean isCaseSensitive) {
             if (!validName(name)) {
-                throw new IllegalArgumentException("Illegal section name:" + name);
+                throw ArgumentError("Illegal section name:" + name);
             }
             this.name = name;
             this.isCaseSensitive = isCaseSensitive;
@@ -1115,7 +1115,7 @@ public class IniEditor {
 
         public Option(String name, String value, char separator, OptionFormat format) {
             if (!validName(name, separator)) {
-                throw new IllegalArgumentException("Illegal option name:" + name);
+                throw ArgumentError("Illegal option name:" + name);
             }
             this.name = name;
             this.separator = separator;
@@ -1210,7 +1210,7 @@ public class IniEditor {
                 case 's':
                     if (seenPercent) {
                         if (tokenCount >= EXPECTED_TOKENS) {
-                            throw new IllegalArgumentException("Illegal option format. Too many %s placeholders.");
+                            throw ArgumentError("Illegal option format. Too many %s placeholders.");
                         }
                         tokens[tokenCount] = token.toString();
                         tokenCount++;
@@ -1222,14 +1222,14 @@ public class IniEditor {
                     break;
                 default:
                     if (seenPercent) {
-                        throw new IllegalArgumentException("Illegal option format. Unknown format specifier.");
+                        throw ArgumentError("Illegal option format. Unknown format specifier.");
                     }
                     token.append(formatString.charAt(i));
                     break;
                 }
             }
             if (tokenCount != EXPECTED_TOKENS - 1) {
-                throw new IllegalArgumentException("Illegal option format. Not enough %s placeholders.");
+                throw ArgumentError("Illegal option format. Not enough %s placeholders.");
             }
             tokens[tokenCount] = token.toString();
             return tokens;

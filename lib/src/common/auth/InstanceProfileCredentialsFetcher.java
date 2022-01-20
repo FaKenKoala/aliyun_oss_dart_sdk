@@ -35,7 +35,7 @@ public class InstanceProfileCredentialsFetcher extends HttpCredentialsFetcher {
 
     public void setRoleName(String roleName) {
         if (null == roleName || roleName.isEmpty()) {
-            throw new IllegalArgumentException("You must specifiy a valid role name.");
+            throw ArgumentError("You must specifiy a valid role name.");
         }
         this.roleName = roleName;
     }
@@ -50,7 +50,7 @@ public class InstanceProfileCredentialsFetcher extends HttpCredentialsFetcher {
         try {
             return new URL("http://" + metadataServiceHost + URL_IN_ECS_METADATA + roleName);
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException(e.toString());
+            throw ArgumentError(e.toString());
         }
     }
 

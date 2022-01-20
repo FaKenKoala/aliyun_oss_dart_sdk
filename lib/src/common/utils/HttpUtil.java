@@ -42,7 +42,7 @@ public class HttpUtil {
             String encoded = URLEncoder.encode(value, encoding);
             return encoded.replace("+", "%20").replace("*", "%2A").replace("~", "%7E").replace("/", "%2F");
         } catch (UnsupportedEncodingException e) {
-            throw new IllegalArgumentException(OSS_RESOURCE_MANAGER.getString("FailedToEncodeUri"), e);
+            throw ArgumentError(OSS_RESOURCE_MANAGER.getString("FailedToEncodeUri"), e);
         }
     }
 
@@ -54,7 +54,7 @@ public class HttpUtil {
         try {
             return URLDecoder.decode(value, encoding);
         } catch (UnsupportedEncodingException e) {
-            throw new IllegalArgumentException(OSS_RESOURCE_MANAGER.getString("FailedToDecodeUrl"), e);
+            throw ArgumentError(OSS_RESOURCE_MANAGER.getString("FailedToDecodeUrl"), e);
         }
     }
 
@@ -114,7 +114,7 @@ public class HttpUtil {
             try {
                 header.setValue(new String(header.getValue().getBytes(fromCharset), toCharset));
             } catch (UnsupportedEncodingException e) {
-                throw new IllegalArgumentException("Invalid charset name: " + e.getMessage(), e);
+                throw ArgumentError("Invalid charset name: " + e.getMessage(), e);
             }
         }
     }

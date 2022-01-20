@@ -301,7 +301,7 @@ public class OSSClient implements OSS {
     @Override
     public void switchCredentials(Credentials creds) {
         if (creds == null) {
-            throw new IllegalArgumentException("creds should not be null.");
+            throw ArgumentError("creds should not be null.");
         }
 
         this.credsProvider.setCredentials(creds);
@@ -310,7 +310,7 @@ public class OSSClient implements OSS {
     @Override
     public void switchSignatureVersion(SignVersion signatureVersion) {
         if (signatureVersion == null) {
-            throw new IllegalArgumentException("signatureVersion should not be null.");
+            throw ArgumentError("signatureVersion should not be null.");
         }
 
         this.getClientConfiguration().setSignatureVersion(signatureVersion);
@@ -541,7 +541,7 @@ public class OSSClient implements OSS {
         try {
             File toUpload = new File(filePath);
             if (!checkFile(toUpload)) {
-                throw new IllegalArgumentException("Illegal file path: " + filePath);
+                throw ArgumentError("Illegal file path: " + filePath);
             }
             long fileSize = toUpload.length();
             requestContent = new FileInputStream(toUpload);
@@ -817,12 +817,12 @@ public class OSSClient implements OSS {
         assertParameterNotNull(request, "request");
 
         if (request.getBucketName() == null) {
-            throw new IllegalArgumentException(OSS_RESOURCE_MANAGER.getString("MustSetBucketName"));
+            throw ArgumentError(OSS_RESOURCE_MANAGER.getString("MustSetBucketName"));
         }
         ensureBucketNameValid(request.getBucketName());
 
         if (request.getExpiration() == null) {
-            throw new IllegalArgumentException(OSS_RESOURCE_MANAGER.getString("MustSetExpiration"));
+            throw ArgumentError(OSS_RESOURCE_MANAGER.getString("MustSetExpiration"));
         }
         String url;
 

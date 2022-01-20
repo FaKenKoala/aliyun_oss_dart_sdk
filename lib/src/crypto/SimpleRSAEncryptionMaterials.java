@@ -263,6 +263,6 @@ public class SimpleRSAEncryptionMaterials implements EncryptionMaterials {
 
     private void assertParameterNotNull(Object parameterValue, String errorMessage) {
         if (parameterValue == null)
-            throw new IllegalArgumentException(errorMessage);
+            throw ArgumentError(errorMessage);
     }
 }

@@ -33,7 +33,7 @@ public class AesCtr extends CryptoScheme {
         final int blockSize = BLOCK_SIZE;
         long remainder = dataStartPos % blockSize;
         if (remainder != 0) {
-            throw new IllegalArgumentException(
+            throw ArgumentError(
                     "Expected data start pos should be multiple of 16," + "but it was: " + dataStartPos);
         }
 

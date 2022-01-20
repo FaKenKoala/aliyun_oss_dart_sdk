@@ -332,7 +332,7 @@ public class OSSMultipartOperation extends OSSOperation {
         assertStringNotNullOrEmpty(uploadId, "uploadId");
 
         if (uploadPartRequest.getInputStream() == null) {
-            throw new IllegalArgumentException(OSS_RESOURCE_MANAGER.getString("MustSetContentStream"));
+            throw ArgumentError(OSS_RESOURCE_MANAGER.getString("MustSetContentStream"));
         }
 
         InputStream repeatableInputStream = null;
@@ -345,7 +345,7 @@ public class OSSMultipartOperation extends OSSOperation {
 
         int partNumber = uploadPartRequest.getPartNumber();
         if (!checkParamRange(partNumber, 0, false, MAX_PART_NUMBER, true)) {
-            throw new IllegalArgumentException(OSS_RESOURCE_MANAGER.getString("PartNumberOutOfRange"));
+            throw ArgumentError(OSS_RESOURCE_MANAGER.getString("PartNumberOutOfRange"));
         }
 
         Map<String, String> headers = new HashMap<String, String>();
@@ -412,13 +412,13 @@ public class OSSMultipartOperation extends OSSOperation {
         Long partSize = uploadPartCopyRequest.getPartSize();
         if (partSize != null) {
             if (!checkParamRange(partSize, 0, true, DEFAULT_FILE_SIZE_LIMIT, true)) {
-                throw new IllegalArgumentException(OSS_RESOURCE_MANAGER.getString("FileSizeOutOfRange"));
+                throw ArgumentError(OSS_RESOURCE_MANAGER.getString("FileSizeOutOfRange"));
             }
         }
 
         int partNumber = uploadPartCopyRequest.getPartNumber();
         if (!checkParamRange(partNumber, 0, false, MAX_PART_NUMBER, true)) {
-            throw new IllegalArgumentException(OSS_RESOURCE_MANAGER.getString("PartNumberOutOfRange"));
+            throw ArgumentError(OSS_RESOURCE_MANAGER.getString("PartNumberOutOfRange"));
         }
 
         Map<String, String> headers = new HashMap<String, String>();
@@ -453,7 +453,7 @@ public class OSSMultipartOperation extends OSSOperation {
         Integer maxUploads = listMultipartUploadsRequest.getMaxUploads();
         if (maxUploads != null) {
             if (!checkParamRange(maxUploads, 0, true, LIST_UPLOAD_MAX_RETURNS, true)) {
-                throw new IllegalArgumentException(
+                throw ArgumentError(
                         OSS_RESOURCE_MANAGER.getFormattedString("MaxUploadsOutOfRange", LIST_UPLOAD_MAX_RETURNS));
             }
             params.put(MAX_UPLOADS, listMultipartUploadsRequest.getMaxUploads().toString());
@@ -480,7 +480,7 @@ public class OSSMultipartOperation extends OSSOperation {
         Integer maxParts = listPartsRequest.getMaxParts();
         if (maxParts != null) {
             if (!checkParamRange(maxParts, 0, true, LIST_PART_MAX_RETURNS, true)) {
-                throw new IllegalArgumentException(
+                throw ArgumentError(
                         OSS_RESOURCE_MANAGER.getFormattedString("MaxPartsOutOfRange", LIST_PART_MAX_RETURNS));
             }
             params.put(MAX_PARTS, maxParts.toString());
@@ -489,7 +489,7 @@ public class OSSMultipartOperation extends OSSOperation {
         Integer partNumberMarker = listPartsRequest.getPartNumberMarker();
         if (partNumberMarker != null) {
             if (!checkParamRange(partNumberMarker, 0, false, MAX_PART_NUMBER, true)) {
-                throw new IllegalArgumentException(OSS_RESOURCE_MANAGER.getString("PartNumberMarkerOutOfRange"));
+                throw ArgumentError(OSS_RESOURCE_MANAGER.getString("PartNumberMarkerOutOfRange"));
             }
             params.put(PART_NUMBER_MARKER, partNumberMarker.toString());
         }
@@ -544,7 +544,7 @@ public class OSSMultipartOperation extends OSSOperation {
         if (!uploadPartRequest.isUseChunkEncoding()) {
             long partSize = uploadPartRequest.getPartSize();
             if (!checkParamRange(partSize, 0, true, DEFAULT_FILE_SIZE_LIMIT, true)) {
-                throw new IllegalArgumentException(OSS_RESOURCE_MANAGER.getString("FileSizeOutOfRange"));
+                throw ArgumentError(OSS_RESOURCE_MANAGER.getString("FileSizeOutOfRange"));
             }
 
             headers.put(OSSHeaders.CONTENT_LENGTH, Long.toString(partSize));

@@ -34,7 +34,7 @@ public class RepeatableInputStream extends InputStream {
 
     public RepeatableInputStream(InputStream inputStream, int bufferSize) {
         if (inputStream == null) {
-            throw new IllegalArgumentException("inputStream should not be null");
+            throw ArgumentError("inputStream should not be null");
         }
 
         this.is = inputStream;

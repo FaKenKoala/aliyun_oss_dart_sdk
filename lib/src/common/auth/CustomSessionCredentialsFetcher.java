@@ -40,7 +40,7 @@ public class CustomSessionCredentialsFetcher extends HttpCredentialsFetcher {
         try {
             return new URL(ossAuthServerHost);
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException(e.toString());
+            throw ArgumentError(e.toString());
         }
     }
 

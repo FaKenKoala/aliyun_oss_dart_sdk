@@ -70,7 +70,7 @@ public abstract class CryptoScheme {
         if (blockDelta == 0)
             return counter;
         if (counter == null || counter.length != 16)
-            throw new IllegalArgumentException();
+            throw ArgumentError();
 
         ByteBuffer bb = ByteBuffer.allocate(8);
         for (int i = 12; i <= 15; i++)

@@ -1,0 +1,4 @@
+enum CompressionType {
+  NONE,
+  GZIP,
+}

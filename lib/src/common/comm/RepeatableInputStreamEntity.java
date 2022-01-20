@@ -87,7 +87,7 @@ public class RepeatableInputStreamEntity extends BasicHttpEntity {
         public NoAutoClosedInputStreamEntity(final InputStream instream, long length) {
             super();
             if (instream == null) {
-                throw new IllegalArgumentException("Source input stream may not be null");
+                throw ArgumentError("Source input stream may not be null");
             }
             this.content = instream;
             this.length = length;
@@ -107,7 +107,7 @@ public class RepeatableInputStreamEntity extends BasicHttpEntity {
 
         public void writeTo(final OutputStream outstream) throws IOException {
             if (outstream == null) {
-                throw new IllegalArgumentException("Output stream may not be null");
+                throw ArgumentError("Output stream may not be null");
             }
             InputStream instream = this.content;
 

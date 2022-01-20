@@ -459,7 +459,7 @@ public class ClientConfiguration {
      */
     public void setCnameExcludeList(List<String> cnameExcludeList) {
         if (cnameExcludeList == null) {
-            throw new IllegalArgumentException("cname exclude list should not be null.");
+            throw ArgumentError("cname exclude list should not be null.");
         }
 
         this.cnameExcludeList.clear();

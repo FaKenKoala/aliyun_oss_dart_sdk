@@ -69,7 +69,7 @@ public class OSSUtils {
 
     public static void ensureEndpointValid(String endpoint) {
         if (!validateEndpoint(endpoint)) {
-            throw new IllegalArgumentException(
+            throw ArgumentError(
                     OSS_RESOURCE_MANAGER.getFormattedString("EndpointInvalid", endpoint));
         }
     }
@@ -88,7 +88,7 @@ public class OSSUtils {
 
     public static void ensureBucketNameValid(String bucketName) {
         if (!validateBucketName(bucketName)) {
-            throw new IllegalArgumentException(
+            throw ArgumentError(
                     OSS_RESOURCE_MANAGER.getFormattedString("BucketNameInvalid", bucketName));
         }
     }
@@ -107,7 +107,7 @@ public class OSSUtils {
 
     public static void ensureBucketNameCreationValid(String bucketName) {
         if (!validateBucketNameCreation(bucketName)) {
-            throw new IllegalArgumentException(
+            throw ArgumentError(
                     OSS_RESOURCE_MANAGER.getFormattedString("BucketNameInvalid", bucketName));
         }
     }
@@ -140,13 +140,13 @@ public class OSSUtils {
 
     public static void ensureObjectKeyValid(String key) {
         if (!validateObjectKey(key)) {
-            throw new IllegalArgumentException(OSS_RESOURCE_MANAGER.getFormattedString("ObjectKeyInvalid", key));
+            throw ArgumentError(OSS_RESOURCE_MANAGER.getFormattedString("ObjectKeyInvalid", key));
         }
     }
 
     public static void ensureLiveChannelNameValid(String liveChannelName) {
         if (!validateObjectKey(liveChannelName)) {
-            throw new IllegalArgumentException(
+            throw ArgumentError(
                     OSS_RESOURCE_MANAGER.getFormattedString("LiveChannelNameInvalid", liveChannelName));
         }
     }
@@ -165,7 +165,7 @@ public class OSSUtils {
             conbinedEndpoint.append(endpoint.getPath());
             return new URI(conbinedEndpoint.toString());
         } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex.getMessage(), ex);
+            throw ArgumentError(ex.getMessage(), ex);
         }
     }
 
@@ -197,7 +197,7 @@ public class OSSUtils {
             }
             return true;
         }
-        throw new IllegalArgumentException("Host name can not be null.");
+        throw ArgumentError("Host name can not be null.");
     }
 
     public static String determineResourcePath(String bucket, String key, boolean sldEnabled) {
@@ -531,7 +531,7 @@ public class OSSUtils {
         try {
             return new URI(endpoint);
         } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
+            throw ArgumentError(e);
         }
     }
 }

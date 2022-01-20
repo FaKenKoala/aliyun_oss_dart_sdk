@@ -779,7 +779,7 @@ public class OSSBucketOperation extends OSSOperation {
 
         if (setBucketWebSiteRequest.getIndexDocument() == null && setBucketWebSiteRequest.getErrorDocument() == null
                 && setBucketWebSiteRequest.getRoutingRules().size() == 0) {
-            throw new IllegalArgumentException(String.format("IndexDocument/ErrorDocument/RoutingRules must have one"));
+            throw ArgumentError(String.format("IndexDocument/ErrorDocument/RoutingRules must have one"));
         }
 
         Map<String, String> params = new HashMap<String, String>();

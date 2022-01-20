@@ -28,6 +28,6 @@ public enum DataEncryptionAlgorithm {
             if (e.getAlgorithm().equals(algorithm))
                 return e;
         }
-        throw new IllegalArgumentException("Unsupported data encryption algorithm " + algorithm);
+        throw ArgumentError("Unsupported data encryption algorithm " + algorithm);
     }
 }

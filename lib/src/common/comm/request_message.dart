@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:aliyun_oss_dart_sdk/src/common/comm/http_message.dart';
 import 'package:aliyun_oss_dart_sdk/src/http_method.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/web_service_request.dart';
@@ -24,7 +22,7 @@ class RequestMessage extends HttpMessage {
   Map<String, String> _parameters = <String, String>{};
 
   /* The absolute url to which the request should be sent */
-  Url? absoluteUrl;
+  Uri? absoluteUrl;
 
   /* Indicate whether using url signature */
   bool useUrlSignature = false;

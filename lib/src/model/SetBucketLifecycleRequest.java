@@ -41,11 +41,11 @@ public class SetBucketLifecycleRequest extends GenericRequest {
 
     public void setLifecycleRules(List<LifecycleRule> lifecycleRules) {
         if (lifecycleRules == null || lifecycleRules.isEmpty()) {
-            throw new IllegalArgumentException("lifecycleRules should not be null or empty.");
+            throw ArgumentError("lifecycleRules should not be null or empty.");
         }
 
         if (lifecycleRules.size() > MAX_LIFECYCLE_RULE_LIMIT) {
-            throw new IllegalArgumentException("One bucket not allow exceed one thousand items of LifecycleRules.");
+            throw ArgumentError("One bucket not allow exceed one thousand items of LifecycleRules.");
         }
 
         this.lifecycleRules.clear();
@@ -58,15 +58,15 @@ public class SetBucketLifecycleRequest extends GenericRequest {
 
     public void AddLifecycleRule(LifecycleRule lifecycleRule) {
         if (lifecycleRule == null) {
-            throw new IllegalArgumentException("lifecycleRule should not be null or empty.");
+            throw ArgumentError("lifecycleRule should not be null or empty.");
         }
 
         if (this.lifecycleRules.size() >= MAX_LIFECYCLE_RULE_LIMIT) {
-            throw new IllegalArgumentException("One bucket not allow exceed one thousand items of LifecycleRules.");
+            throw ArgumentError("One bucket not allow exceed one thousand items of LifecycleRules.");
         }
 
         if (lifecycleRule.getId() != null && lifecycleRule.getId().length() > MAX_RULE_ID_LENGTH) {
-            throw new IllegalArgumentException("Length of lifecycle rule id exceeds max limit " + MAX_RULE_ID_LENGTH);
+            throw ArgumentError("Length of lifecycle rule id exceeds max limit " + MAX_RULE_ID_LENGTH);
         }
 
         int expirationTimeFlag = lifecycleRule.hasExpirationTime() ? 1 : 0;
@@ -75,17 +75,17 @@ public class SetBucketLifecycleRequest extends GenericRequest {
         int expiredDeleteMarkerFlag = lifecycleRule.hasExpiredDeleteMarker() ? 1: 0;
         int flagSum = expirationTimeFlag + expirationDaysFlag + createdBeforeDateFlag + expiredDeleteMarkerFlag;
         if (flagSum > 1 ) {
-            throw new IllegalArgumentException("Only one expiration property should be specified.");
+            throw ArgumentError("Only one expiration property should be specified.");
         }
 
         if (flagSum == 0 && !lifecycleRule.hasAbortMultipartUpload()
                 && !lifecycleRule.hasStorageTransition() && !lifecycleRule.hasNoncurrentVersionStorageTransitions()
                 && !lifecycleRule.hasNoncurrentVersionExpiration()) {
-            throw new IllegalArgumentException("Rule has none expiration or transition specified.");
+            throw ArgumentError("Rule has none expiration or transition specified.");
         }
 
         if (lifecycleRule.getStatus() == LifecycleRule.RuleStatus.Unknown) {
-            throw new IllegalArgumentException("RuleStatus property should be specified with 'Enabled' or 'Disabled'.");
+            throw ArgumentError("RuleStatus property should be specified with 'Enabled' or 'Disabled'.");
         }
 
         if (lifecycleRule.hasAbortMultipartUpload()) {
@@ -94,7 +94,7 @@ public class SetBucketLifecycleRequest extends GenericRequest {
             createdBeforeDateFlag = abortMultipartUpload.hasCreatedBeforeDate() ? 1 : 0;
             flagSum = expirationDaysFlag + createdBeforeDateFlag;
             if (flagSum != 1) {
-                throw new IllegalArgumentException(
+                throw ArgumentError(
                         "Only one expiration property for AbortMultipartUpload should be specified.");
             }
         }
@@ -105,7 +105,7 @@ public class SetBucketLifecycleRequest extends GenericRequest {
                 createdBeforeDateFlag = storageTransition.hasCreatedBeforeDate() ? 1 : 0;
                 flagSum = expirationDaysFlag + createdBeforeDateFlag;
                 if (flagSum != 1) {
-                    throw new IllegalArgumentException(
+                    throw ArgumentError(
                             "Only one expiration property for StorageTransition should be specified.");
                 }
             }

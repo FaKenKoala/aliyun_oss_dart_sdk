@@ -278,13 +278,13 @@ public class OSSObjectOperation extends OSSOperation {
 
         SelectObjectRequest.ExpressionType expressionType = selectObjectRequest.getExpressionType();
         if (expressionType != SelectObjectRequest.ExpressionType.SQL) {
-            throw new IllegalArgumentException("Select object only support sql expression");
+            throw ArgumentError("Select object only support sql expression");
         }
         if (selectObjectRequest.getExpression() == null) {
-            throw new IllegalArgumentException("Select expression is null");
+            throw ArgumentError("Select expression is null");
         }
         if (selectObjectRequest.getLineRange() != null && selectObjectRequest.getSplitRange() != null) {
-            throw new IllegalArgumentException("Line range and split range of select request should not both set");
+            throw ArgumentError("Line range and split range of select request should not both set");
         }
 
         byte[] content = selectObjectRequestMarshaller.marshall(selectObjectRequest);
@@ -1112,7 +1112,7 @@ public class OSSObjectOperation extends OSSOperation {
                 return HttpMethod.PUT;
 
             default:
-                throw new IllegalArgumentException("Unsuported write mode" + mode.toString());
+                throw ArgumentError("Unsuported write mode" + mode.toString());
             }
         }
     }

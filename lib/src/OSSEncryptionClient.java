@@ -106,7 +106,7 @@ public class OSSEncryptionClient extends OSSClient {
             } else {
                 long partSize = downloadFileRequest.getPartSize();
                 if (0 != (partSize % CryptoScheme.BLOCK_SIZE) || partSize <= 0) {
-                    throw new IllegalArgumentException("download file part size is not 16 bytes alignment.");
+                    throw ArgumentError("download file part size is not 16 bytes alignment.");
                 }
                 OSSDownloadOperationEncrypted ossDownloadOperationEncrypted = new OSSDownloadOperationEncrypted(this);
                 this.setDownloadOperation(ossDownloadOperationEncrypted);
@@ -278,6 +278,6 @@ public class OSSEncryptionClient extends OSSClient {
     private void assertParameterNotNull(Object parameterValue,
             String errorMessage) {
         if (parameterValue == null)
-            throw new IllegalArgumentException(errorMessage);
+            throw ArgumentError(errorMessage);
     }
 }

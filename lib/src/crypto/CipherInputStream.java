@@ -43,7 +43,7 @@ public class CipherInputStream extends SdkFilterInputStream {
         super(is);
         this.cryptoCipher = c;
         if (buffsize <= 0 || (buffsize % DEFAULT_IN_BUFFER_SIZE) != 0) {
-            throw new IllegalArgumentException(
+            throw ArgumentError(
                     "buffsize (" + buffsize + ") must be a positive multiple of " + DEFAULT_IN_BUFFER_SIZE);
         }
         this.bufin = new byte[buffsize];

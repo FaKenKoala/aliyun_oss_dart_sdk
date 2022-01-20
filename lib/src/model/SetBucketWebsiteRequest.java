@@ -57,7 +57,7 @@ public class SetBucketWebsiteRequest extends GenericRequest {
 
     public void setRoutingRules(List<RoutingRule> routingRules) {
         if (routingRules == null || routingRules.isEmpty()) {
-            throw new IllegalArgumentException("routingRules should not be null or empty.");
+            throw ArgumentError("routingRules should not be null or empty.");
         }
 
         for (RoutingRule rule : routingRules) {

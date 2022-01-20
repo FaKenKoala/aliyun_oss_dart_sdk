@@ -110,7 +110,7 @@ public final class RequestMarshallers {
         @Override
         public FixedLengthInputStream marshall(String input) {
             if (input == null) {
-                throw new IllegalArgumentException("The input should not be null.");
+                throw ArgumentError("The input should not be null.");
             }
 
             byte[] binaryData = null;

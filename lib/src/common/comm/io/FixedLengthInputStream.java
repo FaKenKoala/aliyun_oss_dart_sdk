@@ -29,7 +29,7 @@ public class FixedLengthInputStream extends InputStream {
 
     public FixedLengthInputStream(InputStream instream, long length) {
         if (instream == null || length < 0) {
-            throw new IllegalArgumentException("Illegal input stream or length");
+            throw ArgumentError("Illegal input stream or length");
         }
 
         this.wrappedInputStream = instream;

@@ -37,7 +37,7 @@ public class InstanceProfileCredentials extends BasicCredentials {
             Date date = parser.parse(expiration.replace('T', ' ').replace('Z', ' '));
             this.expirationInMilliseconds = date.getTime();
         } catch (ParseException e) {
-            throw new IllegalArgumentException("Failed to get valid expiration time from ECS Metadata service.");
+            throw ArgumentError("Failed to get valid expiration time from ECS Metadata service.");
         }
     }
     

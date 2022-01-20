@@ -66,17 +66,17 @@ public class DeleteObjectsRequest extends GenericRequest {
 
     public void setKeys(List<String> keys) {
         if (keys == null || keys.size() == 0) {
-            throw new IllegalArgumentException("Keys to delete must be specified");
+            throw ArgumentError("Keys to delete must be specified");
         }
 
         if (keys.size() > DELETE_OBJECTS_ONETIME_LIMIT) {
-            throw new IllegalArgumentException(
+            throw ArgumentError(
                     "The count of keys to delete exceed max limit " + DELETE_OBJECTS_ONETIME_LIMIT);
         }
 
         for (String key : keys) {
             if (key == null || key.equals("") || !validateObjectKey(key)) {
-                throw new IllegalArgumentException("Illegal object key " + key);
+                throw ArgumentError("Illegal object key " + key);
             }
         }
 

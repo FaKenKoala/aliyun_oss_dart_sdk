@@ -36,14 +36,14 @@ public class CodingUtils {
 
     public static void assertParameterInRange(long param, long lower, long upper) {
         if (!checkParamRange(param, lower, true, upper, true)) {
-            throw new IllegalArgumentException(String.format("%d not in valid range [%d, %d]", param, lower, upper));
+            throw ArgumentError(String.format("%d not in valid range [%d, %d]", param, lower, upper));
         }
     }
 
     public static void assertStringNotNullOrEmpty(String param, String paramName) {
         assertParameterNotNull(param, paramName);
         if (param.trim().length() == 0) {
-            throw new IllegalArgumentException(
+            throw ArgumentError(
                     COMMON_RESOURCE_MANAGER.getFormattedString("ParameterStringIsEmpty", paramName));
         }
     }
@@ -51,7 +51,7 @@ public class CodingUtils {
     public static void assertListNotNullOrEmpty(List<?> param, String paramName) {
         assertParameterNotNull(param, paramName);
         if (param.size() == 0) {
-            throw new IllegalArgumentException(
+            throw ArgumentError(
                     COMMON_RESOURCE_MANAGER.getFormattedString("ParameterListIsEmpty", paramName));
         }
     }
@@ -62,7 +62,7 @@ public class CodingUtils {
 
     public static void assertTrue(boolean condition, String message) {
         if (!condition) {
-            throw new IllegalArgumentException(message);
+            throw ArgumentError(message);
         }
     }
 

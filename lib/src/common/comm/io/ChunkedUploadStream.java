@@ -42,7 +42,7 @@ public class ChunkedUploadStream extends InputStream {
 
     public ChunkedUploadStream(InputStream innerStream, int innerStreamBufferSize) {
         if (innerStream == null) {
-            throw new IllegalArgumentException("Source input stream should not be null");
+            throw ArgumentError("Source input stream should not be null");
         }
 
         this.innerStream = innerStream;

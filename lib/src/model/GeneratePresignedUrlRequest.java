@@ -118,7 +118,7 @@ public class GeneratePresignedUrlRequest {
      */
     public void setMethod(HttpMethod method) {
         if (method != HttpMethod.GET && method != HttpMethod.PUT)
-            throw new IllegalArgumentException("Only GET or PUT is supported!");
+            throw ArgumentError("Only GET or PUT is supported!");
 
         this.method = method;
     }

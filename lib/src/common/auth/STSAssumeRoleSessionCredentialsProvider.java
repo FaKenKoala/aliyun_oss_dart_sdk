@@ -64,7 +64,7 @@ public class STSAssumeRoleSessionCredentialsProvider implements CredentialsProvi
 
     public STSAssumeRoleSessionCredentialsProvider withExpiredDuration(long expiredDurationSeconds) {
         if (expiredDurationSeconds < 900 || expiredDurationSeconds > 3600) {
-            throw new IllegalArgumentException("Assume Role session duration should be in the range of 15min - 1hour");
+            throw ArgumentError("Assume Role session duration should be in the range of 15min - 1hour");
         }
         this.expiredDurationSeconds = expiredDurationSeconds;
         return this;

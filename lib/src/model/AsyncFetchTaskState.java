@@ -64,6 +64,6 @@ public enum AsyncFetchTaskState {
             }
         }
 
-        throw new IllegalArgumentException("Unable to parse AsyncFetchTaskState: " + stateString);
+        throw ArgumentError("Unable to parse AsyncFetchTaskState: " + stateString);
     }
 }
