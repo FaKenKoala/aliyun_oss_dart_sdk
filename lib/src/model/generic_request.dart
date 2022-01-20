@@ -1,6 +1,8 @@
+import 'package:aliyun_oss_dart_sdk/src/model/web_service_request.dart';
+
 import 'payer.dart';
 
-class GenericRequest {
+class GenericRequest extends WebServiceRequest{
   GenericRequest({
     this.bucketName,
     this.key,
