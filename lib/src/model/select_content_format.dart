@@ -1,0 +1,4 @@
+enum SelectContentFormat {
+  CSV,
+  JSON,
+}

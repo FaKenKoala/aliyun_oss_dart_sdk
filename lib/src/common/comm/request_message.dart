@@ -19,7 +19,7 @@ class RequestMessage extends HttpMessage {
   HttpMethod method = HttpMethod.get;
 
   /* Use a LinkedHashMap to preserve the insertion order. */
-  Map<String, String> _parameters = <String, String>{};
+  final Map<String, String> _parameters = <String, String>{};
 
   /* The absolute url to which the request should be sent */
   Uri? absoluteUrl;
@@ -37,6 +37,7 @@ class RequestMessage extends HttpMessage {
       [final WebServiceRequest? originalRequest])
       : originalRequest = originalRequest ?? WebServiceRequest.noop;
 
+  Map<String, String> get parameters => _parameters;
   set parameters(Map<String, String>? parameters) {
     _parameters.clear();
     if (parameters?.isNotEmpty ?? false) {

@@ -9,4 +9,8 @@ class HttpMessage {
     content?.close();
     content = null;
   }
+
+  void addHeader(String key, String value) {
+    headers[key] = value;
+  }
 }

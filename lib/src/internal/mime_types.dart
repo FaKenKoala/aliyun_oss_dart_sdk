@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:aliyun_oss_dart_sdk/src/common/utils/log_utils.dart';
 import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
 
 /// Utility class used to determine the mimetype of files based on file
@@ -21,12 +22,12 @@ import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
         mimeType =  MimeType();
         InputStream? inputStream = mimeType.getClass().getResourceAsStream("/oss.mime.types");
         if (inputStream != null) {
-            getLog().debug("Loading mime types from file in the classpath: oss.mime.types");
+            LogUtils.getLog().debug("Loading mime types from file in the classpath: oss.mime.types");
 
             try {
                 mimeType.loadMimetypes(inputStream);
-            } catch (IOException e) {
-                getLog().error("Failed to load mime types from file in the classpath: oss.mime.types", e);
+            } catch ( e) {
+                LogUtils.getLog().error("Failed to load mime types from file in the classpath: oss.mime.types", e);
             } finally {
                 try {
                     inputStream.close();
@@ -34,19 +35,19 @@ import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
                 }
             }
         } else {
-            getLog().warn("Unable to find 'oss.mime.types' file in classpath");
+            LogUtils.getLog().warn("Unable to find 'oss.mime.types' file in classpath");
         }
         return mimeType;
     }
 
      void loadMimetypes(InputStream inpuStream) {
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        String line = null;
+        BufferedReader br =  BufferedReader(new InputStreamReader(is));
+        String? line;
 
         while ((line = br.readLine()) != null) {
-            line = line.trim();
+            line = line!.trim();
 
-            if (line.startsWith("#") || line.length() == 0) {
+            if (line.startsWith("#") || line.isEmpty) {
                 // Ignore comments and empty lines.
             } else {
                 StringTokenizer st = new StringTokenizer(line, " \t");
@@ -54,7 +55,7 @@ import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
                     String extension = st.nextToken();
                     if (st.hasMoreTokens()) {
                         String mimetype = st.nextToken();
-                        extensionToMimetypeMap.put(extension.toLowerCase(), mimetype);
+                        extensionToMimetypeMap[extension.toLowerCase()] = mimetype;
                     }
                 }
             }
@@ -93,11 +94,10 @@ import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
 
      String? getMimetypeByExt(String fileName) {
         int lastPeriodIndex = fileName.lastIndexOf(".");
-        if (lastPeriodIndex > 0 && lastPeriodIndex + 1 < fileName.length()) {
+        if (lastPeriodIndex > 0 && lastPeriodIndex + 1 < fileName.length) {
             String ext = fileName.substring(lastPeriodIndex + 1).toLowerCase();
-            if (extensionToMimetypeMap.keySet().contains(ext)) {
-                String mimetype = (String) extensionToMimetypeMap.get(ext);
-                return mimetype;
+            if (extensionToMimetypeMap.containsKey(ext)) {
+                return extensionToMimetypeMap[ext];
             }
         }
         return null;

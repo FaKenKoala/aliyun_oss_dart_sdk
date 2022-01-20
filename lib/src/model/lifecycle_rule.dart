@@ -91,6 +91,10 @@ class StorageTransition {
   DateTime? createdBeforeDateTime;
   StorageClass? storageClass;
 
+  bool hasExpirationDays() {
+    return this.expirationDays != null;
+  }
+
   bool hasCreatedBeforeDateTime() {
     return this.createdBeforeDateTime != null;
   }
