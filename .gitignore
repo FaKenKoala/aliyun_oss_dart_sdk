@@ -18,5 +18,5 @@ commitlint.config.js
 package-lock.json
 package.json
 
-**.java
-**/**.java
+# **.java
+# **/**.java
