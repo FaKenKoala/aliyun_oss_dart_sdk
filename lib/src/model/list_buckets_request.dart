@@ -1,3 +1,5 @@
+import 'package:aliyun_oss_dart_sdk/src/internal/oss_utils.dart';
+
 import 'web_service_request.dart';
 
 class ListBucketsRequest extends WebServiceRequest {

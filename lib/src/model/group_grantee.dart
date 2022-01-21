@@ -17,6 +17,8 @@
  * under the License.
  */
 
+import 'package:aliyun_oss_dart_sdk/src/internal/oss_utils.dart';
+
 import 'grantee.dart';
 
 /// The group of grantees that could be granted permission as a whole.
@@ -36,6 +38,6 @@ class GroupGrantee implements Grantee {
   @override
   void setIdentifier(String id) {
     throw UnsupportedError(
-        OSS_RESOURCE_MANAGER.getString("GroupGranteeNotSupportId"));
+        OSSUtils.OSS_RESOURCE_MANAGER.getString("GroupGranteeNotSupportId"));
   }
 }

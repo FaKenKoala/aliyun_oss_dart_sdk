@@ -1,3 +1,5 @@
+import 'package:aliyun_oss_dart_sdk/src/internal/oss_utils.dart';
+
 import 'generic_request.dart';
 
 /// This is the request class to list objects under a bucket.

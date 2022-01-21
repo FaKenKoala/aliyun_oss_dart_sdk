@@ -10,6 +10,8 @@ import 'package:aliyun_oss_dart_sdk/src/model/put_object_result.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/upload_part_request.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/upload_part_result.dart';
 
+import 'multipart_upload_crypto_context.dart';
+
 /// An interafce used to implements different crypto module.
  abstract class  CryptoModule {
  

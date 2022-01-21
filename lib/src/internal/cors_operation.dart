@@ -4,12 +4,15 @@ import 'package:aliyun_oss_dart_sdk/src/common/comm/response_message.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/comm/service_client.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/coding_utils.dart';
 import 'package:aliyun_oss_dart_sdk/src/http_method.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/cors_configuration.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/generic_request.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/options_request.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/set_bucket_cors_request.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/void_result.dart';
 
 import 'oss_headers.dart';
 import 'oss_operation.dart';
+import 'oss_request_message_builder.dart';
 
 class CORSOperation extends OSSOperation {
   static final String SUBRESOURCE_CORS = "cors";
@@ -44,7 +47,7 @@ class CORSOperation extends OSSOperation {
   CORSConfiguration getBucketCORS(GenericRequest genericRequest) {
     assertParameterNotNull(genericRequest, "genericRequest");
 
-    String bucketName = genericRequest.getBucketName();
+    String bucketName = genericRequest.bucketName;
     assertParameterNotNull(bucketName, "bucketName");
     ensureBucketNameValid(bucketName);
 
@@ -53,7 +56,7 @@ class CORSOperation extends OSSOperation {
 
     RequestMessage request = OSSRequestMessageBuilder(getInnerClient())
         .setEndpoint(getEndpoint(genericRequest))
-        .setMethod(HttpMethod.GET)
+        .setMethod(HttpMethod.get)
         .setParameters(parameters)
         .setBucket(bucketName)
         .setOriginalRequest(genericRequest)

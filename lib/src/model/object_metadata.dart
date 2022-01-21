@@ -2,8 +2,10 @@
 
 import 'dart:collection';
 
+import 'package:aliyun_oss_dart_sdk/src/common/utils/date_util.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/http_headers.dart';
 import 'package:aliyun_oss_dart_sdk/src/internal/oss_headers.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/sign_v2_utils.dart';
 
 import 'canned_access_control_list.dart';
 import 'storage_class.dart';
@@ -200,26 +202,24 @@ class ObjectMetadata {
   }
 
   void setObjectTagging(Map<String?, String?>? tags) {
-    if(tags == null || tags.isEmpty) {
+    if (tags == null || tags.isEmpty) {
       return;
     }
-   
-      StringBuffer builder = StringBuffer();
-      tags.forEach((key, value) {
 
-        if (key == null || key.isEmpty || value == null || value.isEmpty) {
-          throw ArgumentError();
-        }
-
-        if (builder.length > 0) {
-          builder.write("&");
-        }
-        builder.write(SignV2Utils.uriEncoding(key));
-        builder.write("=");
-        builder.write(SignV2Utils.uriEncoding(value));
+    StringBuffer builder = StringBuffer();
+    tags.forEach((key, value) {
+      if (key == null || key.isEmpty || value == null || value.isEmpty) {
+        throw ArgumentError();
       }
 
-      metadata[OSSHeaders.ossTagging] = builder.toString();
-    
+      if (builder.length > 0) {
+        builder.write("&");
+      }
+      builder.write(SignV2Utils.uriEncoding(key));
+      builder.write("=");
+      builder.write(SignV2Utils.uriEncoding(value));
+    });
+
+    metadata[OSSHeaders.ossTagging] = builder.toString();
   }
 }

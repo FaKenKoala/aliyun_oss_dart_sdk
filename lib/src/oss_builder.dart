@@ -1,6 +1,8 @@
 import 'package:aliyun_oss_dart_sdk/src/client_builder_configuration.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/auth/credentials_provider.dart';
 
+import 'oss.dart';
+
 abstract class OSSBuilder {
   OSS build({
     String? endpoint,

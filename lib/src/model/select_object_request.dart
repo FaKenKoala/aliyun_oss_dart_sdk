@@ -1,5 +1,6 @@
 import 'package:aliyun_oss_dart_sdk/src/common/utils/range_spec.dart';
 import 'package:aliyun_oss_dart_sdk/src/event/progress_listener.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/request_parameters.dart';
 
 import 'get_object_request.dart';
 import 'input_serialization.dart';
@@ -18,7 +19,7 @@ class SelectObjectRequest extends GetObjectRequest {
   static final String LINE_RANGE_PREFIX = "line-range=";
   static final String SPLIT_RANGE_PREFIX = "split-range=";
 
-  String expression;
+  String? expression;
   bool skipPartialDataRecord = false;
   int maxSkippedRecordsAllowed = 0;
   ExpressionType expressionType = ExpressionType.SQL;
@@ -37,7 +38,7 @@ class SelectObjectRequest extends GetObjectRequest {
 
   SelectObjectRequest(String bucketName, String key)
       : super(bucketName: bucketName, key: key) {
-    process = SUBRESOURCE_CSV_SELECT;
+    process = RequestParameters.SUBRESOURCE_CSV_SELECT;
   }
 
   List<int> getLineRange() {
@@ -83,9 +84,9 @@ class SelectObjectRequest extends GetObjectRequest {
   void setInputSerialization(InputSerialization inputSerialization) {
     if (inputSerialization.selectContentFormat ==
         SelectContentFormat.CSV) {
-      process = SUBRESOURCE_CSV_SELECT;
+      process = RequestParameters.SUBRESOURCE_CSV_SELECT;
     } else {
-      process = SUBRESOURCE_JSON_SELECT;
+      process = RequestParameters.SUBRESOURCE_JSON_SELECT;
     }
     _inputSerialization = inputSerialization;
   }
