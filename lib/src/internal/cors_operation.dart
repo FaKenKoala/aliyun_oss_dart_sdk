@@ -81,7 +81,7 @@ class CORSOperation extends OSSOperation {
 
     RequestMessage request = OSSRequestMessageBuilder(getInnerClient())
         .setEndpoint(getEndpoint(genericRequest))
-        .setMethod(HttpMethod.DELETE)
+        .setMethod(HttpMethod.delete)
         .setParameters(parameters)
         .setBucket(bucketName)
         .setOriginalRequest(genericRequest)

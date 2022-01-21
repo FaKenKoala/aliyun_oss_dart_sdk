@@ -48,18 +48,18 @@ class CreateSelectMetaInputStream extends FilterInputStream {
         super(inputStream);
         currentFrameOffset = 0;
         currentFramePayloadLength = 0;
-        currentFrameTypeBytes = new byte[4];
-        currentFramePayloadLengthBytes = new byte[4];
-        currentFrameHeaderChecksumBytes = new byte[4];
-        scannedDataBytes = new byte[8];
-        currentFramePayloadChecksumBytes = new byte[4];
+        currentFrameTypeBytes = byte[4];
+        currentFramePayloadLengthBytes = byte[4];
+        currentFrameHeaderChecksumBytes = byte[4];
+        scannedDataBytes = byte[8];
+        currentFramePayloadChecksumBytes = byte[4];
         finished = false;
         firstReadFrame = true;
         this.selectContentMetadataBase = selectContentMetadataBase;
         this.selectProgressListener = selectProgressListener;
-        this.nextNotificationScannedSize = DEFAULT_NOTIFICATION_THRESHOLD;
-        this.crc32 = new CRC32();
-        this.crc32.reset();
+        nextNotificationScannedSize = DEFAULT_NOTIFICATION_THRESHOLD;
+        crc32 = CRC32();
+        crc32.reset();
     }
 
      void internalRead(List<int> buf, int off, int len) {
@@ -67,7 +67,7 @@ class CreateSelectMetaInputStream extends FilterInputStream {
         while (bytesRead < len) {
             int bytes = in.read(buf, off + bytesRead, len - bytesRead);
             if (bytes < 0) {
-                throw new SelectObjectException(SelectObjectException.INVALID_INPUT_STREAM, "Invalid input stream end found, need another " + (len - bytesRead) + " bytes", requestId);
+                throw SelectObjectException(SelectObjectException.INVALID_INPUT_STREAM, "Invalid input stream end found, need another " + (len - bytesRead) + " bytes", requestId);
             }
             bytesRead += bytes;
         }
@@ -76,7 +76,7 @@ class CreateSelectMetaInputStream extends FilterInputStream {
      void validateCheckSum(List<int> checksumBytes, CRC32 crc32) throws IOException {
         int currentChecksum = ByteBuffer.wrap(checksumBytes).getInt();
         if (crc32.getValue() != ((int)currentChecksum & 0xffffffffL)) {
-            throw new SelectObjectException(SelectObjectException.INVALID_CRC, "Frame crc check failed, actual " + crc32.getValue() + ", expect: " + currentChecksum, requestId);
+            throw SelectObjectException(SelectObjectException.INVALID_CRC, "Frame crc check failed, actual " + crc32.getValue() + ", expect: " + currentChecksum, requestId);
         }
         crc32.reset();
     }
@@ -92,7 +92,7 @@ class CreateSelectMetaInputStream extends FilterInputStream {
             internalRead(currentFrameTypeBytes, 0, 4);
             //first byte is version byte
             if (currentFrameTypeBytes[0] != SELECT_VERSION) {
-                throw new SelectObjectException(SelectObjectException.INVALID_SELECT_VERSION, "Invalid select version found " + currentFrameTypeBytes[0] + ", expect: " + SELECT_VERSION, requestId);
+                throw SelectObjectException(SelectObjectException.INVALID_SELECT_VERSION, "Invalid select version found " + currentFrameTypeBytes[0] + ", expect: " + SELECT_VERSION, requestId);
             }
             internalRead(currentFramePayloadLengthBytes, 0, 4);
             internalRead(currentFrameHeaderChecksumBytes, 0, 4);
@@ -108,15 +108,15 @@ class CreateSelectMetaInputStream extends FilterInputStream {
                 case CSV_END_FRAME_MAGIC:
                 case JSON_END_FRAME_MAGIC:
                     currentFramePayloadLength = ByteBuffer.wrap(currentFramePayloadLengthBytes).getInt() - 8;
-                    List<int> totalScannedDataSizeBytes = new byte[8];
+                    List<int> totalScannedDataSizeBytes = byte[8];
                     internalRead(totalScannedDataSizeBytes, 0, 8);
-                    List<int> statusBytes = new byte[4];
+                    List<int> statusBytes = byte[4];
                     internalRead(statusBytes, 0, 4);
-                    List<int> splitBytes = new byte[4];
+                    List<int> splitBytes = byte[4];
                     internalRead(splitBytes, 0, 4);
-                    List<int> totalLineBytes = new byte[8];
+                    List<int> totalLineBytes = byte[8];
                     internalRead(totalLineBytes, 0, 8);
-                    List<int> columnBytes = new byte[4];
+                    List<int> columnBytes = byte[4];
                     if (type == CSV_END_FRAME_MAGIC) {
                         internalRead(columnBytes, 0, 4);
                     }
@@ -138,9 +138,9 @@ class CreateSelectMetaInputStream extends FilterInputStream {
 
                     String error = "";
                     if (errorMessageSize > 0) {
-                        List<int> errorMessageBytes = new byte[errorMessageSize];
+                        List<int> errorMessageBytes = byte[errorMessageSize];
                         internalRead(errorMessageBytes, 0, errorMessageSize);
-                        error = new String(errorMessageBytes);
+                        error = String(errorMessageBytes);
                         crc32.update(errorMessageBytes);
                     }
 
@@ -151,10 +151,10 @@ class CreateSelectMetaInputStream extends FilterInputStream {
                     validateCheckSum(currentFramePayloadChecksumBytes, crc32);
                     if (status / 100 != 2) {
                         if (error.contains(".")) {
-                            throw new SelectObjectException(error.split("\\.")[0], error.substring(error.indexOf(".") + 1), requestId);
+                            throw SelectObjectException(error.split("\\.")[0], error.substring(error.indexOf(".") + 1), requestId);
                         } else {
                             // forward compatbility consideration
-                            throw new SelectObjectException(error, error, requestId);
+                            throw SelectObjectException(error, error, requestId);
                         }
                     }
 
@@ -162,7 +162,7 @@ class CreateSelectMetaInputStream extends FilterInputStream {
                             .withTotalLines(ByteBuffer.wrap(totalLineBytes).getint());
                     break;
                 default:
-                    throw new SelectObjectException(SelectObjectException.INVALID_SELECT_FRAME, "Unsupported frame type " + type + " found", requestId);
+                    throw SelectObjectException(SelectObjectException.INVALID_SELECT_FRAME, "Unsupported frame type " + type + " found", requestId);
             }
             //notify create select meta progress
             ProgressEventType eventType = ProgressEventType.selectScanEvent;
@@ -196,7 +196,7 @@ class CreateSelectMetaInputStream extends FilterInputStream {
 
     @override
      int available()  {
-        throw new IOException("Create select meta input stream does not support available() operation");
+        throw IOException("Create select meta input stream does not support available() operation");
     }
 
      void setRequestId(String requestId) {

@@ -56,7 +56,7 @@ class DownloadFileRequest extends GenericRequest {
     _nonmatchingEtagConstraints.clear();
   }
 
-  List<int> getRange() {
+  List<int>? getRange() {
     return _range;
   }
 
@@ -89,5 +89,5 @@ class DownloadFileRequest extends GenericRequest {
   // Traffic limit speed, its uint is bit/s
   int trafficLimit = 0;
 
-  List<int> _range = [0, 0];
+  List<int>? _range;
 }
