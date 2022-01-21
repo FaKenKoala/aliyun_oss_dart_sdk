@@ -269,7 +269,7 @@ public class OSSUtils {
                         key = key.trim();
                     if (value != null)
                         value = value.trim();
-                    headers.put(key, value);
+                    headers[key] = value;
                 }
             }
         }

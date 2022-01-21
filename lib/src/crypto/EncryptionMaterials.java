@@ -23,7 +23,7 @@ package com.aliyun.oss.crypto;
  * EncryptionMaterials is an interface used to implement different
  * encrypt/decrypt content materials providers.
  */
-public interface EncryptionMaterials {
+abstract class EncryptionMaterials {
     /**
      * Encrypt the cek and iv and put the result into the given {@link ContentCryptoMaterialRW} instance.
      * 

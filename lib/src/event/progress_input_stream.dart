@@ -160,3 +160,9 @@ class BoundedInputStream extends InputStream {
 
   final int partSize;
 }
+
+class FixedLengthInputStream extends InputStream {
+  FixedLengthInputStream(InputStream inputStream) : super(inputStream);
+
+  int length = 0;
+}

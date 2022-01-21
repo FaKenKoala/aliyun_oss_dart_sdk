@@ -44,7 +44,7 @@ import com.aliyun.oss.model.InventoryConfiguration;
  * or enterprise or personal data backup.
  * </p>
  */
-public interface OSS {
+abstract class OSS {
 
     /**
      * Switches to another users with specified credentials

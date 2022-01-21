@@ -97,11 +97,11 @@ public final class RequestMarshallers {
     public static final SetBucketResourceGroupRequestMarshaller setBucketResourceGroupRequestMarshaller = new SetBucketResourceGroupRequestMarshaller();
     public static final PutBucketTransferAccelerationRequestMarshaller putBucketTransferAccelerationRequestMarshaller = new PutBucketTransferAccelerationRequestMarshaller();
 
-    public interface RequestMarshaller<R> extends Marshaller<FixedLengthInputStream, R> {
+    abstract class RequestMarshaller<R> extends Marshaller<FixedLengthInputStream, R> {
 
     }
 
-    public interface RequestMarshaller2<R> extends Marshaller<byte[], R> {
+    abstract class RequestMarshaller2<R> extends Marshaller<byte[], R> {
 
     }
 

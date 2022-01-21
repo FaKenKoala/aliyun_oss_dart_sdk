@@ -18,7 +18,7 @@
  */
 package com.aliyun.oss.crypto;
 
-public interface CryptoHeaders {
+abstract class CryptoHeaders {
     public static String CRYPTO_KEY = "client-side-encryption-key";
     public static String CRYPTO_IV = "client-side-encryption-start";
     public static String CRYPTO_CEK_ALG = "client-side-encryption-cek-alg";

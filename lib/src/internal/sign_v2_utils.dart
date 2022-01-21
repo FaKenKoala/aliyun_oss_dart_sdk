@@ -1,63 +1,43 @@
-package com.aliyun.oss.internal;
 
-import com.aliyun.oss.ClientConfiguration;
-import com.aliyun.oss.ClientException;
-import com.aliyun.oss.HttpMethod;
-import com.aliyun.oss.common.auth.Credentials;
-import com.aliyun.oss.common.auth.HmacSHA256Signature;
-import com.aliyun.oss.common.comm.RequestMessage;
-import com.aliyun.oss.common.utils.HttpHeaders;
-import com.aliyun.oss.common.utils.HttpUtil;
-import com.aliyun.oss.model.GeneratePresignedUrlRequest;
+ import 'package:aliyun_oss_dart_sdk/src/common/comm/request_message.dart';
 
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.util.*;
+import 'sign_parameters.dart';
 
-import static com.aliyun.oss.common.utils.CodingUtils.assertTrue;
-import static com.aliyun.oss.internal.OSSConstants.DEFAULT_CHARSET_NAME;
-import static com.aliyun.oss.internal.OSSUtils.populateResponseHeaderParameters;
-import static com.aliyun.oss.internal.RequestParameters.*;
-import static com.aliyun.oss.internal.SignParameters.AUTHORIZATION_ACCESS_KEY_ID;
-import static com.aliyun.oss.internal.SignParameters.AUTHORIZATION_ADDITIONAL_HEADERS;
-import static com.aliyun.oss.internal.SignParameters.AUTHORIZATION_PREFIX_V2;
-import static com.aliyun.oss.internal.SignParameters.AUTHORIZATION_SIGNATURE;
+class SignV2Utils {
 
-public class SignV2Utils {
+     static String composeRequestAuthorization(String accessKeyId, String signature, RequestMessage request) {
+        StringBuffer sb = StringBuffer();
+        sb..write(SignParameters.AUTHORIZATION_PREFIX_V2 + SignParameters.AUTHORIZATION_ACCESS_KEY_ID)..write(":")..write(accessKeyId)..write(", ");
 
-    public static String composeRequestAuthorization(String accessKeyId, String signature, RequestMessage request) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(AUTHORIZATION_PREFIX_V2 + AUTHORIZATION_ACCESS_KEY_ID).append(":").append(accessKeyId).append(", ");
+        String additionHeaderNameStr = buildSortedAdditionalHeaderNameStr(request.originalRequest.headers.keys.toSet(),
+                request.originalRequest.additionalHeaderNames);
 
-        String additionHeaderNameStr = buildSortedAdditionalHeaderNameStr(request.getOriginalRequest().getHeaders().keySet(),
-                request.getOriginalRequest().getAdditionalHeaderNames());
-
-        if (!additionHeaderNameStr.isEmpty()) {
-            sb.append(AUTHORIZATION_ADDITIONAL_HEADERS).append(":").append(additionHeaderNameStr).append(", ");
+        if (additionHeaderNameStr.isNotEmpty) {
+            sb..write(SignParameters.AUTHORIZATION_ADDITIONAL_HEADERS)..write(":")..write(additionHeaderNameStr)..write(", ");
         }
-        sb.append(AUTHORIZATION_SIGNATURE).append(":").append(signature);
+        sb..write(SignParameters.AUTHORIZATION_SIGNATURE)..write(":")..write(signature);
 
         return sb.toString();
     }
 
-    private static String buildSortedAdditionalHeaderNameStr(Set<String> headerNames, Set<String> additionalHeaderNames) {
+     static String buildSortedAdditionalHeaderNameStr(Set<String> headerNames, Set<String> additionalHeaderNames) {
         Set<String> ts = buildSortedAdditionalHeaderNames(headerNames, additionalHeaderNames);
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = StringBuffer();
         String separator = "";
 
-        for (String header : ts) {
-            sb.append(separator);
-            sb.append(header);
+        for (String header in ts) {
+            sb.write(separator);
+            sb.write(header);
             separator = ";";
         }
         return sb.toString();
     }
 
-    private static Set<String> buildSortedAdditionalHeaderNames(Set<String> headerNames, Set<String> additionalHeaderNames) {
-        Set<String> ts = new TreeSet<String>();
+     static Set<String> buildSortedAdditionalHeaderNames(Set<String>? headerNames, Set<String>? additionalHeaderNames) {
+        Set<String> ts = {};
 
         if (headerNames != null && additionalHeaderNames != null) {
-            for (String additionalHeaderName : additionalHeaderNames) {
+            for (String additionalHeaderName in additionalHeaderNames) {
                 if (headerNames.contains(additionalHeaderName)) {
                     ts.add(additionalHeaderName.toLowerCase());
                 }
@@ -66,11 +46,11 @@ public class SignV2Utils {
         return ts;
     }
 
-    private static Set<String> buildRawAdditionalHeaderNames(Set<String> headerNames, Set<String> additionalHeaderNames) {
-        Set<String> hs = new HashSet<String>();
+     static Set<String> buildRawAdditionalHeaderNames(Set<String>? headerNames, Set<String>? additionalHeaderNames) {
+        Set<String> hs = {};
 
         if (headerNames != null && additionalHeaderNames != null) {
-            for (String additionalHeaderName : additionalHeaderNames) {
+            for (String additionalHeaderName in additionalHeaderNames) {
                 if (headerNames.contains(additionalHeaderName)) {
                     hs.add(additionalHeaderName);
                 }
@@ -79,15 +59,15 @@ public class SignV2Utils {
         return hs;
     }
 
-    public static String buildCanonicalString(String method, String resourcePath, RequestMessage request, Set<String> additionalHeaderNames) {
-        StringBuilder canonicalString = new StringBuilder();
-        canonicalString.append(method).append(SignParameters.NEW_LINE);
-        Map<String, String> headers = request.getHeaders();
-        TreeMap<String, String> fixedHeadersToSign = new TreeMap<String, String>();
-        TreeMap<String, String> canonicalizedOssHeadersToSign = new TreeMap<String, String>();
+     static String buildCanonicalString(String method, String resourcePath, RequestMessage request, Set<String> additionalHeaderNames) {
+        StringBuffer canonicalString = StringBuffer();
+        canonicalString..write(method)..write(SignParameters.NEW_LINE);
+        Map<String, String> headers = request.headers;
+        Map<String, String> fixedHeadersToSign = <String, String>{};
+        Map<String, String> canonicalizedOssHeadersToSign = <String, String>{};
 
         if (headers != null) {
-            for (Map.Entry<String, String> header : headers.entrySet()) {
+            for (Map.Entry<String, String> header in headers.entrySet()) {
                 if (header.getKey() != null) {
                     String lowerKey = header.getKey().toLowerCase();
                     if (lowerKey.equals(HttpHeaders.CONTENT_TYPE.toLowerCase())
@@ -108,60 +88,60 @@ public class SignV2Utils {
             fixedHeadersToSign.put(HttpHeaders.CONTENT_MD5.toLowerCase(), "");
         }
 
-        for (String additionalHeaderName : additionalHeaderNames) {
+        for (String additionalHeaderName in additionalHeaderNames) {
             if (additionalHeaderName != null && headers.get(additionalHeaderName) != null) {
                 canonicalizedOssHeadersToSign.put(additionalHeaderName.toLowerCase(), headers.get(additionalHeaderName).trim());
             }
         }
 
-        // Append fixed headers to sign to canonical string
-        for (Map.Entry<String, String> entry : fixedHeadersToSign.entrySet()) {
+        // write fixed headers to sign to canonical string
+        for (Map.Entry<String, String> entry in fixedHeadersToSign.entrySet()) {
             Object value = entry.getValue();
 
-            canonicalString.append(value);
-            canonicalString.append(SignParameters.NEW_LINE);
+            canonicalString.write(value);
+            canonicalString.write(SignParameters.NEW_LINE);
         }
 
-        // Append canonicalized oss headers to sign to canonical string
-        for (Map.Entry<String, String> entry : canonicalizedOssHeadersToSign.entrySet()) {
+        // write canonicalized oss headers to sign to canonical string
+        for (Map.Entry<String, String> entry in canonicalizedOssHeadersToSign.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
 
-            canonicalString.append(key).append(':').append(value).append(SignParameters.NEW_LINE);
+            canonicalString.write(key).write(':').write(value).write(SignParameters.NEW_LINE);
         }
 
 
-        // Append additional header names
-        TreeSet<String> ts = new TreeSet<String>();
-        for (String additionalHeaderName : additionalHeaderNames) {
+        // write additional header names
+        TreeSet<String> ts = TreeSet<String>();
+        for (String additionalHeaderName in additionalHeaderNames) {
             ts.add(additionalHeaderName.toLowerCase());
         }
         String separator = "";
 
-        for (String additionalHeaderName : ts) {
-            canonicalString.append(separator).append(additionalHeaderName);
+        for (String additionalHeaderName in ts) {
+            canonicalString.write(separator).write(additionalHeaderName);
             separator = ";";
         }
-        canonicalString.append(SignParameters.NEW_LINE);
+        canonicalString.write(SignParameters.NEW_LINE);
 
-        // Append canonical resource to canonical string
-        canonicalString.append(buildCanonicalizedResource(resourcePath, request.getParameters()));
+        // write canonical resource to canonical string
+        canonicalString.write(buildCanonicalizedResource(resourcePath, request.getParameters()));
 
         return canonicalString.toString();
     }
 
-    public static String buildSignedURL(GeneratePresignedUrlRequest request, Credentials currentCreds, ClientConfiguration config, URI endpoint) {
+     static String buildSignedURL(GeneratePresignedUrlRequest request, Credentials currentCreds, ClientConfiguration config, URI endpoint) {
         String bucketName = request.getBucketName();
         String accessId = currentCreds.getAccessKeyId();
         String accessKey = currentCreds.getSecretAccessKey();
         bool useSecurityToken = currentCreds.useSecurityToken();
-        HttpMethod method = request.getMethod() != null ? request.getMethod() : HttpMethod.GET;
+        HttpMethod method = request.getMethod() != null ? request.getMethod() in HttpMethod.GET;
 
         String expires = String.valueOf(request.getExpiration().getTime() / 1000L);
         String key = request.getKey();
         String resourcePath = OSSUtils.determineResourcePath(bucketName, key, config.isSLDEnabled());
 
-        RequestMessage requestMessage = new RequestMessage(bucketName, key);
+        RequestMessage requestMessage = RequestMessage(bucketName, key);
         requestMessage.setEndpoint(OSSUtils.determineFinalEndpoint(endpoint, bucketName, config));
         requestMessage.setMethod(method);
         requestMessage.setResourcePath(resourcePath);
@@ -174,17 +154,17 @@ public class SignV2Utils {
         if (request.getContentMD5() != null && !request.getContentMD5().trim().equals("")) {
             requestMessage.addHeader(HttpHeaders.CONTENT_MD5, request.getContentMD5());
         }
-        for (Map.Entry<String, String> h : request.getUserMetadata().entrySet()) {
+        for (Map.Entry<String, String> h in request.getUserMetadata().entrySet()) {
             requestMessage.addHeader(OSSHeaders.OSS_USER_METADATA_PREFIX + h.getKey(), h.getValue());
         }
-        Map<String, String> responseHeaderParams = new HashMap<String, String>();
+        Map<String, String> responseHeaderParams = <String, String>{};
         populateResponseHeaderParameters(responseHeaderParams, request.getResponseHeaders());
         if (responseHeaderParams.size() > 0) {
             requestMessage.setParameters(responseHeaderParams);
         }
 
         if (request.getQueryParameter() != null && request.getQueryParameter().size() > 0) {
-            for (Map.Entry<String, String> entry : request.getQueryParameter().entrySet()) {
+            for (Map.Entry<String, String> entry in request.getQueryParameter().entrySet()) {
                 requestMessage.addParameter(entry.getKey(), entry.getValue());
             }
         }
@@ -197,7 +177,7 @@ public class SignV2Utils {
             requestMessage.addParameter(SECURITY_TOKEN, currentCreds.getSecurityToken());
         }
 
-        String canonicalResource = "/" + ((bucketName != null) ? bucketName : "") + ((key != null ? "/" + key : ""));
+        String canonicalResource = "/" + ((bucketName != null) ? bucketName in "") + ((key != null ? "/" + key in ""));
         requestMessage.addParameter(OSS_SIGNATURE_VERSION, SignParameters.AUTHORIZATION_V2);
         requestMessage.addParameter(OSS_EXPIRES, expires);
         requestMessage.addParameter(OSS_ACCESS_KEY_ID_PARAM, accessId);
@@ -209,9 +189,9 @@ public class SignV2Utils {
         }
         Set<String> rawAdditionalHeaderNames = buildRawAdditionalHeaderNames(request.getHeaders().keySet(), request.getAdditionalHeaderNames());
         String canonicalString = buildCanonicalString(method.toString(), canonicalResource, requestMessage, rawAdditionalHeaderNames);
-        String signature = new HmacSHA256Signature().computeSignature(accessKey, canonicalString);
+        String signature = HmacSHA256Signature().computeSignature(accessKey, canonicalString);
 
-        Map<String, String> params = new LinkedHashMap<String, String>();
+        Map<String, String> params = Linked<String, String>{};
 
         if (!additionalHeaderNameStr.isEmpty()) {
             params.put(OSS_ADDITIONAL_HEADERS, additionalHeaderNameStr);
@@ -230,15 +210,15 @@ public class SignV2Utils {
         return url;
     }
 
-    private static String buildCanonicalizedResource(String resourcePath, Map<String, String> parameters) {
+     static String buildCanonicalizedResource(String resourcePath, Map<String, String> parameters) {
         assertTrue(resourcePath.startsWith("/"), "Resource path should start with slash character");
 
-        StringBuilder builder = new StringBuilder();
-        builder.append(uriEncoding(resourcePath));
+        StringBuffer builder = StringBuffer();
+        builder.write(uriEncoding(resourcePath));
 
         if (parameters != null) {
-            TreeMap<String, String> canonicalizedParams = new TreeMap<String, String>();
-            for (Map.Entry<String, String> param : parameters.entrySet()) {
+            Map<String, String> canonicalizedParams = <String, String>{};
+            for (Map.Entry<String, String> param in parameters.entrySet()) {
                 if (param.getValue() != null ) {
                     canonicalizedParams.put(uriEncoding(param.getKey()), uriEncoding(param.getValue()));
                 }
@@ -248,11 +228,11 @@ public class SignV2Utils {
             }
 
             char separator = '?';
-            for (Map.Entry<String, String> entry : canonicalizedParams.entrySet()) {
-                builder.append(separator);
-                builder.append(entry.getKey());
+            for (Map.Entry<String, String> entry in canonicalizedParams.entrySet()) {
+                builder.write(separator);
+                builder.write(entry.getKey());
                 if (entry.getValue() != null && !entry.getValue().isEmpty()) {
-                    builder.append("=").append(entry.getValue());
+                    builder.write("=").write(entry.getValue());
                 }
                 separator = '&';
             }
@@ -261,11 +241,11 @@ public class SignV2Utils {
         return builder.toString();
     }
 
-    public static String uriEncoding(String uri) {
+     static String uriEncoding(String uri) {
         String result = "";
 
         try {
-            for (char c : uri.toCharArray()) {
+            for (char c in uri.toCharArray()) {
                 if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
                         || (c >= '0' && c <= '9') || c == '_' || c == '-'
                         || c == '~' || c == '.') {
@@ -287,15 +267,15 @@ public class SignV2Utils {
                 }
             }
         } catch (UnsupportedEncodingException e) {
-            throw new ClientException(e);
+            throw ClientException(e);
         }
         return result;
     }
 
-    public static String buildSignature(String secretAccessKey, String httpMethod, String resourcePath, RequestMessage request) {
+     static String buildSignature(String secretAccessKey, String httpMethod, String resourcePath, RequestMessage request) {
         String canonicalString = buildCanonicalString(httpMethod, resourcePath, request,
                 buildRawAdditionalHeaderNames(request.getOriginalRequest().getHeaders().keySet(), request.getOriginalRequest().getAdditionalHeaderNames()));
-        return new HmacSHA256Signature().computeSignature(secretAccessKey, canonicalString);
+        return HmacSHA256Signature().computeSignature(secretAccessKey, canonicalString);
     }
 
 }

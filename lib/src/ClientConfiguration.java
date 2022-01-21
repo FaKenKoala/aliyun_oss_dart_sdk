@@ -627,7 +627,7 @@ public class ClientConfiguration {
      *            The default header value.
      */
     public void addDefaultHeader(String key, String value) {
-        this.defaultHeaders.put(key, value);
+        this.defaultHeaders[key] = value;
     }
 
     /**

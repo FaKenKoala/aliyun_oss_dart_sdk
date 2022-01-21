@@ -13,9 +13,9 @@ class CodingUtils {
     }
   }
 
-  static void assertStringNotNullOrEmpty(String param, String paramName) {
+  static void assertStringNotNullOrEmpty(String? param, String paramName) {
     assertParameterNotNull(param, paramName);
-    if (param.trim().isEmpty) {
+    if (param!.trim().isEmpty) {
       throw ArgumentError(OSSUtils.COMMON_RESOURCE_MANAGER.getFormattedString(
           "ParameterStringIsEmpty", paramName));
     }

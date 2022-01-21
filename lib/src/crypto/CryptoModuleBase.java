@@ -584,7 +584,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
             while (iter.hasNext()) {
                 String key = (String) iter.next();
                 String value = obj.getString(key);
-                map.put(key, value);
+                map[key] = value;
             }
             return map;
         } catch (JSONException e) {
