@@ -12,7 +12,7 @@
         executor.allowCoreThreadTimeOut(true);
     }
 
-    @Override
+    @override
      ResponseMessage sendRequestCore(ServiceClient.Request request, ExecutionContext context) throws IOException {
         HttpRequestBase httpRequest = httpRequestFactory.createHttpRequest(request, context);
         HttpClientContext httpContext = HttpClientContext.create();
@@ -51,7 +51,7 @@
         return buildResponse(request, httpResponse);
     }
 
-    @Override
+    @override
      void shutdown() {
         executor.shutdown();
         try {
@@ -79,7 +79,7 @@
             this.httpContext = httpContext;
         }
 
-        @Override
+        @override
          CloseableHttpResponse call() throws Exception {
             return httpClient.execute(httpRequest, httpContext);
         }

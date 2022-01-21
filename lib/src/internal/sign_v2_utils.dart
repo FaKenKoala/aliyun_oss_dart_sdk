@@ -6,11 +6,13 @@ import 'package:aliyun_oss_dart_sdk/src/common/auth/credentials.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/comm/request_message.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/coding_utils.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/http_headers.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/http_util.dart';
 import 'package:aliyun_oss_dart_sdk/src/http_method.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/generate_presigned_url_request.dart';
 
 import 'oss_constants.dart';
 import 'oss_headers.dart';
+import 'oss_utils.dart';
 import 'request_parameters.dart';
 import 'sign_parameters.dart';
 
@@ -175,7 +177,7 @@ class SignV2Utils {
         ((request.expiration?.millisecondsSinceEpoch ?? 0) / 1000).toString();
     String key = request.key;
     String resourcePath =
-        OSSUtils.determineResourcePath(bucketName, key, config.isSLDEnabled());
+        OSSUtils.determineResourcePath(bucketName, key, config.sldEnabled);
 
     RequestMessage requestMessage = RequestMessage(bucketName, key);
     requestMessage.endpoint =
@@ -249,7 +251,7 @@ class SignV2Utils {
     params.addAll(requestMessage.parameters);
 
     String queryString =
-        HttpUtil.paramToQueryString(params, OSSConstants.DEFAULT_CHARSET_NAME);
+        HttpUtil.paramToQueryString(params, OSSConstants.DEFAULT_CHARSET_NAME) ?? '';
 
     /* Compose HTTP request uri. */
     String url = requestMessage.endpoint.toString();

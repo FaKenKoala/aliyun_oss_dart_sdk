@@ -158,7 +158,7 @@ public class OSSUploadOperation {
             return true;
         }
 
-        @Override
+        @override
         public int hashCode() {
             final int prime = 31;
             int result = 1;
@@ -199,7 +199,7 @@ public class OSSUploadOperation {
     static class FileStat implements Serializable {
         private static final long serialVersionUID = -1223810339796425415L;
 
-        @Override
+        @override
         public int hashCode() {
             final int prime = 31;
             int result = 1;
@@ -225,7 +225,7 @@ public class OSSUploadOperation {
     static class UploadPart implements Serializable {
         private static final long serialVersionUID = 6692863980224332199L;
 
-        @Override
+        @override
         public int hashCode() {
             final int prime = 31;
             int result = 1;
@@ -501,7 +501,7 @@ public class OSSUploadOperation {
 
         // Sorts PartResult by the part numnber.
         Collections.sort(taskResults, new Comparator<PartResult>() {
-            @Override
+            @override
             public int compare(PartResult p1, PartResult p2) {
                 return p1.getNumber() - p2.getNumber();
             }
@@ -525,7 +525,7 @@ public class OSSUploadOperation {
             this.progressListener = progressListener;
         }
 
-        @Override
+        @override
         public PartResult call() throws Exception {
             PartResult tr = null;
             InputStream instream = null;
@@ -594,7 +594,7 @@ public class OSSUploadOperation {
     private CompleteMultipartUploadResult complete(UploadCheckPoint uploadCheckPoint,
             UploadFileRequest uploadFileRequest) {
         Collections.sort(uploadCheckPoint.partETags, new Comparator<PartETag>() {
-            @Override
+            @override
             public int compare(PartETag p1, PartETag p2) {
                 return p1.getPartNumber() - p2.getPartNumber();
             }

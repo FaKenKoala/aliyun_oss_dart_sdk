@@ -13,7 +13,7 @@ class GetObjectRequest extends GenericRequest {
 
   List<int> _range = [];
 
-  ResponseHeaderOverrides? responseHeaders;
+  ResponseHeaderoverrides? responseHeaders;
 
   /// Fields releated with getobject operation by using url signature.
   Uri? absoluteUrl;

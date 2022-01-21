@@ -43,7 +43,7 @@ public class HttpDeleteWithBody extends HttpEntityEnclosingRequestBase {
         setURI(URI.create(uri));
     }
 
-    @Override
+    @override
     public String getMethod() {
         return METHOD_NAME;
     }

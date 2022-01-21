@@ -165,7 +165,7 @@ public class CryptoConfiguration implements Cloneable, Serializable {
         return this.contentCryptoProvider;
     }
 
-    @Override
+    @override
     public CryptoConfiguration clone() {
         CryptoConfiguration config = new CryptoConfiguration();
         config.setContentCryptoMode(contentCryptoMode);

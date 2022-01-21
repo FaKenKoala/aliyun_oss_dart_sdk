@@ -20,12 +20,12 @@
 package com.aliyun.oss.crypto;
 
 public class AesCtr extends CryptoScheme {
-    @Override public String getKeyGeneratorAlgorithm() {return "AES";}
-    @Override public int getKeyLengthInBits() {return 256;}
-    @Override public String getContentChiperAlgorithm() {return "AES/CTR/NoPadding";}
-    @Override public int getContentChiperIVLength() {return 16;}
+    @override public String getKeyGeneratorAlgorithm() {return "AES";}
+    @override public int getKeyLengthInBits() {return 256;}
+    @override public String getContentChiperAlgorithm() {return "AES/CTR/NoPadding";}
+    @override public int getContentChiperIVLength() {return 16;}
 
-    @Override
+    @override
     public byte[] adjustIV(byte[] iv, long dataStartPos) {
         if (iv.length != 16)
             throw new UnsupportedOperationException();

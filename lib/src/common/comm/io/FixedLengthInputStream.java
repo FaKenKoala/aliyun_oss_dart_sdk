@@ -52,7 +52,7 @@ public class FixedLengthInputStream extends InputStream {
         return wrappedInputStream.available();
     }
 
-    @Override
+    @override
     public long skip(long n) throws IOException {
         return wrappedInputStream.skip(n);
     }
@@ -73,7 +73,7 @@ public class FixedLengthInputStream extends InputStream {
         this.length = length;
     }
 
-    @Override
+    @override
     public int read() throws IOException {
         return wrappedInputStream.read();
     }

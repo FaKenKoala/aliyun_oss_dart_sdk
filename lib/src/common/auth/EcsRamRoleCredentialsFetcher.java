@@ -35,7 +35,7 @@ public class EcsRamRoleCredentialsFetcher extends HttpCredentialsFetcher {
         this.ossAuthServerHost = ossAuthServerHost;
     }
 
-    @Override
+    @override
     public URL buildUrl() throws ClientException {
         try {
             return new URL(ossAuthServerHost);

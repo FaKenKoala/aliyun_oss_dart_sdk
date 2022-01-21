@@ -51,17 +51,17 @@ public class RepeatableInputStreamEntity extends BasicHttpEntity {
         setContentLength(request.getContentLength());
     }
 
-    @Override
+    @override
     public bool isChunked() {
         return false;
     }
 
-    @Override
+    @override
     public bool isRepeatable() {
         return content.markSupported() || innerEntity.isRepeatable();
     }
 
-    @Override
+    @override
     public void writeTo(OutputStream output) throws IOException {
         if (!firstAttempt && isRepeatable()) {
             content.reset();

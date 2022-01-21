@@ -37,7 +37,7 @@ public abstract class HttpCredentialsFetcher implements CredentialsFetcher {
 
     public abstract Credentials parse(HttpResponse response) throws ClientException;
 
-    @Override
+    @override
     public Credentials fetch() throws ClientException {
         URL url = buildUrl();
         HttpRequest request = new HttpRequest(url.toString());
@@ -55,7 +55,7 @@ public abstract class HttpCredentialsFetcher implements CredentialsFetcher {
         return parse(response);
     }
 
-    @Override
+    @override
     public HttpResponse send(HttpRequest request) throws IOException {
 
         HttpResponse response = null;
@@ -71,7 +71,7 @@ public abstract class HttpCredentialsFetcher implements CredentialsFetcher {
         return response;
     }
 
-    @Override
+    @override
     public Credentials fetch(int retryTimes) throws ClientException {
         for (int i = 0; i <= retryTimes; i++) {
             try {

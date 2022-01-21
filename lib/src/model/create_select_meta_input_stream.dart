@@ -1,66 +1,51 @@
-package com.aliyun.oss.model;
+ import 'package:aliyun_oss_dart_sdk/src/event/progress_event_type.dart';
+import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
+import 'package:aliyun_oss_dart_sdk/src/event/progress_listener.dart';
+import 'package:aliyun_oss_dart_sdk/src/event/progress_publisher.dart';
 
-import com.aliyun.oss.event.ProgressEventType;
-import com.aliyun.oss.event.ProgressListener;
-import com.aliyun.oss.model.SelectObjectMetadata.SelectContentMetadataBase;
+import 'select_object_metadata.dart';
 
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.util.zip.CRC32;
+class CreateSelectMetaInputStream extends FilterInputStream {
+    /// Format of continuous frame
+    /// |--frame type(4 bytes)--|--payload length(4 bytes)--|--header checksum(4 bytes)--|
+    /// |--scanned data bytes(8 bytes)--|--payload checksum(4 bytes)--|
+     static final int CONTINUOUS_FRAME_MAGIC = 8388612;
 
-import static com.aliyun.oss.event.ProgressPublisher.publishSelectProgress;
+    /// Format of csv end frame
+    /// |--frame type(4 bytes)--|--payload length(4 bytes)--|--header checksum(4 bytes)--|
+    /// |--scanned data bytes(8 bytes)--|--total scan size(8 bytes)--|
+    /// |--status code(4 bytes)--|--total splits count(4 bytes)--|
+    /// |--total lines(8 bytes)--|--columns count(4 bytes)--|--error message(optional)--|--payload checksum(4 bytes)--|
+     static final int CSV_END_FRAME_MAGIC = 8388614;
 
-public class CreateSelectMetaInputStream extends FilterInputStream {
-    /**
-     * Format of continuous frame
-     * |--frame type(4 bytes)--|--payload length(4 bytes)--|--header checksum(4 bytes)--|
-     * |--scanned data bytes(8 bytes)--|--payload checksum(4 bytes)--|
-     */
-    private static final int CONTINUOUS_FRAME_MAGIC = 8388612;
+    /// Format of json end frame
+    /// |--frame type(4 bytes)--|--payload length(4 bytes)--|--header checksum(4 bytes)--|
+    /// |--scanned data bytes(8 bytes)--|--total scan size(8 bytes)--|
+    /// |--status code(4 bytes)--|--total splits count(4 bytes)--|
+    /// |--total lines(8 bytes)--|--error message(optional)--|--payload checksum(4 bytes)--|
+     static final int JSON_END_FRAME_MAGIC = 8388615;
+     static final int SELECT_VERSION = 1;
+     static final int DEFAULT_NOTIFICATION_THRESHOLD = 50 * 1024 * 1024;//notify every scanned 50MB
 
-    /**
-     * Format of csv end frame
-     * |--frame type(4 bytes)--|--payload length(4 bytes)--|--header checksum(4 bytes)--|
-     * |--scanned data bytes(8 bytes)--|--total scan size(8 bytes)--|
-     * |--status code(4 bytes)--|--total splits count(4 bytes)--|
-     * |--total lines(8 bytes)--|--columns count(4 bytes)--|--error message(optional)--|--payload checksum(4 bytes)--|
-     */
-    private static final int CSV_END_FRAME_MAGIC = 8388614;
+     int currentFrameOffset;
+     int currentFramePayloadLength;
+     List<int> currentFrameTypeBytes;
+     List<int> currentFramePayloadLengthBytes;
+     List<int> currentFrameHeaderChecksumBytes;
+     List<int> scannedDataBytes;
+     List<int> currentFramePayloadChecksumBytes;
+     bool finished;
+     ProgressListener selectProgressListener;
+     int nextNotificationScannedSize;
+     CRC32 crc32;
+     SelectContentMetadataBase selectContentMetadataBase;
+     String requestId;
+    /// payload checksum is the last 4 bytes in one frame, we use this flag to indicate whether we
+    /// need read the 4 bytes before we advance to next frame.
+     bool firstReadFrame;
 
-    /**
-     * Format of json end frame
-     * |--frame type(4 bytes)--|--payload length(4 bytes)--|--header checksum(4 bytes)--|
-     * |--scanned data bytes(8 bytes)--|--total scan size(8 bytes)--|
-     * |--status code(4 bytes)--|--total splits count(4 bytes)--|
-     * |--total lines(8 bytes)--|--error message(optional)--|--payload checksum(4 bytes)--|
-     */
-    private static final int JSON_END_FRAME_MAGIC = 8388615;
-    private static final int SELECT_VERSION = 1;
-    private static final long DEFAULT_NOTIFICATION_THRESHOLD = 50 * 1024 * 1024;//notify every scanned 50MB
-
-    private long currentFrameOffset;
-    private long currentFramePayloadLength;
-    private byte[] currentFrameTypeBytes;
-    private byte[] currentFramePayloadLengthBytes;
-    private byte[] currentFrameHeaderChecksumBytes;
-    private byte[] scannedDataBytes;
-    private byte[] currentFramePayloadChecksumBytes;
-    private bool finished;
-    private ProgressListener selectProgressListener;
-    private long nextNotificationScannedSize;
-    private CRC32 crc32;
-    private SelectContentMetadataBase selectContentMetadataBase;
-    private String requestId;
-    /**
-     * payload checksum is the last 4 bytes in one frame, we use this flag to indicate whether we
-     * need read the 4 bytes before we advance to next frame.
-     */
-    private bool firstReadFrame;
-
-    public CreateSelectMetaInputStream(InputStream in, SelectContentMetadataBase selectContentMetadataBase, ProgressListener selectProgressListener) {
-        super(in);
+     CreateSelectMetaInputStream(InputStream inputStream, SelectContentMetadataBase selectContentMetadataBase, ProgressListener selectProgressListener) {
+        super(inputStream);
         currentFrameOffset = 0;
         currentFramePayloadLength = 0;
         currentFrameTypeBytes = new byte[4];
@@ -77,7 +62,7 @@ public class CreateSelectMetaInputStream extends FilterInputStream {
         this.crc32.reset();
     }
 
-    private void internalRead(byte[] buf, int off, int len) throws IOException {
+     void internalRead(List<int> buf, int off, int len) {
         int bytesRead = 0;
         while (bytesRead < len) {
             int bytes = in.read(buf, off + bytesRead, len - bytesRead);
@@ -88,15 +73,15 @@ public class CreateSelectMetaInputStream extends FilterInputStream {
         }
     }
 
-    private void validateCheckSum(byte[] checksumBytes, CRC32 crc32) throws IOException {
+     void validateCheckSum(List<int> checksumBytes, CRC32 crc32) throws IOException {
         int currentChecksum = ByteBuffer.wrap(checksumBytes).getInt();
-        if (crc32.getValue() != ((long)currentChecksum & 0xffffffffL)) {
+        if (crc32.getValue() != ((int)currentChecksum & 0xffffffffL)) {
             throw new SelectObjectException(SelectObjectException.INVALID_CRC, "Frame crc check failed, actual " + crc32.getValue() + ", expect: " + currentChecksum, requestId);
         }
         crc32.reset();
     }
 
-    private void readFrame() throws IOException {
+     void readFrame()  {
         while (currentFrameOffset >= currentFramePayloadLength && !finished) {
             if (!firstReadFrame) {
                 internalRead(currentFramePayloadChecksumBytes, 0, 4);
@@ -123,15 +108,15 @@ public class CreateSelectMetaInputStream extends FilterInputStream {
                 case CSV_END_FRAME_MAGIC:
                 case JSON_END_FRAME_MAGIC:
                     currentFramePayloadLength = ByteBuffer.wrap(currentFramePayloadLengthBytes).getInt() - 8;
-                    byte[] totalScannedDataSizeBytes = new byte[8];
+                    List<int> totalScannedDataSizeBytes = new byte[8];
                     internalRead(totalScannedDataSizeBytes, 0, 8);
-                    byte[] statusBytes = new byte[4];
+                    List<int> statusBytes = new byte[4];
                     internalRead(statusBytes, 0, 4);
-                    byte[] splitBytes = new byte[4];
+                    List<int> splitBytes = new byte[4];
                     internalRead(splitBytes, 0, 4);
-                    byte[] totalLineBytes = new byte[8];
+                    List<int> totalLineBytes = new byte[8];
                     internalRead(totalLineBytes, 0, 8);
-                    byte[] columnBytes = new byte[4];
+                    List<int> columnBytes = new byte[4];
                     if (type == CSV_END_FRAME_MAGIC) {
                         internalRead(columnBytes, 0, 4);
                     }
@@ -153,7 +138,7 @@ public class CreateSelectMetaInputStream extends FilterInputStream {
 
                     String error = "";
                     if (errorMessageSize > 0) {
-                        byte[] errorMessageBytes = new byte[errorMessageSize];
+                        List<int> errorMessageBytes = new byte[errorMessageSize];
                         internalRead(errorMessageBytes, 0, errorMessageSize);
                         error = new String(errorMessageBytes);
                         crc32.update(errorMessageBytes);
@@ -174,47 +159,47 @@ public class CreateSelectMetaInputStream extends FilterInputStream {
                     }
 
                     selectContentMetadataBase.withSplits(ByteBuffer.wrap(splitBytes).getInt())
-                            .withTotalLines(ByteBuffer.wrap(totalLineBytes).getLong());
+                            .withTotalLines(ByteBuffer.wrap(totalLineBytes).getint());
                     break;
                 default:
                     throw new SelectObjectException(SelectObjectException.INVALID_SELECT_FRAME, "Unsupported frame type " + type + " found", requestId);
             }
             //notify create select meta progress
-            ProgressEventType eventType = ProgressEventType.SELECT_SCAN_EVENT;
+            ProgressEventType eventType = ProgressEventType.selectScanEvent;
             if (finished) {
-                eventType = ProgressEventType.SELECT_COMPLETED_EVENT;
+                eventType = ProgressEventType.selectCompletedEvent;
             }
-            long scannedDataSize = ByteBuffer.wrap(scannedDataBytes).getLong();
+            int scannedDataSize = ByteBuffer.wrap(scannedDataBytes).getint();
             if (scannedDataSize >= nextNotificationScannedSize || finished) {
-                publishSelectProgress(selectProgressListener, eventType, scannedDataSize);
+                ProgressPublisher.publishSelectProgress(selectProgressListener, eventType, scannedDataSize);
                 nextNotificationScannedSize += DEFAULT_NOTIFICATION_THRESHOLD;
             }
         }
     }
 
-    @Override
-    public int read() throws IOException {
+    @override
+     int read()  {
         readFrame();
         return -1;
     }
 
-    @Override
-    public int read(byte b[]) throws IOException {
+    @override
+     int read(byte b[])  {
         return read(b, 0, b.length);
     }
 
-    @Override
-    public int read(byte[] buf, int off, int len) throws IOException {
+    @override
+     int read(List<int> buf, int off, int len) {
         readFrame();
         return -1;
     }
 
-    @Override
-    public int available() throws IOException {
+    @override
+     int available()  {
         throw new IOException("Create select meta input stream does not support available() operation");
     }
 
-    public void setRequestId(String requestId) {
+     void setRequestId(String requestId) {
         this.requestId = requestId;
     }
 }

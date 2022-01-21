@@ -29,7 +29,7 @@ class GeneratePresignedUrlRequest {
   DateTime? expiration;
 
   // The response headers to override.
-  ResponseHeaderOverrides responseHeaders = ResponseHeaderOverrides();
+  ResponseHeaderoverrides responseHeaders = ResponseHeaderoverrides();
 
   // User's customized metadata, which are the http headers start with the
   // x-oos-meta-.

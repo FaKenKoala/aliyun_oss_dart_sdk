@@ -36,12 +36,12 @@ public class OSSDownloadOperationEncrypted extends OSSDownloadOperation {
         this.ossEncryptionClient = ossEncryptionClient;
     }
 
-    @Override
+    @override
     protected OSSObject getObjectWrap(GetObjectRequest getObjectRequest){
         return ossEncryptionClient.getObject(getObjectRequest);
     }
 
-    @Override
+    @override
     protected Long getInputStreamCRCWrap(InputStream inputStream) {
         if (inputStream instanceof AdjustedRangeInputStream) {
             InputStream subInputStream = ((AdjustedRangeInputStream) inputStream).getWrappedInputStream();

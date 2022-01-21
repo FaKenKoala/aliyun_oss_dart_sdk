@@ -91,7 +91,7 @@ public class CRC64 implements Checksum {
     /**
      * Get long representation of current CRC64 value.
      **/
-    @Override
+    @override
     public long getValue() {
         return this.value;
     }
@@ -119,19 +119,19 @@ public class CRC64 implements Checksum {
         this.value = ~this.value;
     }
 
-    @Override
+    @override
     public void update(int b) {
         update((byte) (b & 0xFF));
     }
 
-    @Override
+    @override
     public void update(byte[] b, int off, int len) {
         for (int i = off; len > 0; len--) {
             update(b[i++]);
         }
     }
 
-    @Override
+    @override
     public void reset() {
         this.value = 0;
     }

@@ -45,7 +45,7 @@ public class InstanceProfileCredentialsFetcher extends HttpCredentialsFetcher {
         return this;
     }
 
-    @Override
+    @override
     public URL buildUrl() throws ClientException {
         try {
             return new URL("http://" + metadataServiceHost + URL_IN_ECS_METADATA + roleName);
@@ -54,7 +54,7 @@ public class InstanceProfileCredentialsFetcher extends HttpCredentialsFetcher {
         }
     }
 
-    @Override
+    @override
     public Credentials parse(HttpResponse response) throws ClientException {
         String jsonContent = new String(response.getHttpContent());
 

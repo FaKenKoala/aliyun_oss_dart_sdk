@@ -33,12 +33,12 @@ import com.aliyun.oss.common.utils.StringUtils;
  */
 public class SystemPropertiesCredentialsProvider implements CredentialsProvider {
 
-    @Override
+    @override
     public void setCredentials(Credentials creds) {
         
     }
 
-    @Override
+    @override
     public Credentials getCredentials() {
         String accessKeyId = StringUtils.trim(System.getProperty(AuthUtils.ACCESS_KEY_SYSTEM_PROPERTY));
         String secretAccessKey = StringUtils.trim(System.getProperty(AuthUtils.SECRET_KEY_SYSTEM_PROPERTY));

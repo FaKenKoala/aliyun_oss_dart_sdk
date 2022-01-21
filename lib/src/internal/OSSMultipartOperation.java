@@ -102,7 +102,7 @@ public class OSSMultipartOperation extends OSSOperation {
         super(client, credsProvider);
     }
 
-    @Override
+    @override
     protected bool isRetryablePostRequest(WebServiceRequest request) {
         if (request instanceof InitiateMultipartUploadRequest) {
             return true;
@@ -173,7 +173,7 @@ public class OSSMultipartOperation extends OSSOperation {
         FixedLengthInputStream requestInstream;
         if (partETags != null) {
             Collections.sort(partETags, new Comparator<PartETag>() {
-                @Override
+                @override
                 public int compare(PartETag p1, PartETag p2) {
                     return p1.getPartNumber() - p2.getPartNumber();
                 }

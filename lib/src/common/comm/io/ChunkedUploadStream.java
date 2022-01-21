@@ -51,7 +51,7 @@ public class ChunkedUploadStream extends InputStream {
         this.outputBuffer = new byte[CalculateChunkHeaderLength(DEFAULT_CHUNK_SIZE)];
     }
 
-    @Override
+    @override
     public int read() throws IOException {
         byte[] tmp = new byte[1];
         int count = read(tmp);
@@ -62,12 +62,12 @@ public class ChunkedUploadStream extends InputStream {
         }
     }
 
-    @Override
+    @override
     public int read(byte[] buffer) throws IOException {
         return read(buffer, 0, buffer.length);
     }
 
-    @Override
+    @override
     public int read(byte[] buffer, int offset, int count) throws IOException {
         if (buffer == null) {
             throw new NullPointerException();

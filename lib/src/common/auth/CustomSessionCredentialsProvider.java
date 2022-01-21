@@ -36,12 +36,12 @@ public class CustomSessionCredentialsProvider implements CredentialsProvider {
         return this;
     }
 
-    @Override
+    @override
     public void setCredentials(Credentials creds) {
 
     }
 
-    @Override
+    @override
     public Credentials getCredentials() {        
         if (credentials == null || credentials.willSoonExpire()) {
             synchronized (this) {

@@ -1,9 +1,8 @@
- import 'package:aliyun_oss_dart_sdk/src/common/utils/http_headers.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/utils/log_utils.dart';
-import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
+ import 'package:aliyun_oss_dart_sdk/src/client_configuration.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/auth/request_signer.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/http_headers.dart';
+import 'package:aliyun_oss_dart_sdk/src/oss_client.dart';
 
-import '../../client_configuration.dart';
-import '../../http_method.dart';
 import 'execution_context.dart';
 import 'http_message.dart';
 import 'request_message.dart';
@@ -21,9 +20,6 @@ abstract class ServiceClient {
      ResponseMessage sendRequest(RequestMessage request, ExecutionContext context)
              {
 
-        assertParameterNotNull(request, "request");
-        assertParameterNotNull(context, "context");
-
         try {
             return sendRequestImpl(request, context);
         } finally {
@@ -40,15 +36,15 @@ abstract class ServiceClient {
      ResponseMessage sendRequestImpl(RequestMessage request, ExecutionContext context)
             {
 
-        RetryStrategy retryStrategy = context.getRetryStrategy() != null ? context.getRetryStrategy()
-                : this.getDefaultRetryStrategy();
+        RetryStrategy retryStrategy = context.retryStrategy??
+                 getDefaultRetryStrategy();
 
         // Sign the request if a signer provided.
-        if (context.getSigner() != null && !request.isUseUrlSignature()) {
-            context.getSigner().sign(request);
+        if (context.signer != null && !request.useUrlSignature) {
+            context.signer!.sign(request);
         }
 
-        for (RequestSigner signer : context.getSignerHandlers()) {
+        for (RequestSigner signer in context.getSignerHandlers()) {
             signer.sign(request);
         }
 
@@ -67,7 +63,7 @@ abstract class ServiceClient {
                     if (requestContent != null && requestContent.markSupported()) {
                         try {
                             requestContent.reset();
-                        } catch ( ex) {
+                        } catch (ex) {
                             LogUtils.logException("Failed to reset the request input stream: ", ex);
                             throw ClientException("Failed to reset the request input stream: ", ex);
                         }
@@ -88,10 +84,10 @@ abstract class ServiceClient {
 
                 // Step 3. Send HTTP request to OSS.
                 String poolStatsInfo = config.isLogConnectionPoolStatsEnable()? "Connection pool stats " + getConnectionPoolStats():"";
-                long startTime = System.currentTimeMillis();
+                int startTime = DateTime.now().millisecondsSinceEpoch;
                 response = sendRequestCore(httpRequest, context);
-                long duration = System.currentTimeMillis() - startTime;
-                if (duration > config.getSlowRequestsThreshold()) {
+                int duration = DateTime.now().millisecondsSinceEpoch - startTime;
+                if (duration > config.slowRequestsThreshold) {
                     LogUtils.getLog().warn(formatSlowRequestLog(request, response, duration) + poolStatsInfo);
                 }
 
@@ -99,17 +95,17 @@ abstract class ServiceClient {
                 handleResponse(response, context.getResponseHandlers());
 
                 return response;
-            } catch (ServiceException sex) {
+            } catch (sex) {
                 logException("[Server]Unable to execute HTTP request: ", sex,
-                        request.getOriginalRequest().isLogEnabled());
+                        request.originalRequest.logEnabled);
 
                 // Notice that the response should not be closed in the
                 // finally block because if the request is successful,
                 // the response should be returned to the callers.
                 closeResponseSilently(response);
 
-                if (!shouldRetry(sex, request, response, retries, retryStrategy)) {
-                    throw sex;
+                if (!shouldRetry(sex as Exception, request, response, retries, retryStrategy)) {
+                    rethrow;
                 }
             } catch (ClientException cex) {
                 logException("[Client]Unable to execute HTTP request: ", cex,
@@ -226,7 +222,7 @@ abstract class ServiceClient {
 
      void pause(int retries, RetryStrategy retryStrategy) throws ClientException {
 
-        long delay = retryStrategy.getPauseDelay(retries);
+        int delay = retryStrategy.getPauseDelay(retries);
 
         getLog().debug(
                 "An retriable error request will be retried after " + delay + "(ms) with attempt times: " + retries);

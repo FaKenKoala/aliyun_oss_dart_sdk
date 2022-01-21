@@ -90,7 +90,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
      *          The put object request.
      * @return the result of the request.
      */
-    @Override
+    @override
     public PutObjectResult putObjectSecurely(PutObjectRequest req) {
         // Update User-Agent.
         setUserAgent(req, encryptionClientUserAgent);
@@ -187,7 +187,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
      * Gets the object in OSS, if it was an encrypted object then decrypt it and
      * return the result, otherwise return the object directly.
      */
-    @Override
+    @override
     public OSSObject getObjectSecurely(GetObjectRequest req) {
         // Update User-Agent.
         setUserAgent(req, encryptionClientUserAgent);
@@ -292,7 +292,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
      * Gets the object in OSS and write it in a file, if it was an encrypted object
      * then decrypt it, otherwise wirte the object directly.
      */
-    @Override
+    @override
     public ObjectMetadata getObjectSecurely(GetObjectRequest getObjectRequest, File file) {
         assertParameterNotNull(file, "file");
         OSSObject ossObject = getObjectSecurely(getObjectRequest);
@@ -337,7 +337,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
      *         upload information, it should created on the outside with part-size and data-size set done, the 
      *         content crypto materials and other upload information will be filled after initiate request done.
      */
-    @Override
+    @override
     public InitiateMultipartUploadResult initiateMultipartUploadSecurely(InitiateMultipartUploadRequest req,
             MultipartUploadCryptoContext context) {
         checkMultipartContext(context);
@@ -369,7 +369,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
     /**
      * Uploads the part secured.
      */
-    @Override
+    @override
     public UploadPartResult uploadPartSecurely(UploadPartRequest req, MultipartUploadCryptoContext context) {
         final UploadPartResult result;
 

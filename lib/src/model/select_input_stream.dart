@@ -177,7 +177,7 @@ public class SelectInputStream extends FilterInputStream {
         }
     }
 
-    @Override
+    @override
     public int read() throws IOException {
         readFrame();
         int byteRead = in.read();
@@ -190,12 +190,12 @@ public class SelectInputStream extends FilterInputStream {
         return byteRead;
     }
 
-    @Override
+    @override
     public int read(byte b[]) throws IOException {
         return read(b, 0, b.length);
     }
 
-    @Override
+    @override
     public int read(byte[] buf, int off, int len) throws IOException {
         readFrame();
         int bytesToRead = (int)Math.min(len, currentFramePayloadLength - currentFrameOffset);
@@ -212,7 +212,7 @@ public class SelectInputStream extends FilterInputStream {
         return -1;
     }
 
-    @Override
+    @override
     public int available() throws IOException {
         throw new IOException("Select object input stream does not support available() operation");
     }

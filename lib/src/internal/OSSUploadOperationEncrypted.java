@@ -54,7 +54,7 @@ public class OSSUploadOperationEncrypted extends OSSUploadOperation {
             this.context = context;
         }
 
-        @Override
+        @override
         public int hashCode() {
             int result = super.hashCode();
             final int prime = 31;
@@ -62,7 +62,7 @@ public class OSSUploadOperationEncrypted extends OSSUploadOperation {
             return result;
         }
 
-       @Override
+       @override
         public void assign(UploadCheckPoint ucp) {
             assertUploadCheckPointIsLegal(ucp);
             super.assign(ucp);
@@ -70,12 +70,12 @@ public class OSSUploadOperationEncrypted extends OSSUploadOperation {
         }
     }
 
-    @Override
+    @override
     public UploadCheckPoint createUploadCheckPointWrap() {
         return new UploadCheckPointEncryption();
     }
 
-    @Override
+    @override
     public void loadUploadCheckPointWrap(UploadCheckPoint uploadCheckPoint, String checkpointFile) throws Throwable {
         assertUploadCheckPointIsLegal(uploadCheckPoint);
         uploadCheckPoint.load(checkpointFile);
@@ -86,7 +86,7 @@ public class OSSUploadOperationEncrypted extends OSSUploadOperation {
         }
     }
 
-    @Override
+    @override
     public InitiateMultipartUploadResult initiateMultipartUploadWrap(
             UploadCheckPoint uploadCheckPoint, InitiateMultipartUploadRequest initiateMultipartUploadRequest)
             throws OSSException, ClientException {
@@ -103,14 +103,14 @@ public class OSSUploadOperationEncrypted extends OSSUploadOperation {
         return result;
     }
 
-    @Override
+    @override
     public UploadPartResult uploadPartWrap(UploadCheckPoint uploadCheckPoint, UploadPartRequest uploadPartRequest)
             throws OSSException, ClientException {
         assertUploadCheckPointIsLegal(uploadCheckPoint);
         return ossEncryptionClient.uploadPart(uploadPartRequest, ((UploadCheckPointEncryption) uploadCheckPoint).getContext());
     }
 
-    @Override
+    @override
     public CompleteMultipartUploadResult completeMultipartUploadWrap(
             UploadCheckPoint uploadCheckPoint, CompleteMultipartUploadRequest request)
             throws OSSException, ClientException {

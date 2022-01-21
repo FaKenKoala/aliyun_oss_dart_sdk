@@ -74,12 +74,12 @@ public class STSAssumeRoleSessionCredentialsProvider implements CredentialsProvi
         return "aliyun-java-sdk-" + System.currentTimeMillis();
     }
 
-    @Override
+    @override
     public void setCredentials(Credentials creds) {
 
     }
 
-    @Override
+    @override
     public Credentials getCredentials() {
         if (credentials == null || credentials.willSoonExpire()) {
             synchronized (this) {

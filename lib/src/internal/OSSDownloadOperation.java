@@ -150,7 +150,7 @@ public class OSSDownloadOperation {
             return true;
         }
 
-        @Override
+        @override
         public int hashCode() {
             final int prime = 31;
             int result = 1;
@@ -187,7 +187,7 @@ public class OSSDownloadOperation {
 
         private static final long serialVersionUID = -2883494783412999919L;
 
-        @Override
+        @override
         public int hashCode() {
             final int prime = 31;
             int result = 1;
@@ -232,7 +232,7 @@ public class OSSDownloadOperation {
 
         private static final long serialVersionUID = -3655925846487976207L;
 
-        @Override
+        @override
         public int hashCode() {
             final int prime = 31;
             int result = 1;
@@ -568,7 +568,7 @@ public class OSSDownloadOperation {
 
         // Sorts the download result by the part number.
         Collections.sort(taskResults, new Comparator<PartResult>() {
-            @Override
+            @override
             public int compare(PartResult p1, PartResult p2) {
                 return p1.getNumber() - p2.getNumber();
             }
@@ -602,7 +602,7 @@ public class OSSDownloadOperation {
             this.progressListener = progressListener;
         }
 
-        @Override
+        @override
         public PartResult call() throws Exception {
             PartResult tr = null;
             RandomAccessFile output = null;

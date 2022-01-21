@@ -45,7 +45,7 @@ public final class RenewableCipherInputStream extends CipherInputStream {
      * then be marked at and get reset back to the very beginning of the stream (but
      * not anywhere else).
      */
-    @Override
+    @override
     public bool markSupported() {
         abortIfNeeded();
         return in.markSupported();
@@ -60,7 +60,7 @@ public final class RenewableCipherInputStream extends CipherInputStream {
      * @throws UnsupportedOperationException
      *             if mark is called after this stream has been accessed.
      */
-    @Override
+    @override
     public void mark(final int readlimit) {
         abortIfNeeded();
         if (hasBeenAccessed) {
@@ -78,7 +78,7 @@ public final class RenewableCipherInputStream extends CipherInputStream {
      * then be marked at and get reset back to the very beginning of the stream (but
      * not anywhere else).
      */
-    @Override
+    @override
     public void reset() throws IOException {
         abortIfNeeded();
         in.reset();
@@ -87,25 +87,25 @@ public final class RenewableCipherInputStream extends CipherInputStream {
         hasBeenAccessed = false;
     }
 
-    @Override
+    @override
     public int read() throws IOException {
         hasBeenAccessed = true;
         return super.read();
     }
 
-    @Override
+    @override
     public int read(final byte[] b) throws IOException {
         hasBeenAccessed = true;
         return super.read(b);
     }
 
-    @Override
+    @override
     public int read(final byte[] b, final int off, final int len) throws IOException {
         hasBeenAccessed = true;
         return super.read(b, off, len);
     }
 
-    @Override
+    @override
     public long skip(final long n) throws IOException {
         hasBeenAccessed = true;
         return super.skip(n);

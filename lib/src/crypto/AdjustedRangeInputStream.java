@@ -89,7 +89,7 @@ public class AdjustedRangeInputStream extends InputStream {
         this.virtualAvailable = (rangeEnd - rangeBeginning) + 1;
     }
 
-    @Override
+    @override
     public int read() throws IOException {
         abortIfNeeded();
         int result;
@@ -110,7 +110,7 @@ public class AdjustedRangeInputStream extends InputStream {
         return result;
     }
 
-    @Override
+    @override
     public int read(byte[] buffer, int offset, int length) throws IOException {
         abortIfNeeded();
         int numBytesRead;
@@ -132,7 +132,7 @@ public class AdjustedRangeInputStream extends InputStream {
         return numBytesRead;
     }
 
-    @Override
+    @override
     public int available() throws IOException {
         abortIfNeeded();
         int available = this.decryptedContents.available();
@@ -143,7 +143,7 @@ public class AdjustedRangeInputStream extends InputStream {
         }
     }
 
-    @Override
+    @override
     public void close() throws IOException {
         if (!this.closed) {
             this.closed = true;

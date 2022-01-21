@@ -369,7 +369,7 @@ public class OSSObjectOperation extends OSSOperation {
             ossObject = doOperation(request, new GetObjectResponseParser(bucketName, key), bucketName, key, true);
             InputStream instream = ossObject.getObjectContent();
             ProgressInputStream progressInputStream = new ProgressInputStream(instream, listener) {
-                @Override
+                @override
                 protected void onEOF() {
                     publishProgress(getListener(), ProgressEventType.TRANSFER_COMPLETED_EVENT);
                 };
@@ -1069,7 +1069,7 @@ public class OSSObjectOperation extends OSSOperation {
             this.directiveAsString = directiveAsString;
         }
 
-        @Override
+        @override
         public String toString() {
             return this.directiveAsString;
         }
@@ -1098,7 +1098,7 @@ public class OSSObjectOperation extends OSSOperation {
             this.modeAsString = modeAsString;
         }
 
-        @Override
+        @override
         public String toString() {
             return this.modeAsString;
         }

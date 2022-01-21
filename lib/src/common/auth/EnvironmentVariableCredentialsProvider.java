@@ -29,12 +29,12 @@ import com.aliyun.oss.common.utils.StringUtils;
  */
 public class EnvironmentVariableCredentialsProvider implements CredentialsProvider {
 
-    @Override
+    @override
     public void setCredentials(Credentials creds) {
         
     }
 
-    @Override
+    @override
     public Credentials getCredentials() {
         String accessKeyId = StringUtils.trim(System.getenv(AuthUtils.ACCESS_KEY_ENV_VAR));
         String secretAccessKey = StringUtils.trim(System.getenv(AuthUtils.SECRET_KEY_ENV_VAR));

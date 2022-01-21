@@ -66,7 +66,7 @@ public final class IdleConnectionReaper extends Thread {
     }
 
     @SuppressWarnings("unchecked")
-    @Override
+    @override
     public void run() {
         while (true) {
             if (shuttingDown) {

@@ -301,34 +301,34 @@ class OSSUtils {
     }
 
      static void populateResponseHeaderParameters(Map<String, String> params,
-            ResponseHeaderOverrides responseHeaders) {
+            ResponseHeaderoverrides responseHeaders) {
 
         if (responseHeaders != null) {
             if (responseHeaders.getCacheControl() != null) {
-                params.put(ResponseHeaderOverrides.RESPONSE_HEADER_CACHE_CONTROL, responseHeaders.getCacheControl());
+                params.put(ResponseHeaderoverrides.RESPONSE_HEADER_CACHE_CONTROL, responseHeaders.getCacheControl());
             }
 
             if (responseHeaders.getContentDisposition() != null) {
-                params.put(ResponseHeaderOverrides.RESPONSE_HEADER_CONTENT_DISPOSITION,
+                params.put(ResponseHeaderoverrides.RESPONSE_HEADER_CONTENT_DISPOSITION,
                         responseHeaders.getContentDisposition());
             }
 
             if (responseHeaders.getContentEncoding() != null) {
-                params.put(ResponseHeaderOverrides.RESPONSE_HEADER_CONTENT_ENCODING,
+                params.put(ResponseHeaderoverrides.RESPONSE_HEADER_CONTENT_ENCODING,
                         responseHeaders.getContentEncoding());
             }
 
             if (responseHeaders.getContentLangauge() != null) {
-                params.put(ResponseHeaderOverrides.RESPONSE_HEADER_CONTENT_LANGUAGE,
+                params.put(ResponseHeaderoverrides.RESPONSE_HEADER_CONTENT_LANGUAGE,
                         responseHeaders.getContentLangauge());
             }
 
             if (responseHeaders.getContentType() != null) {
-                params.put(ResponseHeaderOverrides.RESPONSE_HEADER_CONTENT_TYPE, responseHeaders.getContentType());
+                params.put(ResponseHeaderoverrides.RESPONSE_HEADER_CONTENT_TYPE, responseHeaders.getContentType());
             }
 
             if (responseHeaders.getExpires() != null) {
-                params.put(ResponseHeaderOverrides.RESPONSE_HEADER_EXPIRES, responseHeaders.getExpires());
+                params.put(ResponseHeaderoverrides.RESPONSE_HEADER_EXPIRES, responseHeaders.getExpires());
             }
         }
     }

@@ -127,7 +127,7 @@ public class DefaultServiceClient extends ServiceClient {
         this.requestConfig = requestConfigBuilder.build();
     }
 
-    @Override
+    @override
     public ResponseMessage sendRequestCore(ServiceClient.Request request, ExecutionContext context) throws IOException {
         HttpRequestBase httpRequest = httpRequestFactory.createHttpRequest(request, context);
         setProxyAuthorizationIfNeed(httpRequest);
@@ -187,7 +187,7 @@ public class DefaultServiceClient extends ServiceClient {
 
     private static class DefaultRetryStrategy extends RetryStrategy {
 
-        @Override
+        @override
         public bool shouldRetry(Exception ex, RequestMessage request, ResponseMessage response, int retries) {
             if (ex instanceof ClientException) {
                 String errorCode = ((ClientException) ex).getErrorCode();
@@ -226,7 +226,7 @@ public class DefaultServiceClient extends ServiceClient {
         }
     }
 
-    @Override
+    @override
     protected RetryStrategy getDefaultRetryStrategy() {
         return new DefaultRetryStrategy();
     }
@@ -317,13 +317,13 @@ public class DefaultServiceClient extends ServiceClient {
         }
     }
 
-    @Override
+    @override
     public void shutdown() {
         IdleConnectionReaper.removeConnectionManager(this.connectionManager);
         this.connectionManager.shutdown();
     }
 
-    @Override
+    @override
     public String getConnectionPoolStats() {
         if (connectionManager != null && connectionManager instanceof PoolingHttpClientConnectionManager) {
             PoolingHttpClientConnectionManager conn = (PoolingHttpClientConnectionManager)connectionManager;
@@ -372,12 +372,12 @@ public class DefaultServiceClient extends ServiceClient {
             this.trustManagers = trustManagers;
         }
 
-        @Override
+        @override
         public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
             // do nothing
         }
 
-        @Override
+        @override
         public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
             if (!verifySSL) {
                 return;
@@ -393,7 +393,7 @@ public class DefaultServiceClient extends ServiceClient {
             throw new CertificateException("None of the TrustManagers trust this certificate chain");
         }
 
-        @Override
+        @override
         public X509Certificate[] getAcceptedIssuers() {
             List<X509Certificate> certificates = [];
             for (X509TrustManager trustManager : trustManagers) {

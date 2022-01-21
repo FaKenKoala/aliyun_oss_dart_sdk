@@ -1,12 +1,13 @@
 
  import 'package:aliyun_oss_dart_sdk/src/common/comm/request_message.dart';
 
+import 'request_parameters.dart';
 import 'sign_parameters.dart';
 
 class SignUtils {
 
      static String composeRequestAuthorization(String accessKeyId, String signature) {
-        return AUTHORIZATION_PREFIX + accessKeyId + ":" + signature;
+        return SignParameters.AUTHORIZATION_PREFIX + accessKeyId + ":" + signature;
     }
 
      static String buildCanonicalString(String method, String resourcePath, RequestMessage request,
@@ -191,7 +192,7 @@ class SignUtils {
 
      static void populateTrafficLimitParams(Map<String, String> params, int limit) {
         if (limit > 0) {
-            params.put(OSS_TRAFFIC_LIMIT, String.valueOf(limit));
+            params[RequestParameters.OSS_TRAFFIC_LIMIT] =  '$limit';
         }
     }
 }

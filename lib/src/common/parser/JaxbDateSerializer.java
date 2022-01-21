@@ -27,12 +27,12 @@ import com.aliyun.oss.common.utils.DateUtil;
 
 public class JaxbDateSerializer extends XmlAdapter<String, Date> {
 
-    @Override
+    @override
     public String marshal(Date date) throws Exception {
         return DateUtil.formatRfc822Date(date);
     }
 
-    @Override
+    @override
     public Date unmarshal(String date) throws Exception {
         return DateUtil.parseRfc822Date(date);
     }

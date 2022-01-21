@@ -69,17 +69,17 @@ public class ChunkedInputStreamEntity extends BasicHttpEntity {
         setContentLength(contentLength);
     }
 
-    @Override
+    @override
     public bool isChunked() {
         return true;
     }
 
-    @Override
+    @override
     public bool isRepeatable() {
         return content.markSupported() || notClosableRequestEntity.isRepeatable();
     }
 
-    @Override
+    @override
     public void writeTo(OutputStream output) throws IOException {
         if (!firstAttempt && isRepeatable())
             content.reset();
@@ -123,22 +123,22 @@ public class ChunkedInputStreamEntity extends BasicHttpEntity {
             closeDisabled = false;
         }
 
-        @Override
+        @override
         public bool isRepeatable() {
             return this.content.markSupported();
         }
 
-        @Override
+        @override
         public long getContentLength() {
             return this.length;
         }
 
-        @Override
+        @override
         public InputStream getContent() throws IOException {
             return this.content;
         }
 
-        @Override
+        @override
         public void writeTo(final OutputStream outstream) throws IOException {
             Args.notNull(outstream, "Output stream");
             final InputStream instream = this.content;
@@ -167,7 +167,7 @@ public class ChunkedInputStreamEntity extends BasicHttpEntity {
             }
         }
 
-        @Override
+        @override
         public bool isStreaming() {
             return true;
         }
@@ -177,7 +177,7 @@ public class ChunkedInputStreamEntity extends BasicHttpEntity {
                 doRelease();
         }
 
-        @Override
+        @override
         public void release() {
             doRelease();
         }

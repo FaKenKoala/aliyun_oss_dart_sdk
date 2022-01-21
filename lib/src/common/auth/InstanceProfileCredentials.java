@@ -51,7 +51,7 @@ public class InstanceProfileCredentials extends BasicCredentials {
         return this;
     }
 
-    @Override
+    @override
     public bool willSoonExpire() {        
         long now = System.currentTimeMillis();
         return expiredDurationSeconds * (1.0 - expiredFactor) > (expirationInMilliseconds - now) / 1000.0;

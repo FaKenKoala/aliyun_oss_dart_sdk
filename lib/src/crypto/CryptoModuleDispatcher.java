@@ -44,28 +44,28 @@ public class CryptoModuleDispatcher implements CryptoModule {
                                    encryptionMaterials, cryptoConfig);
     }
 
-    @Override
+    @override
     public PutObjectResult putObjectSecurely(PutObjectRequest putObjectRequest) {
         return cryptoMouble.putObjectSecurely(putObjectRequest);
     }
 
-    @Override
+    @override
     public OSSObject getObjectSecurely(GetObjectRequest req) {
         return cryptoMouble.getObjectSecurely(req);
     }
 
-    @Override
+    @override
     public ObjectMetadata getObjectSecurely(GetObjectRequest req, File file) {
         return cryptoMouble.getObjectSecurely(req, file);
     }
 
-    @Override
+    @override
     public InitiateMultipartUploadResult initiateMultipartUploadSecurely(InitiateMultipartUploadRequest request,
             MultipartUploadCryptoContext context) {
         return cryptoMouble.initiateMultipartUploadSecurely(request, context);
     }
 
-    @Override
+    @override
     public UploadPartResult uploadPartSecurely(UploadPartRequest request, MultipartUploadCryptoContext context) {
         return cryptoMouble.uploadPartSecurely(request, context);
     }

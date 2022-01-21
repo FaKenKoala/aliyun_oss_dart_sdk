@@ -229,7 +229,7 @@ public final class ResponseParsers {
     public static final DeleteDirectoryResponseParser deleteDirectoryResponseParser = new DeleteDirectoryResponseParser();
     public static final class EmptyResponseParser implements ResponseParser<ResponseMessage> {
 
-        @Override
+        @override
         public ResponseMessage parse(ResponseMessage response) throws ResponseParseException {
             // Close response and return it directly without parsing.
             safeCloseResponse(response);
@@ -240,7 +240,7 @@ public final class ResponseParsers {
 
     public static final class RequestIdResponseParser implements ResponseParser<VoidResult> {
 
-        @Override
+        @override
         public VoidResult parse(ResponseMessage response) throws ResponseParseException {
             try{
                 VoidResult result = new VoidResult();
@@ -256,7 +256,7 @@ public final class ResponseParsers {
 
     public static final class ListBucketResponseParser implements ResponseParser<BucketList> {
 
-        @Override
+        @override
         public BucketList parse(ResponseMessage response) throws ResponseParseException {
             try {
                 BucketList result = parseListBucket(response.getContent());
@@ -270,7 +270,7 @@ public final class ResponseParsers {
     }
 
     public static final class ListImageStyleResponseParser implements ResponseParser<List<Style>> {
-        @Override
+        @override
         public List<Style> parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseListImageStyle(response.getContent());
@@ -282,7 +282,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketRefererResponseParser implements ResponseParser<BucketReferer> {
 
-        @Override
+        @override
         public BucketReferer parse(ResponseMessage response) throws ResponseParseException {
             try {
                 BucketReferer result = parseGetBucketReferer(response.getContent());
@@ -297,7 +297,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketAclResponseParser implements ResponseParser<AccessControlList> {
 
-        @Override
+        @override
         public AccessControlList parse(ResponseMessage response) throws ResponseParseException {
             try {
                 AccessControlList result = parseGetBucketAcl(response.getContent());
@@ -312,7 +312,7 @@ public final class ResponseParsers {
 	
     public static final class GetBucketMetadataResponseParser implements ResponseParser<BucketMetadata> {
 
-        @Override
+        @override
         public BucketMetadata parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseBucketMetadata(response.getHeaders());
@@ -325,7 +325,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketLocationResponseParser implements ResponseParser<String> {
 
-        @Override
+        @override
         public String parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseGetBucketLocation(response.getContent());
@@ -338,7 +338,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketLoggingResponseParser implements ResponseParser<BucketLoggingResult> {
 
-        @Override
+        @override
         public BucketLoggingResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 BucketLoggingResult result = parseBucketLogging(response.getContent());
@@ -352,7 +352,7 @@ public final class ResponseParsers {
     }
 
     public static final class GetBucketImageResponseParser implements ResponseParser<GetBucketImageResult> {
-        @Override
+        @override
         public GetBucketImageResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseBucketImage(response.getContent());
@@ -363,7 +363,7 @@ public final class ResponseParsers {
     }
 
     public static final class GetImageStyleResponseParser implements ResponseParser<GetImageStyleResult> {
-        @Override
+        @override
         public GetImageStyleResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseImageStyle(response.getContent());
@@ -375,7 +375,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketImageProcessConfResponseParser implements ResponseParser<BucketProcess> {
 
-        @Override
+        @override
         public BucketProcess parse(ResponseMessage response) throws ResponseParseException {
             try {
                 BucketProcess result = parseGetBucketImageProcessConf(response.getContent());
@@ -390,7 +390,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketWebsiteResponseParser implements ResponseParser<BucketWebsiteResult> {
 
-        @Override
+        @override
         public BucketWebsiteResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 BucketWebsiteResult result = parseBucketWebsite(response.getContent());
@@ -405,7 +405,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketLifecycleResponseParser implements ResponseParser<List<LifecycleRule>> {
 
-        @Override
+        @override
         public List<LifecycleRule> parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseGetBucketLifecycle(response.getContent());
@@ -417,7 +417,7 @@ public final class ResponseParsers {
     }
 
     public static final class AddBucketCnameResponseParser implements ResponseParser<AddBucketCnameResult> {
-        @Override
+        @override
         public AddBucketCnameResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 AddBucketCnameResult result = new AddBucketCnameResult();
@@ -433,7 +433,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketCnameResponseParser implements ResponseParser<List<CnameConfiguration>> {
 
-        @Override
+        @override
         public List<CnameConfiguration> parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseGetBucketCname(response.getContent());
@@ -446,7 +446,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketInfoResponseParser implements ResponseParser<BucketInfo> {
 
-        @Override
+        @override
         public BucketInfo parse(ResponseMessage response) throws ResponseParseException {
             try {
                 BucketInfo result = parseGetBucketInfo(response.getContent());
@@ -461,7 +461,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketStatResponseParser implements ResponseParser<BucketStat> {
 
-        @Override
+        @override
         public BucketStat parse(ResponseMessage response) throws ResponseParseException {
             try {
                 BucketStat result = parseGetBucketStat(response.getContent());
@@ -476,7 +476,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketQosResponseParser implements ResponseParser<UserQos> {
 
-        @Override
+        @override
         public UserQos parse(ResponseMessage response) throws ResponseParseException {
             try {
                 UserQos result = parseGetUserQos(response.getContent());
@@ -492,7 +492,7 @@ public final class ResponseParsers {
     public static final class GetBucketVersioningResponseParser
         implements ResponseParser<BucketVersioningConfiguration> {
 
-        @Override
+        @override
         public BucketVersioningConfiguration parse(ResponseMessage response) throws ResponseParseException {
             try {
                 BucketVersioningConfiguration result = parseGetBucketVersioning(response.getContent());
@@ -507,7 +507,7 @@ public final class ResponseParsers {
     public static final class GetBucketEncryptionResponseParser
     implements ResponseParser<ServerSideEncryptionConfiguration> {
     	
-    	@Override
+    	@override
     	public ServerSideEncryptionConfiguration parse(ResponseMessage response) throws ResponseParseException {
     		try {
     			ServerSideEncryptionConfiguration result = parseGetBucketEncryption(response.getContent());
@@ -521,7 +521,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketPolicyResponseParser implements ResponseParser<GetBucketPolicyResult> {
     	
-        @Override
+        @override
         public GetBucketPolicyResult parse(ResponseMessage response) throws ResponseParseException {
         	try {
         		GetBucketPolicyResult result = parseGetBucketPolicy(response.getContent());
@@ -536,7 +536,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketRequestPaymentResponseParser implements ResponseParser<GetBucketRequestPaymentResult> {
 
-        @Override
+        @override
         public GetBucketRequestPaymentResult parse(ResponseMessage response) throws ResponseParseException {
             try {
             	GetBucketRequestPaymentResult result = parseGetBucketRequestPayment(response.getContent());
@@ -551,7 +551,7 @@ public final class ResponseParsers {
 
     public static final class GetUSerQosInfoResponseParser implements ResponseParser<UserQosInfo> {
 
-        @Override
+        @override
         public UserQosInfo parse(ResponseMessage response) throws ResponseParseException {
             try {
                 UserQosInfo result = parseGetUserQosInfo(response.getContent());
@@ -566,7 +566,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketQosInfoResponseParser implements ResponseParser<BucketQosInfo> {
 
-        @Override
+        @override
         public BucketQosInfo parse(ResponseMessage response) throws ResponseParseException {
             try {
                 BucketQosInfo result = parseGetBucketQosInfo(response.getContent());
@@ -581,7 +581,7 @@ public final class ResponseParsers {
 
     public static final class SetAsyncFetchTaskResponseParser implements ResponseParser<SetAsyncFetchTaskResult> {
 
-        @Override
+        @override
         public SetAsyncFetchTaskResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 SetAsyncFetchTaskResult result = parseSetAsyncFetchTaskResult(response.getContent());
@@ -596,7 +596,7 @@ public final class ResponseParsers {
 
     public static final class GetAsyncFetchTaskResponseParser implements ResponseParser<GetAsyncFetchTaskResult> {
 
-        @Override
+        @override
         public GetAsyncFetchTaskResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 GetAsyncFetchTaskResult result = parseGetAsyncFetchTaskResult(response.getContent());
@@ -611,7 +611,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketInventoryConfigurationParser implements ResponseParser<GetBucketInventoryConfigurationResult> {
 
-        @Override
+        @override
         public GetBucketInventoryConfigurationResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 GetBucketInventoryConfigurationResult result = parseGetBucketInventoryConfig(response.getContent());
@@ -626,7 +626,7 @@ public final class ResponseParsers {
 
     public static final class ListBucketInventoryConfigurationsParser implements ResponseParser<ListBucketInventoryConfigurationsResult> {
 
-        @Override
+        @override
         public ListBucketInventoryConfigurationsResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 ListBucketInventoryConfigurationsResult result = parseListBucketInventoryConfigurations(response.getContent());
@@ -641,7 +641,7 @@ public final class ResponseParsers {
 
     public static final class CreateLiveChannelResponseParser implements ResponseParser<CreateLiveChannelResult> {
 
-        @Override
+        @override
         public CreateLiveChannelResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 CreateLiveChannelResult result = parseCreateLiveChannel(response.getContent());
@@ -656,7 +656,7 @@ public final class ResponseParsers {
 
     public static final class GetLiveChannelInfoResponseParser implements ResponseParser<LiveChannelInfo> {
 
-        @Override
+        @override
         public LiveChannelInfo parse(ResponseMessage response) throws ResponseParseException {
             try {
                 LiveChannelInfo result = parseGetLiveChannelInfo(response.getContent());
@@ -671,7 +671,7 @@ public final class ResponseParsers {
 
     public static final class GetLiveChannelStatResponseParser implements ResponseParser<LiveChannelStat> {
 
-        @Override
+        @override
         public LiveChannelStat parse(ResponseMessage response) throws ResponseParseException {
             try {
                 LiveChannelStat result = parseGetLiveChannelStat(response.getContent());
@@ -686,7 +686,7 @@ public final class ResponseParsers {
 
     public static final class GetLiveChannelHistoryResponseParser implements ResponseParser<List<LiveRecord>> {
 
-        @Override
+        @override
         public List<LiveRecord> parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseGetLiveChannelHistory(response.getContent());
@@ -699,7 +699,7 @@ public final class ResponseParsers {
 
     public static final class ListLiveChannelsReponseParser implements ResponseParser<LiveChannelListing> {
 
-        @Override
+        @override
         public LiveChannelListing parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseListLiveChannels(response.getContent());
@@ -712,7 +712,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketCorsResponseParser implements ResponseParser<CORSConfiguration> {
 
-        @Override
+        @override
         public CORSConfiguration parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseListBucketCORS(response.getContent());
@@ -725,7 +725,7 @@ public final class ResponseParsers {
 
     public static final class GetTaggingResponseParser implements ResponseParser<TagSet> {
 
-        @Override
+        @override
         public TagSet parse(ResponseMessage response) throws ResponseParseException {
             try {
                 TagSet result = parseGetBucketTagging(response.getContent());
@@ -740,7 +740,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketReplicationResponseParser implements ResponseParser<List<ReplicationRule>> {
 
-        @Override
+        @override
         public List<ReplicationRule> parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseGetBucketReplication(response.getContent());
@@ -754,7 +754,7 @@ public final class ResponseParsers {
     public static final class GetBucketReplicationProgressResponseParser
             implements ResponseParser<BucketReplicationProgress> {
 
-        @Override
+        @override
         public BucketReplicationProgress parse(ResponseMessage response) throws ResponseParseException {
             try {
                 BucketReplicationProgress result = parseGetBucketReplicationProgress(response.getContent());
@@ -769,7 +769,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketReplicationLocationResponseParser implements ResponseParser<List<String>> {
 
-        @Override
+        @override
         public List<String> parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseGetBucketReplicationLocation(response.getContent());
@@ -782,7 +782,7 @@ public final class ResponseParsers {
 
     public static final class ListObjectsReponseParser implements ResponseParser<ObjectListing> {
 
-        @Override
+        @override
         public ObjectListing parse(ResponseMessage response) throws ResponseParseException {
             try {
                 ObjectListing result = parseListObjects(response.getContent());
@@ -797,7 +797,7 @@ public final class ResponseParsers {
 
     public static final class ListObjectsV2ResponseParser implements ResponseParser<ListObjectsV2Result> {
 
-        @Override
+        @override
         public ListObjectsV2Result parse(ResponseMessage response) throws ResponseParseException {
             try {
                 ListObjectsV2Result result = parseListObjectsV2(response.getContent());
@@ -812,7 +812,7 @@ public final class ResponseParsers {
     
     public static final class ListVersionsReponseParser implements ResponseParser<VersionListing> {
 
-        @Override
+        @override
         public VersionListing parse(ResponseMessage response) throws ResponseParseException {
             try {
                 VersionListing result = parseListVersions(response.getContent());
@@ -827,7 +827,7 @@ public final class ResponseParsers {
 
     public static final class PutObjectReponseParser implements ResponseParser<PutObjectResult> {
 
-        @Override
+        @override
         public PutObjectResult parse(ResponseMessage response) throws ResponseParseException {
             PutObjectResult result = new PutObjectResult();
             try {
@@ -845,7 +845,7 @@ public final class ResponseParsers {
 
     public static final class PutObjectProcessReponseParser implements ResponseParser<PutObjectResult> {
 
-        @Override
+        @override
         public PutObjectResult parse(ResponseMessage response) throws ResponseParseException {
             PutObjectResult result = new PutObjectResult();
             result.setRequestId(response.getRequestId());
@@ -860,7 +860,7 @@ public final class ResponseParsers {
 
     public static final class AppendObjectResponseParser implements ResponseParser<AppendObjectResult> {
 
-        @Override
+        @override
         public AppendObjectResult parse(ResponseMessage response) throws ResponseParseException {
             AppendObjectResult result = new AppendObjectResult();
             result.setRequestId(response.getRequestId());
@@ -889,7 +889,7 @@ public final class ResponseParsers {
             this.key = key;
         }
 
-        @Override
+        @override
         public OSSObject parse(ResponseMessage response) throws ResponseParseException {
             OSSObject ossObject = new OSSObject();
             ossObject.setBucketName(this.bucketName);
@@ -916,7 +916,7 @@ public final class ResponseParsers {
 
     public static final class GetObjectAclResponseParser implements ResponseParser<ObjectAcl> {
 
-        @Override
+        @override
         public ObjectAcl parse(ResponseMessage response) throws ResponseParseException {
             try {
                 ObjectAcl result = parseGetObjectAcl(response.getContent());
@@ -932,7 +932,7 @@ public final class ResponseParsers {
 
     public static final class GetSimplifiedObjectMetaResponseParser implements ResponseParser<SimplifiedObjectMeta> {
 
-        @Override
+        @override
         public SimplifiedObjectMeta parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseSimplifiedObjectMeta(response.getHeaders());
@@ -945,7 +945,7 @@ public final class ResponseParsers {
 
     public static final class RestoreObjectResponseParser implements ResponseParser<RestoreObjectResult> {
 
-        @Override
+        @override
         public RestoreObjectResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 RestoreObjectResult result = new RestoreObjectResult(response.getStatusCode());
@@ -961,7 +961,7 @@ public final class ResponseParsers {
 
     public static final class ProcessObjectResponseParser implements ResponseParser<GenericResult> {
 
-        @Override
+        @override
         public GenericResult parse(ResponseMessage response) throws ResponseParseException {
             GenericResult result = new PutObjectResult();
             result.setRequestId(response.getRequestId());
@@ -973,7 +973,7 @@ public final class ResponseParsers {
 
     public static final class GetObjectMetadataResponseParser implements ResponseParser<ObjectMetadata> {
 
-        @Override
+        @override
         public ObjectMetadata parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseObjectMetadata(response.getHeaders());
@@ -986,7 +986,7 @@ public final class ResponseParsers {
 
     public static final class HeadObjectResponseParser implements ResponseParser<ObjectMetadata> {
 
-        @Override
+        @override
         public ObjectMetadata parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseObjectMetadata(response.getHeaders());
@@ -998,7 +998,7 @@ public final class ResponseParsers {
 
     public static final class CopyObjectResponseParser implements ResponseParser<CopyObjectResult> {
 
-        @Override
+        @override
         public CopyObjectResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 CopyObjectResult result = parseCopyObjectResult(response.getContent());
@@ -1015,7 +1015,7 @@ public final class ResponseParsers {
 
     public static final class DeleteObjectsResponseParser implements ResponseParser<DeleteObjectsResult> {
 
-        @Override
+        @override
         public DeleteObjectsResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 DeleteObjectsResult result = null;
@@ -1038,7 +1038,7 @@ public final class ResponseParsers {
     
     public static final class DeleteVersionsResponseParser implements ResponseParser<DeleteVersionsResult> {
 
-        @Override
+        @override
         public DeleteVersionsResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 DeleteVersionsResult result = null;
@@ -1062,7 +1062,7 @@ public final class ResponseParsers {
     public static final class CompleteMultipartUploadResponseParser
             implements ResponseParser<CompleteMultipartUploadResult> {
 
-        @Override
+        @override
         public CompleteMultipartUploadResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 CompleteMultipartUploadResult result = parseCompleteMultipartUpload(response.getContent());
@@ -1080,7 +1080,7 @@ public final class ResponseParsers {
     public static final class CompleteMultipartUploadProcessResponseParser
             implements ResponseParser<CompleteMultipartUploadResult> {
 
-        @Override
+        @override
         public CompleteMultipartUploadResult parse(ResponseMessage response) throws ResponseParseException {
             CompleteMultipartUploadResult result = new CompleteMultipartUploadResult();
             result.setVersionId(response.getHeaders().get(OSSHeaders.OSS_HEADER_VERSION_ID));
@@ -1095,7 +1095,7 @@ public final class ResponseParsers {
     public static final class InitiateMultipartUploadResponseParser
             implements ResponseParser<InitiateMultipartUploadResult> {
 
-        @Override
+        @override
         public InitiateMultipartUploadResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 InitiateMultipartUploadResult result = parseInitiateMultipartUpload(response.getContent());
@@ -1111,7 +1111,7 @@ public final class ResponseParsers {
 
     public static final class ListMultipartUploadsResponseParser implements ResponseParser<MultipartUploadListing> {
 
-        @Override
+        @override
         public MultipartUploadListing parse(ResponseMessage response) throws ResponseParseException {
             try {
                 MultipartUploadListing result = parseListMultipartUploads(response.getContent());
@@ -1126,7 +1126,7 @@ public final class ResponseParsers {
 
     public static final class ListPartsResponseParser implements ResponseParser<PartListing> {
 
-        @Override
+        @override
         public PartListing parse(ResponseMessage response) throws ResponseParseException {
             try {
                 PartListing result = parseListParts(response.getContent());
@@ -1147,7 +1147,7 @@ public final class ResponseParsers {
             this.partNumber = partNumber;
         }
 
-        @Override
+        @override
         public UploadPartCopyResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 UploadPartCopyResult result = new UploadPartCopyResult();
@@ -1165,7 +1165,7 @@ public final class ResponseParsers {
 
     public static final class GetSymbolicLinkResponseParser implements ResponseParser<OSSSymlink> {
 
-        @Override
+        @override
         public OSSSymlink parse(ResponseMessage response) throws ResponseParseException {
             try {
                 OSSSymlink result = parseSymbolicLink(response);
@@ -1180,7 +1180,7 @@ public final class ResponseParsers {
 
     public static final class InitiateBucketWormResponseParser implements ResponseParser<InitiateBucketWormResult> {
 
-        @Override
+        @override
         public InitiateBucketWormResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 InitiateBucketWormResult result = parseInitiateBucketWormResponseHeader(response.getHeaders());
@@ -1195,7 +1195,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketWormResponseParser implements ResponseParser<GetBucketWormResult> {
 
-        @Override
+        @override
         public GetBucketWormResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 GetBucketWormResult result = parseWormConfiguration(response.getContent());
@@ -1210,7 +1210,7 @@ public final class ResponseParsers {
 
     public static final class GetBucketResourceGroupResponseParser implements ResponseParser<GetBucketResourceGroupResult> {
 
-        @Override
+        @override
         public GetBucketResourceGroupResult parse(ResponseMessage response) throws ResponseParseException {
             try {
                 GetBucketResourceGroupResult result = parseResourceGroupConfiguration(response.getContent());
@@ -3566,7 +3566,7 @@ public final class ResponseParsers {
 
     public static final class CreateVpcipResultResponseParser implements ResponseParser<Vpcip> {
 
-        @Override
+        @override
         public Vpcip parse(ResponseMessage response) throws ResponseParseException {
             try {
                 Vpcip result = parseGetCreateVpcipResult(response.getContent());
@@ -3580,7 +3580,7 @@ public final class ResponseParsers {
     }
 
     public static final class ListVpcipResultResponseParser implements ResponseParser<List<Vpcip>> {
-        @Override
+        @override
         public List<Vpcip> parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseListVpcipResult(response.getContent());
@@ -3591,7 +3591,7 @@ public final class ResponseParsers {
     }
 
     public static final class ListVpcPolicyResultResponseParser implements ResponseParser<List<VpcPolicy>> {
-        @Override
+        @override
         public List<VpcPolicy> parse(ResponseMessage response) throws ResponseParseException {
             try {
                 return parseListVpcPolicyResult(response.getContent());
@@ -3729,7 +3729,7 @@ public final class ResponseParsers {
 
     public static final class DeleteDirectoryResponseParser implements ResponseParser<DeleteDirectoryResult> {
 
-        @Override
+        @override
         public DeleteDirectoryResult parse(ResponseMessage response) throws ResponseParseException {
             try{
                 DeleteDirectoryResult result =  parseDeleteDirectoryResult(response.getContent());
@@ -3782,7 +3782,7 @@ public final class ResponseParsers {
     }
 
     public static final class GetBucketTransferAccelerationResponseParser implements ResponseParser<TransferAcceleration> {
-        @Override
+        @override
         public TransferAcceleration parse(ResponseMessage response) throws ResponseParseException {
             try {
                 TransferAcceleration result = parseTransferAcceleration(response.getContent());

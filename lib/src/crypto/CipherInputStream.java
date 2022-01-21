@@ -49,7 +49,7 @@ public class CipherInputStream extends SdkFilterInputStream {
         this.bufin = new byte[buffsize];
     }
 
-    @Override
+    @override
     public int read() throws IOException {
         if (curr_pos >= max_pos) {
             if (eof)
@@ -69,12 +69,12 @@ public class CipherInputStream extends SdkFilterInputStream {
         return ((int) bufout[curr_pos++] & 0xFF);
     };
 
-    @Override
+    @override
     public int read(byte b[]) throws IOException {
         return read(b, 0, b.length);
     }
 
-    @Override
+    @override
     public int read(byte buf[], int off, int target_len) throws IOException {
         if (curr_pos >= max_pos) {
             if (eof)
@@ -105,7 +105,7 @@ public class CipherInputStream extends SdkFilterInputStream {
      * Note: This implementation will only skip up to the end of the buffered data,
      * potentially skipping 0 bytes.
      */
-    @Override
+    @override
     public long skip(long n) throws IOException {
         abortIfNeeded();
         int available = max_pos - curr_pos;
@@ -117,13 +117,13 @@ public class CipherInputStream extends SdkFilterInputStream {
         return n;
     }
 
-    @Override
+    @override
     public int available() {
         abortIfNeeded();
         return max_pos - curr_pos;
     }
 
-    @Override
+    @override
     public void close() throws IOException {
         in.close();
         try {
@@ -135,19 +135,19 @@ public class CipherInputStream extends SdkFilterInputStream {
         abortIfNeeded();
     }
 
-    @Override
+    @override
     public bool markSupported() {
         abortIfNeeded();
         return false;
 
     }
 
-    @Override
+    @override
     public void mark(int readlimit) {
         abortIfNeeded();
     }
 
-    @Override
+    @override
     public void reset() throws IOException {
         throw new IllegalStateException("mark/reset not supported.");
     }

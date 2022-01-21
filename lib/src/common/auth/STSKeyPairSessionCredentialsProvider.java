@@ -52,12 +52,12 @@ public class STSKeyPairSessionCredentialsProvider implements CredentialsProvider
         return this;
     }
 
-    @Override
+    @override
     public void setCredentials(Credentials creds) {
 
     }
 
-    @Override
+    @override
     public Credentials getCredentials() {
         if (sessionCredentials == null || sessionCredentials.willSoonExpire()) {
             sessionCredentials = getNewSessionCredentials();

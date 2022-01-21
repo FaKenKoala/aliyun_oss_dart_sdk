@@ -45,12 +45,12 @@ public class InstanceProfileCredentialsProvider implements CredentialsProvider {
         return this;
     }
 
-    @Override
+    @override
     public void setCredentials(Credentials creds) {
 
     }
 
-    @Override
+    @override
     public InstanceProfileCredentials getCredentials() {
         if (credentials == null || credentials.isExpired()) {
             try {

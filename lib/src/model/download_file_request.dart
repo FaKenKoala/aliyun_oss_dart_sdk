@@ -84,7 +84,7 @@ class DownloadFileRequest extends GenericRequest {
   // The modified since constraints.
   DateTime? modifiedSinceConstraint;
   // The response headers to override.
-  ResponseHeaderOverrides? responseHeaders;
+  ResponseHeaderoverrides? responseHeaders;
 
   // Traffic limit speed, its uint is bit/s
   int trafficLimit = 0;
