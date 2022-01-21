@@ -1,3 +1,5 @@
+import 'package:aliyun_oss_dart_sdk/src/internal/oss_utils.dart';
+
 import 'generic_request.dart';
 
 /// Options for deleting multiple objects in a specified bucket.

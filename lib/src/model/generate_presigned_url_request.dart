@@ -6,7 +6,7 @@ import 'response_header_overrides.dart';
 class GeneratePresignedUrlRequest {
   /// The HTTP method (GET, PUT, DELETE, HEAD) to be used in this request and
   /// when the pre-signed URL is used
-  HttpMethod _method;
+  HttpMethod? _method;
 
   /// The name of the bucket involved in this request
   String bucketName;
@@ -47,7 +47,7 @@ class GeneratePresignedUrlRequest {
   GeneratePresignedUrlRequest(this.bucketName, this.key,
       [this._method = HttpMethod.get]);
 
-  HttpMethod getMethod() {
+  HttpMethod? getMethod() {
     return _method;
   }
 

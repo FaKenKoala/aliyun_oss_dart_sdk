@@ -1,221 +1,18 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+import 'package:aliyun_oss_dart_sdk/src/common/comm/response_message.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/bucket.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
 
-package com.aliyun.oss.internal;
+/// Bucket operation.
+ class OSSBucketOperation extends OSSOperation {
 
-import static com.aliyun.oss.common.parser.RequestMarshallers.bucketRefererMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.createBucketRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.putBucketImageRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.putImageStyleRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.setBucketLifecycleRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.setBucketLoggingRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.setBucketTaggingRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.setBucketWebsiteRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.addBucketReplicationRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.deleteBucketReplicationRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.addBucketCnameRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.deleteBucketCnameRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.setBucketQosRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.bucketImageProcessConfMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.setBucketVersioningRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.setBucketEncryptionRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.setBucketPolicyRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.setBucketRequestPaymentRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.setBucketQosInfoRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.setAsyncFetchTaskRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.createVpcipRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.deleteVpcipRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.createBucketVpcipRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.deleteBucketVpcipRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.setBucketInventoryRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.extendBucketWormRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.initiateBucketWormRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.setBucketResourceGroupRequestMarshaller;
-import static com.aliyun.oss.common.parser.RequestMarshallers.putBucketTransferAccelerationRequestMarshaller;
-import static com.aliyun.oss.common.utils.CodingUtils.assertParameterNotNull;
-import static com.aliyun.oss.internal.OSSUtils.OSS_RESOURCE_MANAGER;
-import static com.aliyun.oss.internal.OSSUtils.ensureBucketNameValid;
-import static com.aliyun.oss.internal.OSSUtils.ensureBucketNameCreationValid;
-import static com.aliyun.oss.internal.OSSUtils.safeCloseResponse;
-import static com.aliyun.oss.internal.RequestParameters.*;
-import static com.aliyun.oss.internal.ResponseParsers.addBucketCnameResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketAclResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketLifecycleResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketLocationResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketLoggingResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketRefererResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getTaggingResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketWebsiteResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketReplicationResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketReplicationProgressResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketReplicationLocationResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketCnameResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketInfoResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketStatResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketQosResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketVersioningResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.listBucketResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.listObjectsReponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.listObjectsV2ResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.listVersionsReponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketImageResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getImageStyleResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.listImageStyleResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketImageProcessConfResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketEncryptionResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketPolicyResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketRequestPaymentResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getUSerQosInfoResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketQosInfoResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getAsyncFetchTaskResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.setAsyncFetchTaskResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.createVpcipResultResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.listVpcipResultResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.listVpcPolicyResultResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketInventoryConfigurationParser;
-import static com.aliyun.oss.internal.ResponseParsers.listBucketInventoryConfigurationsParser;
-import static com.aliyun.oss.internal.ResponseParsers.initiateBucketWormResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketWormResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketResourceGroupResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getBucketTransferAccelerationResponseParser;
-
-import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.aliyun.oss.ClientException;
-import com.aliyun.oss.HttpMethod;
-import com.aliyun.oss.OSSErrorCode;
-import com.aliyun.oss.OSSException;
-import com.aliyun.oss.ServiceException;
-import com.aliyun.oss.common.auth.CredentialsProvider;
-import com.aliyun.oss.common.comm.RequestMessage;
-import com.aliyun.oss.common.comm.ResponseHandler;
-import com.aliyun.oss.common.comm.ResponseMessage;
-import com.aliyun.oss.common.comm.ServiceClient;
-import com.aliyun.oss.common.utils.BinaryUtil;
-import com.aliyun.oss.common.utils.ExceptionFactory;
-import com.aliyun.oss.common.utils.HttpHeaders;
-import com.aliyun.oss.model.AccessControlList;
-import com.aliyun.oss.model.AddBucketCnameResult;
-import com.aliyun.oss.model.Bucket;
-import com.aliyun.oss.model.BucketInfo;
-import com.aliyun.oss.model.BucketList;
-import com.aliyun.oss.model.BucketLoggingResult;
-import com.aliyun.oss.model.BucketMetadata;
-import com.aliyun.oss.model.BucketProcess;
-import com.aliyun.oss.model.BucketQosInfo;
-import com.aliyun.oss.model.BucketReferer;
-import com.aliyun.oss.model.BucketReplicationProgress;
-import com.aliyun.oss.model.BucketStat;
-import com.aliyun.oss.model.BucketVersioningConfiguration;
-import com.aliyun.oss.model.BucketWebsiteResult;
-import com.aliyun.oss.model.CannedAccessControlList;
-import com.aliyun.oss.model.CnameConfiguration;
-import com.aliyun.oss.model.CreateBucketRequest;
-import com.aliyun.oss.model.DeleteBucketCnameRequest;
-import com.aliyun.oss.model.DeleteBucketReplicationRequest;
-import com.aliyun.oss.model.GenericRequest;
-import com.aliyun.oss.model.GetBucketImageResult;
-import com.aliyun.oss.model.GetBucketReplicationProgressRequest;
-import com.aliyun.oss.model.GetBucketRequestPaymentResult;
-import com.aliyun.oss.model.ImageProcess;
-import com.aliyun.oss.model.ListObjectsV2Request;
-import com.aliyun.oss.model.ListObjectsV2Result;
-import com.aliyun.oss.model.ReplicationRule;
-import com.aliyun.oss.model.ServerSideEncryptionConfiguration;
-import com.aliyun.oss.model.SetBucketEncryptionRequest;
-import com.aliyun.oss.model.GetImageStyleResult;
-import com.aliyun.oss.model.LifecycleRule;
-import com.aliyun.oss.model.ListBucketsRequest;
-import com.aliyun.oss.model.ListObjectsRequest;
-import com.aliyun.oss.model.ListVersionsRequest;
-import com.aliyun.oss.model.ObjectListing;
-import com.aliyun.oss.model.Payer;
-import com.aliyun.oss.model.PutBucketImageRequest;
-import com.aliyun.oss.model.PutImageStyleRequest;
-import com.aliyun.oss.model.SetBucketAclRequest;
-import com.aliyun.oss.model.AddBucketCnameRequest;
-import com.aliyun.oss.model.SetBucketLifecycleRequest;
-import com.aliyun.oss.model.SetBucketLoggingRequest;
-import com.aliyun.oss.model.SetBucketProcessRequest;
-import com.aliyun.oss.model.SetBucketQosInfoRequest;
-import com.aliyun.oss.model.SetBucketRefererRequest;
-import com.aliyun.oss.model.SetBucketRequestPaymentRequest;
-import com.aliyun.oss.model.AddBucketReplicationRequest;
-import com.aliyun.oss.model.SetBucketStorageCapacityRequest;
-import com.aliyun.oss.model.SetBucketTaggingRequest;
-import com.aliyun.oss.model.SetBucketVersioningRequest;
-import com.aliyun.oss.model.SetBucketWebsiteRequest;
-import com.aliyun.oss.model.SetBucketPolicyRequest;
-import com.aliyun.oss.model.GetBucketPolicyResult;
-import com.aliyun.oss.model.TagSet;
-import com.aliyun.oss.model.Style;
-import com.aliyun.oss.model.UserQos;
-import com.aliyun.oss.model.UserQosInfo;
-import com.aliyun.oss.model.VersionListing;
-import com.aliyun.oss.model.VoidResult;
-import org.apache.http.HttpStatus;
-import com.aliyun.oss.model.SetAsyncFetchTaskRequest;
-import com.aliyun.oss.model.SetAsyncFetchTaskResult;
-import com.aliyun.oss.model.GetAsyncFetchTaskRequest;
-import com.aliyun.oss.model.GetAsyncFetchTaskResult;
-import com.aliyun.oss.model.AsyncFetchTaskConfiguration;
-import com.aliyun.oss.model.CreateBucketVpcipRequest;
-import com.aliyun.oss.model.CreateVpcipRequest;
-import com.aliyun.oss.model.CreateVpcipResult;
-import com.aliyun.oss.model.DeleteBucketVpcipRequest;
-import com.aliyun.oss.model.DeleteVpcipRequest;
-import com.aliyun.oss.model.VpcPolicy;
-import com.aliyun.oss.model.Vpcip;
-import com.aliyun.oss.model.SetBucketInventoryConfigurationRequest;
-import com.aliyun.oss.model.GetBucketInventoryConfigurationRequest;
-import com.aliyun.oss.model.GetBucketInventoryConfigurationResult;
-import com.aliyun.oss.model.ListBucketInventoryConfigurationsRequest;
-import com.aliyun.oss.model.ListBucketInventoryConfigurationsResult;
-import com.aliyun.oss.model.DeleteBucketInventoryConfigurationRequest;
-import com.aliyun.oss.model.ExtendBucketWormRequest;
-import com.aliyun.oss.model.GetBucketWormResult;
-import com.aliyun.oss.model.CompleteBucketWormRequest;
-import com.aliyun.oss.model.InitiateBucketWormRequest;
-import com.aliyun.oss.model.InitiateBucketWormResult;
-import com.aliyun.oss.model.SetBucketResourceGroupRequest;
-import com.aliyun.oss.model.GetBucketResourceGroupResult;
-import com.aliyun.oss.model.TransferAcceleration;
-import com.aliyun.oss.model.SetBucketTransferAccelerationRequest;
-
-/**
- * Bucket operation.
- */
-public class OSSBucketOperation extends OSSOperation {
-
-    public OSSBucketOperation(ServiceClient client, CredentialsProvider credsProvider) {
+     OSSBucketOperation(ServiceClient client, CredentialsProvider credsProvider) {
         super(client, credsProvider);
     }
 
     /**
      * Create a bucket.
      */
-    public Bucket createBucket(CreateBucketRequest createBucketRequest) throws OSSException, ClientException {
+     Bucket createBucket(CreateBucketRequest createBucketRequest) {
 
         assertParameterNotNull(createBucketRequest, "createBucketRequest");
 
@@ -240,7 +37,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Delete a bucket.
      */
-    public VoidResult deleteBucket(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucket(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -257,7 +54,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * List all my buckets.
      */
-    public List<Bucket> listBuckets() throws OSSException, ClientException {
+     List<Bucket> listBuckets() throws OSSException, ClientException {
         BucketList bucketList = listBuckets(new ListBucketsRequest(null, null, null));
         List<Bucket> buckets = bucketList.getBucketList();
         while (bucketList.isTruncated()) {
@@ -270,7 +67,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * List all my buckets.
      */
-    public BucketList listBuckets(ListBucketsRequest listBucketRequest) throws OSSException, ClientException {
+     BucketList listBuckets(ListBucketsRequest listBucketRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(listBucketRequest, "listBucketRequest");
 
@@ -305,7 +102,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Set bucket's canned ACL.
      */
-    public VoidResult setBucketAcl(SetBucketAclRequest setBucketAclRequest) throws OSSException, ClientException {
+     VoidResult setBucketAcl(SetBucketAclRequest setBucketAclRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(setBucketAclRequest, "setBucketAclRequest");
 
@@ -329,7 +126,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Get bucket's ACL.
      */
-    public AccessControlList getBucketAcl(GenericRequest genericRequest) throws OSSException, ClientException {
+     AccessControlList getBucketAcl(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -347,7 +144,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, getBucketAclResponseParser, bucketName, null, true);
     }
 
-    public BucketMetadata getBucketMetadata(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketMetadata getBucketMetadata(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -361,7 +158,7 @@ public class OSSBucketOperation extends OSSOperation {
         List<ResponseHandler> reponseHandlers = [];
         reponseHandlers.add(new ResponseHandler() {
             @Override
-            public void handle(ResponseMessage response) throws ServiceException, ClientException {
+             void handle(ResponseMessage response) throws ServiceException, ClientException {
                 if (response.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
                     safeCloseResponse(response);
                     throw ExceptionFactory.createOSSException(
@@ -378,7 +175,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Set bucket referer.
      */
-    public VoidResult setBucketReferer(SetBucketRefererRequest setBucketRefererRequest) throws OSSException, ClientException {
+     VoidResult setBucketReferer(SetBucketRefererRequest setBucketRefererRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(setBucketRefererRequest, "setBucketRefererRequest");
 
@@ -405,7 +202,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Get bucket referer.
      */
-    public BucketReferer getBucketReferer(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketReferer getBucketReferer(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -426,7 +223,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Get bucket location.
      */
-    public String getBucketLocation(GenericRequest genericRequest) {
+     String getBucketLocation(GenericRequest genericRequest) {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -447,7 +244,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Determine whether a bucket exists or not.
      */
-    public bool doesBucketExists(GenericRequest genericRequest) throws OSSException, ClientException {
+     bool doesBucketExists(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -468,7 +265,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * List objects under the specified bucket.
      */
-    public ObjectListing listObjects(ListObjectsRequest listObjectsRequest) throws OSSException, ClientException {
+     ObjectListing listObjects(ListObjectsRequest listObjectsRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(listObjectsRequest, "listObjectsRequest");
 
@@ -492,7 +289,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * List objects under the specified bucket.
      */
-    public ListObjectsV2Result listObjectsV2(ListObjectsV2Request listObjectsV2Request) throws OSSException, ClientException {
+     ListObjectsV2Result listObjectsV2(ListObjectsV2Request listObjectsV2Request) throws OSSException, ClientException {
 
         assertParameterNotNull(listObjectsV2Request, "listObjectsRequest");
 
@@ -516,7 +313,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * List versions under the specified bucket.
      */
-    public VersionListing listVersions(ListVersionsRequest listVersionsRequest) throws OSSException, ClientException {
+     VersionListing listVersions(ListVersionsRequest listVersionsRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(listVersionsRequest, "listVersionsRequest");
 
@@ -540,7 +337,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Set bucket logging.
      */
-    public VoidResult setBucketLogging(SetBucketLoggingRequest setBucketLoggingRequest) throws OSSException, ClientException {
+     VoidResult setBucketLogging(SetBucketLoggingRequest setBucketLoggingRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(setBucketLoggingRequest, "setBucketLoggingRequest");
 
@@ -562,7 +359,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Put bucket image
      */
-    public VoidResult putBucketImage(PutBucketImageRequest putBucketImageRequest) {
+     VoidResult putBucketImage(PutBucketImageRequest putBucketImageRequest) {
         assertParameterNotNull(putBucketImageRequest, "putBucketImageRequest");
         String bucketName = putBucketImageRequest.GetBucketName();
         assertParameterNotNull(bucketName, "bucketName");
@@ -581,7 +378,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Get bucket image
      */
-    public GetBucketImageResult getBucketImage(String bucketName, GenericRequest genericRequest) {
+     GetBucketImageResult getBucketImage(String bucketName, GenericRequest genericRequest) {
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
@@ -596,7 +393,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Delete bucket image attributes.
      */
-    public VoidResult deleteBucketImage(String bucketName, GenericRequest genericRequest)
+     VoidResult deleteBucketImage(String bucketName, GenericRequest genericRequest)
             throws OSSException, ClientException {
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
@@ -614,7 +411,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * put image style
      */
-    public VoidResult putImageStyle(PutImageStyleRequest putImageStyleRequest) throws OSSException, ClientException {
+     VoidResult putImageStyle(PutImageStyleRequest putImageStyleRequest) throws OSSException, ClientException {
         assertParameterNotNull(putImageStyleRequest, "putImageStyleRequest");
         String bucketName = putImageStyleRequest.GetBucketName();
         String styleName = putImageStyleRequest.GetStyleName();
@@ -633,7 +430,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public VoidResult deleteImageStyle(String bucketName, String styleName, GenericRequest genericRequest)
+     VoidResult deleteImageStyle(String bucketName, String styleName, GenericRequest genericRequest)
             throws OSSException, ClientException {
         assertParameterNotNull(bucketName, "bucketName");
         assertParameterNotNull(styleName, "styleName");
@@ -649,7 +446,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public GetImageStyleResult getImageStyle(String bucketName, String styleName, GenericRequest genericRequest)
+     GetImageStyleResult getImageStyle(String bucketName, String styleName, GenericRequest genericRequest)
             throws OSSException, ClientException {
         assertParameterNotNull(bucketName, "bucketName");
         assertParameterNotNull(styleName, "styleName");
@@ -668,7 +465,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * List image style.
      */
-    public List<Style> listImageStyle(String bucketName, GenericRequest genericRequest)
+     List<Style> listImageStyle(String bucketName, GenericRequest genericRequest)
             throws OSSException, ClientException {
 
         assertParameterNotNull(bucketName, "bucketName");
@@ -684,7 +481,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, listImageStyleResponseParser, bucketName, null, true);
     }
 
-    public VoidResult setBucketProcess(SetBucketProcessRequest setBucketProcessRequest) throws OSSException, ClientException {
+     VoidResult setBucketProcess(SetBucketProcessRequest setBucketProcessRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(setBucketProcessRequest, "setBucketProcessRequest");
 
@@ -706,7 +503,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public BucketProcess getBucketProcess(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketProcess getBucketProcess(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -727,7 +524,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Get bucket logging.
      */
-    public BucketLoggingResult getBucketLogging(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketLoggingResult getBucketLogging(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -748,7 +545,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Delete bucket logging.
      */
-    public VoidResult deleteBucketLogging(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketLogging(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -769,7 +566,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Set bucket website.
      */
-    public VoidResult setBucketWebsite(SetBucketWebsiteRequest setBucketWebSiteRequest) throws OSSException, ClientException {
+     VoidResult setBucketWebsite(SetBucketWebsiteRequest setBucketWebSiteRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(setBucketWebSiteRequest, "setBucketWebSiteRequest");
 
@@ -796,7 +593,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Get bucket website.
      */
-    public BucketWebsiteResult getBucketWebsite(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketWebsiteResult getBucketWebsite(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -817,7 +614,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Delete bucket website.
      */
-    public VoidResult deleteBucketWebsite(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketWebsite(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -838,7 +635,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Set bucket lifecycle.
      */
-    public VoidResult setBucketLifecycle(SetBucketLifecycleRequest setBucketLifecycleRequest)
+     VoidResult setBucketLifecycle(SetBucketLifecycleRequest setBucketLifecycleRequest)
             throws OSSException, ClientException {
 
         assertParameterNotNull(setBucketLifecycleRequest, "setBucketLifecycleRequest");
@@ -861,7 +658,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Get bucket lifecycle.
      */
-    public List<LifecycleRule> getBucketLifecycle(GenericRequest genericRequest) throws OSSException, ClientException {
+     List<LifecycleRule> getBucketLifecycle(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -882,7 +679,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Delete bucket lifecycle.
      */
-    public VoidResult deleteBucketLifecycle(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketLifecycle(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -903,7 +700,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Set bucket tagging.
      */
-    public VoidResult setBucketTagging(SetBucketTaggingRequest setBucketTaggingRequest) throws OSSException, ClientException {
+     VoidResult setBucketTagging(SetBucketTaggingRequest setBucketTaggingRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(setBucketTaggingRequest, "setBucketTaggingRequest");
 
@@ -925,7 +722,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Get bucket tagging.
      */
-    public TagSet getBucketTagging(GenericRequest genericRequest) throws OSSException, ClientException {
+     TagSet getBucketTagging(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -946,7 +743,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Delete bucket tagging.
      */
-    public VoidResult deleteBucketTagging(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketTagging(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -967,7 +764,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Get bucket versioning.
      */
-    public BucketVersioningConfiguration getBucketVersioning(GenericRequest genericRequest)
+     BucketVersioningConfiguration getBucketVersioning(GenericRequest genericRequest)
         throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
@@ -989,7 +786,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Set bucket versioning.
      */
-    public VoidResult setBucketVersioning(SetBucketVersioningRequest setBucketVersioningRequest)
+     VoidResult setBucketVersioning(SetBucketVersioningRequest setBucketVersioningRequest)
         throws OSSException, ClientException {
         assertParameterNotNull(setBucketVersioningRequest, "setBucketVersioningRequest");
         assertParameterNotNull(setBucketVersioningRequest.getVersioningConfiguration(), "versioningConfiguration");
@@ -1016,7 +813,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Add bucket replication.
      */
-    public VoidResult addBucketReplication(AddBucketReplicationRequest addBucketReplicationRequest)
+     VoidResult addBucketReplication(AddBucketReplicationRequest addBucketReplicationRequest)
             throws OSSException, ClientException {
 
         assertParameterNotNull(addBucketReplicationRequest, "addBucketReplicationRequest");
@@ -1041,7 +838,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Get bucket replication.
      */
-    public List<ReplicationRule> getBucketReplication(GenericRequest genericRequest)
+     List<ReplicationRule> getBucketReplication(GenericRequest genericRequest)
             throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
@@ -1063,7 +860,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Delete bucket replication.
      */
-    public VoidResult deleteBucketReplication(DeleteBucketReplicationRequest deleteBucketReplicationRequest)
+     VoidResult deleteBucketReplication(DeleteBucketReplicationRequest deleteBucketReplicationRequest)
             throws OSSException, ClientException {
 
         assertParameterNotNull(deleteBucketReplicationRequest, "deleteBucketReplicationRequest");
@@ -1089,7 +886,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    private static void addRequestRequiredHeaders(Map<String, String> headers, byte[] rawContent) {
+     static void addRequestRequiredHeaders(Map<String, String> headers, byte[] rawContent) {
         headers.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(rawContent.length));
 
         byte[] md5 = BinaryUtil.calculateMd5(rawContent);
@@ -1100,7 +897,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Get bucket replication progress.
      */
-    public BucketReplicationProgress getBucketReplicationProgress(
+     BucketReplicationProgress getBucketReplicationProgress(
             GetBucketReplicationProgressRequest getBucketReplicationProgressRequest)
             throws OSSException, ClientException {
 
@@ -1125,7 +922,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Get bucket replication progress.
      */
-    public List<String> getBucketReplicationLocation(GenericRequest genericRequest)
+     List<String> getBucketReplicationLocation(GenericRequest genericRequest)
             throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
@@ -1144,7 +941,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, getBucketReplicationLocationResponseParser, bucketName, null, true);
     }
 
-    public AddBucketCnameResult addBucketCname(AddBucketCnameRequest addBucketCnameRequest) throws OSSException, ClientException {
+     AddBucketCnameResult addBucketCname(AddBucketCnameRequest addBucketCnameRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(addBucketCnameRequest, "addBucketCnameRequest");
         assertParameterNotNull(addBucketCnameRequest.getDomain(), "addBucketCnameRequest.domain");
@@ -1169,7 +966,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, addBucketCnameResponseParser, bucketName, null);
     }
 
-    public List<CnameConfiguration> getBucketCname(GenericRequest genericRequest) throws OSSException, ClientException {
+     List<CnameConfiguration> getBucketCname(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -1187,7 +984,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, getBucketCnameResponseParser, bucketName, null, true);
     }
 
-    public VoidResult deleteBucketCname(DeleteBucketCnameRequest deleteBucketCnameRequest)
+     VoidResult deleteBucketCname(DeleteBucketCnameRequest deleteBucketCnameRequest)
             throws OSSException, ClientException {
 
         assertParameterNotNull(deleteBucketCnameRequest, "deleteBucketCnameRequest");
@@ -1213,7 +1010,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public BucketInfo getBucketInfo(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketInfo getBucketInfo(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -1231,7 +1028,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, getBucketInfoResponseParser, bucketName, null, true);
     }
 
-    public BucketStat getBucketStat(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketStat getBucketStat(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -1249,7 +1046,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, getBucketStatResponseParser, bucketName, null, true);
     }
 
-    public VoidResult setBucketStorageCapacity(SetBucketStorageCapacityRequest setBucketStorageCapacityRequest)
+     VoidResult setBucketStorageCapacity(SetBucketStorageCapacityRequest setBucketStorageCapacityRequest)
             throws OSSException, ClientException {
 
         assertParameterNotNull(setBucketStorageCapacityRequest, "setBucketStorageCapacityRequest");
@@ -1277,7 +1074,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public UserQos getBucketStorageCapacity(GenericRequest genericRequest) throws OSSException, ClientException {
+     UserQos getBucketStorageCapacity(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -1299,7 +1096,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Set bucket encryption.
      */
-    public VoidResult setBucketEncryption(SetBucketEncryptionRequest setBucketEncryptionRequest)
+     VoidResult setBucketEncryption(SetBucketEncryptionRequest setBucketEncryptionRequest)
         throws OSSException, ClientException {
 
         assertParameterNotNull(setBucketEncryptionRequest, "setBucketEncryptionRequest");
@@ -1326,7 +1123,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * get bucket encryption.
      */
-    public ServerSideEncryptionConfiguration getBucketEncryption(GenericRequest genericRequest)
+     ServerSideEncryptionConfiguration getBucketEncryption(GenericRequest genericRequest)
         throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
@@ -1348,7 +1145,7 @@ public class OSSBucketOperation extends OSSOperation {
     /**
      * Delete bucket encryption.
      */
-    public VoidResult deleteBucketEncryption(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketEncryption(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -1366,7 +1163,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public VoidResult setBucketPolicy(SetBucketPolicyRequest setBucketPolicyRequest) throws OSSException, ClientException {
+     VoidResult setBucketPolicy(SetBucketPolicyRequest setBucketPolicyRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(setBucketPolicyRequest, "setBucketPolicyRequest");
 
@@ -1388,7 +1185,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public GetBucketPolicyResult getBucketPolicy(GenericRequest genericRequest) throws OSSException, ClientException {
+     GetBucketPolicyResult getBucketPolicy(GenericRequest genericRequest) throws OSSException, ClientException {
     	assertParameterNotNull(genericRequest, "genericRequest");
 
         String bucketName = genericRequest.getBucketName();
@@ -1402,7 +1199,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, getBucketPolicyResponseParser, bucketName, null, true);
     }
     
-    public VoidResult deleteBucketPolicy(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketPolicy(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -1420,7 +1217,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public VoidResult setBucketRequestPayment(SetBucketRequestPaymentRequest setBucketRequestPaymentRequest)
+     VoidResult setBucketRequestPayment(SetBucketRequestPaymentRequest setBucketRequestPaymentRequest)
             throws OSSException, ClientException {
 
         assertParameterNotNull(setBucketRequestPaymentRequest, "setBucketRequestPaymentRequest");
@@ -1446,7 +1243,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public GetBucketRequestPaymentResult getBucketRequestPayment(GenericRequest genericRequest) throws OSSException, ClientException {
+     GetBucketRequestPaymentResult getBucketRequestPayment(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -1464,7 +1261,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, getBucketRequestPaymentResponseParser, bucketName, null, true);
     }
 
-    public VoidResult setBucketQosInfo(SetBucketQosInfoRequest setBucketQosInfoRequest) throws OSSException, ClientException {
+     VoidResult setBucketQosInfo(SetBucketQosInfoRequest setBucketQosInfoRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(setBucketQosInfoRequest, "setBucketQosInfoRequest");
         assertParameterNotNull(setBucketQosInfoRequest.getBucketQosInfo(), "setBucketQosInfoRequest.getBucketQosInfo");
@@ -1488,7 +1285,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public BucketQosInfo getBucketQosInfo(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketQosInfo getBucketQosInfo(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -1506,7 +1303,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, getBucketQosInfoResponseParser, bucketName, null, true);
     }
 
-    public VoidResult deleteBucketQosInfo(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketQosInfo(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -1524,7 +1321,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public UserQosInfo getUserQosInfo() throws OSSException, ClientException {
+     UserQosInfo getUserQosInfo() throws OSSException, ClientException {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put(RequestParameters.SUBRESOURCE_QOS_INFO, null);
@@ -1537,7 +1334,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, getUSerQosInfoResponseParser, null, null, true);
     }
 
-    public SetAsyncFetchTaskResult setAsyncFetchTask(SetAsyncFetchTaskRequest setAsyncFetchTaskRequest)
+     SetAsyncFetchTaskResult setAsyncFetchTask(SetAsyncFetchTaskRequest setAsyncFetchTaskRequest)
             throws OSSException, ClientException {
         assertParameterNotNull(setAsyncFetchTaskRequest, "setAsyncFetchTaskRequest");
 
@@ -1563,7 +1360,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, setAsyncFetchTaskResponseParser, bucketName, null, true);
     }
 
-    public GetAsyncFetchTaskResult getAsyncFetchTask(GetAsyncFetchTaskRequest getAsyncFetchTaskRequest)
+     GetAsyncFetchTaskResult getAsyncFetchTask(GetAsyncFetchTaskRequest getAsyncFetchTaskRequest)
             throws OSSException, ClientException {
         assertParameterNotNull(getAsyncFetchTaskRequest, "getAsyncFetchTaskInfoRequest");
 
@@ -1587,7 +1384,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, getAsyncFetchTaskResponseParser, bucketName, null, true);
     }
 
-    public CreateVpcipResult createVpcip(CreateVpcipRequest createVpcipRequest) throws OSSException, ClientException{
+     CreateVpcipResult createVpcip(CreateVpcipRequest createVpcipRequest) throws OSSException, ClientException{
 
         assertParameterNotNull(createVpcipRequest, "createVpcipRequest");
         String region = createVpcipRequest.getRegion();
@@ -1609,7 +1406,7 @@ public class OSSBucketOperation extends OSSOperation {
         return createVpcipResult;
     }
 
-    public List<Vpcip> listVpcip() {
+     List<Vpcip> listVpcip() {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put(RequestParameters.VPCIP, null);
@@ -1620,7 +1417,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, listVpcipResultResponseParser, null, null,true);
     }
 
-    public VoidResult deleteVpcip(DeleteVpcipRequest deleteVpcipRequest) {
+     VoidResult deleteVpcip(DeleteVpcipRequest deleteVpcipRequest) {
 
         assertParameterNotNull(deleteVpcipRequest, "deleteVpcipRequest");
         VpcPolicy vpcPolicy = deleteVpcipRequest.getVpcPolicy();
@@ -1643,7 +1440,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, null, null);
     }
 
-    public VoidResult createBucketVpcip(CreateBucketVpcipRequest createBucketVpcipRequest) {
+     VoidResult createBucketVpcip(CreateBucketVpcipRequest createBucketVpcipRequest) {
 
         String bucketName = createBucketVpcipRequest.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
@@ -1670,7 +1467,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public VoidResult deleteBucketVpcip(DeleteBucketVpcipRequest deleteBucketVpcipRequest) {
+     VoidResult deleteBucketVpcip(DeleteBucketVpcipRequest deleteBucketVpcipRequest) {
 
         String bucketName = deleteBucketVpcipRequest.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
@@ -1696,7 +1493,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public List<VpcPolicy> getBucketVpcip(GenericRequest genericRequest) {
+     List<VpcPolicy> getBucketVpcip(GenericRequest genericRequest) {
 
         String bucketName = genericRequest.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
@@ -1710,7 +1507,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, listVpcPolicyResultResponseParser, bucketName, null,true);
     }
 
-    public VoidResult setBucketInventoryConfiguration(SetBucketInventoryConfigurationRequest
+     VoidResult setBucketInventoryConfiguration(SetBucketInventoryConfigurationRequest
             setBucketInventoryConfigurationRequest) throws OSSException, ClientException {
         assertParameterNotNull(setBucketInventoryConfigurationRequest, "SetBucketInventoryConfigurationRequest");
         String bucketName = setBucketInventoryConfigurationRequest.getBucketName();
@@ -1737,7 +1534,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public GetBucketInventoryConfigurationResult getBucketInventoryConfiguration(GetBucketInventoryConfigurationRequest
+     GetBucketInventoryConfigurationResult getBucketInventoryConfiguration(GetBucketInventoryConfigurationRequest
             getBucketInventoryConfigurationRequest) throws OSSException, ClientException {
         assertParameterNotNull(getBucketInventoryConfigurationRequest, "getBucketInventoryConfigurationRequest");
         String bucketName = getBucketInventoryConfigurationRequest.getBucketName();
@@ -1758,7 +1555,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, getBucketInventoryConfigurationParser, bucketName, null, true);
     }
 
-    public ListBucketInventoryConfigurationsResult listBucketInventoryConfigurations(ListBucketInventoryConfigurationsRequest
+     ListBucketInventoryConfigurationsResult listBucketInventoryConfigurations(ListBucketInventoryConfigurationsRequest
             listBucketInventoryConfigurationsRequest) throws OSSException, ClientException {
         assertParameterNotNull(listBucketInventoryConfigurationsRequest, "listBucketInventoryConfigurationsRequest");
         String bucketName = listBucketInventoryConfigurationsRequest.getBucketName();
@@ -1780,7 +1577,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, listBucketInventoryConfigurationsParser, bucketName, null, true);
     }
 
-    public VoidResult deleteBucketInventoryConfiguration(DeleteBucketInventoryConfigurationRequest
+     VoidResult deleteBucketInventoryConfiguration(DeleteBucketInventoryConfigurationRequest
             deleteBucketInventoryConfigurationRequest) throws OSSException, ClientException {
         assertParameterNotNull(deleteBucketInventoryConfigurationRequest, "deleteBucketInventoryConfigurationRequest");
         String bucketName = deleteBucketInventoryConfigurationRequest.getBucketName();
@@ -1800,7 +1597,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public InitiateBucketWormResult initiateBucketWorm(InitiateBucketWormRequest initiateBucketWormRequest) throws OSSException, ClientException {
+     InitiateBucketWormResult initiateBucketWorm(InitiateBucketWormRequest initiateBucketWormRequest) throws OSSException, ClientException {
         assertParameterNotNull(initiateBucketWormRequest, "initiateBucketWormRequest");
         String bucketName = initiateBucketWormRequest.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
@@ -1822,7 +1619,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, initiateBucketWormResponseParser, bucketName, null);
     }
 
-    public VoidResult abortBucketWorm(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult abortBucketWorm(GenericRequest genericRequest) throws OSSException, ClientException {
         assertParameterNotNull(genericRequest, "genericRequest");
         String bucketName = genericRequest.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
@@ -1839,7 +1636,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public VoidResult completeBucketWorm(CompleteBucketWormRequest completeBucketWormRequest) throws OSSException, ClientException {
+     VoidResult completeBucketWorm(CompleteBucketWormRequest completeBucketWormRequest) throws OSSException, ClientException {
         assertParameterNotNull(completeBucketWormRequest, "completeBucketWormRequest");
         String bucketName = completeBucketWormRequest.getBucketName();
         String wormId = completeBucketWormRequest.getWormId();
@@ -1859,7 +1656,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public VoidResult extendBucketWorm(ExtendBucketWormRequest extendBucketWormRequest) throws OSSException, ClientException {
+     VoidResult extendBucketWorm(ExtendBucketWormRequest extendBucketWormRequest) throws OSSException, ClientException {
         assertParameterNotNull(extendBucketWormRequest, "extendBucketWormRequest");
         String bucketName = extendBucketWormRequest.getBucketName();
         String wormId = extendBucketWormRequest.getWormId();
@@ -1884,7 +1681,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public GetBucketWormResult getBucketWorm(GenericRequest genericRequest) throws OSSException, ClientException {
+     GetBucketWormResult getBucketWorm(GenericRequest genericRequest) throws OSSException, ClientException {
         assertParameterNotNull(genericRequest, "genericRequest");
         String bucketName = genericRequest.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
@@ -1901,7 +1698,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, getBucketWormResponseParser, bucketName, null, true);
     }
 
-    public VoidResult setBucketResourceGroup(SetBucketResourceGroupRequest setBucketResourceGroupRequest)
+     VoidResult setBucketResourceGroup(SetBucketResourceGroupRequest setBucketResourceGroupRequest)
             throws OSSException, ClientException {
 
         assertParameterNotNull(setBucketResourceGroupRequest, "setBucketResourceGroupRequest");
@@ -1926,7 +1723,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    public GetBucketResourceGroupResult getBucketResourceGroup(GenericRequest genericRequest) throws OSSException, ClientException {
+     GetBucketResourceGroupResult getBucketResourceGroup(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -1944,7 +1741,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, getBucketResourceGroupResponseParser, bucketName, null, true);
     }
 
-    private static void populateListObjectsRequestParameters(ListObjectsRequest listObjectsRequest,
+     static void populateListObjectsRequestParameters(ListObjectsRequest listObjectsRequest,
             Map<String, String> params) {
 
         if (listObjectsRequest.getPrefix() != null) {
@@ -1968,7 +1765,7 @@ public class OSSBucketOperation extends OSSOperation {
         }
     }
 
-    private static void populateListObjectsV2RequestParameters(ListObjectsV2Request listObjectsV2Request,
+     static void populateListObjectsV2RequestParameters(ListObjectsV2Request listObjectsV2Request,
             Map<String, String> params) {
 
         params.put(LIST_TYPE, "2");
@@ -2004,7 +1801,7 @@ public class OSSBucketOperation extends OSSOperation {
     }
 
 
-    private static void populateListVersionsRequestParameters(ListVersionsRequest listVersionsRequest,
+     static void populateListVersionsRequestParameters(ListVersionsRequest listVersionsRequest,
         Map<String, String> params) {
 
         params.put(SUBRESOURCE_VRESIONS, null);
@@ -2034,13 +1831,13 @@ public class OSSBucketOperation extends OSSOperation {
         }
     }
 
-    private static void addOptionalACLHeader(Map<String, String> headers, CannedAccessControlList cannedAcl) {
+     static void addOptionalACLHeader(Map<String, String> headers, CannedAccessControlList cannedAcl) {
         if (cannedAcl != null) {
             headers.put(OSSHeaders.OSS_CANNED_ACL, cannedAcl.toString());
         }
     }
 
-    public VoidResult setBucketTransferAcceleration(SetBucketTransferAccelerationRequest setBucketTransferAccelerationRequest) throws OSSException, ClientException {
+     VoidResult setBucketTransferAcceleration(SetBucketTransferAccelerationRequest setBucketTransferAccelerationRequest) throws OSSException, ClientException {
         assertParameterNotNull(setBucketTransferAccelerationRequest, "putBucketTransferAccelerationRequest");
 
         String bucketName = setBucketTransferAccelerationRequest.getBucketName();
@@ -2059,7 +1856,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null, true);
     }
 
-    public TransferAcceleration getBucketTransferAcceleration(GenericRequest genericRequest) throws OSSException, ClientException {
+     TransferAcceleration getBucketTransferAcceleration(GenericRequest genericRequest) throws OSSException, ClientException {
         assertParameterNotNull(genericRequest, "genericRequest");
 
         String bucketName = genericRequest.getBucketName();
@@ -2076,7 +1873,7 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, getBucketTransferAccelerationResponseParser, bucketName, null, true);
     }
 
-    public VoidResult deleteBucketTransferAcceleration(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketTransferAcceleration(GenericRequest genericRequest) throws OSSException, ClientException {
         assertParameterNotNull(genericRequest, "genericRequest");
         String bucketName = genericRequest.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
@@ -2092,18 +1889,18 @@ public class OSSBucketOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-    private static void addOptionalHnsHeader(Map<String, String> headers, String hnsStatus) {
+     static void addOptionalHnsHeader(Map<String, String> headers, String hnsStatus) {
         if (hnsStatus != null ) {
             headers.put(OSSHeaders.OSS_HNS_STATUS, hnsStatus.toLowerCase());
         }
     }
-    private static void addOptionalResourceGroupIdHeader(Map<String, String> headers, String resourceGroupId) {
+     static void addOptionalResourceGroupIdHeader(Map<String, String> headers, String resourceGroupId) {
         if (resourceGroupId != null) {
             headers.put(OSSHeaders.OSS_RESOURCE_GROUP_ID, resourceGroupId);
         }
     }
 
-    private static void populateRequestPayerHeader (Map<String, String> headers, Payer payer) {
+     static void populateRequestPayerHeader (Map<String, String> headers, Payer payer) {
         if (payer != null && payer.equals(Payer.Requester)) {
             headers.put(OSSHeaders.OSS_REQUEST_PAYER, payer.toString().toLowerCase());
         }

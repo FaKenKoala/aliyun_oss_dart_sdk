@@ -6,7 +6,7 @@ class OSSException extends ServiceException {
   String? header;
   String? method;
 
-  OSSException({
+  OSSException([
     String? errorMessage,
     String? errorCode,
     String? requestId,
@@ -15,7 +15,7 @@ class OSSException extends ServiceException {
     this.header,
     this.resourceType,
     this.method,
-  }) : super(
+  ]) : super(
             errorMessage: errorMessage,
             errorCode: errorCode,
             requestId: requestId,

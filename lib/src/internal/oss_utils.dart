@@ -1,73 +1,25 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
-package com.aliyun.oss.internal;
+ import 'package:aliyun_oss_dart_sdk/src/common/utils/resource_manager.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/oss_constants.dart';
 
-import static com.aliyun.oss.internal.OSSConstants.DEFAULT_CHARSET_NAME;
-import static com.aliyun.oss.internal.OSSConstants.OBJECT_NAME_MAX_LENGTH;
-import static com.aliyun.oss.internal.OSSConstants.RESOURCE_NAME_COMMON;
-import static com.aliyun.oss.internal.OSSConstants.RESOURCE_NAME_OSS;
+class OSSUtils {
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+     static final ResourceManager OSS_RESOURCE_MANAGER = ResourceManager.getInstance(OSSConstants.RESOURCE_NAME_OSS);
+     static final ResourceManager COMMON_RESOURCE_MANAGER = ResourceManager.getInstance(OSSConstants.RESOURCE_NAME_COMMON);
 
-import com.aliyun.oss.ClientConfiguration;
-import com.aliyun.oss.InconsistentException;
-import com.aliyun.oss.common.comm.ResponseMessage;
-import com.aliyun.oss.common.utils.BinaryUtil;
-import com.aliyun.oss.common.utils.CodingUtils;
-import com.aliyun.oss.common.utils.DateUtil;
-import com.aliyun.oss.common.utils.HttpUtil;
-import com.aliyun.oss.common.utils.ResourceManager;
-import com.aliyun.oss.common.utils.StringUtils;
-import com.aliyun.oss.model.Callback;
-import com.aliyun.oss.model.ObjectMetadata;
-import com.aliyun.oss.model.ResponseHeaderOverrides;
-import com.aliyun.oss.model.Callback.CalbackBodyType;
+     static final String BUCKET_NAMING_CREATION_REGEX = "^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\$";
+     static final String BUCKET_NAMING_REGEX = "^[a-z0-9][a-z0-9-_]{1,61}[a-z0-9]\$";
+     static final String ENDPOINT_REGEX = "^[a-zA-Z0-9._-]+\$";
 
-public class OSSUtils {
-
-    public static final ResourceManager OSS_RESOURCE_MANAGER = ResourceManager.getInstance(RESOURCE_NAME_OSS);
-    public static final ResourceManager COMMON_RESOURCE_MANAGER = ResourceManager.getInstance(RESOURCE_NAME_COMMON);
-
-    private static final String BUCKET_NAMING_CREATION_REGEX = "^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$";
-    private static final String BUCKET_NAMING_REGEX = "^[a-z0-9][a-z0-9-_]{1,61}[a-z0-9]$";
-    private static final String ENDPOINT_REGEX = "^[a-zA-Z0-9._-]+$";
-
-    /**
-     * Validate endpoint.
-     */
-    public static bool validateEndpoint(String endpoint) {
+    /// Validate endpoint.
+     static bool validateEndpoint(String? endpoint) {
         if (endpoint == null) {
             return false;
         }
         return endpoint.matches(ENDPOINT_REGEX);
     }
 
-    public static void ensureEndpointValid(String endpoint) {
+     static void ensureEndpointValid(String endpoint) {
         if (!validateEndpoint(endpoint)) {
             throw ArgumentError(
                     OSS_RESOURCE_MANAGER.getFormattedString("EndpointInvalid", endpoint));
@@ -77,7 +29,7 @@ public class OSSUtils {
     /**
      * Validate bucket name.
      */
-    public static bool validateBucketName(String bucketName) {
+     static bool validateBucketName(String bucketName) {
 
         if (bucketName == null) {
             return false;
@@ -86,7 +38,7 @@ public class OSSUtils {
         return bucketName.matches(BUCKET_NAMING_REGEX);
     }
 
-    public static void ensureBucketNameValid(String bucketName) {
+     static void ensureBucketNameValid(String bucketName) {
         if (!validateBucketName(bucketName)) {
             throw ArgumentError(
                     OSS_RESOURCE_MANAGER.getFormattedString("BucketNameInvalid", bucketName));
@@ -96,7 +48,7 @@ public class OSSUtils {
     /**
      * Validate bucket creation name.
      */
-    public static bool validateBucketNameCreation(String bucketName) {
+     static bool validateBucketNameCreation(String bucketName) {
 
         if (bucketName == null) {
             return false;
@@ -105,7 +57,7 @@ public class OSSUtils {
         return bucketName.matches(BUCKET_NAMING_CREATION_REGEX);
     }
 
-    public static void ensureBucketNameCreationValid(String bucketName) {
+     static void ensureBucketNameCreationValid(String bucketName) {
         if (!validateBucketNameCreation(bucketName)) {
             throw ArgumentError(
                     OSS_RESOURCE_MANAGER.getFormattedString("BucketNameInvalid", bucketName));
@@ -115,9 +67,9 @@ public class OSSUtils {
     /**
      * Validate object name.
      */
-    public static bool validateObjectKey(String key) {
+     static bool validateObjectKey(String? key) {
 
-        if (key == null || key.length() == 0) {
+        if (key == null || key.isEmpty) {
             return false;
         }
 
@@ -138,13 +90,13 @@ public class OSSUtils {
         return (bytes.length > 0 && bytes.length < OBJECT_NAME_MAX_LENGTH);
     }
 
-    public static void ensureObjectKeyValid(String key) {
+     static void ensureObjectKeyValid(String key) {
         if (!validateObjectKey(key)) {
             throw ArgumentError(OSS_RESOURCE_MANAGER.getFormattedString("ObjectKeyInvalid", key));
         }
     }
 
-    public static void ensureLiveChannelNameValid(String liveChannelName) {
+     static void ensureLiveChannelNameValid(String liveChannelName) {
         if (!validateObjectKey(liveChannelName)) {
             throw ArgumentError(
                     OSS_RESOURCE_MANAGER.getFormattedString("LiveChannelNameInvalid", liveChannelName));
@@ -156,7 +108,7 @@ public class OSSUtils {
      * endpoint if no binding to CNAME, otherwise use original endpoint as
      * second-level domain directly.
      */
-    public static URI determineFinalEndpoint(URI endpoint, String bucket, ClientConfiguration clientConfig) {
+     static URI determineFinalEndpoint(URI endpoint, String bucket, ClientConfiguration clientConfig) {
         try {
             StringBuilder conbinedEndpoint = new StringBuilder();
             conbinedEndpoint.append(String.format("%s://", endpoint.getScheme()));
@@ -169,7 +121,7 @@ public class OSSUtils {
         }
     }
 
-    private static String buildCanonicalHost(URI endpoint, String bucket, ClientConfiguration clientConfig) {
+     static String buildCanonicalHost(URI endpoint, String bucket, ClientConfiguration clientConfig) {
         String host = endpoint.getHost();
 
         bool isCname = false;
@@ -187,7 +139,7 @@ public class OSSUtils {
         return cannonicalHost.toString();
     }
 
-    private static bool cnameExcludeFilter(String hostToFilter, List<String> excludeList) {
+     static bool cnameExcludeFilter(String hostToFilter, List<String> excludeList) {
         if (hostToFilter != null && !hostToFilter.trim().isEmpty()) {
             String canonicalHost = hostToFilter.toLowerCase();
             for (String excl : excludeList) {
@@ -200,7 +152,7 @@ public class OSSUtils {
         throw ArgumentError("Host name can not be null.");
     }
 
-    public static String determineResourcePath(String bucket, String key, bool sldEnabled) {
+     static String determineResourcePath(String bucket, String key, bool sldEnabled) {
         return sldEnabled ? makeResourcePath(bucket, key) : makeResourcePath(key);
     }
 
@@ -208,14 +160,14 @@ public class OSSUtils {
      * Make a resource path from the object key, used when the bucket name
      * pearing in the endpoint.
      */
-    public static String makeResourcePath(String key) {
+     static String makeResourcePath(String key) {
         return key != null ? OSSUtils.urlEncodeKey(key) : null;
     }
 
     /**
      * Make a resource path from the bucket name and the object key.
      */
-    public static String makeResourcePath(String bucket, String key) {
+     static String makeResourcePath(String bucket, String key) {
         if (bucket != null) {
             return bucket + "/" + (key != null ? OSSUtils.urlEncodeKey(key) : "");
         } else {
@@ -226,7 +178,7 @@ public class OSSUtils {
     /**
      * Encode object URI.
      */
-    private static String urlEncodeKey(String key) {
+     static String urlEncodeKey(String key) {
         if (key.startsWith("/")) {
             return HttpUtil.urlEncode(key, DEFAULT_CHARSET_NAME);
         }
@@ -258,7 +210,7 @@ public class OSSUtils {
     /**
      * Populate metadata to headers.
      */
-    public static void populateRequestMetadata(Map<String, String> headers, ObjectMetadata metadata) {
+     static void populateRequestMetadata(Map<String, String> headers, ObjectMetadata metadata) {
         Map<String, Object> rawMetadata = metadata.getRawMetadata();
         if (rawMetadata != null) {
             for (Entry<String, Object> entry : rawMetadata.entrySet()) {
@@ -290,31 +242,31 @@ public class OSSUtils {
         }
     }
 
-    public static void addHeader(Map<String, String> headers, String header, String value) {
+     static void addHeader(Map<String, String> headers, String header, String value) {
         if (value != null) {
             headers.put(header, value);
         }
     }
 
-    public static void addDateHeader(Map<String, String> headers, String header, Date value) {
+     static void addDateHeader(Map<String, String> headers, String header, Date value) {
         if (value != null) {
             headers.put(header, DateUtil.formatRfc822Date(value));
         }
     }
 
-    public static void addStringListHeader(Map<String, String> headers, String header, List<String> values) {
+     static void addStringListHeader(Map<String, String> headers, String header, List<String> values) {
         if (values != null && !values.isEmpty()) {
             headers.put(header, join(values));
         }
     }
 
-    public static void removeHeader(Map<String, String> headers, String header) {
+     static void removeHeader(Map<String, String> headers, String header) {
         if (header != null && headers.containsKey(header)) {
             headers.remove(header);
         }
     }
 
-    public static String join(List<String> strings) {
+     static String join(List<String> strings) {
 
         StringBuilder sb = new StringBuilder();
         bool first = true;
@@ -331,7 +283,7 @@ public class OSSUtils {
         return sb.toString();
     }
 
-    public static String trimQuotes(String s) {
+     static String trimQuotes(String s) {
 
         if (s == null) {
             return null;
@@ -348,7 +300,7 @@ public class OSSUtils {
         return s;
     }
 
-    public static void populateResponseHeaderParameters(Map<String, String> params,
+     static void populateResponseHeaderParameters(Map<String, String> params,
             ResponseHeaderOverrides responseHeaders) {
 
         if (responseHeaders != null) {
@@ -381,21 +333,21 @@ public class OSSUtils {
         }
     }
 
-    public static void safeCloseResponse(ResponseMessage response) {
+     static void safeCloseResponse(ResponseMessage response) {
         try {
             response.close();
         } catch (IOException e) {
         }
     }
 
-    public static void mandatoryCloseResponse(ResponseMessage response) {
+     static void mandatoryCloseResponse(ResponseMessage response) {
         try {
             response.abort();
         } catch (IOException e) {
         }
     }
 
-    public static long determineInputStreamLength(InputStream instream, long hintLength) {
+     static long determineInputStreamLength(InputStream instream, long hintLength) {
 
         if (hintLength <= 0 || !instream.markSupported()) {
             return -1;
@@ -404,7 +356,7 @@ public class OSSUtils {
         return hintLength;
     }
 
-    public static long determineInputStreamLength(InputStream instream, long hintLength, bool useChunkEncoding) {
+     static long determineInputStreamLength(InputStream instream, long hintLength, bool useChunkEncoding) {
 
         if (useChunkEncoding) {
             return -1;
@@ -417,7 +369,7 @@ public class OSSUtils {
         return hintLength;
     }
 
-    public static String joinETags(List<String> eTags) {
+     static String joinETags(List<String> eTags) {
 
         StringBuilder sb = new StringBuilder();
         bool first = true;
@@ -437,7 +389,7 @@ public class OSSUtils {
     /**
      * Encode the callback with JSON.
      */
-    public static String jsonizeCallback(Callback callback) {
+     static String jsonizeCallback(Callback callback) {
         StringBuffer jsonBody = new StringBuffer();
 
         jsonBody.append("{");
@@ -466,7 +418,7 @@ public class OSSUtils {
     /**
      * Encode CallbackVar with Json.
      */
-    public static String jsonizeCallbackVar(Callback callback) {
+     static String jsonizeCallbackVar(Callback callback) {
         StringBuffer jsonBody = new StringBuffer();
 
         jsonBody.append("{");
@@ -487,7 +439,7 @@ public class OSSUtils {
      * Ensure the callback is valid by checking its url and body are not null or
      * empty.
      */
-    public static void ensureCallbackValid(Callback callback) {
+     static void ensureCallbackValid(Callback callback) {
         if (callback != null) {
             CodingUtils.assertStringNotNullOrEmpty(callback.getCallbackUrl(), "Callback.callbackUrl");
             CodingUtils.assertParameterNotNull(callback.getCallbackBody(), "Callback.callbackBody");
@@ -497,7 +449,7 @@ public class OSSUtils {
     /**
      * Put the callback parameter into header.
      */
-    public static void populateRequestCallback(Map<String, String> headers, Callback callback) {
+     static void populateRequestCallback(Map<String, String> headers, Callback callback) {
         if (callback != null) {
             String jsonCb = jsonizeCallback(callback);
             String base64Cb = BinaryUtil.toBase64String(jsonCb.getBytes());
@@ -517,13 +469,13 @@ public class OSSUtils {
      * Checks if OSS and SDK's checksum is same. If not, throws
      * InconsistentException.
      */
-    public static void checkChecksum(Long clientChecksum, Long serverChecksum, String requestId) {
+     static void checkChecksum(Long clientChecksum, Long serverChecksum, String requestId) {
         if (clientChecksum != null && serverChecksum != null && !clientChecksum.equals(serverChecksum)) {
             throw new InconsistentException(clientChecksum, serverChecksum, requestId);
         }
     }
 
-    public static URI toEndpointURI(String endpoint, String defaultProtocol) throws IllegalArgumentException {
+     static URI toEndpointURI(String endpoint, String defaultProtocol) throws IllegalArgumentException {
         if (endpoint != null && !endpoint.contains("://")) {
             endpoint = defaultProtocol + "://" + endpoint;
         }

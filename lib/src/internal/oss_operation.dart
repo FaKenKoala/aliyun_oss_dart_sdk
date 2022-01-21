@@ -1,6 +1,7 @@
 import 'package:aliyun_oss_dart_sdk/src/common/auth/credentials.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/auth/credentials_provider.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/auth/request_signer.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/comm/execution_context.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/comm/request_checksum_handler.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/comm/request_handler.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/comm/request_message.dart';
@@ -10,12 +11,17 @@ import 'package:aliyun_oss_dart_sdk/src/common/comm/response_message.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/comm/response_progress_handler.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/comm/retry_strategy.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/comm/service_client.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/comm/sign_version.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/parser/response_parse_exception.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/parser/response_parser.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/exception_factory.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/log_utils.dart';
 import 'package:aliyun_oss_dart_sdk/src/http_method.dart';
 import 'package:aliyun_oss_dart_sdk/src/internal/oss_headers.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/web_service_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/oss_exception.dart';
+
+import 'oss_request_signer.dart';
 
 /// Abstract base class that provides some common functionalities for OSS
 /// operations (such as bucket/object/multipart/cors operations).
@@ -82,10 +88,10 @@ abstract class OSSOperation {
     ExecutionContext context =
         createDefaultContext(request.method, bucketName, key, originalRequest);
 
-    if (context.getCredentials().useSecurityToken() &&
+    if (context.credentials.useSecurityToken() &&
         !request.useUrlSignature) {
       request.addHeader(OSSHeaders.ossSecurityToken,
-          context.getCredentials().getSecurityToken());
+          context.credentials.getSecurityToken());
     }
 
     context.addRequestHandler(RequestProgressHanlder());
@@ -121,8 +127,8 @@ abstract class OSSOperation {
     try {
       return parser.parse(response);
     } on ResponseParseException catch (rpe) {
-      OSSException oe = ExceptionFactory.createInvalidResponseException(
-          response.getRequestId(), rpe.message, rpe);
+      OSSException oe = ExceptionFactory.createInvalidResponseExceptionWithCause(
+          response.getRequestId(), rpe, rpe.message);
       LogUtils.logException("Unable to parse response error: ", rpe);
       throw oe;
     }

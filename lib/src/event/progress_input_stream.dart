@@ -127,6 +127,8 @@ class InputStream {
 
   final InputStream inputStream;
 
+  String? data;
+
   void close() {}
 
   void reset() {}

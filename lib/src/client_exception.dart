@@ -25,7 +25,7 @@ class ClientException implements Exception {
     this.requestId,
   ]);
 
-  String? errorMessage;
+  dynamic errorMessage;
   String? requestId;
   String? errorCode;
 
