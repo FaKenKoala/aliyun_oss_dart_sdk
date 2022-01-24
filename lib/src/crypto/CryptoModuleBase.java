@@ -308,9 +308,9 @@ public abstract class CryptoModuleBase implements CryptoModule {
             if (ossDirect.getInnerClientConfiguration().isCrcCheckEnabled() && getObjectRequest.getRange() == null) {
                 Long clientCRC = null;
                 InputStream contentInputStream = ossObject.getObjectContent();
-                if (contentInputStream instanceof CipherInputStream) {
+                if (contentInputStream is CipherInputStream) {
                     InputStream subStream = ((CipherInputStream) contentInputStream).getDelegateStream();
-                    if (subStream instanceof CheckedInputStream){
+                    if (subStream is CheckedInputStream){
                         clientCRC = ((CheckedInputStream) subStream).getChecksum().getValue();
                     }
                 }

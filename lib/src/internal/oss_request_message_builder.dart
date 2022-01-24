@@ -74,7 +74,7 @@ class OSSRequestMessageBuilder {
     if (clientCofig.getTickOffset() != 0) {
       now.setTime(now.getTime() + clientCofig.getTickOffset());
     }
-    sentHeaders[HttpHeaders.date] = DateUtil.formatRfc822Date(now);
+    sentHeaders[HttpHeaders.DATE] = DateUtil.formatRfc822Date(now);
 
     RequestMessage request = RequestMessage(bucket, key, originalRequest);
     request.bucket = bucket;

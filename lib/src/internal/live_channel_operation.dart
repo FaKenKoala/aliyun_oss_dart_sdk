@@ -300,7 +300,7 @@ import 'request_parameters.dart';
         requestMessage.endpoint = OSSUtils.determineFinalEndpoint(endpoint, bucketName, config);
 
         // Headers
-        requestMessage.addHeader(HttpHeaders.date, expires.toString());
+        requestMessage.addHeader(HttpHeaders.DATE, expires.toString());
 
         // Parameters
         requestMessage.addParameter(RequestParameters.PLAYLIST_NAME, playlistName);
@@ -365,7 +365,7 @@ import 'request_parameters.dart';
 
         List<int> md5 = BinaryUtil.calculateMd5(rawContent);
         String md5Base64 = BinaryUtil.toBase64String(md5);
-        headers[HttpHeaders.contentMd5] = md5Base64;
+        headers[HttpHeaders.CONTENT_MD5] = md5Base64;
     }
 
 }

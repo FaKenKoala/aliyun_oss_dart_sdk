@@ -2,6 +2,7 @@ import 'package:aliyun_oss_dart_sdk/src/common/auth/credentials.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/auth/credentials_provider.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/auth/request_signer.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/comm/execution_context.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/comm/no_retry_strategy.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/comm/request_checksum_handler.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/comm/request_handler.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/comm/request_message.dart';
@@ -18,10 +19,13 @@ import 'package:aliyun_oss_dart_sdk/src/common/utils/exception_factory.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/log_utils.dart';
 import 'package:aliyun_oss_dart_sdk/src/http_method.dart';
 import 'package:aliyun_oss_dart_sdk/src/internal/oss_headers.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/response_parsers.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/web_service_request.dart';
 import 'package:aliyun_oss_dart_sdk/src/oss_exception.dart';
 
+import 'oss_error_response_handler.dart';
 import 'oss_request_signer.dart';
+import 'oss_utils.dart';
 
 /// Abstract base class that provides some common functionalities for OSS
 /// operations (such as bucket/object/multipart/cors operations).
@@ -134,11 +138,11 @@ abstract class OSSOperation {
     }
   }
 
-  static RequestSigner createSigner(HttpMethod method, String bucketName,
-      String key, Credentials creds, SignVersion signatureVersion) {
+  static RequestSigner createSigner(HttpMethod method, String? bucketName,
+      String? key, Credentials creds, SignVersion signatureVersion) {
     String resourcePath = "/" +
         ((bucketName != null) ? bucketName + "/" : "") +
-        ((key != null ? key : ""));
+        ((key ?? ""));
 
     return OSSRequestSigner(
         method.toString(), resourcePath, creds, signatureVersion);

@@ -152,7 +152,7 @@ class OSSUtils {
         throw ArgumentError("Host name can not be null.");
     }
 
-     static String determineResourcePath(String bucket, String key, bool sldEnabled) {
+     static String determineResourcePath(String? bucket, String? key, bool sldEnabled) {
         return sldEnabled ? makeResourcePath(bucket, key) : makeResourcePath(key);
     }
 
@@ -160,14 +160,14 @@ class OSSUtils {
      * Make a resource path from the object key, used when the bucket name
      * pearing in the endpoint.
      */
-     static String makeResourcePath(String key) {
+     static String makeResourcePath(String? key) {
         return key != null ? OSSUtils.urlEncodeKey(key) : null;
     }
 
     /**
      * Make a resource path from the bucket name and the object key.
      */
-     static String makeResourcePath(String bucket, String key) {
+     static String makeResourcePath(String? bucket, String? key) {
         if (bucket != null) {
             return bucket + "/" + (key != null ? OSSUtils.urlEncodeKey(key) : "");
         } else {

@@ -151,7 +151,7 @@ public class OSSUploadOperation {
             // checkpoint.
             // If any item is changed, return false (re-upload the file).
             if (!this.uploadFile.equals(uploadFile) || this.uploadFileStat.size != upload.length()
-                    || this.uploadFileStat.lastModified != upload.lastModified()) {
+                    || this.uploadFileStat.LAST_MODIFIED != upload.LAST_MODIFIED()) {
                 return false;
             }
 
@@ -204,7 +204,7 @@ public class OSSUploadOperation {
             final int prime = 31;
             int result = 1;
             result = prime * result + ((digest == null) ? 0 : digest.hashCode());
-            result = prime * result + (int) (lastModified ^ (lastModified >>> 32));
+            result = prime * result + (int) (LAST_MODIFIED ^ (LAST_MODIFIED >>> 32));
             result = prime * result + (int) (size ^ (size >>> 32));
             return result;
         }
@@ -213,12 +213,12 @@ public class OSSUploadOperation {
             FileStat fileStat = new FileStat();
             File file = new File(uploadFile);
             fileStat.size = file.length();
-            fileStat.lastModified = file.lastModified();
+            fileStat.LAST_MODIFIED = file.LAST_MODIFIED();
             return fileStat;
         }
 
         public long size; // file size
-        public long lastModified; // file last modified time.
+        public long LAST_MODIFIED; // file last modified time.
         public String digest; // file content's digest (signature).
     }
 

@@ -142,7 +142,7 @@ public class OSSDownloadOperation {
 
             // Object's size, last modified time or ETAG are not same as the one
             // in the checkpoint.
-            if (this.objectStat.size != meta.getSize() || !this.objectStat.lastModified.equals(meta.getLastModified())
+            if (this.objectStat.size != meta.getSize() || !this.objectStat.LAST_MODIFIED.equals(meta.getLastModified())
                     || !this.objectStat.digest.equals(meta.getETag())) {
                 return false;
             }
@@ -192,7 +192,7 @@ public class OSSDownloadOperation {
             final int prime = 31;
             int result = 1;
             result = prime * result + ((digest == null) ? 0 : digest.hashCode());
-            result = prime * result + ((lastModified == null) ? 0 : lastModified.hashCode());
+            result = prime * result + ((LAST_MODIFIED == null) ? 0 : LAST_MODIFIED.hashCode());
             result = prime * result + (int) (size ^ (size >>> 32));
             return result;
         }
@@ -217,14 +217,14 @@ public class OSSDownloadOperation {
 
             ObjectStat objStat = new ObjectStat();
             objStat.size = meta.getSize();
-            objStat.lastModified = meta.getLastModified();
+            objStat.LAST_MODIFIED = meta.getLastModified();
             objStat.digest = meta.getETag();
 
             return objStat;
         }
 
         public long size; // file size
-        public Date lastModified; // file's last modified time.
+        public Date LAST_MODIFIED; // file's last modified time.
         public String digest; // The file's ETag.
     }
 
@@ -739,21 +739,21 @@ public class OSSDownloadOperation {
         long start = 0;
         long size = totalSize;
 
-        if ((range == null) ||
-            (range.length != 2) ||
+        if ((RANGE == null) ||
+            (RANGE.length != 2) ||
             (totalSize < 1) ||
-            (range[0] < 0 && range[1] < 0) ||
-            (range[0] > 0 && range[1] > 0 && range[0] > range[1])||
-            (range[0] >= totalSize)) {
+            (RANGE[0] < 0 && RANGE[1] < 0) ||
+            (RANGE[0] > 0 && RANGE[1] > 0 && RANGE[0] > RANGE[1])||
+            (RANGE[0] >= totalSize)) {
             //download all
         } else {
             //dwonload part by range & total size
-            long begin = range[0];
-            long end = range[1];
-            if (range[0] < 0) {
+            long begin = RANGE[0];
+            long end = RANGE[1];
+            if (RANGE[0] < 0) {
                 begin = 0;
             }
-            if (range[1] < 0 || range[1] >= totalSize) {
+            if (RANGE[1] < 0 || RANGE[1] >= totalSize) {
                 end = totalSize -1;
             }
             start = begin;

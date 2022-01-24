@@ -1,118 +1,49 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
-package com.aliyun.oss.common.comm;
+import 'package:aliyun_oss_dart_sdk/src/client_configuration.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/comm/service_client.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/comm/service_client.dart';
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.security.KeyStore;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import 'service_client.dart';
 
-import javax.net.ssl.*;
+/// Default implementation of {@link ServiceClient}.
+ class DefaultServiceClient extends ServiceClient {
+     static HttpRequestFactory httpRequestFactory = HttpRequestFactory();
+	 static Method setNormalizeUriMethod = null;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.http.Header;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpStatus;
-import org.apache.http.auth.AUTH;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.NTCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.config.SocketConfig;
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.DefaultHostnameVerifier;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+     CloseableHttpClient httpClient;
+     HttpClientConnectionManager connectionManager;
+     RequestConfig requestConfig;
+     CredentialsProvider credentialsProvider;
+     HttpHost proxyHttpHost;
+     AuthCache authCache;
 
-import com.aliyun.oss.ClientConfiguration;
-import com.aliyun.oss.ClientErrorCode;
-import com.aliyun.oss.ClientException;
-import com.aliyun.oss.OSSErrorCode;
-import com.aliyun.oss.OSSException;
-import com.aliyun.oss.common.utils.ExceptionFactory;
-import com.aliyun.oss.common.utils.HttpHeaders;
-import com.aliyun.oss.common.utils.HttpUtil;
-import com.aliyun.oss.common.utils.IOUtils;
-
-/**
- * Default implementation of {@link ServiceClient}.
- */
-public class DefaultServiceClient extends ServiceClient {
-    protected static HttpRequestFactory httpRequestFactory = new HttpRequestFactory();
-	private static Method setNormalizeUriMethod = null;
-
-    protected CloseableHttpClient httpClient;
-    protected HttpClientConnectionManager connectionManager;
-    protected RequestConfig requestConfig;
-    protected CredentialsProvider credentialsProvider;
-    protected HttpHost proxyHttpHost;
-    protected AuthCache authCache;
-
-    public DefaultServiceClient(ClientConfiguration config) {
-        super(config);
-        this.connectionManager = createHttpClientConnectionManager();
-        this.httpClient = createHttpClient(this.connectionManager);
+     DefaultServiceClient(ClientConfiguration config) {
+        connectionManager = createHttpClientConnectionManager();
+        httpClient = createHttpClient(connectionManager);
         RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
         requestConfigBuilder.setConnectTimeout(config.getConnectionTimeout());
         requestConfigBuilder.setSocketTimeout(config.getSocketTimeout());
         requestConfigBuilder.setConnectionRequestTimeout(config.getConnectionRequestTimeout());
         requestConfigBuilder.setRedirectsEnabled(config.isRedirectEnable());
 
-        String proxyHost = resolveStringValue(config.getProxyHost(), "http.proxyHost", config.isUseSystemPropertyValues());
-        int proxyPort = resolveIntValue(config.getProxyPort(), "http.proxyPort", config.isUseSystemPropertyValues());
+        String? proxyHost = resolveStringValue(config.proxyHost, "http.proxyHost", config.isUseSystemPropertyValues());
+        int proxyPort = resolveIntValue(config.proxyHost, "http.proxyPort", config.isUseSystemPropertyValues());
 
         if (proxyHost != null && proxyPort > 0) {
-            this.proxyHttpHost = new HttpHost(proxyHost, proxyPort);
+            proxyHttpHost = HttpHost(proxyHost, proxyPort);
             requestConfigBuilder.setProxy(proxyHttpHost);
 
-            String proxyUsername = resolveStringValue(config.getProxyUsername(),"http.proxyUser", config.isUseSystemPropertyValues());
-            String proxyPassword = resolveStringValue(config.getProxyPassword(),"http.proxyPassword", config.isUseSystemPropertyValues());
-            String proxyDomain = config.getProxyDomain();
-            String proxyWorkstation = config.getProxyWorkstation();
+            String? proxyUsername = resolveStringValue(config.proxyUsername,"http.proxyUser", config.useSystemPropertyValues);
+            String? proxyPassword = resolveStringValue(config.proxyPassword,"http.proxyPassword", config.useSystemPropertyValues);
+            String proxyDomain = config.proxyDomain;
+            String proxyWorkstation = config.proxyWorkstation;
             if (proxyUsername != null && proxyPassword != null) {
-                this.credentialsProvider = new BasicCredentialsProvider();
-                this.credentialsProvider.setCredentials(new AuthScope(proxyHost, proxyPort),
-                        new NTCredentials(proxyUsername, proxyPassword, proxyWorkstation, proxyDomain));
+                credentialsProvider = BasicCredentialsProvider();
+                credentialsProvider.setCredentials(AuthScope(proxyHost, proxyPort),
+                        NTCredentials(proxyUsername, proxyPassword, proxyWorkstation, proxyDomain));
 
-                this.authCache = new BasicAuthCache();
-                authCache.put(this.proxyHttpHost, new BasicScheme());
+                authCache = BasicAuthCache();
+                authCache.put(proxyHttpHost, BasicScheme());
             }
         }
 
@@ -120,19 +51,19 @@ public class DefaultServiceClient extends ServiceClient {
         if (setNormalizeUriMethod != null) {
             try {
                 setNormalizeUriMethod.invoke(requestConfigBuilder, false);
-            }catch (Exception e) {
+            }catch ( e) {
             }
         }
 
-        this.requestConfig = requestConfigBuilder.build();
+        requestConfig = requestConfigBuilder.build();
     }
 
     @override
-    public ResponseMessage sendRequestCore(ServiceClient.Request request, ExecutionContext context) throws IOException {
+     ResponseMessage sendRequestCore(ServiceClient.Request request, ExecutionContext context) {
         HttpRequestBase httpRequest = httpRequestFactory.createHttpRequest(request, context);
         setProxyAuthorizationIfNeed(httpRequest);
         HttpClientContext httpContext = createHttpContext();
-        httpContext.setRequestConfig(this.requestConfig);
+        httpContext.setRequestConfig(requestConfig);
 
         CloseableHttpResponse httpResponse = null;
         try {
@@ -145,12 +76,12 @@ public class DefaultServiceClient extends ServiceClient {
         return buildResponse(request, httpResponse);
     }
 
-    protected static ResponseMessage buildResponse(ServiceClient.Request request, CloseableHttpResponse httpResponse)
-            throws IOException {
+     static ResponseMessage buildResponse(ServiceClient.Request request, CloseableHttpResponse httpResponse)
+            {
 
         assert (httpResponse != null);
 
-        ResponseMessage response = new ResponseMessage(request);
+        ResponseMessage response = ResponseMessage(request);
         response.setUrl(request.getUri());
         response.setHttpResponse(httpResponse);
 
@@ -178,18 +109,18 @@ public class DefaultServiceClient extends ServiceClient {
         return response;
     }
 
-    private static void readAndSetErrorResponse(InputStream originalContent, ResponseMessage response)
-            throws IOException {
+     static void readAndSetErrorResponse(InputStream originalContent, ResponseMessage response)
+            {
         byte[] contentBytes = IOUtils.readStreamAsByteArray(originalContent);
-        response.setErrorResponseAsString(new String(contentBytes));
-        response.setContent(new ByteArrayInputStream(contentBytes));
+        response.setErrorResponseAsString(String(contentBytes));
+        response.setContent(ByteArrayInputStream(contentBytes));
     }
 
-    private static class DefaultRetryStrategy extends RetryStrategy {
+     static class DefaultRetryStrategy extends RetryStrategy {
 
         @override
-        public bool shouldRetry(Exception ex, RequestMessage request, ResponseMessage response, int retries) {
-            if (ex instanceof ClientException) {
+         bool shouldRetry(Exception ex, RequestMessage request, ResponseMessage response, int retries) {
+            if (ex is ClientException) {
                 String errorCode = ((ClientException) ex).getErrorCode();
                 if (errorCode.equals(ClientErrorCode.CONNECTION_TIMEOUT)
                         || errorCode.equals(ClientErrorCode.SOCKET_TIMEOUT)
@@ -206,7 +137,7 @@ public class DefaultServiceClient extends ServiceClient {
                 }
             }
 
-            if (ex instanceof OSSException) {
+            if (ex is OSSException) {
                 String errorCode = ((OSSException) ex).getErrorCode();
                 // No need retry for invalid responses
                 if (errorCode.equals(OSSErrorCode.INVALID_RESPONSE)) {
@@ -227,16 +158,16 @@ public class DefaultServiceClient extends ServiceClient {
     }
 
     @override
-    protected RetryStrategy getDefaultRetryStrategy() {
-        return new DefaultRetryStrategy();
+     RetryStrategy getDefaultRetryStrategy() {
+        return DefaultRetryStrategy();
     }
 
-    protected CloseableHttpClient createHttpClient(HttpClientConnectionManager connectionManager) {
-        return HttpClients.custom().setConnectionManager(connectionManager).setUserAgent(this.config.getUserAgent())
+     CloseableHttpClient createHttpClient(HttpClientConnectionManager connectionManager) {
+        return HttpClients.custom().setConnectionManager(connectionManager).setUserAgent(config.getUserAgent())
                 .disableContentCompression().disableAutomaticRetries().build();
     }
 
-    protected HttpClientConnectionManager createHttpClientConnectionManager() {
+     HttpClientConnectionManager createHttpClientConnectionManager() {
         SSLConnectionSocketFactory sslSocketFactory = null;
         try {
             List<TrustManager> trustManagerList = [];
@@ -253,11 +184,11 @@ public class DefaultServiceClient extends ServiceClient {
 
             final List<X509TrustManager> finalTrustManagerList = [];
             for (TrustManager tm : trustManagerList) {
-                if (tm instanceof X509TrustManager) {
+                if (tm is X509TrustManager) {
                     finalTrustManagerList.add((X509TrustManager) tm);
                 }
             }
-            CompositeX509TrustManager compositeX509TrustManager = new CompositeX509TrustManager(finalTrustManagerList);
+            CompositeX509TrustManager compositeX509TrustManager = CompositeX509TrustManager(finalTrustManagerList);
             compositeX509TrustManager.setVerifySSL(config.isVerifySSLEnable());
             KeyManager[] keyManagers = null;
             if (config.getKeyManagers() != null) {
@@ -265,29 +196,29 @@ public class DefaultServiceClient extends ServiceClient {
             }
 
             SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(keyManagers, new TrustManager[]{compositeX509TrustManager}, config.getSecureRandom());
+            sslContext.init(keyManagers, TrustManager[]{compositeX509TrustManager}, config.getSecureRandom());
 
             HostnameVerifier hostnameVerifier = null;
             if (!config.isVerifySSLEnable()) {
-                hostnameVerifier = new NoopHostnameVerifier();
+                hostnameVerifier = NoopHostnameVerifier();
             } else if (config.getHostnameVerifier() != null) {
                 hostnameVerifier = config.getHostnameVerifier();
             } else {
-                hostnameVerifier = new DefaultHostnameVerifier();
+                hostnameVerifier = DefaultHostnameVerifier();
             }
-            sslSocketFactory = new SSLConnectionSocketFactory(sslContext, hostnameVerifier);
+            sslSocketFactory = SSLConnectionSocketFactory(sslContext, hostnameVerifier);
         } catch (Exception e) {
-            throw new ClientException(e.getMessage());
+            throw ClientException(e.getMessage());
         }
 
         Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create()
                 .register(Protocol.HTTP.toString(), PlainConnectionSocketFactory.getSocketFactory())
                 .register(Protocol.HTTPS.toString(), sslSocketFactory).build();
 
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
+        PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManager(
                 socketFactoryRegistry);
-        connectionManager.setDefaultMaxPerRoute(config.getMaxConnections());
-        connectionManager.setMaxTotal(config.getMaxConnections());
+        connectionManager.setDefaultMaxPerRoute(config.maxConnections);
+        connectionManager.setMaxTotal(config.maxConnections);
         connectionManager.setValidateAfterInactivity(config.getValidateAfterInactivity());
         connectionManager.setDefaultSocketConfig(
                 SocketConfig.custom().setSoTimeout(config.getSocketTimeout()).setTcpNoDelay(true).build());
@@ -298,41 +229,41 @@ public class DefaultServiceClient extends ServiceClient {
         return connectionManager;
     }
 
-    protected HttpClientContext createHttpContext() {
+     HttpClientContext createHttpContext() {
         HttpClientContext httpContext = HttpClientContext.create();
-        httpContext.setRequestConfig(this.requestConfig);
-        if (this.credentialsProvider != null) {
-            httpContext.setCredentialsProvider(this.credentialsProvider);
-            httpContext.setAuthCache(this.authCache);
+        httpContext.setRequestConfig(requestConfig);
+        if (credentialsProvider != null) {
+            httpContext.setCredentialsProvider(credentialsProvider);
+            httpContext.setAuthCache(authCache);
         }
         return httpContext;
     }
 
-    private void setProxyAuthorizationIfNeed(HttpRequestBase httpRequest) {
-        if (this.credentialsProvider != null) {
-            String auth = this.config.getProxyUsername() + ":" + this.config.getProxyPassword();
+     void setProxyAuthorizationIfNeed(HttpRequestBase httpRequest) {
+        if (credentialsProvider != null) {
+            String auth = config.getProxyUsername() + ":" + config.getProxyPassword();
             byte[] encodedAuth = Base64.encodeBase64(auth.getBytes());
-            String authHeader = "Basic " + new String(encodedAuth);
+            String authHeader = "Basic " + String(encodedAuth);
             httpRequest.addHeader(AUTH.PROXY_AUTH_RESP, authHeader);
         }
     }
 
     @override
-    public void shutdown() {
-        IdleConnectionReaper.removeConnectionManager(this.connectionManager);
-        this.connectionManager.shutdown();
+     void shutdown() {
+        IdleConnectionReaper.removeConnectionManager(connectionManager);
+        connectionManager.shutdown();
     }
 
     @override
-    public String getConnectionPoolStats() {
-        if (connectionManager != null && connectionManager instanceof PoolingHttpClientConnectionManager) {
+     String getConnectionPoolStats() {
+        if (connectionManager != null && connectionManager is PoolingHttpClientConnectionManager) {
             PoolingHttpClientConnectionManager conn = (PoolingHttpClientConnectionManager)connectionManager;
             return conn.getTotalStats().toString();
         }
         return "";
     }
 
-    private static Method getClassMethd(Class<?> clazz, String methodName) {
+     static Method getClassMethd(Class<?> clazz, String methodName) {
         try {
             Method[] method = clazz.getDeclaredMethods();
             for (Method m : method) {
@@ -355,30 +286,30 @@ public class DefaultServiceClient extends ServiceClient {
         }
     }
 
-    private class CompositeX509TrustManager implements X509TrustManager {
+     class CompositeX509TrustManager implements X509TrustManager {
 
-        private final List<X509TrustManager> trustManagers;
-        private bool verifySSL = true;
+         final List<X509TrustManager> trustManagers;
+         bool verifySSL = true;
 
-        public bool isVerifySSL() {
+         bool isVerifySSL() {
             return this.verifySSL;
         }
 
-        public void setVerifySSL(bool verifySSL) {
+         void setVerifySSL(bool verifySSL) {
             this.verifySSL = verifySSL;
         }
 
-        public CompositeX509TrustManager(List<X509TrustManager> trustManagers) {
+         CompositeX509TrustManager(List<X509TrustManager> trustManagers) {
             this.trustManagers = trustManagers;
         }
 
         @override
-        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+         void checkClientTrusted(X509Certificate[] chain, String authType) {
             // do nothing
         }
 
         @override
-        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+         void checkServerTrusted(X509Certificate[] chain, String authType) {
             if (!verifySSL) {
                 return;
             }
@@ -390,11 +321,11 @@ public class DefaultServiceClient extends ServiceClient {
                     // maybe someone else will trust them
                 }
             }
-            throw new CertificateException("None of the TrustManagers trust this certificate chain");
+            throw CertificateException("None of the TrustManagers trust this certificate chain");
         }
 
         @override
-        public X509Certificate[] getAcceptedIssuers() {
+         X509Certificate[] getAcceptedIssuers() {
             List<X509Certificate> certificates = [];
             for (X509TrustManager trustManager : trustManagers) {
                 X509Certificate[] accepts = trustManager.getAcceptedIssuers();
@@ -402,12 +333,12 @@ public class DefaultServiceClient extends ServiceClient {
                     certificates.addAll(Arrays.asList(accepts));
                 }
             }
-            X509Certificate[] certificatesArray = new X509Certificate[certificates.size()];
+            X509Certificate[] certificatesArray = X509Certificate[certificates.size()];
             return certificates.toArray(certificatesArray);
         }
     }
 
-    protected static String resolveStringValue(String value, String key, bool flag) {
+     static String resolveStringValue(String value, String key, bool flag) {
         if (value == null && flag) {
             try {
                 return System.getProperty(key);
@@ -418,7 +349,7 @@ public class DefaultServiceClient extends ServiceClient {
         return value;
     }
 
-    protected static int resolveIntValue(int value, String key, bool flag) {
+     static int resolveIntValue(int value, String key, bool flag) {
         if (value == -1 && flag) {
             try {
                 return Integer.parseInt(System.getProperty(key));

@@ -1,6 +1,9 @@
  import 'package:aliyun_oss_dart_sdk/src/client_configuration.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/auth/request_signer.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/http_headers.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/log_utils.dart';
+import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/oss_constants.dart';
 import 'package:aliyun_oss_dart_sdk/src/oss_client.dart';
 
 import 'execution_context.dart';
@@ -83,7 +86,7 @@ abstract class ServiceClient {
                 Request httpRequest = buildRequest(request, context);
 
                 // Step 3. Send HTTP request to OSS.
-                String poolStatsInfo = config.isLogConnectionPoolStatsEnable()? "Connection pool stats " + getConnectionPoolStats():"";
+                String poolStatsInfo = config.logConnectionPoolStats? "Connection pool stats " + getConnectionPoolStats():"";
                 int startTime = DateTime.now().millisecondsSinceEpoch;
                 response = sendRequestCore(httpRequest, context);
                 int duration = DateTime.now().millisecondsSinceEpoch - startTime;
@@ -96,7 +99,7 @@ abstract class ServiceClient {
 
                 return response;
             } catch (sex) {
-                logException("[Server]Unable to execute HTTP request: ", sex,
+                LogUtils.logException("[Server]Unable to execute HTTP request: ", sex,
                         request.originalRequest.logEnabled);
 
                 // Notice that the response should not be closed in the
@@ -107,22 +110,22 @@ abstract class ServiceClient {
                 if (!shouldRetry(sex as Exception, request, response, retries, retryStrategy)) {
                     rethrow;
                 }
-            } catch (ClientException cex) {
-                logException("[Client]Unable to execute HTTP request: ", cex,
-                        request.getOriginalRequest().isLogEnabled());
+            } catch ( cex) {
+                LogUtils.logException("[Client]Unable to execute HTTP request: ", cex,
+                        request.originalRequest.logEnabled);
 
                 closeResponseSilently(response);
 
                 if (!shouldRetry(cex, request, response, retries, retryStrategy)) {
                     throw cex;
                 }
-            } catch (Exception ex) {
-                logException("[Unknown]Unable to execute HTTP request: ", ex,
-                        request.getOriginalRequest().isLogEnabled());
+            } catch ( ex) {
+                LogUtils.logException("[Unknown]Unable to execute HTTP request: ", ex,
+                        request.originalRequest.logEnabled);
 
                 closeResponseSilently(response);
 
-                throw new ClientException(
+                throw  ClientException(
                         COMMON_RESOURCE_MANAGER.getFormattedString("ConnectionError", ex.getMessage()), ex);
             } finally {
                 retries++;
@@ -264,7 +267,7 @@ abstract class ServiceClient {
 
      String formatSlowRequestLog(RequestMessage request, ResponseMessage response, int useTimesMs) {
        return 
-                "Request cost ${useTimesMs / 1000} seconds, endpoint ${request.endpoint}, resourcePath ${request.resourcePath}, method ${request.method}, Date '${request.headers[HttpHeaders.date]}', statusCode ${response.statusCode}, requestId ${response.getRequestId()}.";
+                "Request cost ${useTimesMs / 1000} seconds, endpoint ${request.endpoint}, resourcePath ${request.resourcePath}, method ${request.method}, Date '${request.headers[HttpHeaders.DATE]}', statusCode ${response.statusCode}, requestId ${response.getRequestId()}.";
     }
 
      RetryStrategy getDefaultRetryStrategy();

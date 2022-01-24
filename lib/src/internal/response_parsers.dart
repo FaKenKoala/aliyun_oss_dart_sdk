@@ -1,1251 +1,163 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
-package com.aliyun.oss.internal;
-
-import static com.aliyun.oss.common.utils.CodingUtils.isNullOrEmpty;
-import static com.aliyun.oss.internal.OSSHeaders.OSS_HEADER_WORM_ID;
-import static com.aliyun.oss.internal.OSSUtils.safeCloseResponse;
-import static com.aliyun.oss.internal.OSSUtils.trimQuotes;
-
-import java.io.InputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.math.BigInteger;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.CheckedInputStream;
-
-import com.aliyun.oss.model.AddBucketCnameResult;
-import com.aliyun.oss.model.DeleteDirectoryResult;
-import com.aliyun.oss.model.GetBucketInventoryConfigurationResult;
-import com.aliyun.oss.model.GetBucketWormResult;
-import com.aliyun.oss.model.InitiateBucketWormResult;
-import com.aliyun.oss.model.InventoryServerSideEncryptionOSS;
-import com.aliyun.oss.model.ListBucketInventoryConfigurationsResult;
-import com.aliyun.oss.model.InventoryConfiguration;
-import com.aliyun.oss.model.InventoryDestination;
-import com.aliyun.oss.model.InventoryEncryption;
-import com.aliyun.oss.model.InventoryFilter;
-import com.aliyun.oss.model.InventoryOSSBucketDestination;
-import com.aliyun.oss.model.InventorySchedule;
-import com.aliyun.oss.model.InventoryServerSideEncryptionKMS;
-import com.aliyun.oss.model.ListObjectsV2Result;
-import com.aliyun.oss.model.VoidResult;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.input.JDOMParseException;
-import org.jdom2.input.SAXBuilder;
-
-import com.aliyun.oss.common.comm.ResponseMessage;
-import com.aliyun.oss.common.parser.ResponseParseException;
-import com.aliyun.oss.common.parser.ResponseParser;
-import com.aliyun.oss.common.utils.DateUtil;
-import com.aliyun.oss.common.utils.HttpUtil;
-import com.aliyun.oss.common.utils.StringUtils;
-import com.aliyun.oss.model.AccessControlList;
-import com.aliyun.oss.model.AddBucketReplicationRequest.ReplicationAction;
-import com.aliyun.oss.model.DeleteVersionsResult.DeletedVersion;
-import com.aliyun.oss.model.AppendObjectResult;
-import com.aliyun.oss.model.Bucket;
-import com.aliyun.oss.model.BucketInfo;
-import com.aliyun.oss.model.BucketList;
-import com.aliyun.oss.model.BucketLoggingResult;
-import com.aliyun.oss.model.BucketMetadata;
-import com.aliyun.oss.model.BucketProcess;
-import com.aliyun.oss.model.BucketQosInfo;
-import com.aliyun.oss.model.BucketReferer;
-import com.aliyun.oss.model.BucketReplicationProgress;
-import com.aliyun.oss.model.BucketStat;
-import com.aliyun.oss.model.BucketVersioningConfiguration;
-import com.aliyun.oss.model.BucketWebsiteResult;
-import com.aliyun.oss.model.CannedAccessControlList;
-import com.aliyun.oss.model.CnameConfiguration;
-import com.aliyun.oss.model.CompleteMultipartUploadResult;
-import com.aliyun.oss.model.CopyObjectResult;
-import com.aliyun.oss.model.CreateLiveChannelResult;
-import com.aliyun.oss.model.DataRedundancyType;
-import com.aliyun.oss.model.DeleteObjectsResult;
-import com.aliyun.oss.model.DeleteVersionsResult;
-import com.aliyun.oss.model.GenericResult;
-import com.aliyun.oss.model.GetBucketImageResult;
-import com.aliyun.oss.model.ImageProcess;
-import com.aliyun.oss.model.LiveChannel;
-import com.aliyun.oss.model.LiveChannelInfo;
-import com.aliyun.oss.model.LiveChannelListing;
-import com.aliyun.oss.model.LiveChannelStat;
-import com.aliyun.oss.model.LiveRecord;
-import com.aliyun.oss.model.LiveChannelStat.AudioStat;
-import com.aliyun.oss.model.LiveChannelStat.VideoStat;
-import com.aliyun.oss.model.LiveChannelStatus;
-import com.aliyun.oss.model.LiveChannelTarget;
-import com.aliyun.oss.model.OSSSymlink;
-import com.aliyun.oss.model.OSSVersionSummary;
-import com.aliyun.oss.model.ReplicationRule;
-import com.aliyun.oss.model.GetImageStyleResult;
-import com.aliyun.oss.model.GroupGrantee;
-import com.aliyun.oss.model.InitiateMultipartUploadResult;
-import com.aliyun.oss.model.LifecycleRule;
-import com.aliyun.oss.model.ReplicationStatus;
-import com.aliyun.oss.model.RestoreObjectResult;
-import com.aliyun.oss.model.RoutingRule;
-import com.aliyun.oss.model.ServerSideEncryptionByDefault;
-import com.aliyun.oss.model.ServerSideEncryptionConfiguration;
-import com.aliyun.oss.model.StorageClass;
-import com.aliyun.oss.model.LifecycleRule.RuleStatus;
-import com.aliyun.oss.model.LifecycleRule.StorageTransition;
-import com.aliyun.oss.model.MultipartUpload;
-import com.aliyun.oss.model.MultipartUploadListing;
-import com.aliyun.oss.model.OSSObject;
-import com.aliyun.oss.model.OSSObjectSummary;
-import com.aliyun.oss.model.ObjectAcl;
-import com.aliyun.oss.model.ObjectListing;
-import com.aliyun.oss.model.ObjectMetadata;
-import com.aliyun.oss.model.ObjectPermission;
-import com.aliyun.oss.model.Owner;
-import com.aliyun.oss.model.PartListing;
-import com.aliyun.oss.model.PartSummary;
-import com.aliyun.oss.model.Payer;
-import com.aliyun.oss.model.Permission;
-import com.aliyun.oss.model.PutObjectResult;
-import com.aliyun.oss.model.PushflowStatus;
-import com.aliyun.oss.model.SetBucketCORSRequest.CORSRule;
-import com.aliyun.oss.model.CORSConfiguration;
-import com.aliyun.oss.model.SimplifiedObjectMeta;
-import com.aliyun.oss.model.Style;
-import com.aliyun.oss.model.TagSet;
-import com.aliyun.oss.model.UploadPartCopyResult;
-import com.aliyun.oss.model.UserQos;
-import com.aliyun.oss.model.UserQosInfo;
-import com.aliyun.oss.model.VersionListing;
-import com.aliyun.oss.model.GetBucketPolicyResult;
-import com.aliyun.oss.model.GetBucketRequestPaymentResult;
-import com.aliyun.oss.model.LifecycleRule.NoncurrentVersionStorageTransition;
-import com.aliyun.oss.model.LifecycleRule.NoncurrentVersionExpiration;
-import com.aliyun.oss.model.SetAsyncFetchTaskResult;
-import com.aliyun.oss.model.GetAsyncFetchTaskResult;
-import com.aliyun.oss.model.AsyncFetchTaskConfiguration;
-import com.aliyun.oss.model.AsyncFetchTaskState;
-import com.aliyun.oss.model.VpcPolicy;
-import com.aliyun.oss.model.Vpcip;
-import com.aliyun.oss.model.GetBucketResourceGroupResult;
-import com.aliyun.oss.model.TransferAcceleration;
-/*
- * A collection of parsers that parse HTTP reponses into corresponding human-readable results.
- */
-public final class ResponseParsers {
-
-    public static final ListBucketResponseParser listBucketResponseParser = new ListBucketResponseParser();
-    public static final ListImageStyleResponseParser listImageStyleResponseParser = new ListImageStyleResponseParser();
-    public static final GetBucketRefererResponseParser getBucketRefererResponseParser = new GetBucketRefererResponseParser();
-    public static final GetBucketAclResponseParser getBucketAclResponseParser = new GetBucketAclResponseParser();
-    public static final GetBucketMetadataResponseParser getBucketMetadataResponseParser = new GetBucketMetadataResponseParser();
-    public static final GetBucketLocationResponseParser getBucketLocationResponseParser = new GetBucketLocationResponseParser();
-    public static final GetBucketLoggingResponseParser getBucketLoggingResponseParser = new GetBucketLoggingResponseParser();
-    public static final GetBucketWebsiteResponseParser getBucketWebsiteResponseParser = new GetBucketWebsiteResponseParser();
-    public static final GetBucketLifecycleResponseParser getBucketLifecycleResponseParser = new GetBucketLifecycleResponseParser();
-    public static final GetBucketCorsResponseParser getBucketCorsResponseParser = new GetBucketCorsResponseParser();
-    public static final GetBucketImageResponseParser getBucketImageResponseParser = new GetBucketImageResponseParser();
-    public static final GetImageStyleResponseParser getImageStyleResponseParser = new GetImageStyleResponseParser();
-    public static final GetBucketImageProcessConfResponseParser getBucketImageProcessConfResponseParser = new GetBucketImageProcessConfResponseParser();
-    public static final GetTaggingResponseParser getTaggingResponseParser = new GetTaggingResponseParser();
-    public static final GetBucketReplicationResponseParser getBucketReplicationResponseParser = new GetBucketReplicationResponseParser();
-    public static final GetBucketReplicationProgressResponseParser getBucketReplicationProgressResponseParser = new GetBucketReplicationProgressResponseParser();
-    public static final GetBucketReplicationLocationResponseParser getBucketReplicationLocationResponseParser = new GetBucketReplicationLocationResponseParser();
-    public static final AddBucketCnameResponseParser addBucketCnameResponseParser = new AddBucketCnameResponseParser();
-    public static final GetBucketCnameResponseParser getBucketCnameResponseParser = new GetBucketCnameResponseParser();
-    public static final GetBucketInfoResponseParser getBucketInfoResponseParser = new GetBucketInfoResponseParser();
-    public static final GetBucketStatResponseParser getBucketStatResponseParser = new GetBucketStatResponseParser();
-    public static final GetBucketQosResponseParser getBucketQosResponseParser = new GetBucketQosResponseParser();
-    public static final GetBucketVersioningResponseParser getBucketVersioningResponseParser = new GetBucketVersioningResponseParser();
-    public static final GetBucketEncryptionResponseParser getBucketEncryptionResponseParser = new GetBucketEncryptionResponseParser();
-    public static final GetBucketPolicyResponseParser getBucketPolicyResponseParser = new GetBucketPolicyResponseParser();
-    public static final GetBucketRequestPaymentResponseParser getBucketRequestPaymentResponseParser = new GetBucketRequestPaymentResponseParser();
-    public static final GetUSerQosInfoResponseParser getUSerQosInfoResponseParser = new GetUSerQosInfoResponseParser();
-    public static final GetBucketQosInfoResponseParser getBucketQosInfoResponseParser = new GetBucketQosInfoResponseParser();
-    public static final SetAsyncFetchTaskResponseParser setAsyncFetchTaskResponseParser = new SetAsyncFetchTaskResponseParser();
-    public static final GetAsyncFetchTaskResponseParser getAsyncFetchTaskResponseParser = new GetAsyncFetchTaskResponseParser();
-    public static final CreateVpcipResultResponseParser createVpcipResultResponseParser = new CreateVpcipResultResponseParser();
-    public static final ListVpcipResultResponseParser listVpcipResultResponseParser = new ListVpcipResultResponseParser();
-    public static final ListVpcPolicyResultResponseParser listVpcPolicyResultResponseParser = new ListVpcPolicyResultResponseParser();
-    public static final InitiateBucketWormResponseParser initiateBucketWormResponseParser = new InitiateBucketWormResponseParser();
-    public static final GetBucketWormResponseParser getBucketWormResponseParser = new GetBucketWormResponseParser();
-    public static final GetBucketResourceGroupResponseParser getBucketResourceGroupResponseParser = new GetBucketResourceGroupResponseParser();
-    public static final GetBucketTransferAccelerationResponseParser getBucketTransferAccelerationResponseParser = new GetBucketTransferAccelerationResponseParser();
-
-    public static final GetBucketInventoryConfigurationParser getBucketInventoryConfigurationParser = new GetBucketInventoryConfigurationParser();
-    public static final ListBucketInventoryConfigurationsParser listBucketInventoryConfigurationsParser = new ListBucketInventoryConfigurationsParser();
-    public static final ListObjectsReponseParser listObjectsReponseParser = new ListObjectsReponseParser();
-    public static final ListObjectsV2ResponseParser listObjectsV2ResponseParser = new ListObjectsV2ResponseParser();
-    public static final ListVersionsReponseParser listVersionsReponseParser = new ListVersionsReponseParser();
-    public static final PutObjectReponseParser putObjectReponseParser = new PutObjectReponseParser();
-    public static final PutObjectProcessReponseParser putObjectProcessReponseParser = new PutObjectProcessReponseParser();
-    public static final AppendObjectResponseParser appendObjectResponseParser = new AppendObjectResponseParser();
-    public static final GetObjectMetadataResponseParser getObjectMetadataResponseParser = new GetObjectMetadataResponseParser();
-    public static final CopyObjectResponseParser copyObjectResponseParser = new CopyObjectResponseParser();
-    public static final DeleteObjectsResponseParser deleteObjectsResponseParser = new DeleteObjectsResponseParser();
-    public static final DeleteVersionsResponseParser deleteVersionsResponseParser = new DeleteVersionsResponseParser();
-    public static final GetObjectAclResponseParser getObjectAclResponseParser = new GetObjectAclResponseParser();
-    public static final GetSimplifiedObjectMetaResponseParser getSimplifiedObjectMetaResponseParser = new GetSimplifiedObjectMetaResponseParser();
-    public static final RestoreObjectResponseParser restoreObjectResponseParser = new RestoreObjectResponseParser();
-    public static final ProcessObjectResponseParser processObjectResponseParser = new ProcessObjectResponseParser();
-    public static final HeadObjectResponseParser headObjectResponseParser = new HeadObjectResponseParser();
-
-    public static final CompleteMultipartUploadResponseParser completeMultipartUploadResponseParser = new CompleteMultipartUploadResponseParser();
-    public static final CompleteMultipartUploadProcessResponseParser completeMultipartUploadProcessResponseParser = new CompleteMultipartUploadProcessResponseParser();
-    public static final InitiateMultipartUploadResponseParser initiateMultipartUploadResponseParser = new InitiateMultipartUploadResponseParser();
-    public static final ListMultipartUploadsResponseParser listMultipartUploadsResponseParser = new ListMultipartUploadsResponseParser();
-    public static final ListPartsResponseParser listPartsResponseParser = new ListPartsResponseParser();
-
-    public static final CreateLiveChannelResponseParser createLiveChannelResponseParser = new CreateLiveChannelResponseParser();
-    public static final GetLiveChannelInfoResponseParser getLiveChannelInfoResponseParser = new GetLiveChannelInfoResponseParser();
-    public static final GetLiveChannelStatResponseParser getLiveChannelStatResponseParser = new GetLiveChannelStatResponseParser();
-    public static final GetLiveChannelHistoryResponseParser getLiveChannelHistoryResponseParser = new GetLiveChannelHistoryResponseParser();
-    public static final ListLiveChannelsReponseParser listLiveChannelsReponseParser = new ListLiveChannelsReponseParser();
-
-    public static final GetSymbolicLinkResponseParser getSymbolicLinkResponseParser = new GetSymbolicLinkResponseParser();
-
-    public static final DeleteDirectoryResponseParser deleteDirectoryResponseParser = new DeleteDirectoryResponseParser();
-    public static final class EmptyResponseParser implements ResponseParser<ResponseMessage> {
-
-        @override
-        public ResponseMessage parse(ResponseMessage response) throws ResponseParseException {
-            // Close response and return it directly without parsing.
-            safeCloseResponse(response);
-            return response;
-        }
-
-    }
-
-    public static final class RequestIdResponseParser implements ResponseParser<VoidResult> {
-
-        @override
-        public VoidResult parse(ResponseMessage response) throws ResponseParseException {
-            try{
-                VoidResult result = new VoidResult();
-                result.setResponse(response);
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class ListBucketResponseParser implements ResponseParser<BucketList> {
-
-        @override
-        public BucketList parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                BucketList result = parseListBucket(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class ListImageStyleResponseParser implements ResponseParser<List<Style>> {
-        @override
-        public List<Style> parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseListImageStyle(response.getContent());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-    }
-
-    public static final class GetBucketRefererResponseParser implements ResponseParser<BucketReferer> {
-
-        @override
-        public BucketReferer parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                BucketReferer result = parseGetBucketReferer(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketAclResponseParser implements ResponseParser<AccessControlList> {
-
-        @override
-        public AccessControlList parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                AccessControlList result = parseGetBucketAcl(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-	
-    public static final class GetBucketMetadataResponseParser implements ResponseParser<BucketMetadata> {
-
-        @override
-        public BucketMetadata parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseBucketMetadata(response.getHeaders());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketLocationResponseParser implements ResponseParser<String> {
-
-        @override
-        public String parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseGetBucketLocation(response.getContent());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketLoggingResponseParser implements ResponseParser<BucketLoggingResult> {
-
-        @override
-        public BucketLoggingResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                BucketLoggingResult result = parseBucketLogging(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketImageResponseParser implements ResponseParser<GetBucketImageResult> {
-        @override
-        public GetBucketImageResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseBucketImage(response.getContent());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-    }
-
-    public static final class GetImageStyleResponseParser implements ResponseParser<GetImageStyleResult> {
-        @override
-        public GetImageStyleResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseImageStyle(response.getContent());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-    }
-
-    public static final class GetBucketImageProcessConfResponseParser implements ResponseParser<BucketProcess> {
-
-        @override
-        public BucketProcess parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                BucketProcess result = parseGetBucketImageProcessConf(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketWebsiteResponseParser implements ResponseParser<BucketWebsiteResult> {
-
-        @override
-        public BucketWebsiteResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                BucketWebsiteResult result = parseBucketWebsite(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketLifecycleResponseParser implements ResponseParser<List<LifecycleRule>> {
-
-        @override
-        public List<LifecycleRule> parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseGetBucketLifecycle(response.getContent());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class AddBucketCnameResponseParser implements ResponseParser<AddBucketCnameResult> {
-        @override
-        public AddBucketCnameResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                AddBucketCnameResult result = new AddBucketCnameResult();
-                result.setCertId(response.getHeaders().get(OSSHeaders.OSS_HEADER_CERT_ID));
-                result.setRequestId(response.getRequestId());
-                result.setResponse(response);
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-    }
-
-    public static final class GetBucketCnameResponseParser implements ResponseParser<List<CnameConfiguration>> {
-
-        @override
-        public List<CnameConfiguration> parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseGetBucketCname(response.getContent());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketInfoResponseParser implements ResponseParser<BucketInfo> {
-
-        @override
-        public BucketInfo parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                BucketInfo result = parseGetBucketInfo(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketStatResponseParser implements ResponseParser<BucketStat> {
-
-        @override
-        public BucketStat parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                BucketStat result = parseGetBucketStat(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketQosResponseParser implements ResponseParser<UserQos> {
-
-        @override
-        public UserQos parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                UserQos result = parseGetUserQos(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-    
-    public static final class GetBucketVersioningResponseParser
-        implements ResponseParser<BucketVersioningConfiguration> {
-
-        @override
-        public BucketVersioningConfiguration parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                BucketVersioningConfiguration result = parseGetBucketVersioning(response.getContent());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketEncryptionResponseParser
-    implements ResponseParser<ServerSideEncryptionConfiguration> {
-    	
-    	@override
-    	public ServerSideEncryptionConfiguration parse(ResponseMessage response) throws ResponseParseException {
-    		try {
-    			ServerSideEncryptionConfiguration result = parseGetBucketEncryption(response.getContent());
-    			return result;
-    		} finally {
-    			safeCloseResponse(response);
-    		}
-    	}
-
-    }
-
-    public static final class GetBucketPolicyResponseParser implements ResponseParser<GetBucketPolicyResult> {
-    	
-        @override
-        public GetBucketPolicyResult parse(ResponseMessage response) throws ResponseParseException {
-        	try {
-        		GetBucketPolicyResult result = parseGetBucketPolicy(response.getContent());
-        		result.setRequestId(response.getRequestId());
-        		return result;
-        	} finally {
-        		safeCloseResponse(response);
-        	}
-        }
-
-    }
-
-    public static final class GetBucketRequestPaymentResponseParser implements ResponseParser<GetBucketRequestPaymentResult> {
-
-        @override
-        public GetBucketRequestPaymentResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-            	GetBucketRequestPaymentResult result = parseGetBucketRequestPayment(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetUSerQosInfoResponseParser implements ResponseParser<UserQosInfo> {
-
-        @override
-        public UserQosInfo parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                UserQosInfo result = parseGetUserQosInfo(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketQosInfoResponseParser implements ResponseParser<BucketQosInfo> {
-
-        @override
-        public BucketQosInfo parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                BucketQosInfo result = parseGetBucketQosInfo(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class SetAsyncFetchTaskResponseParser implements ResponseParser<SetAsyncFetchTaskResult> {
-
-        @override
-        public SetAsyncFetchTaskResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                SetAsyncFetchTaskResult result = parseSetAsyncFetchTaskResult(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetAsyncFetchTaskResponseParser implements ResponseParser<GetAsyncFetchTaskResult> {
-
-        @override
-        public GetAsyncFetchTaskResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                GetAsyncFetchTaskResult result = parseGetAsyncFetchTaskResult(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketInventoryConfigurationParser implements ResponseParser<GetBucketInventoryConfigurationResult> {
-
-        @override
-        public GetBucketInventoryConfigurationResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                GetBucketInventoryConfigurationResult result = parseGetBucketInventoryConfig(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class ListBucketInventoryConfigurationsParser implements ResponseParser<ListBucketInventoryConfigurationsResult> {
-
-        @override
-        public ListBucketInventoryConfigurationsResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                ListBucketInventoryConfigurationsResult result = parseListBucketInventoryConfigurations(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class CreateLiveChannelResponseParser implements ResponseParser<CreateLiveChannelResult> {
-
-        @override
-        public CreateLiveChannelResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                CreateLiveChannelResult result = parseCreateLiveChannel(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetLiveChannelInfoResponseParser implements ResponseParser<LiveChannelInfo> {
-
-        @override
-        public LiveChannelInfo parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                LiveChannelInfo result = parseGetLiveChannelInfo(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetLiveChannelStatResponseParser implements ResponseParser<LiveChannelStat> {
-
-        @override
-        public LiveChannelStat parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                LiveChannelStat result = parseGetLiveChannelStat(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetLiveChannelHistoryResponseParser implements ResponseParser<List<LiveRecord>> {
-
-        @override
-        public List<LiveRecord> parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseGetLiveChannelHistory(response.getContent());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class ListLiveChannelsReponseParser implements ResponseParser<LiveChannelListing> {
-
-        @override
-        public LiveChannelListing parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseListLiveChannels(response.getContent());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketCorsResponseParser implements ResponseParser<CORSConfiguration> {
-
-        @override
-        public CORSConfiguration parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseListBucketCORS(response.getContent());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetTaggingResponseParser implements ResponseParser<TagSet> {
-
-        @override
-        public TagSet parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                TagSet result = parseGetBucketTagging(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketReplicationResponseParser implements ResponseParser<List<ReplicationRule>> {
-
-        @override
-        public List<ReplicationRule> parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseGetBucketReplication(response.getContent());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketReplicationProgressResponseParser
-            implements ResponseParser<BucketReplicationProgress> {
-
-        @override
-        public BucketReplicationProgress parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                BucketReplicationProgress result = parseGetBucketReplicationProgress(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketReplicationLocationResponseParser implements ResponseParser<List<String>> {
-
-        @override
-        public List<String> parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseGetBucketReplicationLocation(response.getContent());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class ListObjectsReponseParser implements ResponseParser<ObjectListing> {
-
-        @override
-        public ObjectListing parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                ObjectListing result = parseListObjects(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class ListObjectsV2ResponseParser implements ResponseParser<ListObjectsV2Result> {
-
-        @override
-        public ListObjectsV2Result parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                ListObjectsV2Result result = parseListObjectsV2(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-    
-    public static final class ListVersionsReponseParser implements ResponseParser<VersionListing> {
-
-        @override
-        public VersionListing parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                VersionListing result = parseListVersions(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class PutObjectReponseParser implements ResponseParser<PutObjectResult> {
-
-        @override
-        public PutObjectResult parse(ResponseMessage response) throws ResponseParseException {
-            PutObjectResult result = new PutObjectResult();
-            try {
-                result.setETag(trimQuotes(response.getHeaders().get(OSSHeaders.ETAG)));
-                result.setVersionId(response.getHeaders().get(OSSHeaders.OSS_HEADER_VERSION_ID));
-                result.setRequestId(response.getRequestId());
-                setCRC(result, response);
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class PutObjectProcessReponseParser implements ResponseParser<PutObjectResult> {
-
-        @override
-        public PutObjectResult parse(ResponseMessage response) throws ResponseParseException {
-            PutObjectResult result = new PutObjectResult();
-            result.setRequestId(response.getRequestId());
-            result.setETag(trimQuotes(response.getHeaders().get(OSSHeaders.ETAG)));
-            result.setVersionId(response.getHeaders().get(OSSHeaders.OSS_HEADER_VERSION_ID));
-            result.setCallbackResponseBody(response.getContent());
-            result.setResponse(response);
-            return result;
-        }
-
-    }
-
-    public static final class AppendObjectResponseParser implements ResponseParser<AppendObjectResult> {
-
-        @override
-        public AppendObjectResult parse(ResponseMessage response) throws ResponseParseException {
-            AppendObjectResult result = new AppendObjectResult();
-            result.setRequestId(response.getRequestId());
-            try {
-                String nextPosition = response.getHeaders().get(OSSHeaders.OSS_NEXT_APPEND_POSITION);
-                if (nextPosition != null) {
-                    result.setNextPosition(Long.valueOf(nextPosition));
-                }
-                result.setObjectCRC(response.getHeaders().get(OSSHeaders.OSS_HASH_CRC64_ECMA));
-                result.setResponse(response);
-                setCRC(result, response);
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetObjectResponseParser implements ResponseParser<OSSObject> {
-        private String bucketName;
-        private String key;
-
-        public GetObjectResponseParser(final String bucketName, final String key) {
-            this.bucketName = bucketName;
-            this.key = key;
-        }
-
-        @override
-        public OSSObject parse(ResponseMessage response) throws ResponseParseException {
-            OSSObject ossObject = new OSSObject();
-            ossObject.setBucketName(this.bucketName);
-            ossObject.setKey(this.key);
-            ossObject.setObjectContent(response.getContent());
-            ossObject.setRequestId(response.getRequestId());
-            ossObject.setResponse(response);
-            try {
-                ossObject.setObjectMetadata(parseObjectMetadata(response.getHeaders()));
-                setServerCRC(ossObject, response);
-                return ossObject;
-            } catch (ResponseParseException e) {
-                // Close response only when parsing exception thrown. Otherwise,
-                // just hand over to SDK users and remain them close it when no
-                // longer in use.
-                safeCloseResponse(response);
-
-                // Rethrow
-                throw e;
-            }
-        }
-
-    }
-
-    public static final class GetObjectAclResponseParser implements ResponseParser<ObjectAcl> {
-
-        @override
-        public ObjectAcl parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                ObjectAcl result = parseGetObjectAcl(response.getContent());
-                result.setRequestId(response.getRequestId());
-                result.setVersionId(response.getHeaders().get(OSSHeaders.OSS_HEADER_VERSION_ID));
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetSimplifiedObjectMetaResponseParser implements ResponseParser<SimplifiedObjectMeta> {
-
-        @override
-        public SimplifiedObjectMeta parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseSimplifiedObjectMeta(response.getHeaders());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class RestoreObjectResponseParser implements ResponseParser<RestoreObjectResult> {
-
-        @override
-        public RestoreObjectResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                RestoreObjectResult result = new RestoreObjectResult(response.getStatusCode());
-                result.setRequestId(response.getRequestId());
-                result.setVersionId(response.getHeaders().get(OSSHeaders.OSS_HEADER_VERSION_ID));
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class ProcessObjectResponseParser implements ResponseParser<GenericResult> {
-
-        @override
-        public GenericResult parse(ResponseMessage response) throws ResponseParseException {
-            GenericResult result = new PutObjectResult();
-            result.setRequestId(response.getRequestId());
-            result.setResponse(response);
-            return result;
-        }
-
-    }
-
-    public static final class GetObjectMetadataResponseParser implements ResponseParser<ObjectMetadata> {
-
-        @override
-        public ObjectMetadata parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseObjectMetadata(response.getHeaders());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class HeadObjectResponseParser implements ResponseParser<ObjectMetadata> {
-
-        @override
-        public ObjectMetadata parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseObjectMetadata(response.getHeaders());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-    }
-
-    public static final class CopyObjectResponseParser implements ResponseParser<CopyObjectResult> {
-
-        @override
-        public CopyObjectResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                CopyObjectResult result = parseCopyObjectResult(response.getContent());
-                result.setVersionId(response.getHeaders().get(OSSHeaders.OSS_HEADER_VERSION_ID));
-                result.setRequestId(response.getRequestId());
-                result.setResponse(response);
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class DeleteObjectsResponseParser implements ResponseParser<DeleteObjectsResult> {
-
-        @override
-        public DeleteObjectsResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                DeleteObjectsResult result = null;
-
-                // Occurs when deleting multiple objects in quiet mode.
-                if (response.getContentLength() == 0) {
-                    result = new DeleteObjectsResult(null);
-                } else {
-                    result = parseDeleteObjectsResult(response.getContent());
-                }
-                result.setRequestId(response.getRequestId());
-
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-    
-    public static final class DeleteVersionsResponseParser implements ResponseParser<DeleteVersionsResult> {
-
-        @override
-        public DeleteVersionsResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                DeleteVersionsResult result = null;
-
-                // Occurs when deleting multiple objects in quiet mode.
-                if (response.getContentLength() == 0) {
-                    result = new DeleteVersionsResult([]);
-                } else {
-                    result = parseDeleteVersionsResult(response.getContent());
-                }
-                result.setRequestId(response.getRequestId());
-
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class CompleteMultipartUploadResponseParser
-            implements ResponseParser<CompleteMultipartUploadResult> {
-
-        @override
-        public CompleteMultipartUploadResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                CompleteMultipartUploadResult result = parseCompleteMultipartUpload(response.getContent());
-                result.setVersionId(response.getHeaders().get(OSSHeaders.OSS_HEADER_VERSION_ID));
-                result.setRequestId(response.getRequestId());
-                setServerCRC(result, response);
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class CompleteMultipartUploadProcessResponseParser
-            implements ResponseParser<CompleteMultipartUploadResult> {
-
-        @override
-        public CompleteMultipartUploadResult parse(ResponseMessage response) throws ResponseParseException {
-            CompleteMultipartUploadResult result = new CompleteMultipartUploadResult();
-            result.setVersionId(response.getHeaders().get(OSSHeaders.OSS_HEADER_VERSION_ID));
-            result.setRequestId(response.getRequestId());
-            result.setCallbackResponseBody(response.getContent());
-            result.setResponse(response);
-            return result;
-        }
-
-    }
-
-    public static final class InitiateMultipartUploadResponseParser
-            implements ResponseParser<InitiateMultipartUploadResult> {
-
-        @override
-        public InitiateMultipartUploadResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                InitiateMultipartUploadResult result = parseInitiateMultipartUpload(response.getContent());
-                result.setRequestId(response.getRequestId());
-                result.setResponse(response);
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class ListMultipartUploadsResponseParser implements ResponseParser<MultipartUploadListing> {
-
-        @override
-        public MultipartUploadListing parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                MultipartUploadListing result = parseListMultipartUploads(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class ListPartsResponseParser implements ResponseParser<PartListing> {
-
-        @override
-        public PartListing parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                PartListing result = parseListParts(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class UploadPartCopyResponseParser implements ResponseParser<UploadPartCopyResult> {
-
-        private int partNumber;
-
-        public UploadPartCopyResponseParser(int partNumber) {
-            this.partNumber = partNumber;
-        }
-
-        @override
-        public UploadPartCopyResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                UploadPartCopyResult result = new UploadPartCopyResult();
-                result.setPartNumber(partNumber);
-                result.setETag(trimQuotes(parseUploadPartCopy(response.getContent())));
-                result.setRequestId(response.getRequestId());
-                result.setResponse(response);
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetSymbolicLinkResponseParser implements ResponseParser<OSSSymlink> {
-
-        @override
-        public OSSSymlink parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                OSSSymlink result = parseSymbolicLink(response);
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                OSSUtils.mandatoryCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class InitiateBucketWormResponseParser implements ResponseParser<InitiateBucketWormResult> {
-
-        @override
-        public InitiateBucketWormResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                InitiateBucketWormResult result = parseInitiateBucketWormResponseHeader(response.getHeaders());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketWormResponseParser implements ResponseParser<GetBucketWormResult> {
-
-        @override
-        public GetBucketWormResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                GetBucketWormResult result = parseWormConfiguration(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class GetBucketResourceGroupResponseParser implements ResponseParser<GetBucketResourceGroupResult> {
-
-        @override
-        public GetBucketResourceGroupResult parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                GetBucketResourceGroupResult result = parseResourceGroupConfiguration(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static <ResultType extends GenericResult> void setCRC(ResultType result, ResponseMessage response) {
+/// A collection of parsers that parse HTTP reponses into corresponding human-readable results.
+ final import 'package:aliyun_oss_dart_sdk/src/common/comm/response_message.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/parser/response_parse_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/parser/response_parser.dart';
+import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/access_control_list.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/add_bucket_cname_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/append_object_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/bucket_info.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/bucket_logging_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/bucket_metadata.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/bucket_process.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/bucket_qos_info.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/bucket_referer.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/bucket_stat.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/bucket_versioning_configuration.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/bucket_website_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/cname_configuration.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/complete_multipart_upload_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/cors_configuration.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/create_live_channel_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/delete_directory_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/delete_versions_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/generic_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/get_async_fetch_task_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/get_bucket_image_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/get_bucket_inventory_configuration_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/get_bucket_policy_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/get_bucket_resource_group_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/get_bucket_worm_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/get_image_style_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/initiate_bucket_worm_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/initiate_multipart_upload_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/lifecycle_rule.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/list_bucket_inventory_configurations_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/live_channel_info.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/live_channel_listing.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/live_channel_stat.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/live_record.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/object_listing.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/object_metadata.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/oss_object.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/part_listing.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/put_object_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/restore_object_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/server_side_encryption_configuration.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/set_async_fetch_task_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/simplified_object_meta.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/style.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/tag_set.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/transfer_acceleration.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/upload_part_copy_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/user_qos.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/user_qos_info.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/version_listing.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/void_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/vpc_ip.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/vpc_policy.dart';
+
+import 'oss_headers.dart';
+
+class ResponseParsers {
+
+     static final ListBucketResponseParser listBucketResponseParser = new ListBucketResponseParser();
+     static final ListImageStyleResponseParser listImageStyleResponseParser = new ListImageStyleResponseParser();
+     static final GetBucketRefererResponseParser getBucketRefererResponseParser = new GetBucketRefererResponseParser();
+     static final GetBucketAclResponseParser getBucketAclResponseParser = new GetBucketAclResponseParser();
+     static final GetBucketMetadataResponseParser getBucketMetadataResponseParser = new GetBucketMetadataResponseParser();
+     static final GetBucketLocationResponseParser getBucketLocationResponseParser = new GetBucketLocationResponseParser();
+     static final GetBucketLoggingResponseParser getBucketLoggingResponseParser = new GetBucketLoggingResponseParser();
+     static final GetBucketWebsiteResponseParser getBucketWebsiteResponseParser = new GetBucketWebsiteResponseParser();
+     static final GetBucketLifecycleResponseParser getBucketLifecycleResponseParser = new GetBucketLifecycleResponseParser();
+     static final GetBucketCorsResponseParser getBucketCorsResponseParser = new GetBucketCorsResponseParser();
+     static final GetBucketImageResponseParser getBucketImageResponseParser = new GetBucketImageResponseParser();
+     static final GetImageStyleResponseParser getImageStyleResponseParser = new GetImageStyleResponseParser();
+     static final GetBucketImageProcessConfResponseParser getBucketImageProcessConfResponseParser = new GetBucketImageProcessConfResponseParser();
+     static final GetTaggingResponseParser getTaggingResponseParser = new GetTaggingResponseParser();
+     static final GetBucketReplicationResponseParser getBucketReplicationResponseParser = new GetBucketReplicationResponseParser();
+     static final GetBucketReplicationProgressResponseParser getBucketReplicationProgressResponseParser = new GetBucketReplicationProgressResponseParser();
+     static final GetBucketReplicationLocationResponseParser getBucketReplicationLocationResponseParser = new GetBucketReplicationLocationResponseParser();
+     static final AddBucketCnameResponseParser addBucketCnameResponseParser = new AddBucketCnameResponseParser();
+     static final GetBucketCnameResponseParser getBucketCnameResponseParser = new GetBucketCnameResponseParser();
+     static final GetBucketInfoResponseParser getBucketInfoResponseParser = new GetBucketInfoResponseParser();
+     static final GetBucketStatResponseParser getBucketStatResponseParser = new GetBucketStatResponseParser();
+     static final GetBucketQosResponseParser getBucketQosResponseParser = new GetBucketQosResponseParser();
+     static final GetBucketVersioningResponseParser getBucketVersioningResponseParser = new GetBucketVersioningResponseParser();
+     static final GetBucketEncryptionResponseParser getBucketEncryptionResponseParser = new GetBucketEncryptionResponseParser();
+     static final GetBucketPolicyResponseParser getBucketPolicyResponseParser = new GetBucketPolicyResponseParser();
+     static final GetBucketRequestPaymentResponseParser getBucketRequestPaymentResponseParser = new GetBucketRequestPaymentResponseParser();
+     static final GetUSerQosInfoResponseParser getUSerQosInfoResponseParser = new GetUSerQosInfoResponseParser();
+     static final GetBucketQosInfoResponseParser getBucketQosInfoResponseParser = new GetBucketQosInfoResponseParser();
+     static final SetAsyncFetchTaskResponseParser setAsyncFetchTaskResponseParser = new SetAsyncFetchTaskResponseParser();
+     static final GetAsyncFetchTaskResponseParser getAsyncFetchTaskResponseParser = new GetAsyncFetchTaskResponseParser();
+     static final CreateVpcipResultResponseParser createVpcipResultResponseParser = new CreateVpcipResultResponseParser();
+     static final ListVpcipResultResponseParser listVpcipResultResponseParser = new ListVpcipResultResponseParser();
+     static final ListVpcPolicyResultResponseParser listVpcPolicyResultResponseParser = new ListVpcPolicyResultResponseParser();
+     static final InitiateBucketWormResponseParser initiateBucketWormResponseParser = new InitiateBucketWormResponseParser();
+     static final GetBucketWormResponseParser getBucketWormResponseParser = new GetBucketWormResponseParser();
+     static final GetBucketResourceGroupResponseParser getBucketResourceGroupResponseParser = new GetBucketResourceGroupResponseParser();
+     static final GetBucketTransferAccelerationResponseParser getBucketTransferAccelerationResponseParser = new GetBucketTransferAccelerationResponseParser();
+
+     static final GetBucketInventoryConfigurationParser getBucketInventoryConfigurationParser = new GetBucketInventoryConfigurationParser();
+     static final ListBucketInventoryConfigurationsParser listBucketInventoryConfigurationsParser = new ListBucketInventoryConfigurationsParser();
+     static final ListObjectsReponseParser listObjectsReponseParser = new ListObjectsReponseParser();
+     static final ListObjectsV2ResponseParser listObjectsV2ResponseParser = new ListObjectsV2ResponseParser();
+     static final ListVersionsReponseParser listVersionsReponseParser = new ListVersionsReponseParser();
+     static final PutObjectReponseParser putObjectReponseParser = new PutObjectReponseParser();
+     static final PutObjectProcessReponseParser putObjectProcessReponseParser = new PutObjectProcessReponseParser();
+     static final AppendObjectResponseParser appendObjectResponseParser = new AppendObjectResponseParser();
+     static final GetObjectMetadataResponseParser getObjectMetadataResponseParser = new GetObjectMetadataResponseParser();
+     static final CopyObjectResponseParser copyObjectResponseParser = new CopyObjectResponseParser();
+     static final DeleteObjectsResponseParser deleteObjectsResponseParser = new DeleteObjectsResponseParser();
+     static final DeleteVersionsResponseParser deleteVersionsResponseParser = new DeleteVersionsResponseParser();
+     static final GetObjectAclResponseParser getObjectAclResponseParser = new GetObjectAclResponseParser();
+     static final GetSimplifiedObjectMetaResponseParser getSimplifiedObjectMetaResponseParser = new GetSimplifiedObjectMetaResponseParser();
+     static final RestoreObjectResponseParser restoreObjectResponseParser = new RestoreObjectResponseParser();
+     static final ProcessObjectResponseParser processObjectResponseParser = new ProcessObjectResponseParser();
+     static final HeadObjectResponseParser headObjectResponseParser = new HeadObjectResponseParser();
+
+     static final CompleteMultipartUploadResponseParser completeMultipartUploadResponseParser = new CompleteMultipartUploadResponseParser();
+     static final CompleteMultipartUploadProcessResponseParser completeMultipartUploadProcessResponseParser = new CompleteMultipartUploadProcessResponseParser();
+     static final InitiateMultipartUploadResponseParser initiateMultipartUploadResponseParser = new InitiateMultipartUploadResponseParser();
+     static final ListMultipartUploadsResponseParser listMultipartUploadsResponseParser = new ListMultipartUploadsResponseParser();
+     static final ListPartsResponseParser listPartsResponseParser = new ListPartsResponseParser();
+
+     static final CreateLiveChannelResponseParser createLiveChannelResponseParser = new CreateLiveChannelResponseParser();
+     static final GetLiveChannelInfoResponseParser getLiveChannelInfoResponseParser = new GetLiveChannelInfoResponseParser();
+     static final GetLiveChannelStatResponseParser getLiveChannelStatResponseParser = new GetLiveChannelStatResponseParser();
+     static final GetLiveChannelHistoryResponseParser getLiveChannelHistoryResponseParser = new GetLiveChannelHistoryResponseParser();
+     static final ListLiveChannelsReponseParser listLiveChannelsReponseParser = new ListLiveChannelsReponseParser();
+
+     static final GetSymbolicLinkResponseParser getSymbolicLinkResponseParser = new GetSymbolicLinkResponseParser();
+
+     static final DeleteDirectoryResponseParser deleteDirectoryResponseParser = new DeleteDirectoryResponseParser();
+     
+     
+     
+     static <ResultType extends GenericResult> void setCRC(ResultType result, ResponseMessage response) {
         InputStream inputStream = response.getRequest().getContent();
-        if (inputStream instanceof CheckedInputStream) {
+        if (inputStream is CheckedInputStream) {
             CheckedInputStream checkedInputStream = (CheckedInputStream) inputStream;
             result.setClientCRC(checkedInputStream.getChecksum().getValue());
         }
 
-        String strSrvCrc = response.getHeaders().get(OSSHeaders.OSS_HASH_CRC64_ECMA);
+        String strSrvCrc = response.headers[OSSHeaders.OSS_HASH_CRC64_ECMA];
         if (strSrvCrc != null) {
             BigInteger bi = new BigInteger(strSrvCrc);
             result.setServerCRC(bi.longValue());
         }
     }
 
-    public static <ResultType extends GenericResult> void setServerCRC(ResultType result, ResponseMessage response) {
-        String strSrvCrc = response.getHeaders().get(OSSHeaders.OSS_HASH_CRC64_ECMA);
+     static <ResultType extends GenericResult> void setServerCRC(ResultType result, ResponseMessage response) {
+        String strSrvCrc = response.headers[OSSHeaders.OSS_HASH_CRC64_ECMA];
         if (strSrvCrc != null) {
             BigInteger bi = new BigInteger(strSrvCrc);
             result.setServerCRC(bi.longValue());
         }
     }
 
-    private static Element getXmlRootElement(InputStream responseBody) throws Exception {
+     static Element getXmlRootElement(InputStream responseBody) {
         SAXBuilder builder = new SAXBuilder();
         builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
         builder.setFeature("http://xml.org/sax/features/external-general-entities", false);
@@ -1258,8 +170,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall list objects response body to object listing.
      */
-    @SuppressWarnings("unchecked")
-    public static ObjectListing parseListObjects(InputStream responseBody) throws ResponseParseException {
+    
+     static ObjectListing parseListObjects(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -1336,8 +248,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall list objects response body to ListObjectsV2Result.
      */
-    @SuppressWarnings("unchecked")
-    public static ListObjectsV2Result parseListObjectsV2(InputStream responseBody) throws ResponseParseException {
+    
+     static ListObjectsV2Result parseListObjectsV2(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -1423,8 +335,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall list objects response body to object listing.
      */
-    @SuppressWarnings("unchecked")
-    public static VersionListing parseListVersions(InputStream responseBody) throws ResponseParseException {
+    
+     static VersionListing parseListVersions(InputStream responseBody) {
         try {
             Element root = getXmlRootElement(responseBody);
 
@@ -1534,14 +446,14 @@ public final class ResponseParsers {
     /**
      * Perform an url decode on the given value if specified.
      */
-    private static String decodeIfSpecified(String value, bool decode) {
+     static String decodeIfSpecified(String value, bool decode) {
         return decode ? HttpUtil.urlDecode(value, StringUtils.DEFAULT_ENCODING) : value;
     }
 
     /**
      * Unmarshall get bucket acl response body to ACL.
      */
-    public static AccessControlList parseGetBucketAcl(InputStream responseBody) throws ResponseParseException {
+     static AccessControlList parseGetBucketAcl(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -1558,10 +470,10 @@ public final class ResponseParsers {
             acl.setCannedACL(cacl);
 
             switch (cacl) {
-            case PublicRead:
+            case Read:
                 acl.grantPermission(GroupGrantee.AllUsers, Permission.Read);
                 break;
-            case PublicReadWrite:
+            case ReadWrite:
                 acl.grantPermission(GroupGrantee.AllUsers, Permission.FullControl);
                 break;
             default:
@@ -1579,7 +491,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall object acl response body to object ACL.
      */
-    public static ObjectAcl parseGetObjectAcl(InputStream responseBody) throws ResponseParseException {
+     static ObjectAcl parseGetObjectAcl(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -1605,8 +517,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket referer response body to bucket referer list.
      */
-    @SuppressWarnings("unchecked")
-    public static BucketReferer parseGetBucketReferer(InputStream responseBody) throws ResponseParseException {
+    
+     static BucketReferer parseGetBucketReferer(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -1633,7 +545,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall upload part copy response body to uploaded part's ETag.
      */
-    public static String parseUploadPartCopy(InputStream responseBody) throws ResponseParseException {
+     static String parseUploadPartCopy(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -1648,8 +560,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall list bucket response body to bucket list.
      */
-    @SuppressWarnings("unchecked")
-    public static BucketList parseListBucket(InputStream responseBody) throws ResponseParseException {
+    
+     static BucketList parseListBucket(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -1718,8 +630,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall list image style response body to style list.
      */
-    @SuppressWarnings("unchecked")
-    public static List<Style> parseListImageStyle(InputStream responseBody) throws ResponseParseException {
+    
+     static List<Style> parseListImageStyle(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -1746,7 +658,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket location response body to bucket location.
      */
-    public static String parseGetBucketLocation(InputStream responseBody) throws ResponseParseException {
+     static String parseGetBucketLocation(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -1762,7 +674,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall bucket metadata from response headers.
      */
-    public static BucketMetadata parseBucketMetadata(Map<String, String> headers) throws ResponseParseException {
+     static BucketMetadata parseBucketMetadata(Map<String, String> headers) {
 
         try {
             BucketMetadata bucketMetadata = new BucketMetadata();
@@ -1786,8 +698,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall simplified object meta from response headers.
      */
-    public static SimplifiedObjectMeta parseSimplifiedObjectMeta(Map<String, String> headers)
-            throws ResponseParseException {
+     static SimplifiedObjectMeta parseSimplifiedObjectMeta(Map<String, String> headers)
+            {
 
         try {
             SimplifiedObjectMeta objectMeta = new SimplifiedObjectMeta();
@@ -1822,18 +734,18 @@ public final class ResponseParsers {
     /**
      * Unmarshall symlink link from response headers.
      */
-    public static OSSSymlink parseSymbolicLink(ResponseMessage response) throws ResponseParseException {
+     static OSSSymlink parseSymbolicLink(ResponseMessage response) {
 
         try {
             OSSSymlink smyLink = null;
 
-            String targetObject = response.getHeaders().get(OSSHeaders.OSS_HEADER_SYMLINK_TARGET);
+            String targetObject = response.headers[OSSHeaders.OSS_HEADER_SYMLINK_TARGET];
             if (targetObject != null) {
                 targetObject = HttpUtil.urlDecode(targetObject, "UTF-8");
                 smyLink = new OSSSymlink(null, targetObject);
             }
 
-            smyLink.setMetadata(parseObjectMetadata(response.getHeaders()));
+            smyLink.setMetadata(parseObjectMetadata(response.headers));
 
             return smyLink;
         } catch (Exception e) {
@@ -1844,7 +756,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall object metadata from response headers.
      */
-    public static ObjectMetadata parseObjectMetadata(Map<String, String> headers) throws ResponseParseException {
+     static ObjectMetadata parseObjectMetadata(Map<String, String> headers) {
 
         try {
             ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -1881,8 +793,8 @@ public final class ResponseParsers {
      * Unmarshall initiate multipart upload response body to corresponding
      * result.
      */
-    public static InitiateMultipartUploadResult parseInitiateMultipartUpload(InputStream responseBody)
-            throws ResponseParseException {
+     static InitiateMultipartUploadResult parseInitiateMultipartUpload(InputStream responseBody)
+            {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -1912,9 +824,9 @@ public final class ResponseParsers {
      * Unmarshall list multipart uploads response body to multipart upload
      * listing.
      */
-    @SuppressWarnings("unchecked")
-    public static MultipartUploadListing parseListMultipartUploads(InputStream responseBody)
-            throws ResponseParseException {
+    
+     static MultipartUploadListing parseListMultipartUploads(InputStream responseBody)
+            {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -1999,8 +911,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall list parts response body to part listing.
      */
-    @SuppressWarnings("unchecked")
-    public static PartListing parseListParts(InputStream responseBody) throws ResponseParseException {
+    
+     static PartListing parseListParts(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2052,8 +964,8 @@ public final class ResponseParsers {
      * Unmarshall complete multipart upload response body to corresponding
      * result.
      */
-    public static CompleteMultipartUploadResult parseCompleteMultipartUpload(InputStream responseBody)
-            throws ResponseParseException {
+     static CompleteMultipartUploadResult parseCompleteMultipartUpload(InputStream responseBody)
+            {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2075,7 +987,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket logging response body to corresponding result.
      */
-    public static BucketLoggingResult parseBucketLogging(InputStream responseBody) throws ResponseParseException {
+     static BucketLoggingResult parseBucketLogging(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2099,7 +1011,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket image response body to corresponding result.
      */
-    public static GetBucketImageResult parseBucketImage(InputStream responseBody) throws ResponseParseException {
+     static GetBucketImageResult parseBucketImage(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2124,7 +1036,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get image style response body to corresponding result.
      */
-    public static GetImageStyleResult parseImageStyle(InputStream responseBody) throws ResponseParseException {
+     static GetImageStyleResult parseImageStyle(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2144,7 +1056,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket process response body to bucket process.
      */
-    public static BucketProcess parseGetBucketImageProcessConf(InputStream responseBody) throws ResponseParseException {
+     static BucketProcess parseGetBucketImageProcessConf(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2174,8 +1086,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket website response body to corresponding result.
      */
-    @SuppressWarnings("unchecked")
-    public static BucketWebsiteResult parseBucketWebsite(InputStream responseBody) throws ResponseParseException {
+    
+     static BucketWebsiteResult parseBucketWebsite(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2358,7 +1270,7 @@ public final class ResponseParsers {
      * @param elementList
      * @return
      */
-    private static List<String> parseStringListFromElemet(List<Element> elementList) {
+     static List<String> parseStringListFromElemet(List<Element> elementList) {
         if (elementList != null && elementList.size() > 0) {
             List<String> list = [];
             for (Element element : elementList) {
@@ -2371,7 +1283,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall copy object response body to corresponding result.
      */
-    public static CopyObjectResult parseCopyObjectResult(InputStream responseBody) throws ResponseParseException {
+     static CopyObjectResult parseCopyObjectResult(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2389,8 +1301,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall delete objects response body to corresponding result.
      */
-    @SuppressWarnings("unchecked")
-    public static DeleteObjectsResult parseDeleteObjectsResult(InputStream responseBody) throws ResponseParseException {
+    
+     static DeleteObjectsResult parseDeleteObjectsResult(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2419,9 +1331,9 @@ public final class ResponseParsers {
     /**
      * Unmarshall delete versions response body to corresponding result.
      */
-    @SuppressWarnings("unchecked")
-    public static DeleteVersionsResult parseDeleteVersionsResult(InputStream responseBody)
-        throws ResponseParseException {
+    
+     static DeleteVersionsResult parseDeleteVersionsResult(InputStream responseBody)
+        {
         bool shouldSDKDecodeResponse = false;
 
         try {
@@ -2469,8 +1381,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket cors response body to cors rules.
      */
-    @SuppressWarnings("unchecked")
-    public static CORSConfiguration parseListBucketCORS(InputStream responseBody) throws ResponseParseException {
+    
+     static CORSConfiguration parseListBucketCORS(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2523,8 +1435,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket tagging response body to cors rules.
      */
-    @SuppressWarnings("unchecked")
-    public static TagSet parseGetBucketTagging(InputStream responseBody) throws ResponseParseException {
+    
+     static TagSet parseGetBucketTagging(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2558,9 +1470,9 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket replication response body to replication result.
      */
-    @SuppressWarnings("unchecked")
-    public static List<ReplicationRule> parseGetBucketReplication(InputStream responseBody)
-            throws ResponseParseException {
+    
+     static List<ReplicationRule> parseGetBucketReplication(InputStream responseBody)
+            {
 
         try {
             List<ReplicationRule> repRules = [];
@@ -2636,8 +1548,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket replication response body to replication progress.
      */
-    public static BucketReplicationProgress parseGetBucketReplicationProgress(InputStream responseBody)
-            throws ResponseParseException {
+     static BucketReplicationProgress parseGetBucketReplicationProgress(InputStream responseBody)
+            {
         try {
             BucketReplicationProgress progress = new BucketReplicationProgress();
 
@@ -2680,9 +1592,9 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket replication response body to replication location.
      */
-    @SuppressWarnings("unchecked")
-    public static List<String> parseGetBucketReplicationLocation(InputStream responseBody)
-            throws ResponseParseException {
+    
+     static List<String> parseGetBucketReplicationLocation(InputStream responseBody)
+            {
         try {
             Element root = getXmlRootElement(responseBody);
 
@@ -2704,7 +1616,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket info response body to bucket info.
      */
-    public static BucketInfo parseGetBucketInfo(InputStream responseBody) throws ResponseParseException {
+     static BucketInfo parseGetBucketInfo(InputStream responseBody) {
         try {
             Element root = getXmlRootElement(responseBody);
             Element bucketElem = root.getChild("Bucket");
@@ -2757,10 +1669,10 @@ public final class ResponseParsers {
             CannedAccessControlList acl = CannedAccessControlList.parse(aclString);
             bucketInfo.setCannedACL(acl);
             switch (acl) {
-            case PublicRead:
+            case Read:
                 bucketInfo.grantPermission(GroupGrantee.AllUsers, Permission.Read);
                 break;
-            case PublicReadWrite:
+            case ReadWrite:
                 bucketInfo.grantPermission(GroupGrantee.AllUsers, Permission.FullControl);
                 break;
             default:
@@ -2798,7 +1710,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket info response body to bucket stat.
      */
-    public static BucketStat parseGetBucketStat(InputStream responseBody) throws ResponseParseException {
+     static BucketStat parseGetBucketStat(InputStream responseBody) {
         try {
             Element root = getXmlRootElement(responseBody);
             Long storage = Long.parseLong(root.getChildText("Storage"));
@@ -2816,9 +1728,9 @@ public final class ResponseParsers {
     /**
      * Unmarshall create live channel response body to corresponding result.
      */
-    @SuppressWarnings("unchecked")
-    public static CreateLiveChannelResult parseCreateLiveChannel(InputStream responseBody)
-            throws ResponseParseException {
+    
+     static CreateLiveChannelResult parseCreateLiveChannel(InputStream responseBody)
+            {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2850,7 +1762,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get live channel info response body to corresponding result.
      */
-    public static LiveChannelInfo parseGetLiveChannelInfo(InputStream responseBody) throws ResponseParseException {
+     static LiveChannelInfo parseGetLiveChannelInfo(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2879,7 +1791,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get live channel stat response body to corresponding result.
      */
-    public static LiveChannelStat parseGetLiveChannelStat(InputStream responseBody) throws ResponseParseException {
+     static LiveChannelStat parseGetLiveChannelStat(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2928,8 +1840,8 @@ public final class ResponseParsers {
      * Unmarshall get live channel history response body to corresponding
      * result.
      */
-    @SuppressWarnings("unchecked")
-    public static List<LiveRecord> parseGetLiveChannelHistory(InputStream responseBody) throws ResponseParseException {
+    
+     static List<LiveRecord> parseGetLiveChannelHistory(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -2957,8 +1869,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall list live channels response body to live channel listing.
      */
-    @SuppressWarnings("unchecked")
-    public static LiveChannelListing parseListLiveChannels(InputStream responseBody) throws ResponseParseException {
+    
+     static LiveChannelListing parseListLiveChannels(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3024,7 +1936,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get user qos response body to user qos.
      */
-    public static UserQos parseGetUserQos(InputStream responseBody) throws ResponseParseException {
+     static UserQos parseGetUserQos(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3046,8 +1958,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket versioning response body to versioning configuration.
      */
-    public static BucketVersioningConfiguration parseGetBucketVersioning(InputStream responseBody)
-        throws ResponseParseException {
+     static BucketVersioningConfiguration parseGetBucketVersioning(InputStream responseBody)
+        {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3067,8 +1979,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket encryption response body to encryption configuration.
      */
-    public static ServerSideEncryptionConfiguration parseGetBucketEncryption(InputStream responseBody)
-        throws ResponseParseException {
+     static ServerSideEncryptionConfiguration parseGetBucketEncryption(InputStream responseBody)
+        {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3095,7 +2007,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket policy response body .
      */
-    public static GetBucketPolicyResult parseGetBucketPolicy(InputStream responseBody) throws ResponseParseException {
+     static GetBucketPolicyResult parseGetBucketPolicy(InputStream responseBody) {
 
         try {
         	GetBucketPolicyResult result = new GetBucketPolicyResult();
@@ -3118,7 +2030,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucuket request payment response body to GetBucketRequestPaymentResult.
      */
-    public static GetBucketRequestPaymentResult parseGetBucketRequestPayment(InputStream responseBody) throws ResponseParseException {
+     static GetBucketRequestPaymentResult parseGetBucketRequestPayment(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3140,7 +2052,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get user qos info response body to UserQosInfo.
      */
-    public static UserQosInfo parseGetUserQosInfo(InputStream responseBody) throws ResponseParseException {
+     static UserQosInfo parseGetUserQosInfo(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3169,7 +2081,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucuket qos info response body to BucketQosInfo.
      */
-    public static BucketQosInfo parseGetBucketQosInfo(InputStream responseBody) throws ResponseParseException {
+     static BucketQosInfo parseGetBucketQosInfo(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3194,7 +2106,7 @@ public final class ResponseParsers {
 
     }
 
-    private static InventoryConfiguration parseInventoryConfigurationElem(Element configElem) {
+     static InventoryConfiguration parseInventoryConfigurationElem(Element configElem) {
         InventoryConfiguration inventoryConfiguration = new InventoryConfiguration();
 
         if (configElem.getChildText("Id") != null) {
@@ -3282,8 +2194,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucuket inventory configuration response body to GetBucketInventoryConfigurationResult.
      */
-    public static GetBucketInventoryConfigurationResult parseGetBucketInventoryConfig(InputStream responseBody)
-            throws ResponseParseException {
+     static GetBucketInventoryConfigurationResult parseGetBucketInventoryConfig(InputStream responseBody)
+            {
         try {
             GetBucketInventoryConfigurationResult result = new GetBucketInventoryConfigurationResult();
             Element root = getXmlRootElement(responseBody);
@@ -3301,8 +2213,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucuket qos info response body to BucketQosInfo.
      */
-    public static ListBucketInventoryConfigurationsResult parseListBucketInventoryConfigurations(InputStream responseBody)
-            throws ResponseParseException {
+     static ListBucketInventoryConfigurationsResult parseListBucketInventoryConfigurations(InputStream responseBody)
+            {
         try {
             Element root = getXmlRootElement(responseBody);
             ListBucketInventoryConfigurationsResult result = new ListBucketInventoryConfigurationsResult();
@@ -3341,8 +2253,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket lifecycle response body to lifecycle rules.
      */
-    @SuppressWarnings("unchecked")
-    public static List<LifecycleRule> parseGetBucketLifecycle(InputStream responseBody) throws ResponseParseException {
+    
+     static List<LifecycleRule> parseGetBucketLifecycle(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3466,8 +2378,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket cname response body to cname configuration.
      */
-    @SuppressWarnings("unchecked")
-    public static List<CnameConfiguration> parseGetBucketCname(InputStream responseBody) throws ResponseParseException {
+    
+     static List<CnameConfiguration> parseGetBucketCname(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3508,7 +2420,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall set async fetch task response body to corresponding result.
      */
-    public static SetAsyncFetchTaskResult parseSetAsyncFetchTaskResult(InputStream responseBody) throws ResponseParseException {
+     static SetAsyncFetchTaskResult parseSetAsyncFetchTaskResult(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3522,7 +2434,7 @@ public final class ResponseParsers {
         }
     }
 
-    private static AsyncFetchTaskConfiguration parseAsyncFetchTaskInfo(Element taskInfoEle) {
+     static AsyncFetchTaskConfiguration parseAsyncFetchTaskInfo(Element taskInfoEle) {
         if (taskInfoEle == null) {
             return null;
         }
@@ -3543,7 +2455,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get async fetch task info response body to corresponding result.
      */
-    public static GetAsyncFetchTaskResult parseGetAsyncFetchTaskResult(InputStream responseBody) throws ResponseParseException {
+     static GetAsyncFetchTaskResult parseGetAsyncFetchTaskResult(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3564,47 +2476,12 @@ public final class ResponseParsers {
     }
 
 
-    public static final class CreateVpcipResultResponseParser implements ResponseParser<Vpcip> {
-
-        @override
-        public Vpcip parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                Vpcip result = parseGetCreateVpcipResult(response.getContent());
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-
-    }
-
-    public static final class ListVpcipResultResponseParser implements ResponseParser<List<Vpcip>> {
-        @override
-        public List<Vpcip> parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseListVpcipResult(response.getContent());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-    }
-
-    public static final class ListVpcPolicyResultResponseParser implements ResponseParser<List<VpcPolicy>> {
-        @override
-        public List<VpcPolicy> parse(ResponseMessage response) throws ResponseParseException {
-            try {
-                return parseListVpcPolicyResult(response.getContent());
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-    }
+    
 
     /**
      * Unmarshall image Vpcip response body to style list.
      */
-    public static Vpcip parseGetCreateVpcipResult(InputStream responseBody) throws ResponseParseException {
+     static Vpcip parseGetCreateVpcipResult(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3635,8 +2512,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall list image Vpcip response body to style list.
      */
-    @SuppressWarnings("unchecked")
-    public static List<Vpcip> parseListVpcipResult(InputStream responseBody) throws ResponseParseException {
+    
+     static List<Vpcip> parseListVpcipResult(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3665,8 +2542,8 @@ public final class ResponseParsers {
     /**
      * Unmarshall list image VpcPolicy response body to style list.
      */
-    @SuppressWarnings("unchecked")
-    public static List<VpcPolicy> parseListVpcPolicyResult(InputStream responseBody) throws ResponseParseException {
+    
+     static List<VpcPolicy> parseListVpcPolicyResult(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3694,7 +2571,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall initiate bucket worm result from response headers.
      */
-    public static InitiateBucketWormResult parseInitiateBucketWormResponseHeader(Map<String, String> headers) throws ResponseParseException {
+     static InitiateBucketWormResult parseInitiateBucketWormResponseHeader(Map<String, String> headers) {
 
         try {
             InitiateBucketWormResult result = new InitiateBucketWormResult();
@@ -3709,7 +2586,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket worm result.
      */
-    public static GetBucketWormResult parseWormConfiguration(InputStream responseBody) throws ResponseParseException {
+     static GetBucketWormResult parseWormConfiguration(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3727,25 +2604,12 @@ public final class ResponseParsers {
 
     }
 
-    public static final class DeleteDirectoryResponseParser implements ResponseParser<DeleteDirectoryResult> {
 
-        @override
-        public DeleteDirectoryResult parse(ResponseMessage response) throws ResponseParseException {
-            try{
-                DeleteDirectoryResult result =  parseDeleteDirectoryResult(response.getContent());
-                result.setResponse(response);
-                result.setRequestId(response.getRequestId());
-                return result;
-            } finally {
-                safeCloseResponse(response);
-            }
-        }
-    }
 
     /**
      * Unmarshall delete directory result.
      */
-    public static DeleteDirectoryResult parseDeleteDirectoryResult(InputStream responseBody) throws ResponseParseException {
+     static DeleteDirectoryResult parseDeleteDirectoryResult(InputStream responseBody) {
         try {
             Element root = getXmlRootElement(responseBody);
             DeleteDirectoryResult result = new DeleteDirectoryResult();
@@ -3756,9 +2620,9 @@ public final class ResponseParsers {
             }
             return result;
         } catch (JDOMParseException e) {
-            throw new ResponseParseException(e.getPartialDocument() + ": " + e.getMessage(), e);
-        } catch (Exception e) {
-            throw new ResponseParseException(e.getMessage(), e);
+            throw new ResponseParseException(e.getPartialDocument() + ": $e");
+        } catch ( e) {
+            throw new ResponseParseException(e);
         }
 
     }
@@ -3766,7 +2630,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall get bucket resource group.
      */
-    public static GetBucketResourceGroupResult parseResourceGroupConfiguration(InputStream responseBody) throws ResponseParseException {
+     static GetBucketResourceGroupResult parseResourceGroupConfiguration(InputStream responseBody) {
 
         try {
             Element root = getXmlRootElement(responseBody);
@@ -3780,13 +2644,14 @@ public final class ResponseParsers {
         }
 
     }
+}
 
-    public static final class GetBucketTransferAccelerationResponseParser implements ResponseParser<TransferAcceleration> {
+     class GetBucketTransferAccelerationResponseParser implements ResponseParser<TransferAcceleration> {
         @override
-        public TransferAcceleration parse(ResponseMessage response) throws ResponseParseException {
+         TransferAcceleration parse(ResponseMessage response) {
             try {
-                TransferAcceleration result = parseTransferAcceleration(response.getContent());
-                result.setRequestId(response.getRequestId());
+                TransferAcceleration result = parseTransferAcceleration(response.content);
+                result.requestId = response.getRequestId();
 
                 return result;
             } finally {
@@ -3794,8 +2659,8 @@ public final class ResponseParsers {
             }
         }
 
-        private TransferAcceleration parseTransferAcceleration(InputStream inputStream) throws ResponseParseException {
-            TransferAcceleration transferAcceleration = new TransferAcceleration(bool.FALSE);
+         TransferAcceleration parseTransferAcceleration(InputStream inputStream) {
+            TransferAcceleration transferAcceleration = new TransferAcceleration(false);
             if (inputStream == null) {
                 return transferAcceleration;
             }
@@ -3816,4 +2681,1053 @@ public final class ResponseParsers {
         }
     }
 
-}
+
+
+
+class EmptyResponseParser implements ResponseParser<ResponseMessage> {
+
+        @override
+         ResponseMessage parse(ResponseMessage response) {
+            // Close response and return it directly without parsing.
+            safeCloseResponse(response);
+            return response;
+        }
+
+    }
+
+     class RequestIdResponseParser implements ResponseParser<VoidResult> {
+
+        @override
+         VoidResult parse(ResponseMessage response) {
+            try{
+                VoidResult result = new VoidResult();
+                result.response = response;
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class ListBucketResponseParser implements ResponseParser<BucketList> {
+
+        @override
+         BucketList parse(ResponseMessage response) {
+            try {
+                BucketList result = parseListBucket(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class ListImageStyleResponseParser implements ResponseParser<List<Style>> {
+        @override
+         List<Style> parse(ResponseMessage response) {
+            try {
+                return parseListImageStyle(response.content);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+    }
+
+     class GetBucketRefererResponseParser implements ResponseParser<BucketReferer> {
+
+        @override
+         BucketReferer parse(ResponseMessage response) {
+            try {
+                BucketReferer result = parseGetBucketReferer(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketAclResponseParser implements ResponseParser<AccessControlList> {
+
+        @override
+         AccessControlList parse(ResponseMessage response) {
+            try {
+                AccessControlList result = parseGetBucketAcl(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+	
+     class GetBucketMetadataResponseParser implements ResponseParser<BucketMetadata> {
+
+        @override
+         BucketMetadata parse(ResponseMessage response) {
+            try {
+                return parseBucketMetadata(response.headers);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketLocationResponseParser implements ResponseParser<String> {
+
+        @override
+         String parse(ResponseMessage response) {
+            try {
+                return parseGetBucketLocation(response.content);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketLoggingResponseParser implements ResponseParser<BucketLoggingResult> {
+
+        @override
+         BucketLoggingResult parse(ResponseMessage response) {
+            try {
+                BucketLoggingResult result = parseBucketLogging(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketImageResponseParser implements ResponseParser<GetBucketImageResult> {
+        @override
+         GetBucketImageResult parse(ResponseMessage response) {
+            try {
+                return parseBucketImage(response.content);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+    }
+
+     class GetImageStyleResponseParser implements ResponseParser<GetImageStyleResult> {
+        @override
+         GetImageStyleResult parse(ResponseMessage response) {
+            try {
+                return parseImageStyle(response.content);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+    }
+
+     class GetBucketImageProcessConfResponseParser implements ResponseParser<BucketProcess> {
+
+        @override
+         BucketProcess parse(ResponseMessage response) {
+            try {
+                BucketProcess result = parseGetBucketImageProcessConf(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketWebsiteResponseParser implements ResponseParser<BucketWebsiteResult> {
+
+        @override
+         BucketWebsiteResult parse(ResponseMessage response) {
+            try {
+                BucketWebsiteResult result = parseBucketWebsite(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketLifecycleResponseParser implements ResponseParser<List<LifecycleRule>> {
+
+        @override
+         List<LifecycleRule> parse(ResponseMessage response) {
+            try {
+                return parseGetBucketLifecycle(response.content);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class AddBucketCnameResponseParser implements ResponseParser<AddBucketCnameResult> {
+        @override
+         AddBucketCnameResult parse(ResponseMessage response) {
+            try {
+                AddBucketCnameResult result = new AddBucketCnameResult();
+                result.certId = response.headers[OSSHeaders.OSS_HEADER_CERT_ID];
+                result.requestId = response.getRequestId();
+                result.response = response;
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+    }
+
+     class GetBucketCnameResponseParser implements ResponseParser<List<CnameConfiguration>> {
+
+        @override
+         List<CnameConfiguration> parse(ResponseMessage response) {
+            try {
+                return parseGetBucketCname(response.content);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketInfoResponseParser implements ResponseParser<BucketInfo> {
+
+        @override
+         BucketInfo parse(ResponseMessage response) {
+            try {
+                BucketInfo result = parseGetBucketInfo(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketStatResponseParser implements ResponseParser<BucketStat> {
+
+        @override
+         BucketStat parse(ResponseMessage response) {
+            try {
+                BucketStat result = parseGetBucketStat(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketQosResponseParser implements ResponseParser<UserQos> {
+
+        @override
+         UserQos parse(ResponseMessage response) {
+            try {
+                UserQos result = parseGetUserQos(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+    
+     class GetBucketVersioningResponseParser
+        implements ResponseParser<BucketVersioningConfiguration> {
+
+        @override
+         BucketVersioningConfiguration parse(ResponseMessage response) {
+            try {
+                BucketVersioningConfiguration result = parseGetBucketVersioning(response.content);
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketEncryptionResponseParser
+    implements ResponseParser<ServerSideEncryptionConfiguration> {
+    	
+    	@override
+    	 ServerSideEncryptionConfiguration parse(ResponseMessage response) {
+    		try {
+    			ServerSideEncryptionConfiguration result = parseGetBucketEncryption(response.content);
+    			return result;
+    		} finally {
+    			safeCloseResponse(response);
+    		}
+    	}
+
+    }
+
+     class GetBucketPolicyResponseParser implements ResponseParser<GetBucketPolicyResult> {
+    	
+        @override
+         GetBucketPolicyResult parse(ResponseMessage response) {
+        	try {
+        		GetBucketPolicyResult result = parseGetBucketPolicy(response.content);
+        		result.requestId = response.getRequestId();
+        		return result;
+        	} finally {
+        		safeCloseResponse(response);
+        	}
+        }
+
+    }
+
+     class GetBucketRequestPaymentResponseParser implements ResponseParser<GetBucketRequestPaymentResult> {
+
+        @override
+         GetBucketRequestPaymentResult parse(ResponseMessage response) {
+            try {
+            	GetBucketRequestPaymentResult result = parseGetBucketRequestPayment(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetUSerQosInfoResponseParser implements ResponseParser<UserQosInfo> {
+
+        @override
+         UserQosInfo parse(ResponseMessage response) {
+            try {
+                UserQosInfo result = parseGetUserQosInfo(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketQosInfoResponseParser implements ResponseParser<BucketQosInfo> {
+
+        @override
+         BucketQosInfo parse(ResponseMessage response) {
+            try {
+                BucketQosInfo result = parseGetBucketQosInfo(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class SetAsyncFetchTaskResponseParser implements ResponseParser<SetAsyncFetchTaskResult> {
+
+        @override
+         SetAsyncFetchTaskResult parse(ResponseMessage response) {
+            try {
+                SetAsyncFetchTaskResult result = parseSetAsyncFetchTaskResult(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetAsyncFetchTaskResponseParser implements ResponseParser<GetAsyncFetchTaskResult> {
+
+        @override
+         GetAsyncFetchTaskResult parse(ResponseMessage response) {
+            try {
+                GetAsyncFetchTaskResult result = parseGetAsyncFetchTaskResult(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketInventoryConfigurationParser implements ResponseParser<GetBucketInventoryConfigurationResult> {
+
+        @override
+         GetBucketInventoryConfigurationResult parse(ResponseMessage response) {
+            try {
+                GetBucketInventoryConfigurationResult result = parseGetBucketInventoryConfig(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class ListBucketInventoryConfigurationsParser implements ResponseParser<ListBucketInventoryConfigurationsResult> {
+
+        @override
+         ListBucketInventoryConfigurationsResult parse(ResponseMessage response) {
+            try {
+                ListBucketInventoryConfigurationsResult result = parseListBucketInventoryConfigurations(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class CreateLiveChannelResponseParser implements ResponseParser<CreateLiveChannelResult> {
+
+        @override
+         CreateLiveChannelResult parse(ResponseMessage response) {
+            try {
+                CreateLiveChannelResult result = parseCreateLiveChannel(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetLiveChannelInfoResponseParser implements ResponseParser<LiveChannelInfo> {
+
+        @override
+         LiveChannelInfo parse(ResponseMessage response) {
+            try {
+                LiveChannelInfo result = parseGetLiveChannelInfo(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetLiveChannelStatResponseParser implements ResponseParser<LiveChannelStat> {
+
+        @override
+         LiveChannelStat parse(ResponseMessage response) {
+            try {
+                LiveChannelStat result = parseGetLiveChannelStat(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetLiveChannelHistoryResponseParser implements ResponseParser<List<LiveRecord>> {
+
+        @override
+         List<LiveRecord> parse(ResponseMessage response) {
+            try {
+                return parseGetLiveChannelHistory(response.content);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class ListLiveChannelsReponseParser implements ResponseParser<LiveChannelListing> {
+
+        @override
+         LiveChannelListing parse(ResponseMessage response) {
+            try {
+                return parseListLiveChannels(response.content);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketCorsResponseParser implements ResponseParser<CORSConfiguration> {
+
+        @override
+         CORSConfiguration parse(ResponseMessage response) {
+            try {
+                return parseListBucketCORS(response.content);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetTaggingResponseParser implements ResponseParser<TagSet> {
+
+        @override
+         TagSet parse(ResponseMessage response) {
+            try {
+                TagSet result = parseGetBucketTagging(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketReplicationResponseParser implements ResponseParser<List<ReplicationRule>> {
+
+        @override
+         List<ReplicationRule> parse(ResponseMessage response) {
+            try {
+                return parseGetBucketReplication(response.content);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketReplicationProgressResponseParser
+            implements ResponseParser<BucketReplicationProgress> {
+
+        @override
+         BucketReplicationProgress parse(ResponseMessage response) {
+            try {
+                BucketReplicationProgress result = parseGetBucketReplicationProgress(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketReplicationLocationResponseParser implements ResponseParser<List<String>> {
+
+        @override
+         List<String> parse(ResponseMessage response) {
+            try {
+                return parseGetBucketReplicationLocation(response.content);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class ListObjectsReponseParser implements ResponseParser<ObjectListing> {
+
+        @override
+         ObjectListing parse(ResponseMessage response) {
+            try {
+                ObjectListing result = parseListObjects(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class ListObjectsV2ResponseParser implements ResponseParser<ListObjectsV2Result> {
+
+        @override
+         ListObjectsV2Result parse(ResponseMessage response) {
+            try {
+                ListObjectsV2Result result = parseListObjectsV2(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+    
+     class ListVersionsReponseParser implements ResponseParser<VersionListing> {
+
+        @override
+         VersionListing parse(ResponseMessage response) {
+            try {
+                VersionListing result = parseListVersions(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class PutObjectReponseParser implements ResponseParser<PutObjectResult> {
+
+        @override
+         PutObjectResult parse(ResponseMessage response) {
+            PutObjectResult result = new PutObjectResult();
+            try {
+                result.setETag(trimQuotes(response.headers[OSSHeaders.ETAG))];
+                result.setVersionId(response.headers[OSSHeaders.OSS_HEADER_VERSION_ID)];
+                result.requestId = response.getRequestId();
+                setCRC(result, response);
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class PutObjectProcessReponseParser implements ResponseParser<PutObjectResult> {
+
+        @override
+         PutObjectResult parse(ResponseMessage response) {
+            PutObjectResult result = new PutObjectResult();
+            result.requestId = response.getRequestId();
+            result.setETag(trimQuotes(response.headers[OSSHeaders.ETAG]));
+            result.setVersionId(response.headers[OSSHeaders.ossHeaderVersionId]);
+            result.setCallbackResponseBody(response.content);
+            result.response = response;
+            return result;
+        }
+
+    }
+
+     class AppendObjectResponseParser implements ResponseParser<AppendObjectResult> {
+
+        @override
+         AppendObjectResult parse(ResponseMessage response) {
+            AppendObjectResult result = new AppendObjectResult();
+            result.requestId = response.getRequestId();
+            try {
+                String nextPosition = response.headers[OSSHeaders.OSS_NEXT_APPEND_POSITION];
+                if (nextPosition != null) {
+                    result.setNextPosition(Long.valueOf(nextPosition));
+                }
+                result.setObjectCRC(response.headers[OSSHeaders.OSS_HASH_CRC64_ECMA)];
+                result.response = response;
+                setCRC(result, response);
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetObjectResponseParser implements ResponseParser<OSSObject> {
+         String bucketName;
+         String key;
+
+         GetObjectResponseParser(final String bucketName, final String key) {
+            this.bucketName = bucketName;
+            this.key = key;
+        }
+
+        @override
+         OSSObject parse(ResponseMessage response) {
+            OSSObject ossObject = new OSSObject();
+            ossObject.setBucketName(this.bucketName);
+            ossObject.setKey(this.key);
+            ossObject.setObjectContent(response.content);
+            ossObject.setRequestId(response.getRequestId());
+            ossObject.setResponse(response);
+            try {
+                ossObject.setObjectMetadata(parseObjectMetadata(response.headers));
+                setServerCRC(ossObject, response);
+                return ossObject;
+            } catch (ResponseParseException e) {
+                // Close response only when parsing exception thrown. Otherwise,
+                // just hand over to SDK users and remain them close it when no
+                // longer in use.
+                safeCloseResponse(response);
+
+                // Rethrow
+                throw e;
+            }
+        }
+
+    }
+
+     class GetObjectAclResponseParser implements ResponseParser<ObjectAcl> {
+
+        @override
+         ObjectAcl parse(ResponseMessage response) {
+            try {
+                ObjectAcl result = parseGetObjectAcl(response.content);
+                result.requestId = response.getRequestId();
+                result.setVersionId(response.headers[OSSHeaders.OSS_HEADER_VERSION_ID]);
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetSimplifiedObjectMetaResponseParser implements ResponseParser<SimplifiedObjectMeta> {
+
+        @override
+         SimplifiedObjectMeta parse(ResponseMessage response) {
+            try {
+                return parseSimplifiedObjectMeta(response.headers);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class RestoreObjectResponseParser implements ResponseParser<RestoreObjectResult> {
+
+        @override
+         RestoreObjectResult parse(ResponseMessage response) {
+            try {
+                RestoreObjectResult result = new RestoreObjectResult(response.getStatusCode());
+                result.requestId = response.getRequestId();
+                result.setVersionId(response.headers[OSSHeaders.ossHeaderVersionId]);
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class ProcessObjectResponseParser implements ResponseParser<GenericResult> {
+
+        @override
+         GenericResult parse(ResponseMessage response) {
+            GenericResult result = new PutObjectResult();
+            result.requestId = response.getRequestId();
+            result.response = response;
+            return result;
+        }
+
+    }
+
+     class GetObjectMetadataResponseParser implements ResponseParser<ObjectMetadata> {
+
+        @override
+         ObjectMetadata parse(ResponseMessage response) {
+            try {
+                return parseObjectMetadata(response.headers);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class HeadObjectResponseParser implements ResponseParser<ObjectMetadata> {
+
+        @override
+         ObjectMetadata parse(ResponseMessage response) {
+            try {
+                return parseObjectMetadata(response.headers);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+    }
+
+     class CopyObjectResponseParser implements ResponseParser<CopyObjectResult> {
+
+        @override
+         CopyObjectResult parse(ResponseMessage response) {
+            try {
+                CopyObjectResult result = parseCopyObjectResult(response.content);
+                result.setVersionId(response.headers[OSSHeaders.ossHeaderVersionId]);
+                result.requestId = response.getRequestId();
+                result.response = response;
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class DeleteObjectsResponseParser implements ResponseParser<DeleteObjectsResult> {
+
+        @override
+         DeleteObjectsResult parse(ResponseMessage response) {
+            try {
+                DeleteObjectsResult result = null;
+
+                // Occurs when deleting multiple objects in quiet mode.
+                if (response.getContentLength() == 0) {
+                    result = new DeleteObjectsResult(null);
+                } else {
+                    result = parseDeleteObjectsResult(response.content);
+                }
+                result.requestId = response.getRequestId();
+
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+    
+     class DeleteVersionsResponseParser implements ResponseParser<DeleteVersionsResult> {
+
+        @override
+         DeleteVersionsResult parse(ResponseMessage response) {
+            try {
+                DeleteVersionsResult result = null;
+
+                // Occurs when deleting multiple objects in quiet mode.
+                if (response.getContentLength() == 0) {
+                    result = new DeleteVersionsResult([]);
+                } else {
+                    result = parseDeleteVersionsResult(response.content);
+                }
+                result.requestId = response.getRequestId();
+
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class CompleteMultipartUploadResponseParser
+            implements ResponseParser<CompleteMultipartUploadResult> {
+
+        @override
+         CompleteMultipartUploadResult parse(ResponseMessage response) {
+            try {
+                CompleteMultipartUploadResult result = parseCompleteMultipartUpload(response.content);
+                result.setVersionId(response.headers[OSSHeaders.OSS_HEADER_VERSION_ID]);
+                result.requestId = response.getRequestId();
+                setServerCRC(result, response);
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class CompleteMultipartUploadProcessResponseParser
+            implements ResponseParser<CompleteMultipartUploadResult> {
+
+        @override
+         CompleteMultipartUploadResult parse(ResponseMessage response) {
+            CompleteMultipartUploadResult result = new CompleteMultipartUploadResult();
+            result.setVersionId(response.headers[OSSHeaders.OSS_HEADER_VERSION_ID)];
+            result.requestId = response.getRequestId();
+            result.setCallbackResponseBody(response.content);
+            result.response = response;
+            return result;
+        }
+
+    }
+
+     class InitiateMultipartUploadResponseParser
+            implements ResponseParser<InitiateMultipartUploadResult> {
+
+        @override
+         InitiateMultipartUploadResult parse(ResponseMessage response) {
+            try {
+                InitiateMultipartUploadResult result = parseInitiateMultipartUpload(response.content);
+                result.requestId = response.getRequestId();
+                result.response = response;
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class ListMultipartUploadsResponseParser implements ResponseParser<MultipartUploadListing> {
+
+        @override
+         MultipartUploadListing parse(ResponseMessage response) {
+            try {
+                MultipartUploadListing result = parseListMultipartUploads(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class ListPartsResponseParser implements ResponseParser<PartListing> {
+
+        @override
+         PartListing parse(ResponseMessage response) {
+            try {
+                PartListing result = parseListParts(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class UploadPartCopyResponseParser implements ResponseParser<UploadPartCopyResult> {
+
+         int partNumber;
+
+         UploadPartCopyResponseParser(int partNumber) {
+            this.partNumber = partNumber;
+        }
+
+        @override
+         UploadPartCopyResult parse(ResponseMessage response) {
+            try {
+                UploadPartCopyResult result = new UploadPartCopyResult();
+                result.setPartNumber(partNumber);
+                result.setETag(trimQuotes(parseUploadPartCopy(response.content)));
+                result.requestId = response.getRequestId();
+                result.response = response;
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetSymbolicLinkResponseParser implements ResponseParser<OSSSymlink> {
+
+        @override
+         OSSSymlink parse(ResponseMessage response) {
+            try {
+                OSSSymlink result = parseSymbolicLink(response);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                OSSUtils.mandatoryCloseResponse(response);
+            }
+        }
+
+    }
+
+     class InitiateBucketWormResponseParser implements ResponseParser<InitiateBucketWormResult> {
+
+        @override
+         InitiateBucketWormResult parse(ResponseMessage response) {
+            try {
+                InitiateBucketWormResult result = parseInitiateBucketWormResponseHeader(response.headers);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketWormResponseParser implements ResponseParser<GetBucketWormResult> {
+
+        @override
+         GetBucketWormResult parse(ResponseMessage response) {
+            try {
+                GetBucketWormResult result = parseWormConfiguration(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class GetBucketResourceGroupResponseParser implements ResponseParser<GetBucketResourceGroupResult> {
+
+        @override
+         GetBucketResourceGroupResult parse(ResponseMessage response) {
+            try {
+                GetBucketResourceGroupResult result = parseResourceGroupConfiguration(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+ class CreateVpcipResultResponseParser implements ResponseParser<Vpcip> {
+
+        @override
+         Vpcip parse(ResponseMessage response) {
+            try {
+                Vpcip result = parseGetCreateVpcipResult(response.content);
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+
+    }
+
+     class ListVpcipResultResponseParser implements ResponseParser<List<Vpcip>> {
+        @override
+         List<Vpcip> parse(ResponseMessage response) {
+            try {
+                return parseListVpcipResult(response.content);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+    }
+
+     class ListVpcPolicyResultResponseParser implements ResponseParser<List<VpcPolicy>> {
+        @override
+         List<VpcPolicy> parse(ResponseMessage response) {
+            try {
+                return parseListVpcPolicyResult(response.content);
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+    }
+
+    class DeleteDirectoryResponseParser implements ResponseParser<DeleteDirectoryResult> {
+
+        @override
+         DeleteDirectoryResult parse(ResponseMessage response) {
+            try{
+                DeleteDirectoryResult result =  parseDeleteDirectoryResult(response.content);
+                result.response = response;
+                result.requestId = response.getRequestId();
+                return result;
+            } finally {
+                safeCloseResponse(response);
+            }
+        }
+    }

@@ -43,9 +43,9 @@ public class OSSDownloadOperationEncrypted extends OSSDownloadOperation {
 
     @override
     protected Long getInputStreamCRCWrap(InputStream inputStream) {
-        if (inputStream instanceof AdjustedRangeInputStream) {
+        if (inputStream is AdjustedRangeInputStream) {
             InputStream subInputStream = ((AdjustedRangeInputStream) inputStream).getWrappedInputStream();
-            if (subInputStream instanceof CipherInputStream) {
+            if (subInputStream is CipherInputStream) {
                 InputStream checkedInputStream = ((CipherInputStream) subInputStream).getDelegateStream();
                 return IOUtils.getCRCValue(checkedInputStream);
             }

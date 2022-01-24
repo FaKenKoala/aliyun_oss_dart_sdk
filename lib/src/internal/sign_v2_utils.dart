@@ -103,9 +103,9 @@ class SignV2Utils {
       if (key != null) {
         String lowerKey = key.toLowerCase();
         if ([
-          HttpHeaders.contentType.toLowerCase(),
-          HttpHeaders.contentMd5.toLowerCase(),
-          HttpHeaders.date.toLowerCase()
+          HttpHeaders.CONTENT_TYPE.toLowerCase(),
+          HttpHeaders.CONTENT_MD5.toLowerCase(),
+          HttpHeaders.DATE.toLowerCase()
         ].contains(lowerKey)) {
           fixedHeadersToSign[lowerKey] = value.trim();
         } else if (lowerKey.startsWith(OSSHeaders.ossPrefix)) {
@@ -115,11 +115,11 @@ class SignV2Utils {
     });
 
     if (!fixedHeadersToSign
-        .containsKey(HttpHeaders.contentType.toLowerCase())) {
-      fixedHeadersToSign[HttpHeaders.contentType.toLowerCase()] = "";
+        .containsKey(HttpHeaders.CONTENT_TYPE.toLowerCase())) {
+      fixedHeadersToSign[HttpHeaders.CONTENT_TYPE.toLowerCase()] = "";
     }
-    if (!fixedHeadersToSign.containsKey(HttpHeaders.contentMd5.toLowerCase())) {
-      fixedHeadersToSign[HttpHeaders.contentMd5.toLowerCase()] = "";
+    if (!fixedHeadersToSign.containsKey(HttpHeaders.CONTENT_MD5.toLowerCase())) {
+      fixedHeadersToSign[HttpHeaders.CONTENT_MD5.toLowerCase()] = "";
     }
 
     for (String additionalHeaderName in additionalHeaderNames) {
@@ -186,12 +186,12 @@ class SignV2Utils {
     requestMessage.resourcePath = resourcePath;
     requestMessage.headers = request.headers;
 
-    requestMessage.addHeader(HttpHeaders.date, expires);
+    requestMessage.addHeader(HttpHeaders.DATE, expires);
     if (request.contentType?.trim().isNotEmpty ?? false) {
-      requestMessage.addHeader(HttpHeaders.contentType, request.contentType!);
+      requestMessage.addHeader(HttpHeaders.CONTENT_TYPE, request.contentType!);
     }
     if (request.contentMD5?.trim().isNotEmpty ?? false) {
-      requestMessage.addHeader(HttpHeaders.contentMd5, request.contentMD5!);
+      requestMessage.addHeader(HttpHeaders.CONTENT_MD5, request.contentMD5!);
     }
 
     request.userMetadata.forEach((key, value) {

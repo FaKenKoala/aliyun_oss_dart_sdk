@@ -5,6 +5,7 @@ import 'package:aliyun_oss_dart_sdk/src/common/utils/string_utils.dart';
 
 import 'credentials.dart';
 import 'default_credentials.dart';
+import 'profile_config_loader.dart';
 
 /// Loads the local OSS credential profiles from the standard location
 /// (~/.oss/credentials), which can be easily overridden through the
@@ -52,11 +53,11 @@ class ProfileConfigFile {
         return;
       }
 
-      String accessKeyId =
+      String? accessKeyId =
           StringUtils.trim(profileProperties[AuthUtils.OSS_ACCESS_KEY_ID]);
-      String secretAccessKey = StringUtils.trim(
+      String? secretAccessKey = StringUtils.trim(
           profileProperties[AuthUtils.OSS_SECRET_ACCESS_KEY]);
-      String sessionToken =
+      String? sessionToken =
           StringUtils.trim(profileProperties[AuthUtils.OSS_SESSION_TOKEN]);
 
       if (StringUtils.isNullOrEmpty(accessKeyId)) {
@@ -64,12 +65,12 @@ class ProfileConfigFile {
             "Access key id should not be null or empty.");
       }
       if (StringUtils.isNullOrEmpty(secretAccessKey)) {
-        throw new InvalidCredentialsException(
+        throw InvalidCredentialsException(
             "Secret access key should not be null or empty.");
       }
 
       credentials =
-          DefaultCredentials(accessKeyId, secretAccessKey, sessionToken);
+          DefaultCredentials(accessKeyId!, secretAccessKey!, sessionToken);
     }
   }
 

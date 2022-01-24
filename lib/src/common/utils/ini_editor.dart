@@ -815,7 +815,7 @@ public class IniEditor {
             Iterator<Line> it = this.lines.iterator();
             while (it.hasNext()) {
                 Line line = it.next();
-                if (line instanceof Option) {
+                if (line is Option) {
                     optNames.add(((Option) line).name());
                 }
             }

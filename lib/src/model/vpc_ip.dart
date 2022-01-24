@@ -1,6 +1,6 @@
 import 'package:aliyun_oss_dart_sdk/src/model/generic_result.dart';
 
-class VpcIp extends GenericResult {
+class Vpcip extends GenericResult {
   String? region;
   String? vpcId;
   String? vip;
@@ -8,6 +8,6 @@ class VpcIp extends GenericResult {
 
   @override
   String toString() {
-    return "VpcIp [region=$region, vpcId=$vpcId, vip=$vip , label=$label ]";
+    return "Vpcip [region=$region, vpcId=$vpcId, vip=$vip , label=$label ]";
   }
 }

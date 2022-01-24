@@ -59,7 +59,7 @@ public class SdkFilterInputStream extends FilterInputStream {
     }
 
     public void abort() {
-        if (in instanceof SdkFilterInputStream) {
+        if (in is SdkFilterInputStream) {
             ((SdkFilterInputStream) in).abort();
         }
         aborted = true;

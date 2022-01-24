@@ -129,7 +129,7 @@ public class IOUtils {
     public static InputStream newRepeatableInputStream(final InputStream original) throws IOException {
         InputStream repeatable = null;
         if (!original.markSupported()) {
-            if (original instanceof FileInputStream) {
+            if (original is FileInputStream) {
                 repeatable = new RepeatableFileInputStream((FileInputStream) original);
             } else {
                 repeatable = new BufferedInputStream(original, OSSConstants.DEFAULT_STREAM_BUFFER_SIZE);
@@ -143,7 +143,7 @@ public class IOUtils {
     public static InputStream newRepeatableInputStream(final BoundedInputStream original) throws IOException {
         InputStream repeatable = null;
         if (!original.markSupported()) {
-            if (original.getWrappedInputStream() instanceof FileInputStream) {
+            if (original.getWrappedInputStream() is FileInputStream) {
                 repeatable = new RepeatableBoundedFileInputStream(original);
             } else {
                 repeatable = new BufferedInputStream(original, OSSConstants.DEFAULT_STREAM_BUFFER_SIZE);
@@ -155,7 +155,7 @@ public class IOUtils {
     }
 
     public static Long getCRCValue(InputStream inputStream) {
-        if (inputStream instanceof CheckedInputStream) {
+        if (inputStream is CheckedInputStream) {
             return ((CheckedInputStream) inputStream).getChecksum().getValue();
         }
         return null;

@@ -736,15 +736,14 @@ abstract class OSS {
   ///
   /// @throws OSSException
   /// @throws ClientException
-  ListObjectsV2Result listObjectsV2(
-      String bucketName,
+  ListObjectsV2Result listObjectsV2(String bucketName,
       [String? prefix,
       String? continuationToken,
       String? startAfter,
       String? delimiter,
       int maxKeys = 0,
       String? encodingType,
-      bool fetchOwner = false ]);
+      bool fetchOwner = false]);
 
   /// <p>
   /// Returns a list of summary information about the versions in the specified
@@ -900,9 +899,7 @@ abstract class OSS {
   ///
   /// @see OSSClient#listVersions(String, String)
   /// @see OSSClient#listVersions(ListVersionsRequest)
-  VersionListing listVersions(
-      String bucketName,
-      String prefix,
+  VersionListing listVersions(String bucketName, String prefix,
       [String? keyMarker,
       String? versionIdMarker,
       String? delimiter,
@@ -1005,7 +1002,8 @@ abstract class OSS {
   ///                   the Content-Length information, the data is encoded by
   ///                   chunked
   ///                   tranfer encoding.
-  PutObjectResult putObjectWithStream(String bucketName, String key, InputStream input,
+  PutObjectResult putObjectWithStream(
+      String bucketName, String key, InputStream input,
       [ObjectMetadata? metadata]);
 
   /// Uploads the file to the {@link Bucket} from the file with the
@@ -1022,8 +1020,8 @@ abstract class OSS {
   ///                   the Content-Length information, the data is encoded by
   ///                   chunked
   ///                   tranfer encoding.
-  PutObjectResult putObjectWithFile(
-      String bucketName, String key, File file, [ObjectMetadata? metadata]);
+  PutObjectResult putObjectWithFile(String bucketName, String key, File file,
+      [ObjectMetadata? metadata]);
 
   /// Uploads the file to {@link Bucket}.
   ///
@@ -1055,8 +1053,9 @@ abstract class OSS {
   /// @param useChunkEncoding
   ///                         The flag of using chunked transfer encoding.
   /// @return A {@link PutObjectResult} instance.
-  PutObjectResult putObjectWithHeaders(Uri signedUrl, String filePath,
-      Map<String, String> requestHeaders, [bool useChunkEncoding = false]);
+  PutObjectResult putObjectWithHeaders(
+      Uri signedUrl, String filePath, Map<String, String> requestHeaders,
+      [bool useChunkEncoding = false]);
 
   /// Uploads the file from a InputStream instance to the signed URL with
   /// specified headers.
@@ -1081,11 +1080,8 @@ abstract class OSS {
   /// @param useChunkEncoding
   ///                         The flag of using chunked transfer encoding.
   /// @return A {@link PutObjectResult} instance.
-  PutObjectResult putObject(
-      Uri signedUrl,
-      InputStream requestContent,
-      int contentLength,
-      Map<String, String> requestHeaders,
+  PutObjectResult putObject(Uri signedUrl, InputStream requestContent,
+      int contentLength, Map<String, String> requestHeaders,
       [bool useChunkEncoding = false]);
 
   /// Copies an existing file in OSS from source bucket to the target bucket.
@@ -1177,7 +1173,8 @@ abstract class OSS {
   ///                       headers.
   /// @return A{@link OSSObject} instance.The caller is responsible to close
   ///         the connection after usage.
-  OSSObject getObjectWithHeader(Uri signedUrl, Map<String, String> requestHeaders);
+  OSSObject getObjectWithHeader(
+      Uri signedUrl, Map<String, String> requestHeaders);
 
   /// Gets the simplified metadata information of {@link OSSObject}.
   /// <p>
@@ -1528,7 +1525,8 @@ abstract class OSS {
   ///                       bucket
   ///                       name and object key.
   /// @return A {@link RestoreObjectResult} instance.
-  RestoreObjectResult restoreObjectWithGenericRequest(GenericRequest genericRequest);
+  RestoreObjectResult restoreObjectWithGenericRequest(
+      GenericRequest genericRequest);
 
   /// Restores the object of archive storage. The function is not applicable to
   /// Normal or IA storage. The restoreObject() needs to be called prior to
@@ -1586,7 +1584,8 @@ abstract class OSS {
   ///
   /// @return A {@link VoidResult} instance wrapped void return and
   ///         contains some basic response options, such as requestId.
-  VoidResult setObjectTaggingWithTagSet(String bucketName, String key, TagSet tagSet);
+  VoidResult setObjectTaggingWithTagSet(
+      String bucketName, String key, TagSet tagSet);
 
   /// Sets the tags on the OSS object.
   ///
@@ -3485,7 +3484,7 @@ abstract class OSS {
   ///                         OSS Server side exception.
   /// @throws ClientException
   ///                         OSS Client side exception.
-  List<VpcIp> listVpcip();
+  List<Vpcip> listVpcip();
 
   /// Deletes the {@link Vpcip} instance.
   ///
@@ -3610,9 +3609,10 @@ abstract class OSS {
   ///                         OSS Server side exception.
   /// @throws ClientException
   ///                         OSS Client side exception.
-  GetBucketInventoryConfigurationResult getBucketInventoryConfigurationWithRequest(
-      GetBucketInventoryConfigurationRequest
-          getBucketInventoryConfigurationRequest);
+  GetBucketInventoryConfigurationResult
+      getBucketInventoryConfigurationWithRequest(
+          GetBucketInventoryConfigurationRequest
+              getBucketInventoryConfigurationRequest);
 
   /// Returns the list of inventory configurations for the bucket.
   ///
@@ -3634,8 +3634,9 @@ abstract class OSS {
   ///
   /// @return A {@link ListBucketInventoryConfigurationsResult} object containing
   ///         the inventory configurations.
-  ListBucketInventoryConfigurationsResult listBucketInventoryConfigurationsWithToken(
-      String bucketName, String continuationToken);
+  ListBucketInventoryConfigurationsResult
+      listBucketInventoryConfigurationsWithToken(
+          String bucketName, String continuationToken);
 
   /// Returns the list of inventory configurations for the bucket.
   ///
@@ -3646,9 +3647,10 @@ abstract class OSS {
   ///
   /// @return A {@link ListBucketInventoryConfigurationsResult} object
   ///         containing the list of {@link InventoryConfiguration}.
-  ListBucketInventoryConfigurationsResult listBucketInventoryConfigurationsWithRequest(
-      ListBucketInventoryConfigurationsRequest
-          listBucketInventoryConfigurationsRequest);
+  ListBucketInventoryConfigurationsResult
+      listBucketInventoryConfigurationsWithRequest(
+          ListBucketInventoryConfigurationsRequest
+              listBucketInventoryConfigurationsRequest);
 
   /// Deletes an inventory configuration of the bucket.
   ///
@@ -3852,8 +3854,8 @@ abstract class OSS {
   ///
   /// @return A {@link DeleteDirectoryResult} instance contains delete number and
   ///         next delete token.
-  DeleteDirectoryResult deleteDirectoryWithToken(String bucketName, String dirName,
-      bool deleteRecursive, String nextDeleteToken);
+  DeleteDirectoryResult deleteDirectoryWithToken(String bucketName,
+      String dirName, bool deleteRecursive, String nextDeleteToken);
 
   /// Delete a directory
   ///

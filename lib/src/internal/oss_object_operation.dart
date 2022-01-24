@@ -1,126 +1,19 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
-package com.aliyun.oss.internal;
-
-import static com.aliyun.oss.common.parser.RequestMarshallers.*;
-import static com.aliyun.oss.common.utils.CodingUtils.assertParameterNotNull;
-import static com.aliyun.oss.common.utils.CodingUtils.assertStringNotNullOrEmpty;
-import static com.aliyun.oss.common.utils.CodingUtils.assertTrue;
-import static com.aliyun.oss.common.utils.IOUtils.checkFile;
-import static com.aliyun.oss.common.utils.IOUtils.newRepeatableInputStream;
-import static com.aliyun.oss.common.utils.IOUtils.safeClose;
-import static com.aliyun.oss.common.utils.LogUtils.getLog;
-import static com.aliyun.oss.common.utils.LogUtils.logException;
-import static com.aliyun.oss.event.ProgressPublisher.publishProgress;
-import static com.aliyun.oss.internal.OSSConstants.DEFAULT_BUFFER_SIZE;
-import static com.aliyun.oss.internal.OSSConstants.DEFAULT_CHARSET_NAME;
-import static com.aliyun.oss.internal.OSSHeaders.OSS_SELECT_OUTPUT_RAW;
-import static com.aliyun.oss.internal.OSSUtils.OSS_RESOURCE_MANAGER;
-import static com.aliyun.oss.internal.OSSUtils.addDateHeader;
-import static com.aliyun.oss.internal.OSSUtils.addHeader;
-import static com.aliyun.oss.internal.OSSUtils.addStringListHeader;
-import static com.aliyun.oss.internal.OSSUtils.determineInputStreamLength;
-import static com.aliyun.oss.internal.OSSUtils.ensureBucketNameValid;
-import static com.aliyun.oss.internal.OSSUtils.ensureObjectKeyValid;
-import static com.aliyun.oss.internal.OSSUtils.ensureCallbackValid;
-import static com.aliyun.oss.internal.OSSUtils.joinETags;
-import static com.aliyun.oss.internal.OSSUtils.populateRequestMetadata;
-import static com.aliyun.oss.internal.OSSUtils.populateResponseHeaderParameters;
-import static com.aliyun.oss.internal.OSSUtils.populateRequestCallback;
-import static com.aliyun.oss.internal.OSSUtils.removeHeader;
-import static com.aliyun.oss.internal.OSSUtils.safeCloseResponse;
-import static com.aliyun.oss.internal.RequestParameters.ENCODING_TYPE;
-import static com.aliyun.oss.internal.RequestParameters.SUBRESOURCE_ACL;
-import static com.aliyun.oss.internal.RequestParameters.SUBRESOURCE_DELETE;
-import static com.aliyun.oss.internal.RequestParameters.SUBRESOURCE_OBJECTMETA;
-import static com.aliyun.oss.internal.RequestParameters.SUBRESOURCE_SYMLINK;
-import static com.aliyun.oss.internal.RequestParameters.SUBRESOURCE_TAGGING;
-import static com.aliyun.oss.internal.RequestParameters.SUBRESOURCE_DIR;
-import static com.aliyun.oss.internal.RequestParameters.SUBRESOURCE_RENAME;
-import static com.aliyun.oss.internal.RequestParameters.SUBRESOURCE_DIR_DELETE;
-import static com.aliyun.oss.internal.ResponseParsers.appendObjectResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.copyObjectResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.deleteObjectsResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getTaggingResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getObjectAclResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getObjectMetadataResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.putObjectReponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.putObjectProcessReponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getSimplifiedObjectMetaResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.getSymbolicLinkResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.headObjectResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.deleteVersionsResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.deleteDirectoryResponseParser;
-
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.CheckedInputStream;
-
-import com.aliyun.oss.model.*;
-
-import com.aliyun.oss.ClientException;
-import com.aliyun.oss.HttpMethod;
-import com.aliyun.oss.OSSErrorCode;
-import com.aliyun.oss.OSSException;
-import com.aliyun.oss.common.auth.CredentialsProvider;
-import com.aliyun.oss.common.comm.RequestMessage;
-import com.aliyun.oss.common.comm.ResponseHandler;
-import com.aliyun.oss.common.comm.ServiceClient;
-import com.aliyun.oss.common.comm.io.RepeatableFileInputStream;
-import com.aliyun.oss.common.parser.ResponseParser;
-import com.aliyun.oss.common.utils.BinaryUtil;
-import com.aliyun.oss.common.utils.CRC64;
-import com.aliyun.oss.common.utils.DateUtil;
-import com.aliyun.oss.common.utils.HttpHeaders;
-import com.aliyun.oss.common.utils.HttpUtil;
-import com.aliyun.oss.common.utils.IOUtils;
-import com.aliyun.oss.common.utils.RangeSpec;
-import com.aliyun.oss.event.ProgressEventType;
-import com.aliyun.oss.event.ProgressInputStream;
-import com.aliyun.oss.event.ProgressListener;
-import com.aliyun.oss.internal.ResponseParsers.GetObjectResponseParser;
+import 'oss_operation.dart';
 
 /**
  * Object operation.
  */
-public class OSSObjectOperation extends OSSOperation {
+ class OSSObjectOperation extends OSSOperation {
 
-    public OSSObjectOperation(ServiceClient client, CredentialsProvider credsProvider) {
+     OSSObjectOperation(ServiceClient client, CredentialsProvider credsProvider) {
         super(client, credsProvider);
     }
 
     /**
      * Upload input stream or file to oss.
      */
-    public PutObjectResult putObject(PutObjectRequest putObjectRequest) throws OSSException, ClientException {
+     PutObjectResult putObject(PutObjectRequest putObjectRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(putObjectRequest, "putObjectRequest");
 
@@ -142,7 +35,7 @@ public class OSSObjectOperation extends OSSOperation {
     /**
      * Upload input stream to oss by using url signature.
      */
-    public PutObjectResult putObject(URL signedUrl, InputStream requestContent, long contentLength,
+     PutObjectResult putObject(URL signedUrl, InputStream requestContent, long contentLength,
             Map<String, String> requestHeaders, bool useChunkEncoding) throws OSSException, ClientException {
 
         assertParameterNotNull(signedUrl, "signedUrl");
@@ -178,7 +71,7 @@ public class OSSObjectOperation extends OSSOperation {
     /**
      * Upload input stream or file to oss by append mode.
      */
-    public AppendObjectResult appendObject(AppendObjectRequest appendObjectRequest)
+     AppendObjectResult appendObject(AppendObjectRequest appendObjectRequest)
             throws OSSException, ClientException {
 
         assertParameterNotNull(appendObjectRequest, "appendObjectRequest");
@@ -198,7 +91,7 @@ public class OSSObjectOperation extends OSSOperation {
         return result;
     }
 
-    public SelectObjectMetadata createSelectObjectMetadata(CreateSelectObjectMetadataRequest createSelectObjectMetadataRequest) throws OSSException, ClientException {
+     SelectObjectMetadata createSelectObjectMetadata(CreateSelectObjectMetadataRequest createSelectObjectMetadataRequest) throws OSSException, ClientException {
         String process = createSelectObjectMetadataRequest.getProcess();
         assertParameterNotNull(process, "process");
 
@@ -256,7 +149,7 @@ public class OSSObjectOperation extends OSSOperation {
     /**
      * Select an object from oss.
      */
-    public OSSObject selectObject(SelectObjectRequest selectObjectRequest) throws OSSException, ClientException {
+     OSSObject selectObject(SelectObjectRequest selectObjectRequest) throws OSSException, ClientException {
         assertParameterNotNull(selectObjectRequest, "selectObjectRequest");
         String bucketName = selectObjectRequest.getBucketName();
         String key = selectObjectRequest.getKey();
@@ -316,7 +209,7 @@ public class OSSObjectOperation extends OSSOperation {
     /**
      * Pull an object from oss.
      */
-    public OSSObject getObject(GetObjectRequest getObjectRequest) throws OSSException, ClientException {
+     OSSObject getObject(GetObjectRequest getObjectRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(getObjectRequest, "getObjectRequest");
 
@@ -388,7 +281,7 @@ public class OSSObjectOperation extends OSSOperation {
     /**
      * Populate a local file with the specified object.
      */
-    public ObjectMetadata getObject(GetObjectRequest getObjectRequest, File file) throws OSSException, ClientException {
+     ObjectMetadata getObject(GetObjectRequest getObjectRequest, File file) throws OSSException, ClientException {
 
         assertParameterNotNull(file, "file");
 
@@ -421,7 +314,7 @@ public class OSSObjectOperation extends OSSOperation {
     /**
      * Get simplified object meta.
      */
-    public SimplifiedObjectMeta getSimplifiedObjectMeta(GenericRequest genericRequest) {
+     SimplifiedObjectMeta getSimplifiedObjectMeta(GenericRequest genericRequest) {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -453,7 +346,7 @@ public class OSSObjectOperation extends OSSOperation {
     /**
      * Get object matadata.
      */
-    public ObjectMetadata getObjectMetadata(GenericRequest genericRequest)
+     ObjectMetadata getObjectMetadata(GenericRequest genericRequest)
             throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
@@ -484,7 +377,7 @@ public class OSSObjectOperation extends OSSOperation {
     /**
      * Copy an existing object to another one.
      */
-    public CopyObjectResult copyObject(CopyObjectRequest copyObjectRequest) throws OSSException, ClientException {
+     CopyObjectResult copyObject(CopyObjectRequest copyObjectRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(copyObjectRequest, "copyObjectRequest");
 
@@ -503,7 +396,7 @@ public class OSSObjectOperation extends OSSOperation {
     /**
      * Delete an object.
      */
-    public VoidResult deleteObject(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteObject(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -528,7 +421,7 @@ public class OSSObjectOperation extends OSSOperation {
     /**
      * Delete an object version.
      */
-    public VoidResult deleteVersion(DeleteVersionRequest deleteVersionRequest) throws OSSException, ClientException {
+     VoidResult deleteVersion(DeleteVersionRequest deleteVersionRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(deleteVersionRequest, "deleteVersionRequest");
 
@@ -558,7 +451,7 @@ public class OSSObjectOperation extends OSSOperation {
     /**
      * Delete multiple objects.
      */
-    public DeleteObjectsResult deleteObjects(DeleteObjectsRequest deleteObjectsRequest) {
+     DeleteObjectsResult deleteObjects(DeleteObjectsRequest deleteObjectsRequest) {
 
         assertParameterNotNull(deleteObjectsRequest, "deleteObjectsRequest");
 
@@ -585,7 +478,7 @@ public class OSSObjectOperation extends OSSOperation {
     /**
      * Delete multiple versions.
      */
-    public DeleteVersionsResult deleteVersions(DeleteVersionsRequest deleteVersionsRequest)
+     DeleteVersionsResult deleteVersions(DeleteVersionsRequest deleteVersionsRequest)
         throws OSSException, ClientException {
 
         assertParameterNotNull(deleteVersionsRequest, "deleteObjectsRequest");
@@ -614,7 +507,7 @@ public class OSSObjectOperation extends OSSOperation {
     /**
      * Get head information.
      */
-    public ObjectMetadata headObject(HeadObjectRequest headObjectRequest) throws OSSException, ClientException {
+     ObjectMetadata headObject(HeadObjectRequest headObjectRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(headObjectRequest, "headObjectRequest");
 
@@ -650,7 +543,7 @@ public class OSSObjectOperation extends OSSOperation {
         return doOperation(request, headObjectResponseParser, bucketName, key);
     }
 
-    public VoidResult setObjectAcl(SetObjectAclRequest setObjectAclRequest) throws OSSException, ClientException {
+     VoidResult setObjectAcl(SetObjectAclRequest setObjectAclRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(setObjectAclRequest, "setObjectAclRequest");
 
@@ -682,7 +575,7 @@ public class OSSObjectOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, key);
     }
 
-    public ObjectAcl getObjectAcl(GenericRequest genericRequest) throws OSSException, ClientException {
+     ObjectAcl getObjectAcl(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -710,7 +603,7 @@ public class OSSObjectOperation extends OSSOperation {
         return doOperation(request, getObjectAclResponseParser, bucketName, key, true);
     }
 
-    public RestoreObjectResult restoreObject(GenericRequest genericRequest) throws OSSException, ClientException {
+     RestoreObjectResult restoreObject(GenericRequest genericRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -724,7 +617,7 @@ public class OSSObjectOperation extends OSSOperation {
         ensureObjectKeyValid(key);
 
         byte[] content = new byte[0];
-        if (genericRequest instanceof RestoreObjectRequest) {
+        if (genericRequest is RestoreObjectRequest) {
             RestoreObjectRequest restoreObjectRequest = (RestoreObjectRequest) genericRequest;
             if (restoreObjectRequest.getRestoreConfiguration() != null) {
                 content = restoreObjectRequestMarshaller.marshall(restoreObjectRequest);
@@ -748,7 +641,7 @@ public class OSSObjectOperation extends OSSOperation {
         return doOperation(request, ResponseParsers.restoreObjectResponseParser, bucketName, key);
     }
     
-    public VoidResult setObjectTagging(SetObjectTaggingRequest setObjectTaggingRequest) throws OSSException, ClientException {
+     VoidResult setObjectTagging(SetObjectTaggingRequest setObjectTaggingRequest) throws OSSException, ClientException {
         assertParameterNotNull(setObjectTaggingRequest, "setBucketTaggingRequest");
 
         String bucketName = setObjectTaggingRequest.getBucketName();
@@ -777,7 +670,7 @@ public class OSSObjectOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, key);
     }
 
-    public TagSet getObjectTagging(GenericRequest genericRequest) throws OSSException, ClientException {
+     TagSet getObjectTagging(GenericRequest genericRequest) throws OSSException, ClientException {
         assertParameterNotNull(genericRequest, "genericRequest");
 
         String bucketName = genericRequest.getBucketName();
@@ -805,7 +698,7 @@ public class OSSObjectOperation extends OSSOperation {
         return doOperation(request, getTaggingResponseParser, bucketName, key, true);
     }
 
-    public VoidResult deleteObjectTagging(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteObjectTagging(GenericRequest genericRequest) throws OSSException, ClientException {
         assertParameterNotNull(genericRequest, "genericRequest");
 
         String bucketName = genericRequest.getBucketName();
@@ -833,7 +726,7 @@ public class OSSObjectOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, key);
     }
 
-    public OSSSymlink getSymlink(GenericRequest genericRequest) throws OSSException, ClientException {
+     OSSSymlink getSymlink(GenericRequest genericRequest) throws OSSException, ClientException {
         assertParameterNotNull(genericRequest, "genericRequest");
 
         String bucketName = genericRequest.getBucketName();
@@ -863,7 +756,7 @@ public class OSSObjectOperation extends OSSOperation {
         return symbolicLink;
     }
 
-    public VoidResult createSymlink(CreateSymlinkRequest createSymlinkRequest) throws OSSException, ClientException {
+     VoidResult createSymlink(CreateSymlinkRequest createSymlinkRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(createSymlinkRequest, "createSymlinkRequest");
 
@@ -906,7 +799,7 @@ public class OSSObjectOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, symlink);
     }
 
-    public GenericResult processObject(ProcessObjectRequest processObjectRequest) throws OSSException, ClientException {
+     GenericResult processObject(ProcessObjectRequest processObjectRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(processObjectRequest, "genericRequest");
 
@@ -936,7 +829,7 @@ public class OSSObjectOperation extends OSSOperation {
         return doOperation(request, ResponseParsers.processObjectResponseParser, bucketName, key, true);
     }
 
-    public bool doesObjectExist(GenericRequest genericRequest) throws OSSException, ClientException {
+     bool doesObjectExist(GenericRequest genericRequest) throws OSSException, ClientException {
         try {
             this.getSimplifiedObjectMeta(genericRequest);
             return true;
@@ -949,7 +842,7 @@ public class OSSObjectOperation extends OSSOperation {
         }
     }
 
-    public bool doesObjectExistWithRedirect(GenericRequest genericRequest) throws OSSException, ClientException {
+     bool doesObjectExistWithRedirect(GenericRequest genericRequest) throws OSSException, ClientException {
         OSSObject ossObject = null;
         try {
             String bucketName = genericRequest.getBucketName();
@@ -978,7 +871,7 @@ public class OSSObjectOperation extends OSSOperation {
         }
     }
 
-    public VoidResult createDirectory(CreateDirectoryRequest createDirectoryRequest) throws OSSException, ClientException {
+     VoidResult createDirectory(CreateDirectoryRequest createDirectoryRequest) throws OSSException, ClientException {
         assertParameterNotNull(createDirectoryRequest, "createDirectoryRequest");
         String bucketName = createDirectoryRequest.getBucketName();
         String directory = createDirectoryRequest.getDirectoryName();
@@ -1002,7 +895,7 @@ public class OSSObjectOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, directory);
     }
 
-    public DeleteDirectoryResult deleteDirectory(DeleteDirectoryRequest deleteDirectoryRequest) throws OSSException, ClientException {
+     DeleteDirectoryResult deleteDirectory(DeleteDirectoryRequest deleteDirectoryRequest) throws OSSException, ClientException {
         assertParameterNotNull(deleteDirectoryRequest, "deleteDirectoryRequest");
         String bucketName = deleteDirectoryRequest.getBucketName();
         String directoryName = deleteDirectoryRequest.getDirectoryName();
@@ -1027,7 +920,7 @@ public class OSSObjectOperation extends OSSOperation {
          return doOperation(request, deleteDirectoryResponseParser, bucketName, directoryName, true);
     }
 
-    public VoidResult renameObject(RenameObjectRequest renameObjectRequest) throws OSSException, ClientException {
+     VoidResult renameObject(RenameObjectRequest renameObjectRequest) throws OSSException, ClientException {
         assertParameterNotNull(renameObjectRequest, "renameObjectRequest");
         String bucketName = renameObjectRequest.getBucketName();
         String destObject = renameObjectRequest.getDestinationObjectName();
@@ -1055,7 +948,7 @@ public class OSSObjectOperation extends OSSOperation {
         return doOperation(request, requestIdResponseParser, bucketName, destObject);
     }
 
-    private static enum MetadataDirective {
+     static enum MetadataDirective {
 
         /* Copy metadata from source object */
         COPY("COPY"),
@@ -1063,14 +956,14 @@ public class OSSObjectOperation extends OSSOperation {
         /* Replace metadata with newly metadata */
         REPLACE("REPLACE");
 
-        private final String directiveAsString;
+         final String directiveAsString;
 
-        private MetadataDirective(String directiveAsString) {
+         MetadataDirective(String directiveAsString) {
             this.directiveAsString = directiveAsString;
         }
 
         @override
-        public String toString() {
+         String toString() {
             return this.directiveAsString;
         }
     }
@@ -1079,7 +972,7 @@ public class OSSObjectOperation extends OSSOperation {
      * An enum to represent different modes the client may specify to upload
      * specified file or inputstream.
      */
-    private static enum WriteMode {
+     static enum WriteMode {
 
         /*
          * If object already not exists, create it. otherwise, append it with
@@ -1092,18 +985,18 @@ public class OSSObjectOperation extends OSSOperation {
          */
         OVERWRITE("OVERWRITE");
 
-        private final String modeAsString;
+         final String modeAsString;
 
-        private WriteMode(String modeAsString) {
+         WriteMode(String modeAsString) {
             this.modeAsString = modeAsString;
         }
 
         @override
-        public String toString() {
+         String toString() {
             return this.modeAsString;
         }
 
-        public static HttpMethod getMappingMethod(WriteMode mode) {
+         static HttpMethod getMappingMethod(WriteMode mode) {
             switch (mode) {
             case APPEND:
                 return HttpMethod.POST;
@@ -1117,7 +1010,7 @@ public class OSSObjectOperation extends OSSOperation {
         }
     }
 
-    private <RequestType extends PutObjectRequest, ResponseType> ResponseType writeObjectInternal(WriteMode mode,
+     <RequestType extends PutObjectRequest, ResponseType> ResponseType writeObjectInternal(WriteMode mode,
             RequestType originalRequest, ResponseParser<ResponseType> responseParser) {
 
         final String bucketName = originalRequest.getBucketName();
@@ -1204,15 +1097,15 @@ public class OSSObjectOperation extends OSSOperation {
         return result;
     }
 
-    private bool isCrcCheckEnabled() {
+     bool isCrcCheckEnabled() {
         return getInnerClient().getClientConfiguration().isCrcCheckEnabled();
     }
 
-    private bool hasRangeInRequest(GetObjectRequest getObjectRequest) {
+     bool hasRangeInRequest(GetObjectRequest getObjectRequest) {
         return getObjectRequest.getHeaders().get(OSSHeaders.RANGE) != null;
     }
 
-    private static void populateCopyObjectHeaders(CopyObjectRequest copyObjectRequest, Map<String, String> headers) {
+     static void populateCopyObjectHeaders(CopyObjectRequest copyObjectRequest, Map<String, String> headers) {
 
         String copySourceHeader = "/" + copyObjectRequest.getSourceBucketName() + "/"
                 + HttpUtil.urlEncode(copyObjectRequest.getSourceKey(), DEFAULT_CHARSET_NAME);
@@ -1251,7 +1144,7 @@ public class OSSObjectOperation extends OSSOperation {
         removeHeader(headers, HttpHeaders.CONTENT_LENGTH);
     }
 
-    private static void populateGetObjectRequestHeaders(GetObjectRequest getObjectRequest,
+     static void populateGetObjectRequestHeaders(GetObjectRequest getObjectRequest,
             Map<String, String> headers) {
 
         if (getObjectRequest.getRange() != null) {
@@ -1281,7 +1174,7 @@ public class OSSObjectOperation extends OSSOperation {
         populateTrafficLimitHeader(headers, getObjectRequest.getTrafficLimit());
     }
 
-    private static void addDeleteObjectsRequiredHeaders(Map<String, String> headers, byte[] rawContent) {
+     static void addDeleteObjectsRequiredHeaders(Map<String, String> headers, byte[] rawContent) {
         headers.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(rawContent.length));
 
         byte[] md5 = BinaryUtil.calculateMd5(rawContent);
@@ -1289,12 +1182,12 @@ public class OSSObjectOperation extends OSSOperation {
         headers.put(HttpHeaders.CONTENT_MD5, md5Base64);
     }
     
-    private static void addDeleteVersionsRequiredHeaders(Map<String, String> headers, byte[] rawContent) {
+     static void addDeleteVersionsRequiredHeaders(Map<String, String> headers, byte[] rawContent) {
         addDeleteObjectsRequiredHeaders(headers, rawContent);
         headers.put(ENCODING_TYPE, OSSConstants.URL_ENCODING);
     }
 
-    private static void addDeleteObjectsOptionalHeaders(Map<String, String> headers, DeleteObjectsRequest request) {
+     static void addDeleteObjectsOptionalHeaders(Map<String, String> headers, DeleteObjectsRequest request) {
         if (request.getEncodingType() != null) {
             headers.put(ENCODING_TYPE, request.getEncodingType());
         }
@@ -1302,31 +1195,31 @@ public class OSSObjectOperation extends OSSOperation {
         populateRequestPayerHeader(headers, request.getRequestPayer());
     }
 
-    private static void addGetObjectRangeHeader(long[] range, Map<String, String> headers) {
-        RangeSpec rangeSpec = RangeSpec.parse(range);
+     static void addGetObjectRangeHeader(long[] range, Map<String, String> headers) {
+        RangeSpec rangeSpec = RangeSpec.parse(RANGE);
         headers.put(OSSHeaders.RANGE, rangeSpec.toString());
     }
 
-    private static void populateRequestPayerHeader(Map<String, String> headers, Payer payer) {
+     static void populateRequestPayerHeader(Map<String, String> headers, Payer payer) {
         if (payer != null && payer.equals(Payer.Requester)) {
             headers.put(OSSHeaders.OSS_REQUEST_PAYER, payer.toString().toLowerCase());
         }
     }
 
-    private static void populateTrafficLimitHeader(Map<String, String> headers, int limit) {
+     static void populateTrafficLimitHeader(Map<String, String> headers, int limit) {
         if (limit > 0) {
             headers.put(OSSHeaders.OSS_HEADER_TRAFFIC_LIMIT, String.valueOf(limit));
         }
     }
 
-    private static void populateWriteObjectParams(WriteMode mode, PutObjectRequest originalRequest,
+     static void populateWriteObjectParams(WriteMode mode, PutObjectRequest originalRequest,
             Map<String, String> params) {
 
         if (mode == WriteMode.OVERWRITE) {
             return;
         }
 
-        assert (originalRequest instanceof AppendObjectRequest);
+        assert (originalRequest is AppendObjectRequest);
         params.put(RequestParameters.SUBRESOURCE_APPEND, null);
         AppendObjectRequest appendObjectRequest = (AppendObjectRequest) originalRequest;
         if (appendObjectRequest.getPosition() != null) {
@@ -1334,14 +1227,14 @@ public class OSSObjectOperation extends OSSOperation {
         }
     }
 
-    private static bool isNeedReturnResponse(PutObjectRequest putObjectRequest) {
+     static bool isNeedReturnResponse(PutObjectRequest putObjectRequest) {
         if (putObjectRequest.getCallback() != null || putObjectRequest.getProcess() != null) {
             return true;
         }
         return false;
     }
 
-    private static void populateDeleteDirectoryRequestHeaders(Map<String, String> headers, DeleteDirectoryRequest deleteDirectoryRequest) {
+     static void populateDeleteDirectoryRequestHeaders(Map<String, String> headers, DeleteDirectoryRequest deleteDirectoryRequest) {
         if (deleteDirectoryRequest.isDeleteRecursive()) {
             headers.put(OSSHeaders.OSS_DELETE_RECURSIVE, deleteDirectoryRequest.isDeleteRecursive().toString());
         }

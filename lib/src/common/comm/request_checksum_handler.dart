@@ -1,4 +1,5 @@
 import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/oss_upload_operation.dart';
 
 import 'request_handler.dart';
 import 'request_message.dart';

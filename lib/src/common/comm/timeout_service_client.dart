@@ -33,7 +33,7 @@
             RuntimeException ex;
             httpRequest.abort();
 
-            if (e.getCause() instanceof IOException) {
+            if (e.getCause() is IOException) {
                 ex = ExceptionFactory.createNetworkException((IOException) e.getCause());
             } else {
                 ex = new OSSException(e.getMessage(), e);

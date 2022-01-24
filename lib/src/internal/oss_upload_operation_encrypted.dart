@@ -81,7 +81,7 @@ public class OSSUploadOperationEncrypted extends OSSUploadOperation {
         uploadCheckPoint.load(checkpointFile);
         ContentCryptoMaterial cryptoMaterial = ((UploadCheckPointEncryption)uploadCheckPoint).getContext().getContentCryptoMaterial();
 
-        if (cryptoMaterial instanceof ContentCryptoMaterialRW) {
+        if (cryptoMaterial is ContentCryptoMaterialRW) {
             encryptionMaterials.decryptCEK(((ContentCryptoMaterialRW)cryptoMaterial));
         }
     }
@@ -119,7 +119,7 @@ public class OSSUploadOperationEncrypted extends OSSUploadOperation {
     }
 
     private static void assertUploadCheckPointIsLegal(UploadCheckPoint uploadCheckPoint) {
-        if (!(uploadCheckPoint instanceof UploadCheckPointEncryption)) {
+        if (!(uploadCheckPoint is UploadCheckPointEncryption)) {
             throw new ClientException("the uploadCheckPoint of encryption client operation should instance of UploadCheckPointEncryption.");
         }
     }

@@ -1,110 +1,27 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
-package com.aliyun.oss.internal;
+import 'package:aliyun_oss_dart_sdk/src/common/auth/credentials_provider.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/comm/service_client.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/initiate_multipart_upload_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/web_service_request.dart';
 
-import static com.aliyun.oss.internal.RequestParameters.*;
-import static com.aliyun.oss.common.parser.RequestMarshallers.completeMultipartUploadRequestMarshaller;
-import static com.aliyun.oss.common.utils.CodingUtils.assertParameterNotNull;
-import static com.aliyun.oss.common.utils.CodingUtils.assertStringNotNullOrEmpty;
-import static com.aliyun.oss.common.utils.CodingUtils.checkParamRange;
-import static com.aliyun.oss.common.utils.IOUtils.newRepeatableInputStream;
-import static com.aliyun.oss.common.utils.LogUtils.logException;
-import static com.aliyun.oss.event.ProgressPublisher.publishProgress;
-import static com.aliyun.oss.internal.OSSUtils.OSS_RESOURCE_MANAGER;
-import static com.aliyun.oss.internal.OSSUtils.addDateHeader;
-import static com.aliyun.oss.internal.OSSUtils.addStringListHeader;
-import static com.aliyun.oss.internal.OSSUtils.ensureCallbackValid;
-import static com.aliyun.oss.internal.OSSUtils.populateRequestCallback;
-import static com.aliyun.oss.internal.OSSUtils.removeHeader;
-import static com.aliyun.oss.internal.OSSUtils.ensureBucketNameValid;
-import static com.aliyun.oss.internal.OSSUtils.ensureObjectKeyValid;
-import static com.aliyun.oss.internal.OSSUtils.populateRequestMetadata;
-import static com.aliyun.oss.internal.OSSUtils.trimQuotes;
-import static com.aliyun.oss.internal.OSSConstants.DEFAULT_FILE_SIZE_LIMIT;
-import static com.aliyun.oss.internal.OSSConstants.DEFAULT_CHARSET_NAME;
-import static com.aliyun.oss.internal.ResponseParsers.completeMultipartUploadResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.completeMultipartUploadProcessResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.initiateMultipartUploadResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.listMultipartUploadsResponseParser;
-import static com.aliyun.oss.internal.ResponseParsers.listPartsResponseParser;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.aliyun.oss.ClientException;
-import com.aliyun.oss.HttpMethod;
-import com.aliyun.oss.OSSException;
-import com.aliyun.oss.common.auth.CredentialsProvider;
-import com.aliyun.oss.common.comm.RequestMessage;
-import com.aliyun.oss.common.comm.ResponseHandler;
-import com.aliyun.oss.common.comm.ResponseMessage;
-import com.aliyun.oss.common.comm.ServiceClient;
-import com.aliyun.oss.common.comm.io.FixedLengthInputStream;
-import com.aliyun.oss.common.utils.CRC64;
-import com.aliyun.oss.common.utils.HttpUtil;
-import com.aliyun.oss.event.ProgressEventType;
-import com.aliyun.oss.event.ProgressListener;
-import com.aliyun.oss.internal.ResponseParsers.UploadPartCopyResponseParser;
-import com.aliyun.oss.model.AbortMultipartUploadRequest;
-import com.aliyun.oss.model.CannedAccessControlList;
-import com.aliyun.oss.model.CompleteMultipartUploadRequest;
-import com.aliyun.oss.model.CompleteMultipartUploadResult;
-import com.aliyun.oss.model.InitiateMultipartUploadRequest;
-import com.aliyun.oss.model.InitiateMultipartUploadResult;
-import com.aliyun.oss.model.ListMultipartUploadsRequest;
-import com.aliyun.oss.model.ListPartsRequest;
-import com.aliyun.oss.model.MultipartUploadListing;
-import com.aliyun.oss.model.PartETag;
-import com.aliyun.oss.model.PartListing;
-import com.aliyun.oss.model.UploadPartCopyRequest;
-import com.aliyun.oss.model.UploadPartCopyResult;
-import com.aliyun.oss.model.UploadPartRequest;
-import com.aliyun.oss.model.UploadPartResult;
-import com.aliyun.oss.model.Payer;
-import com.aliyun.oss.model.VoidResult;
-import com.aliyun.oss.model.WebServiceRequest;
+import 'oss_operation.dart';
 
 /**
  * Multipart operation.
  */
-public class OSSMultipartOperation extends OSSOperation {
+ class OSSMultipartOperation extends OSSOperation {
 
-    private static final int LIST_PART_MAX_RETURNS = 1000;
-    private static final int LIST_UPLOAD_MAX_RETURNS = 1000;
-    private static final int MAX_PART_NUMBER = 10000;
+     static final int LIST_PART_MAX_RETURNS = 1000;
+     static final int LIST_UPLOAD_MAX_RETURNS = 1000;
+     static final int MAX_PART_NUMBER = 10000;
 
-    public OSSMultipartOperation(ServiceClient client, CredentialsProvider credsProvider) {
+     OSSMultipartOperation(ServiceClient client, CredentialsProvider credsProvider) {
         super(client, credsProvider);
     }
 
     @override
     protected bool isRetryablePostRequest(WebServiceRequest request) {
-        if (request instanceof InitiateMultipartUploadRequest) {
+        if (request is InitiateMultipartUploadRequest) {
             return true;
         }
         return super.isRetryablePostRequest(request);
@@ -113,7 +30,7 @@ public class OSSMultipartOperation extends OSSOperation {
     /**
      * Abort multipart upload.
      */
-    public VoidResult abortMultipartUpload(AbortMultipartUploadRequest abortMultipartUploadRequest)
+     VoidResult abortMultipartUpload(AbortMultipartUploadRequest abortMultipartUploadRequest)
             throws OSSException, ClientException {
 
         assertParameterNotNull(abortMultipartUploadRequest, "abortMultipartUploadRequest");
@@ -144,7 +61,7 @@ public class OSSMultipartOperation extends OSSOperation {
     /**
      * Complete multipart upload.
      */
-    public CompleteMultipartUploadResult completeMultipartUpload(
+     CompleteMultipartUploadResult completeMultipartUpload(
             CompleteMultipartUploadRequest completeMultipartUploadRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(completeMultipartUploadRequest, "completeMultipartUploadRequest");
@@ -174,7 +91,7 @@ public class OSSMultipartOperation extends OSSOperation {
         if (partETags != null) {
             Collections.sort(partETags, new Comparator<PartETag>() {
                 @override
-                public int compare(PartETag p1, PartETag p2) {
+                 int compare(PartETag p1, PartETag p2) {
                     return p1.getPartNumber() - p2.getPartNumber();
                 }
             });
@@ -213,7 +130,7 @@ public class OSSMultipartOperation extends OSSOperation {
     /**
      * Initiate multipart upload.
      */
-    public InitiateMultipartUploadResult initiateMultipartUpload(
+     InitiateMultipartUploadResult initiateMultipartUpload(
             InitiateMultipartUploadRequest initiateMultipartUploadRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(initiateMultipartUploadRequest, "initiateMultipartUploadRequest");
@@ -260,7 +177,7 @@ public class OSSMultipartOperation extends OSSOperation {
     /**
      * List multipart uploads.
      */
-    public MultipartUploadListing listMultipartUploads(ListMultipartUploadsRequest listMultipartUploadsRequest)
+     MultipartUploadListing listMultipartUploads(ListMultipartUploadsRequest listMultipartUploadsRequest)
             throws OSSException, ClientException {
 
         assertParameterNotNull(listMultipartUploadsRequest, "listMultipartUploadsRequest");
@@ -286,7 +203,7 @@ public class OSSMultipartOperation extends OSSOperation {
     /**
      * List parts.
      */
-    public PartListing listParts(ListPartsRequest listPartsRequest) throws OSSException, ClientException {
+     PartListing listParts(ListPartsRequest listPartsRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(listPartsRequest, "listPartsRequest");
 
@@ -317,7 +234,7 @@ public class OSSMultipartOperation extends OSSOperation {
     /**
      * Upload part.
      */
-    public UploadPartResult uploadPart(UploadPartRequest uploadPartRequest) throws OSSException, ClientException {
+     UploadPartResult uploadPart(UploadPartRequest uploadPartRequest) throws OSSException, ClientException {
 
         assertParameterNotNull(uploadPartRequest, "uploadPartRequest");
 
@@ -394,7 +311,7 @@ public class OSSMultipartOperation extends OSSOperation {
     /**
      * Upload part copy.
      */
-    public UploadPartCopyResult uploadPartCopy(UploadPartCopyRequest uploadPartCopyRequest)
+     UploadPartCopyResult uploadPartCopy(UploadPartCopyRequest uploadPartCopyRequest)
             throws OSSException, ClientException {
 
         assertParameterNotNull(uploadPartCopyRequest, "uploadPartCopyRequest");
@@ -436,7 +353,7 @@ public class OSSMultipartOperation extends OSSOperation {
         return doOperation(request, new UploadPartCopyResponseParser(partNumber), bucketName, key, true);
     }
 
-    private static void populateListMultipartUploadsRequestParameters(
+     static void populateListMultipartUploadsRequestParameters(
             ListMultipartUploadsRequest listMultipartUploadsRequest, Map<String, String> params) {
 
         // Make sure 'uploads' be the first parameter.
@@ -472,7 +389,7 @@ public class OSSMultipartOperation extends OSSOperation {
         }
     }
 
-    private static void populateListPartsRequestParameters(ListPartsRequest listPartsRequest,
+     static void populateListPartsRequestParameters(ListPartsRequest listPartsRequest,
             Map<String, String> params) {
 
         params.put(UPLOAD_ID, listPartsRequest.getUploadId());
@@ -499,7 +416,7 @@ public class OSSMultipartOperation extends OSSOperation {
         }
     }
 
-    private static void populateCopyPartRequestHeaders(UploadPartCopyRequest uploadPartCopyRequest,
+     static void populateCopyPartRequestHeaders(UploadPartCopyRequest uploadPartCopyRequest,
             Map<String, String> headers) {
 
         if (uploadPartCopyRequest.getPartSize() != null) {
@@ -538,7 +455,7 @@ public class OSSMultipartOperation extends OSSOperation {
                 uploadPartCopyRequest.getNonmatchingEtagConstraints());
     }
 
-    private static void populateUploadPartOptionalHeaders(UploadPartRequest uploadPartRequest,
+     static void populateUploadPartOptionalHeaders(UploadPartRequest uploadPartRequest,
             Map<String, String> headers) {
 
         if (!uploadPartRequest.isUseChunkEncoding()) {
@@ -555,7 +472,7 @@ public class OSSMultipartOperation extends OSSOperation {
         }
     }
 
-    private static void populateCompleteMultipartUploadOptionalHeaders(
+     static void populateCompleteMultipartUploadOptionalHeaders(
             CompleteMultipartUploadRequest completeMultipartUploadRequest, Map<String, String> headers) {
 
         CannedAccessControlList cannedACL = completeMultipartUploadRequest.getObjectACL();
@@ -564,19 +481,19 @@ public class OSSMultipartOperation extends OSSOperation {
         }
     }
 
-    private static void populateRequestPayerHeader (Map<String, String> headers, Payer payer) {
+     static void populateRequestPayerHeader (Map<String, String> headers, Payer payer) {
         if (payer != null && payer.equals(Payer.Requester)) {
             headers.put(OSSHeaders.OSS_REQUEST_PAYER, payer.toString().toLowerCase());
         }
     }
 
-    private static void populateTrafficLimitHeader(Map<String, String> headers, int limit) {
+     static void populateTrafficLimitHeader(Map<String, String> headers, int limit) {
         if (limit > 0) {
             headers.put(OSSHeaders.OSS_HEADER_TRAFFIC_LIMIT, String.valueOf(limit));
         }
     }
 
-    private static Long calcObjectCRCFromParts(List<PartETag> partETags) {
+     static Long calcObjectCRCFromParts(List<PartETag> partETags) {
         long crc = 0;
         for (PartETag partETag : partETags) {
             if (partETag.getPartCRC() == null || partETag.getPartSize() <= 0) {
@@ -587,7 +504,7 @@ public class OSSMultipartOperation extends OSSOperation {
         return new Long(crc);
     }
 
-    private static bool isNeedReturnResponse(CompleteMultipartUploadRequest completeMultipartUploadRequest) {
+     static bool isNeedReturnResponse(CompleteMultipartUploadRequest completeMultipartUploadRequest) {
         if (completeMultipartUploadRequest.getCallback() != null
                 || completeMultipartUploadRequest.getProcess() != null) {
             return true;

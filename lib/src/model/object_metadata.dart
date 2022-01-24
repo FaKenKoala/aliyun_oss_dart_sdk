@@ -46,15 +46,15 @@ class ObjectMetadata {
   }
 
   DateTime? getLastModified() {
-    return metadata[HttpHeaders.lastModified] as DateTime?;
+    return metadata[HttpHeaders.LAST_MODIFIED] as DateTime?;
   }
 
   void setLastModified(DateTime lastModified) {
-    metadata[HttpHeaders.lastModified] = lastModified;
+    metadata[HttpHeaders.LAST_MODIFIED] = lastModified;
   }
 
   DateTime? getExpirationTime() {
-    String? expires = metadata[HttpHeaders.expires] as String?;
+    String? expires = metadata[HttpHeaders.EXPIRES] as String?;
 
     if (expires != null) {
       return DateUtil.parseRfc822Date(expires);
@@ -64,11 +64,11 @@ class ObjectMetadata {
   }
 
   String? getRawExpiresValue() {
-    return metadata[HttpHeaders.expires] as String?;
+    return metadata[HttpHeaders.EXPIRES] as String?;
   }
 
   void setExpirationTime(DateTime expirationTime) {
-    metadata[HttpHeaders.expires] = DateUtil.formatRfc822Date(expirationTime);
+    metadata[HttpHeaders.EXPIRES] = DateUtil.formatRfc822Date(expirationTime);
   }
 
   int getContentLength() {
@@ -81,19 +81,19 @@ class ObjectMetadata {
   }
 
   String? getContentType() {
-    return metadata[HttpHeaders.contentType] as String?;
+    return metadata[HttpHeaders.CONTENT_TYPE] as String?;
   }
 
   void setContentType(String contentType) {
-    metadata[HttpHeaders.contentType] = contentType;
+    metadata[HttpHeaders.CONTENT_TYPE] = contentType;
   }
 
   String? getContentMD5() {
-    return metadata[HttpHeaders.contentMd5] as String?;
+    return metadata[HttpHeaders.CONTENT_MD5] as String?;
   }
 
   void setContentMD5(String contentMD5) {
-    metadata[HttpHeaders.contentMd5] = contentMD5;
+    metadata[HttpHeaders.CONTENT_MD5] = contentMD5;
   }
 
   String? getContentEncoding() {
@@ -121,7 +121,7 @@ class ObjectMetadata {
   }
 
   String? getETag() {
-    return metadata[HttpHeaders.etag] as String?;
+    return metadata[HttpHeaders.ETAG] as String?;
   }
 
   String? getServerSideEncryption() {

@@ -1,6 +1,14 @@
 
- import 'package:aliyun_oss_dart_sdk/src/common/comm/request_message.dart';
+ import 'package:aliyun_oss_dart_sdk/src/client_configuration.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/auth/credentials.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/comm/request_message.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/http_headers.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/http_util.dart';
+import 'package:aliyun_oss_dart_sdk/src/http_method.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/generate_presigned_url_request.dart';
 
+import 'oss_headers.dart';
+import 'oss_utils.dart';
 import 'request_parameters.dart';
 import 'sign_parameters.dart';
 
@@ -19,45 +27,45 @@ class SignUtils {
         Map<String, String> headers = request.headers;
         Map<String, String> headersToSign = <String, String>{};
 
-        if (headers != null) {
-            for (Entry<String, String> header in headers.entrySet()) {
-                if (header.getKey() == null) {
-                    continue;
+        headers.forEach((key, value) { 
+if (key == null) {
+                   return;
                 }
 
-                String lowerKey = header.getKey().toLowerCase();
-                if (lowerKey.equals(HttpHeaders.CONTENT_TYPE.toLowerCase())
-                        || lowerKey.equals(HttpHeaders.CONTENT_MD5.toLowerCase())
-                        || lowerKey.equals(HttpHeaders.DATE.toLowerCase())
-                        || lowerKey.startsWith(OSSHeaders.OSS_PREFIX)) {
-                    headersToSign.put(lowerKey, header.getValue().trim());
+                String lowerKey = key.toLowerCase();
+                if (
+                  
+                  [HttpHeaders.CONTENT_TYPE.toLowerCase(),
+                       HttpHeaders.CONTENT_MD5.toLowerCase(),
+                       HttpHeaders.DATE.toLowerCase()].contains(lowerKey)
+                        || lowerKey.startsWith(OSSHeaders.ossPrefix)) {
+                    headersToSign[lowerKey] =value.trim();
                 }
-            }
-        }
+        });
+
+      
 
         if (!headersToSign.containsKey(HttpHeaders.CONTENT_TYPE.toLowerCase())) {
-            headersToSign.put(HttpHeaders.CONTENT_TYPE.toLowerCase(), "");
+            headersToSign[HttpHeaders.CONTENT_TYPE.toLowerCase()] = "";
         }
         if (!headersToSign.containsKey(HttpHeaders.CONTENT_MD5.toLowerCase())) {
-            headersToSign.put(HttpHeaders.CONTENT_MD5.toLowerCase(), "");
+            headersToSign[HttpHeaders.CONTENT_MD5.toLowerCase()] = "";
         }
 
         // Append all headers to sign to canonical string
-        for (Map.Entry<String, String> entry : headersToSign.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
 
-            if (key.startsWith(OSSHeaders.OSS_PREFIX)) {
-                canonicalString.append(key).append(':').append(value);
+        headersToSign.forEach((key, value) {
+if (key.startsWith(OSSHeaders.ossPrefix)) {
+                canonicalString..write(key)..write(':')..write(value);
             } else {
-                canonicalString.append(value);
+                canonicalString.write(value);
             }
 
-            canonicalString.append(SignParameters.NEW_LINE);
-        }
+            canonicalString.write(SignParameters.NEW_LINE);
+         });
 
         // Append canonical resource to canonical string
-        canonicalString.append(buildCanonicalizedResource(resourcePath, request.getParameters()));
+        canonicalString.write(buildCanonicalizedResource(resourcePath, request.parameters));
 
         return canonicalString.toString();
     }
@@ -68,77 +76,78 @@ class SignUtils {
         StringBuffer canonicalString = StringBuffer();
 
         // Append expires
-        canonicalString.append(expires + SignParameters.NEW_LINE);
+        canonicalString.write(expires + SignParameters.NEW_LINE);
 
         // Append canonicalized parameters
-        for (Map.Entry<String, String> entry : request.getParameters().entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            canonicalString.append(key).append(':').append(value);
-            canonicalString.append(SignParameters.NEW_LINE);
-        }
+        request.parameters.forEach((key, value) { 
+canonicalString..write(key)..write(':')..write(value);
+            canonicalString.write(SignParameters.NEW_LINE);
+
+        });
 
         // Append canonicalized resource
-        canonicalString.append(canonicalizedResource);
+        canonicalString.write(canonicalizedResource);
 
         return canonicalString.toString();
     }
 
-     static String buildSignedURL(GeneratePresignedUrlRequest request, Credentials currentCreds, ClientConfiguration config, URI endpoint) {
-        String bucketName = request.getBucketName();
+     static String buildSignedURL(GeneratePresignedUrlRequest request, Credentials currentCreds, ClientConfiguration config, Uri endpoint) {
+        String? bucketName = request.bucketName;
         String accessId = currentCreds.getAccessKeyId();
         String accessKey = currentCreds.getSecretAccessKey();
         bool useSecurityToken = currentCreds.useSecurityToken();
-        HttpMethod method = request.getMethod() != null ? request.getMethod() : HttpMethod.GET;
+        HttpMethod method = request.getMethod() ?? HttpMethod.get;
 
-        String expires = String.valueOf(request.getExpiration().getTime() / 1000L);
-        String key = request.getKey();
-        String resourcePath = OSSUtils.determineResourcePath(bucketName, key, config.isSLDEnabled());
+        String expires = String.valueOf(request.expiration.getTime() / 1000);
+        String? key = request.key;
+        String resourcePath = OSSUtils.determineResourcePath(bucketName, key, config.sldEnabled);
 
         RequestMessage requestMessage = RequestMessage(bucketName, key);
         requestMessage.setEndpoint(OSSUtils.determineFinalEndpoint(endpoint, bucketName, config));
         requestMessage.setMethod(method);
         requestMessage.setResourcePath(resourcePath);
-        requestMessage.setHeaders(request.getHeaders());
+        requestMessage.setHeaders(request.headers);
 
         requestMessage.addHeader(HttpHeaders.DATE, expires);
-        if (request.getContentType() != null && !request.getContentType().trim().equals("")) {
-            requestMessage.addHeader(HttpHeaders.CONTENT_TYPE, request.getContentType());
+        if (request.contentType?.trim().isNotEmpty ?? false){
+            requestMessage.addHeader(HttpHeaders.CONTENT_TYPE, request.contentType!);
         }
-        if (request.getContentMD5() != null && !request.getContentMD5().trim().equals("")) {
-            requestMessage.addHeader(HttpHeaders.CONTENT_MD5, request.getContentMD5());
+        if (request.contentMD5?.trim().isNotEmpty ?? false){
+            requestMessage.addHeader(HttpHeaders.CONTENT_MD5, request.contentMD5!);
         }
-        for (Map.Entry<String, String> h : request.getUserMetadata().entrySet()) {
-            requestMessage.addHeader(OSSHeaders.OSS_USER_METADATA_PREFIX + h.getKey(), h.getValue());
+        request.userMetadata.forEach((key, value) {
+            requestMessage.addHeader(OSSHeaders.OSS_USER_METADATA_PREFIX + key, value);
+
+         });
+
+        Map<String, String> responseHeaderParams = <String, String>{};
+        populateResponseHeaderParameters(responseHeaderParams, request.responseHeaders);
+        populateTrafficLimitParams(responseHeaderParams, request.trafficLimit);
+        if (responseHeaderParams.isNotEmpty) {
+            requestMessage.parameters = responseHeaderParams;
         }
 
-        Map<String, String> responseHeaderParams = HashMap<String, String>();
-        populateResponseHeaderParameters(responseHeaderParams, request.getResponseHeaders());
-        populateTrafficLimitParams(responseHeaderParams, request.getTrafficLimit());
-        if (responseHeaderParams.size() > 0) {
-            requestMessage.setParameters(responseHeaderParams);
+        request.queryParam.forEach((key, value) { 
+                requestMessage.addParameter(key, value);
+
+        });
+
+        if (request.process?.trim().isNotEmpty ?? false) {
+            requestMessage.addParameter(RequestParameters.SUBRESOURCE_PROCESS, request.process!);
+
         }
 
-        if (request.getQueryParameter() != null && request.getQueryParameter().size() > 0) {
-            for (Map.Entry<String, String> entry : request.getQueryParameter().entrySet()) {
-                requestMessage.addParameter(entry.getKey(), entry.getValue());
-            }
-        }
-
-        if (request.getProcess() != null && !request.getProcess().trim().equals("")) {
-            requestMessage.addParameter(RequestParameters.SUBRESOURCE_PROCESS, request.getProcess());
-        }
 
         if (useSecurityToken) {
-            requestMessage.addParameter(SECURITY_TOKEN, currentCreds.getSecurityToken());
+            requestMessage.addParameter(RequestParameters.SECURITY_TOKEN, currentCreds.getSecurityToken()!);
         }
 
-        String canonicalResource = "/" + ((bucketName != null) ? bucketName : "") + ((key != null ? "/" + key : ""));
+        String canonicalResource = "/" + (bucketName ?? "") + ((key != null ? "/" + key : ""));
         String canonicalString = buildCanonicalString(method.toString(), canonicalResource, requestMessage,
                 expires);
         String signature = ServiceSignature.create().computeSignature(accessKey, canonicalString);
 
-        Map<String, String> params = LinkedHashMap<String, String>();
+        Map<String, String> params = <String, String>{};
         params.put(HttpHeaders.EXPIRES, expires);
         params.put(OSS_ACCESS_KEY_ID, accessId);
         params.put(SIGNATURE, signature);

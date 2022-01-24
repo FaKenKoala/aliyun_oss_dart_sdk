@@ -13,6 +13,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/void_result.dart';
 import 'oss_headers.dart';
 import 'oss_operation.dart';
 import 'oss_request_message_builder.dart';
+import 'oss_utils.dart';
 
 class CORSOperation extends OSSOperation {
   static final String SUBRESOURCE_CORS = "cors";
@@ -66,13 +67,11 @@ class CORSOperation extends OSSOperation {
         request, getBucketCorsResponseParser, bucketName, null, true);
   }
 
-  /**
-     * Delete bucket cors.
-     */
+  /// Delete bucket cors.
   VoidResult deleteBucketCORS(GenericRequest genericRequest) {
     assertParameterNotNull(genericRequest, "genericRequest");
 
-    String bucketName = genericRequest.getBucketName();
+    String? bucketName = genericRequest.bucketName;
     assertParameterNotNull(bucketName, "bucketName");
     ensureBucketNameValid(bucketName);
 
