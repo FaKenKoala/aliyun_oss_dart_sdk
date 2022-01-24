@@ -1,200 +1,158 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
 
-package com.aliyun.oss.crypto;
+import 'crypto_cipher.dart';
+import 'sdk_filter_input_stream.dart';
 
-import java.io.IOException;
-import java.io.InputStream;
+class CipherInputStream extends SdkFilterInputStream {
+  static const int MAX_RETRY = 1000;
+  static const int DEFAULT_IN_BUFFER_SIZE = 512;
+  CryptoCipher cryptoCipher;
+  bool eof = false;
+  List<int> bufin = [];
+  List<int>? bufout;
+  int curr_pos = 0;
+  int max_pos = 0;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-
-public class CipherInputStream extends SdkFilterInputStream {
-    private static final int MAX_RETRY = 1000;
-    private static final int DEFAULT_IN_BUFFER_SIZE = 512;
-    private CryptoCipher cryptoCipher;
-    private bool eof;
-    private byte[] bufin;
-    private byte[] bufout;
-    private int curr_pos;
-    private int max_pos;
-
-    public CipherInputStream(InputStream is, CryptoCipher cryptoCipher) {
-        this(is, cryptoCipher, DEFAULT_IN_BUFFER_SIZE);
+  CipherInputStream(InputStream inputStream, this.cryptoCipher,
+      [int buffsize = DEFAULT_IN_BUFFER_SIZE])
+      : super(inputStream) {
+    if (buffsize <= 0 || (buffsize % DEFAULT_IN_BUFFER_SIZE) != 0) {
+      throw ArgumentError(
+          "buffsize ($buffsize) must be a positive multiple of $DEFAULT_IN_BUFFER_SIZE");
     }
+    bufin = List.filled(buffsize, 0);
+  }
 
-    public CipherInputStream(InputStream is, CryptoCipher c, int buffsize) {
-        super(is);
-        this.cryptoCipher = c;
-        if (buffsize <= 0 || (buffsize % DEFAULT_IN_BUFFER_SIZE) != 0) {
-            throw ArgumentError(
-                    "buffsize (" + buffsize + ") must be a positive multiple of " + DEFAULT_IN_BUFFER_SIZE);
+  @override
+  int read([List<int>? list, int? off, int? len]) {
+    if (curr_pos >= max_pos) {
+      if (eof) {
+        return -1;
+      }
+      int count = 0;
+      int len;
+      do {
+        if (count > MAX_RETRY) {
+          throw Exception(
+              "exceeded maximum number of attempts to read next chunk of data");
         }
-        this.bufin = new byte[buffsize];
+        len = nextChunk();
+        count++;
+      } while (len == 0);
+
+      if (len == -1) {
+        return -1;
+      }
     }
 
-    @override
-    public int read() throws IOException {
-        if (curr_pos >= max_pos) {
-            if (eof)
-                return -1;
-            int count = 0;
-            int len;
-            do {
-                if (count > MAX_RETRY)
-                    throw new IOException("exceeded maximum number of attempts to read next chunk of data");
-                len = nextChunk();
-                count++;
-            } while (len == 0);
+    if (list == null) {
+      return bufout![curr_pos++] & 0xFF;
+    }
 
-            if (len == -1)
-                return -1;
+    int offset = off ?? 0;
+    int length = len ?? list.length;
+
+    if (length <= 0) {
+      return 0;
+    }
+    int lenResult = max_pos - curr_pos;
+    if (length < lenResult) {
+      lenResult = length;
+    }
+    System.arraycopy(bufout, curr_pos, list, offset, len);
+    curr_pos += lenResult;
+    return lenResult;
+  }
+
+  /// Note: This implementation will only skip up to the end of the buffered data,
+  /// potentially skipping 0 bytes.
+  @override
+  int skip(int n) {
+    abortIfNeeded();
+    int available = max_pos - curr_pos;
+    if (n > available) {
+      n = available;
+    }
+    if (n < 0) {
+      return 0;
+    }
+    curr_pos += n;
+    return n;
+  }
+
+  @override
+  int available() {
+    abortIfNeeded();
+    return max_pos - curr_pos;
+  }
+
+  @override
+  void close() {
+    inputStream.close();
+    try {
+      cryptoCipher.doFinal();
+    } catch (ex) {}
+    curr_pos = max_pos = 0;
+    abortIfNeeded();
+  }
+
+  @override
+  bool markSupported() {
+    abortIfNeeded();
+    return false;
+  }
+
+  @override
+  void mark(int readlimit) {
+    abortIfNeeded();
+  }
+
+  @override
+  void reset() {
+    throw StateError("mark/reset not supported.");
+  }
+
+  void resetInternal() {
+    curr_pos = max_pos = 0;
+    eof = false;
+  }
+
+  /// Reads and process the next chunk of data into memory.
+  ///
+  /// @return the length of the data chunk read and processed, or -1 if end of
+  ///         stream.
+  /// @throws IOException
+  ///             if there is an IO exception from the underlying input stream
+  ///
+  /// @throws SecurityException
+  ///             if there is authentication failure
+  int nextChunk() {
+    abortIfNeeded();
+    if (eof) {
+      return -1;
+    }
+    bufout = null;
+    int len = inputStream.read(bufin);
+    if (len == -1) {
+      eof = true;
+      try {
+        bufout = cryptoCipher.doFinal();
+        if (bufout == null) {
+          return -1;
         }
-        return ((int) bufout[curr_pos++] & 0xFF);
-    };
-
-    @override
-    public int read(byte b[]) throws IOException {
-        return read(b, 0, b.length);
-    }
-
-    @override
-    public int read(byte buf[], int off, int target_len) throws IOException {
-        if (curr_pos >= max_pos) {
-            if (eof)
-                return -1;
-            int count = 0;
-            int len;
-            do {
-                if (count > MAX_RETRY)
-                    throw new IOException("exceeded maximum number of attempts to read next chunk of data");
-                len = nextChunk();
-                count++;
-            } while (len == 0);
-
-            if (len == -1)
-                return -1;
-        }
-        if (target_len <= 0)
-            return 0;
-        int len = max_pos - curr_pos;
-        if (target_len < len)
-            len = target_len;
-        System.arraycopy(bufout, curr_pos, buf, off, len);
-        curr_pos += len;
-        return len;
-    }
-
-    /**
-     * Note: This implementation will only skip up to the end of the buffered data,
-     * potentially skipping 0 bytes.
-     */
-    @override
-    public long skip(long n) throws IOException {
-        abortIfNeeded();
-        int available = max_pos - curr_pos;
-        if (n > available)
-            n = available;
-        if (n < 0)
-            return 0;
-        curr_pos += n;
-        return n;
-    }
-
-    @override
-    public int available() {
-        abortIfNeeded();
-        return max_pos - curr_pos;
-    }
-
-    @override
-    public void close() throws IOException {
-        in.close();
-        try {
-            cryptoCipher.doFinal();
-        } catch (BadPaddingException ex) {
-        } catch (IllegalBlockSizeException ex) {
-        }
-        curr_pos = max_pos = 0;
-        abortIfNeeded();
-    }
-
-    @override
-    public bool markSupported() {
-        abortIfNeeded();
-        return false;
-
-    }
-
-    @override
-    public void mark(int readlimit) {
-        abortIfNeeded();
-    }
-
-    @override
-    public void reset() throws IOException {
-        throw new IllegalStateException("mark/reset not supported.");
-    }
-
-    final void resetInternal() {
-        curr_pos = max_pos = 0;
-        eof = false;
-    }
-
-    /**
-     * Reads and process the next chunk of data into memory.
-     * 
-     * @return the length of the data chunk read and processed, or -1 if end of
-     *         stream.
-     * @throws IOException
-     *             if there is an IO exception from the underlying input stream
-     * 
-     * @throws SecurityException
-     *             if there is authentication failure
-     */
-    private int nextChunk() throws IOException {
-        abortIfNeeded();
-        if (eof)
-            return -1;
-        bufout = null;
-        int len = in.read(bufin);
-        if (len == -1) {
-            eof = true;
-            try {
-                bufout = cryptoCipher.doFinal();
-                if (bufout == null) {
-                    return -1;
-                }
-                curr_pos = 0;
-                return max_pos = bufout.length;
-            } catch (IllegalBlockSizeException e) {
-            } catch (BadPaddingException e) {
-                throw new SecurityException(e);
-            }
-            return -1;
-        }
-        bufout = cryptoCipher.update(bufin, 0, len);
         curr_pos = 0;
-        return max_pos = (bufout == null ? 0 : bufout.length);
+        return max_pos = bufout!.length;
+      } catch (e) {
+        throw SecurityException(e);
+      }
+      return -1;
     }
+    bufout = cryptoCipher.update(bufin, 0, len);
+    curr_pos = 0;
+    return max_pos = (bufout == null ? 0 : bufout.length);
+  }
 
-    void renewCryptoCipher() {
-        cryptoCipher = cryptoCipher.recreate();
-    }
+  void renewCryptoCipher() {
+    cryptoCipher = cryptoCipher.recreate();
+  }
 }

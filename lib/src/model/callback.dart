@@ -7,10 +7,10 @@
 /// CompleteMultipartUpload.
 enum CallbackBodyType {
   /// 1
-  url,
+  URL,
 
   /// 2
-  json
+  JSON
 }
 
 class Callback {

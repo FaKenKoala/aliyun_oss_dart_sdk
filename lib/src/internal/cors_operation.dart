@@ -26,25 +26,23 @@ class CORSOperation extends OSSOperation {
     checkSetBucketCORSRequestValidity(setBucketCORSRequest);
 
     Map<String, String> parameters = <String, String>{};
-    parameters.PUT(SUBRESOURCE_CORS, null);
+    // parameters[SUBRESOURCE_CORS] =  null;
 
-    RequestMessage request = OSSRequestMessageBuilder(getInnerClient())
-        .setEndpoint(getEndpoint(setBucketCORSRequest))
-        .setMethod(HttpMethod.PUT)
-        .setBucket(setBucketCORSRequest.bucketName)
-        .setParameters(parameters)
-        .setInputStreamWithLength(
-            setBucketCORSRequestMarshaller.marshall(setBucketCORSRequest))
-        .setOriginalRequest(setBucketCORSRequest)
+    RequestMessage request = (OSSRequestMessageBuilder(getInnerClient())
+          ..endpoint = getEndpoint(setBucketCORSRequest)
+          ..method = HttpMethod.PUT
+          ..bucket = setBucketCORSRequest.bucketName
+          ..parameters = parameters
+          ..setInputStreamWithLength(
+              setBucketCORSRequestMarshaller.marshall(setBucketCORSRequest))
+          ..originalRequest = setBucketCORSRequest)
         .build();
 
     return doOperation(request, requestIdResponseParser,
         setBucketCORSRequest.bucketName, null);
   }
 
-  /**
-     * Return the CORS configuration of the specified bucket.
-     */
+  /// Return the CORS configuration of the specified bucket.
   CORSConfiguration getBucketCORS(GenericRequest genericRequest) {
     assertParameterNotNull(genericRequest, "genericRequest");
 
@@ -52,15 +50,15 @@ class CORSOperation extends OSSOperation {
     assertParameterNotNull(bucketName, "bucketName");
     ensureBucketNameValid(bucketName);
 
-    Map<String, String> parameters = LinkedHashMap<String, String>();
-    parameters.PUT(SUBRESOURCE_CORS, null);
+    Map<String, String> parameters = <String, String>{};
+    // parameters[SUBRESOURCE_CORS] = null;
 
-    RequestMessage request = OSSRequestMessageBuilder(getInnerClient())
-        .setEndpoint(getEndpoint(genericRequest))
-        .setMethod(HttpMethod.GET)
-        .setParameters(parameters)
-        .setBucket(bucketName)
-        .setOriginalRequest(genericRequest)
+    RequestMessage request = (OSSRequestMessageBuilder(getInnerClient())
+          ..endpoint = getEndpointgenericRequest
+          ..method = HttpMethod.GET
+          ..parameters = parameters
+          ..bucket = bucketName
+          ..originalRequest = genericRequest)
         .build();
 
     return doOperation(
@@ -75,15 +73,15 @@ class CORSOperation extends OSSOperation {
     assertParameterNotNull(bucketName, "bucketName");
     ensureBucketNameValid(bucketName);
 
-    Map<String, String> parameters = LinkedHashMap<String, String>();
-    parameters.PUT(SUBRESOURCE_CORS, null);
+    Map<String, String> parameters = <String, String>{};
+    // parameters[SUBRESOURCE_CORS] =  null;
 
-    RequestMessage request = OSSRequestMessageBuilder(getInnerClient())
-        .setEndpoint(getEndpoint(genericRequest))
-        .setMethod(HttpMethod.DELETE)
-        .setParameters(parameters)
-        .setBucket(bucketName)
-        .setOriginalRequest(genericRequest)
+    RequestMessage request = (OSSRequestMessageBuilder(getInnerClient())
+        ..endpoint = (getEndpoint(genericRequest))
+        ..method = (HttpMethod.DELETE)
+        ..parameters = (parameters)
+        ..bucket = (bucketName)
+        ..originalRequest = (genericRequest))
         .build();
 
     return doOperation(request, requestIdResponseParser, bucketName, null);
@@ -96,17 +94,17 @@ class CORSOperation extends OSSOperation {
     assertParameterNotNull(bucketName, "bucketName");
     ensureBucketNameValid(bucketName);
 
-    RequestMessage request = OSSRequestMessageBuilder(getInnerClient())
-        .setEndpoint(getEndpoint(optionsRequest))
-        .setMethod(HttpMethod.OPTIONS)
-        .setBucket(bucketName)
-        .setKey(optionsRequest.getObjectName())
-        .addHeader(OSSHeaders.origin, optionsRequest.origin)
-        .addHeader(OSSHeaders.accessControlRequestMethod,
-            optionsRequest.requestMethod.name)
-        .addHeader(OSSHeaders.accessControlRequestHeader,
+    RequestMessage request = (OSSRequestMessageBuilder(getInnerClient())
+        ..endpoint = (getEndpoint(optionsRequest))
+        ..method = (HttpMethod.OPTIONS)
+        ..bucket = (bucketName)
+        ..key = (optionsRequest.key)
+        ..addHeader(OSSHeaders.ORIGIN, optionsRequest.origin)
+        ..addHeader(OSSHeaders.ACCESS_CONTROL_REQUEST_METHOD,
+            optionsRequest.requestMethod?.name)
+        ..addHeader(OSSHeaders.ACCESS_CONTROL_REQUEST_HEADER,
             optionsRequest.requestHeaders)
-        .setOriginalRequest(optionsRequest)
+        ..originalRequest = optionsRequest)
         .build();
 
     return doOperation(request, emptyResponseParser, bucketName, null);

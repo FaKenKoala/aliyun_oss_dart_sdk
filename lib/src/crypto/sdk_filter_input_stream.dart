@@ -1,129 +1,93 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+import 'package:aliyun_oss_dart_sdk/src/client_error_code.dart';
+import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
 
-package com.aliyun.oss.crypto;
+import 'sdk_runtime.dart';
 
-import static com.aliyun.oss.crypto.SdkRuntime.shouldAbort;
+/// Base class for OSS Java SDK specific {@link FilterInputStream}.
+class SdkFilterInputStream extends FilterInputStream {
+  bool aborted = false;
 
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import com.aliyun.oss.ClientErrorCode;
-import com.aliyun.oss.ClientException;
+  SdkFilterInputStream(InputStream inputStream) : super(inputStream);
 
-/**
- * Base class for OSS Java SDK specific {@link FilterInputStream}.
- */
-public class SdkFilterInputStream extends FilterInputStream {
-    private volatile bool aborted = false;
+  /// Aborts the inputstream operation if thread is interrupted.
+  /// interrupted status of the thread is cleared by this method.
+  ///
+  /// @throws ClientException with ClientErrorCode INPUTSTREAM_READING_ABORTED if thread aborted.
+  void abortIfNeeded() {
+    if (SdkRuntime.shouldAbort()) {
+      abort();
+      throw ClientException("Thread aborted, inputStream aborted...",
+          ClientErrorCode.INPUTSTREAM_READING_ABORTED, null);
+    }
+  }
 
-    public SdkFilterInputStream(InputStream in) {
-        super(in);
+  void abort() {
+    if (inputStream is SdkFilterInputStream) {
+      (inputStream as SdkFilterInputStream).abort();
+    }
+    aborted = true;
+  }
+
+  bool isAborted() {
+    return aborted;
+  }
+
+  @override
+  int read([List<int>? list, int? off, int? len]) {
+    abortIfNeeded();
+    if (list == null) {
+      return inputStream.read();
     }
 
-    /**
-     * @return The wrapped stream.
-     */
-    public InputStream getDelegateStream() {
-        return in;
-    }
+    int offset = off ?? 0;
+    int length = len ?? list.length;
+    return inputStream.read(list, offset, length);
+  }
 
-    /**
-     * Aborts the inputstream operation if thread is interrupted.
-     * interrupted status of the thread is cleared by this method.
-     * 
-     * @throws ClientException with ClientErrorCode INPUTSTREAM_READING_ABORTED if thread aborted.
-     */
-    protected final void abortIfNeeded() {
-        if (shouldAbort()) {
-            abort();
-            throw new ClientException("Thread aborted, inputStream aborted...",
-                    ClientErrorCode.INPUTSTREAM_READING_ABORTED, null);
-        }
-    }
+  @override
+  int skip(int n) {
+    abortIfNeeded();
+    return inputStream.skip(n);
+  }
 
-    public void abort() {
-        if (in is SdkFilterInputStream) {
-            ((SdkFilterInputStream) in).abort();
-        }
-        aborted = true;
-    }
+  @override
+  int available() {
+    abortIfNeeded();
+    return inputStream.available();
+  }
 
-    public bool isAborted() {
-        return aborted;
-    }
+  @override
+  void close() {
+    inputStream.close();
+    abortIfNeeded();
+  }
 
-    @override
-    public int read() throws IOException {
-        abortIfNeeded();
-        return in.read();
-    }
+  @override
+  void mark(int readlimit) {
+    abortIfNeeded();
+    inputStream.mark(readlimit);
+  }
 
-    @override
-    public int read(byte b[], int off, int len) throws IOException {
-        abortIfNeeded();
-        return in.read(b, off, len);
-    }
+  @override
+  void reset() {
+    abortIfNeeded();
+    inputStream.reset();
+  }
 
-    @override
-    public long skip(long n) throws IOException {
-        abortIfNeeded();
-        return in.skip(n);
-    }
+  @override
+  bool markSupported() {
+    abortIfNeeded();
+    return inputStream.markSupported();
+  }
 
-    @override
-    public int available() throws IOException {
-        abortIfNeeded();
-        return in.available();
+  void release() {
+    if (inputStream != null) {
+      try {
+        inputStream.close();
+      } catch (ex) {
+        // Ignore exception.
+      }
     }
-
-    @override
-    public void close() throws IOException {
-        in.close();
-        abortIfNeeded();
-    }
-
-    @override
-    public synchronized void mark(int readlimit) {
-        abortIfNeeded();
-        in.mark(readlimit);
-    }
-
-    @override
-    public synchronized void reset() throws IOException {
-        abortIfNeeded();
-        in.reset();
-    }
-
-    @override
-    public bool markSupported() {
-        abortIfNeeded();
-        return in.markSupported();
-    }
-
-    public void release() {
-        if (in != null) {
-            try {
-                in.close();
-            } catch (IOException ex) {
-                // Ignore exception.
-            }
-        }
-    }
+  }
 }

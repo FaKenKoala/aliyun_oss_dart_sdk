@@ -1,10 +1,10 @@
 import 'dart:io';
 
+import 'package:aliyun_oss_dart_sdk/src/common/utils/auth_utils.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/log_utils.dart';
 
 import 'default_credentials.dart';
 import 'profile_config_loader.dart';
-import 'system_properties_credentials_provider.dart';
 
 /// Loads the local OSS credential profiles from the standard location
 /// (~/.oss/credentials), which can be easily overridden through the

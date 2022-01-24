@@ -14,7 +14,7 @@ class RequestProgressHanlder implements RequestHandler {
     final WebServiceRequest originalRequest = request.originalRequest;
     final ProgressListener listener = originalRequest.progressListener;
     Map<String, String> headers = request.headers;
-    String? s = headers[HttpHeaders.contentLength];
+    String? s = headers[HttpHeaders.CONTENT_LENGTH];
     if (s != null) {
       try {
         int contentLength = int.parse(s);

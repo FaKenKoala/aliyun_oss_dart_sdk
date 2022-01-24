@@ -33,12 +33,12 @@ import 'oss_operation.dart';
     }
 
     /**
-     * Upload input stream to oss by using url signature.
+     * Upload input stream to oss by using Uri signature.
      */
-     PutObjectResult putObject(URL signedUrl, InputStream requestContent, long contentLength,
+     PutObjectResult putObject(Uri signedUri, InputStream requestContent, long contentLength,
             Map<String, String> requestHeaders, bool useChunkEncoding) throws OSSException, ClientException {
 
-        assertParameterNotNull(signedUrl, "signedUrl");
+        assertParameterNotNull(signedUri, "signedUri");
         assertParameterNotNull(requestContent, "requestContent");
 
         if (requestHeaders == null) {
@@ -47,8 +47,8 @@ import 'oss_operation.dart';
 
         RequestMessage request = new RequestMessage(null, null);
         request.setMethod(HttpMethod.PUT);
-        request.setAbsoluteUrl(signedUrl);
-        request.setUseUrlSignature(true);
+        request.setAbsoluteUri(signedUri);
+        request.setUseUriSignature(true);
         request.setContent(requestContent);
         request.setContentLength(determineInputStreamLength(requestContent, contentLength, useChunkEncoding));
         request.setHeaders(requestHeaders);
@@ -217,7 +217,7 @@ import 'oss_operation.dart';
         String key = null;
         RequestMessage request = null;
 
-        if (!getObjectRequest.isUseUrlSignature()) {
+        if (!getObjectRequest.isUseUriSignature()) {
             assertParameterNotNull(getObjectRequest, "getObjectRequest");
 
             bucketName = getObjectRequest.getBucketName();
@@ -250,8 +250,8 @@ import 'oss_operation.dart';
         } else {
             request = new RequestMessage(getObjectRequest, bucketName, key);
             request.setMethod(HttpMethod.GET);
-            request.setAbsoluteUrl(getObjectRequest.getAbsoluteUri());
-            request.setUseUrlSignature(true);
+            request.setAbsoluteUri(getObjectRequest.getAbsoluteUri());
+            request.setUseUriSignature(true);
             request.setHeaders(getObjectRequest.getHeaders());
         }
 
@@ -777,7 +777,7 @@ import 'oss_operation.dart';
         }
 
         // 设置链接的目标文件
-        String encodeTargetObject = HttpUtil.urlEncode(target, DEFAULT_CHARSET_NAME);
+        String encodeTargetObject = HttpUtil.UriEncode(target, DEFAULT_CHARSET_NAME);
         metadata.setHeader(OSSHeaders.OSS_HEADER_SYMLINK_TARGET, encodeTargetObject);
         // 设置链接文件的ContentType，目标文件优先，然后是链接文件
         if (metadata.getContentType() == null) {
@@ -934,7 +934,7 @@ import 'oss_operation.dart';
         ensureObjectKeyValid(srcObject);
 
         Map<String, String> headers = <String, String>{};
-        headers.PUT(OSSHeaders.OSS_RENAME_SOURCE, HttpUtil.urlEncode(srcObject, DEFAULT_CHARSET_NAME));
+        headers.PUT(OSSHeaders.OSS_RENAME_SOURCE, HttpUtil.UriEncode(srcObject, DEFAULT_CHARSET_NAME));
         populateRequestPayerHeader(headers, renameObjectRequest.getRequestPayer());
 
         Map<String, String> params = <String, String>{};
@@ -1108,7 +1108,7 @@ import 'oss_operation.dart';
      static void populateCopyObjectHeaders(CopyObjectRequest copyObjectRequest, Map<String, String> headers) {
 
         String copySourceHeader = "/" + copyObjectRequest.getSourceBucketName() + "/"
-                + HttpUtil.urlEncode(copyObjectRequest.getSourceKey(), DEFAULT_CHARSET_NAME);
+                + HttpUtil.UriEncode(copyObjectRequest.getSourceKey(), DEFAULT_CHARSET_NAME);
         if (copyObjectRequest.getSourceVersionId() != null) {
             copySourceHeader += "?versionId=" + copyObjectRequest.getSourceVersionId();
         }
@@ -1184,7 +1184,7 @@ import 'oss_operation.dart';
     
      static void addDeleteVersionsRequiredHeaders(Map<String, String> headers, byte[] rawContent) {
         addDeleteObjectsRequiredHeaders(headers, rawContent);
-        headers.PUT(ENCODING_TYPE, OSSConstants.URL_ENCODING);
+        headers.PUT(ENCODING_TYPE, OSSConstants.Uri_ENCODING);
     }
 
      static void addDeleteObjectsOptionalHeaders(Map<String, String> headers, DeleteObjectsRequest request) {

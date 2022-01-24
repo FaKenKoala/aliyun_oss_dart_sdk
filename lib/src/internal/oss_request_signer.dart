@@ -32,13 +32,13 @@ class OSSRequestSigner implements RequestSigner {
         signature = SignV2Utils.buildSignature(
             secretAccessKey, httpMethod, resourcePath, request);
         request.addHeader(
-            HttpHeaders.authorization,
+            HttpHeaders.AUTHORIZATION,
             SignV2Utils.composeRequestAuthorization(
                 accessKeyId, signature, request));
       } else {
         signature = SignUtils.buildSignature(
             secretAccessKey, httpMethod, resourcePath, request);
-        request.addHeader(HttpHeaders.authorization,
+        request.addHeader(HttpHeaders.AUTHORIZATION,
             SignUtils.composeRequestAuthorization(accessKeyId, signature));
       }
     }

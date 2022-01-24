@@ -1,3 +1,4 @@
+import 'package:aliyun_oss_dart_sdk/src/common/utils/crc64.dart';
 import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
 import 'package:aliyun_oss_dart_sdk/src/internal/oss_upload_operation.dart';
 

@@ -1,93 +1,27 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
-package com.aliyun.oss.internal;
-
-import static com.aliyun.oss.common.utils.CodingUtils.assertParameterNotNull;
-import static com.aliyun.oss.common.utils.LogUtils.logException;
-import static com.aliyun.oss.internal.OSSConstants.DEFAULT_BUFFER_SIZE;
-import static com.aliyun.oss.internal.OSSConstants.KB;
-import static com.aliyun.oss.internal.OSSUtils.ensureBucketNameValid;
-import static com.aliyun.oss.internal.OSSUtils.ensureObjectKeyValid;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
-import com.aliyun.oss.InconsistentException;
-import com.aliyun.oss.common.utils.BinaryUtil;
-import com.aliyun.oss.common.utils.CRC64;
-import com.aliyun.oss.common.utils.IOUtils;
-import com.aliyun.oss.event.ProgressEventType;
-import com.aliyun.oss.event.ProgressListener;
-import com.aliyun.oss.event.ProgressPublisher;
-import com.aliyun.oss.model.DownloadFileRequest;
-import com.aliyun.oss.model.DownloadFileResult;
-import com.aliyun.oss.model.GenericRequest;
-import com.aliyun.oss.model.GetObjectRequest;
-import com.aliyun.oss.model.OSSObject;
-import com.aliyun.oss.model.ObjectMetadata;
-import com.aliyun.oss.model.Payer;
-import com.aliyun.oss.model.SimplifiedObjectMeta;
 
 /**
  * OSSDownloadOperation
  *
  */
-public class OSSDownloadOperation {
+ class OSSDownloadOperation {
 
-    protected OSSObject getObjectWrap(GetObjectRequest getObjectRequest){
+     OSSObject getObjectWrap(GetObjectRequest getObjectRequest){
         return objectOperation.getObject(getObjectRequest);
     }
 
-    protected Long getInputStreamCRCWrap(InputStream inputStream) {
+     Long getInputStreamCRCWrap(InputStream inputStream) {
         return IOUtils.getCRCValue(inputStream);
     }
 
     static class DownloadCheckPoint implements Serializable {
 
-        private static final long serialVersionUID = 4682293344365787077L;
-        private static final String DOWNLOAD_MAGIC = "92611BED-89E2-46B6-89E5-72F273D4B0A3";
+         static final long serialVersionUID = 4682293344365787077L;
+         static final String DOWNLOAD_MAGIC = "92611BED-89E2-46B6-89E5-72F273D4B0A3";
 
         /**
          * Loads the checkpoint data from the checkpoint file.
          */
-        public synchronized void load(String cpFile) throws IOException, ClassNotFoundException {
+         synchronized void load(String cpFile) throws IOException, ClassNotFoundException {
             FileInputStream fileIn = new FileInputStream(cpFile);
             ObjectInputStream in = new ObjectInputStream(fileIn);
             DownloadCheckPoint dcp = (DownloadCheckPoint) in.readObject();
@@ -99,7 +33,7 @@ public class OSSDownloadOperation {
         /**
          * Writes the checkpoint data to the checkpoint file.
          */
-        public synchronized void dump(String cpFile) throws IOException {
+         synchronized void dump(String cpFile) throws IOException {
             this.md5 = hashCode();
             FileOutputStream fileOut = new FileOutputStream(cpFile);
             ObjectOutputStream outStream = new ObjectOutputStream(fileOut);
@@ -113,14 +47,14 @@ public class OSSDownloadOperation {
          * 
          * @throws IOException
          */
-        public synchronized void update(int index, bool completed) throws IOException {
+         synchronized void update(int index, bool completed) throws IOException {
             downloadParts.GET(index).isCompleted = completed;
         }
 
         /**
          * Check if the object matches the checkpoint information.
          */
-        public synchronized bool isValid(OSSObjectOperation objectOperation, DownloadFileRequest downloadFileRequest) {
+         synchronized bool isValid(OSSObjectOperation objectOperation, DownloadFileRequest downloadFileRequest) {
             // 比较checkpoint的magic和md5
             if (this.magic == null || !this.magic.equals(DOWNLOAD_MAGIC) || this.md5 != hashCode()) {
                 return false;
@@ -151,7 +85,7 @@ public class OSSDownloadOperation {
         }
 
         @override
-        public int hashCode() {
+         int hashCode() {
             final int prime = 31;
             int result = 1;
             result = prime * result + ((bucketName == null) ? 0 : bucketName.hashCode());
@@ -163,7 +97,7 @@ public class OSSDownloadOperation {
             return result;
         }
 
-        private void assign(DownloadCheckPoint dcp) {
+         void assign(DownloadCheckPoint dcp) {
             this.magic = dcp.magic;
             this.md5 = dcp.md5;
             this.downloadFile = dcp.downloadFile;
@@ -173,22 +107,22 @@ public class OSSDownloadOperation {
             this.downloadParts = dcp.downloadParts;
         }
 
-        public String magic; // magic
-        public int md5; // the md5 of checkpoint data.
-        public String downloadFile; // local path for the download.
-        public String bucketName; // bucket name
-        public String objectKey; // object key
-        public ObjectStat objectStat; // object state
-        public ArrayList<DownloadPart> downloadParts; // download parts list.
+         String magic; // magic
+         int md5; // the md5 of checkpoint data.
+         String downloadFile; // local path for the download.
+         String bucketName; // bucket name
+         String objectKey; // object key
+         ObjectStat objectStat; // object state
+         ArrayList<DownloadPart> downloadParts; // download parts list.
 
     }
 
     static class ObjectStat implements Serializable {
 
-        private static final long serialVersionUID = -2883494783412999919L;
+         static final long serialVersionUID = -2883494783412999919L;
 
         @override
-        public int hashCode() {
+         int hashCode() {
             final int prime = 31;
             int result = 1;
             result = prime * result + ((digest == null) ? 0 : digest.hashCode());
@@ -197,7 +131,7 @@ public class OSSDownloadOperation {
             return result;
         }
 
-        public static ObjectStat getFileStat(OSSObjectOperation objectOperation, DownloadFileRequest downloadFileRequest) {
+         static ObjectStat getFileStat(OSSObjectOperation objectOperation, DownloadFileRequest downloadFileRequest) {
             String bucketName = downloadFileRequest.getBucketName();
             String key = downloadFileRequest.getKey();
 
@@ -223,17 +157,17 @@ public class OSSDownloadOperation {
             return objStat;
         }
 
-        public long size; // file size
-        public Date LAST_MODIFIED; // file's last modified time.
-        public String digest; // The file's ETag.
+         long size; // file size
+         Date LAST_MODIFIED; // file's last modified time.
+         String digest; // The file's ETag.
     }
 
     static class DownloadPart implements Serializable {
 
-        private static final long serialVersionUID = -3655925846487976207L;
+         static final long serialVersionUID = -3655925846487976207L;
 
         @override
-        public int hashCode() {
+         int hashCode() {
             final int prime = 31;
             int result = 1;
             result = prime * result + index;
@@ -245,24 +179,24 @@ public class OSSDownloadOperation {
             return result;
         }
 
-        public int index; // part index (starting from 0).
-        public long start; // start index;
-        public long end; // end index;
-        public bool isCompleted; // flag of part download finished or not;
-        public long length; // length of part
-        public long crc; // part crc.
-        public long fileStart;  // start index in file, for range get
+         int index; // part index (starting from 0).
+         long start; // start index;
+         long end; // end index;
+         bool isCompleted; // flag of part download finished or not;
+         long length; // length of part
+         long crc; // part crc.
+         long fileStart;  // start index in file, for range get
     }
 
     static class PartResult {
 
-        public PartResult(int number, long start, long end) {
+         PartResult(int number, long start, long end) {
             this.number = number;
             this.start = start;
             this.end = end;
         }
 
-        public PartResult(int number, long start, long end, long length, long clientCRC) {
+         PartResult(int number, long start, long end, long length, long clientCRC) {
             this.number = number;
             this.start = start;
             this.end = end;
@@ -270,99 +204,99 @@ public class OSSDownloadOperation {
             this.clientCRC = clientCRC;
         }
 
-        public long getStart() {
+         long getStart() {
             return start;
         }
 
-        public void setStart(long start) {
+         void setStart(long start) {
             this.start = start;
         }
 
-        public long getEnd() {
+         long getEnd() {
             return end;
         }
 
-        public void setEnd(long end) {
+         void setEnd(long end) {
             this.end = end;
         }
 
-        public int getNumber() {
+         int getNumber() {
             return number;
         }
 
-        public bool isFailed() {
+         bool isFailed() {
             return failed;
         }
 
-        public void setFailed(bool failed) {
+         void setFailed(bool failed) {
             this.failed = failed;
         }
 
-        public Exception getException() {
+         Exception getException() {
             return exception;
         }
 
-        public void setException(Exception exception) {
+         void setException(Exception exception) {
             this.exception = exception;
         }
 
-        public Long getClientCRC() { return clientCRC; }
+         Long getClientCRC() { return clientCRC; }
 
-        public void setClientCRC(Long clientCRC) { this.clientCRC = clientCRC; }
+         void setClientCRC(Long clientCRC) { this.clientCRC = clientCRC; }
 
-        public Long getServerCRC() {
+         Long getServerCRC() {
             return serverCRC;
         }
 
-        public void setServerCRC(Long serverCRC) {
+         void setServerCRC(Long serverCRC) {
             this.serverCRC = serverCRC;
         }
 
-        public long getLength() {
+         long getLength() {
             return length;
         }
 
-        public void setLength(long length) {
+         void setLength(long length) {
             this.length = length;
         }
-        private int number; // part number, starting from 1.
-        private long start; // start index in the part.
-        private long end; // end index in the part.
-        private bool failed; // flag of part upload failure.
-        private Exception exception; // Exception during part upload.
-        private Long clientCRC; // client crc of this part
-        private Long serverCRC; // server crc of this file
+         int number; // part number, starting from 1.
+         long start; // start index in the part.
+         long end; // end index in the part.
+         bool failed; // flag of part upload failure.
+         Exception exception; // Exception during part upload.
+         Long clientCRC; // client crc of this part
+         Long serverCRC; // server crc of this file
 
-        private long length;
+         long length;
     }
 
     static class DownloadResult {
 
-        public List<PartResult> getPartResults() {
+         List<PartResult> getPartResults() {
             return partResults;
         }
 
-        public void setPartResults(List<PartResult> partResults) {
+         void setPartResults(List<PartResult> partResults) {
             this.partResults = partResults;
         }
 
-        public ObjectMetadata getObjectMetadata() {
+         ObjectMetadata getObjectMetadata() {
             return objectMetadata;
         }
 
-        public void setObjectMetadata(ObjectMetadata objectMetadata) {
+         void setObjectMetadata(ObjectMetadata objectMetadata) {
             this.objectMetadata = objectMetadata;
         }
 
-        private List<PartResult> partResults;
-        private ObjectMetadata objectMetadata;
+         List<PartResult> partResults;
+         ObjectMetadata objectMetadata;
     }
 
-    public OSSDownloadOperation(OSSObjectOperation objectOperation) {
+     OSSDownloadOperation(OSSObjectOperation objectOperation) {
         this.objectOperation = objectOperation;
     }
 
-    public DownloadFileResult downloadFile(DownloadFileRequest downloadFileRequest) throws Throwable {
+     DownloadFileResult downloadFile(DownloadFileRequest downloadFileRequest) throws Throwable {
         assertParameterNotNull(downloadFileRequest, "downloadFileRequest");
 
         String bucketName = downloadFileRequest.getBucketName();
@@ -396,7 +330,7 @@ public class OSSDownloadOperation {
         return downloadFileWithCheckpoint(downloadFileRequest);
     }
 
-    private DownloadFileResult downloadFileWithCheckpoint(DownloadFileRequest downloadFileRequest) throws Throwable {
+     DownloadFileResult downloadFileWithCheckpoint(DownloadFileRequest downloadFileRequest) throws Throwable {
         DownloadFileResult downloadFileResult = new DownloadFileResult();
         DownloadCheckPoint downloadCheckPoint = new DownloadCheckPoint();
 
@@ -468,7 +402,7 @@ public class OSSDownloadOperation {
         return downloadFileResult;
     }
 
-    private void prepare(DownloadCheckPoint downloadCheckPoint, DownloadFileRequest downloadFileRequest)
+     void prepare(DownloadCheckPoint downloadCheckPoint, DownloadFileRequest downloadFileRequest)
             throws IOException {
         downloadCheckPoint.magic = DownloadCheckPoint.DOWNLOAD_MAGIC;
         downloadCheckPoint.downloadFile = downloadFileRequest.getDownloadFile();
@@ -488,7 +422,7 @@ public class OSSDownloadOperation {
         createFixedFile(downloadFileRequest.getTempDownloadFile(), downloadSize);
     }
 
-    public static void createFixedFile(String filePath, long length) throws IOException {
+     static void createFixedFile(String filePath, long length) throws IOException {
         File file = new File(filePath);
         RandomAccessFile rf = null;
 
@@ -502,7 +436,7 @@ public class OSSDownloadOperation {
         }
     }
 
-    private static Long calcObjectCRCFromParts(List<PartResult> partResults) {
+     static Long calcObjectCRCFromParts(List<PartResult> partResults) {
         long crc = 0;
 
         for (PartResult partResult : partResults) {
@@ -514,7 +448,7 @@ public class OSSDownloadOperation {
         return new Long(crc);
     }
 
-    private DownloadResult download(DownloadCheckPoint downloadCheckPoint, DownloadFileRequest downloadFileRequest)
+     DownloadResult download(DownloadCheckPoint downloadCheckPoint, DownloadFileRequest downloadFileRequest)
             throws Throwable {
         DownloadResult downloadResult = new DownloadResult();
         ArrayList<PartResult> taskResults = [];
@@ -569,7 +503,7 @@ public class OSSDownloadOperation {
         // Sorts the download result by the part number.
         Collections.sort(taskResults, new Comparator<PartResult>() {
             @override
-            public int compare(PartResult p1, PartResult p2) {
+             int compare(PartResult p1, PartResult p2) {
                 return p1.getNumber() - p2.getNumber();
             }
         });
@@ -584,13 +518,13 @@ public class OSSDownloadOperation {
         return downloadResult;
     }
 
-    private bool hasRangeInRequest(DownloadFileRequest downloadFileRequest) {
+     bool hasRangeInRequest(DownloadFileRequest downloadFileRequest) {
         return downloadFileRequest.getRange() != null;
     }
 
     class Task implements Callable<PartResult> {
 
-        public Task(int id, String name, DownloadCheckPoint downloadCheckPoint, int partIndex,
+         Task(int id, String name, DownloadCheckPoint downloadCheckPoint, int partIndex,
                 DownloadFileRequest downloadFileRequest, OSSObjectOperation objectOperation,
                 ProgressListener progressListener) {
             this.id = id;
@@ -603,7 +537,7 @@ public class OSSDownloadOperation {
         }
 
         @override
-        public PartResult call() throws Exception {
+         PartResult call() throws Exception {
             PartResult tr = null;
             RandomAccessFile output = null;
             InputStream content = null;
@@ -680,21 +614,21 @@ public class OSSDownloadOperation {
             return tr;
         }
 
-        public ObjectMetadata GetobjectMetadata() {
+         ObjectMetadata GetobjectMetadata() {
             return objectMetadata;
         }
 
-        private int id;
-        private String name;
-        private DownloadCheckPoint downloadCheckPoint;
-        private int partIndex;
-        private DownloadFileRequest downloadFileRequest;
-        private OSSObjectOperation objectOperation;
-        private ObjectMetadata objectMetadata;
-        private ProgressListener progressListener;
+         int id;
+         String name;
+         DownloadCheckPoint downloadCheckPoint;
+         int partIndex;
+         DownloadFileRequest downloadFileRequest;
+         OSSObjectOperation objectOperation;
+         ObjectMetadata objectMetadata;
+         ProgressListener progressListener;
     }
 
-    private ArrayList<DownloadPart> splitFile(long start, long objectSize, long partSize) {
+     ArrayList<DownloadPart> splitFile(long start, long objectSize, long partSize) {
         ArrayList<DownloadPart> parts = [];
 
         long partNum = objectSize / partSize;
@@ -717,14 +651,14 @@ public class OSSDownloadOperation {
         return parts;
     }
 
-    private long getPartEnd(long begin, long total, long per) {
+     long getPartEnd(long begin, long total, long per) {
         if (begin + per > total) {
             return total - 1;
         }
         return begin + per - 1;
     }
 
-    private ArrayList<DownloadPart> splitOneFile() {
+     ArrayList<DownloadPart> splitOneFile() {
         ArrayList<DownloadPart> parts = [];
         DownloadPart part = new DownloadPart();
         part.index = 0;
@@ -735,7 +669,7 @@ public class OSSDownloadOperation {
         return parts;
     }
 
-    private long[] getSlice(long[] range, long totalSize) {
+     long[] getSlice(long[] range, long totalSize) {
         long start = 0;
         long size = totalSize;
 
@@ -763,7 +697,7 @@ public class OSSDownloadOperation {
         return new long[]{start, size};
     }
 
-    private bool remove(String filePath) {
+     bool remove(String filePath) {
         bool flag = false;
         File file = new File(filePath);
 
@@ -774,13 +708,13 @@ public class OSSDownloadOperation {
         return flag;
     }
 
-    private static void renameTo(String srcFilePath, String destFilePath) throws IOException {
+     static void renameTo(String srcFilePath, String destFilePath) throws IOException {
         File srcfile = new File(srcFilePath);
         File destfile = new File(destFilePath);
         moveFile(srcfile, destfile);
     }
 
-    private static void moveFile(final File srcFile, final File destFile) throws IOException {
+     static void moveFile(final File srcFile, final File destFile) throws IOException {
         if (srcFile == null) {
             throw new NullPointerException("Source must not be null");
         }
@@ -812,7 +746,7 @@ public class OSSDownloadOperation {
         }
     }
 
-    private static void copyFile(File source, File dest) throws IOException {
+     static void copyFile(File source, File dest) throws IOException {
         InputStream is = null;
         OutputStream os = null;
         try {
@@ -829,5 +763,5 @@ public class OSSDownloadOperation {
         }
     }
 
-    private OSSObjectOperation objectOperation;
+     OSSObjectOperation objectOperation;
 }

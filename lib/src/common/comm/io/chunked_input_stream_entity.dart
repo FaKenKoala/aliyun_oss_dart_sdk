@@ -1,4 +1,13 @@
- class ChunkedInputStreamEntity extends BasicHttpEntity {
+ import 'dart:io';
+import 'dart:math';
+
+import 'package:aliyun_oss_dart_sdk/src/common/utils/http_headers.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/log_utils.dart';
+import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
+
+import 'releasable.dart';
+
+class ChunkedInputStreamEntity extends BasicHttpEntity {
 
      bool firstAttempt = true;
      ReleasableInputStreamEntity notClosableRequestEntity;
@@ -7,24 +16,25 @@
      ChunkedInputStreamEntity(ServiceClient.Request request) {
         setChunked(true);
 
-        long contentLength = -1;
+        int contentLength = -1;
         try {
-            String contentLengthString = request.getHeaders().get(HttpHeaders.CONTENT_LENGTH);
+            String? contentLengthString = request.getHeaders().get(HttpHeaders.CONTENT_LENGTH);
             if (contentLengthString != null) {
-                contentLength = Long.parseLong(contentLengthString);
+                contentLength = int.parse(contentLengthString);
             }
-        } catch (NumberFormatException nfe) {
-            logException("Unable to parse content length from request.", nfe);
+        } catch ( nfe) {
+            LogUtils.logException("Unable to parse content length from request.", nfe);
         }
 
         String contentType = request.getHeaders().get(HttpHeaders.CONTENT_TYPE);
 
-        notClosableRequestEntity = new ReleasableInputStreamEntity(request.getContent(), contentLength);
+        notClosableRequestEntity = ReleasableInputStreamEntity(request.getContent(), contentLength);
         notClosableRequestEntity.setCloseDisabled(true);
         notClosableRequestEntity.setContentType(contentType);
         content = request.getContent();
 
         setContent(content);
+        content = content;
         setContentType(contentType);
         setContentLength(contentLength);
     }
@@ -40,43 +50,26 @@
     }
 
     @override
-     void writeTo(OutputStream output) throws IOException {
+     void writeTo(OutputStream output) {
         if (!firstAttempt && isRepeatable())
             content.reset();
 
         firstAttempt = false;
         notClosableRequestEntity.writeTo(output);
     }
+}
 
-    /**
-     * A releaseable HTTP entity that can control its inner inputstream's
-     * auto-close functionality on/off, and it will try to close its inner
-     * inputstream by default when the inputstream reaches EOF.
-     */
-     static class ReleasableInputStreamEntity extends AbstractHttpEntity implements Releasable {
+    /// A releaseable HTTP entity that can control its inner inputstream's
+    /// auto-close functionality on/off, and it will try to close its inner
+    /// inputstream by default when the inputstream reaches EOF.
+      class ReleasableInputStreamEntity extends AbstractHttpEntity implements Releasable {
 
          final InputStream content;
-         final long length;
+         final int length;
 
          bool closeDisabled;
 
-         ReleasableInputStreamEntity(final InputStream instream) {
-            this(instream, -1);
-        }
-
-         ReleasableInputStreamEntity(final InputStream instream, final long length) {
-            this(instream, length, null);
-        }
-
-         ReleasableInputStreamEntity(final InputStream instream, final ContentType contentType) {
-            this(instream, -1, contentType);
-        }
-
-         ReleasableInputStreamEntity(final InputStream instream, final long length,
-                final ContentType contentType) {
-            super();
-            this.content = Args.notNull(instream, "Source input stream");
-            this.length = length;
+         ReleasableInputStreamEntity(this.content,[this.length = -1, ContentType? contentType]) {
             if (contentType != null) {
                 setContentType(contentType.toString());
             }
@@ -85,36 +78,36 @@
 
         @override
          bool isRepeatable() {
-            return this.content.markSupported();
+            return content.markSupported();
         }
 
         @override
-         long getContentLength() {
-            return this.length;
+         int getContentLength() {
+            return length;
         }
 
         @override
-         InputStream getContent() throws IOException {
-            return this.content;
+         InputStream getContent() {
+            return content;
         }
 
         @override
-         void writeTo(final OutputStream outstream) throws IOException {
+         void writeTo(final OutputStream outstream) {
             Args.notNull(outstream, "Output stream");
-            final InputStream instream = this.content;
+            final InputStream instream = content;
             try {
-                final byte[] buffer = new byte[OUTPUT_BUFFER_SIZE];
+                final byte[] buffer = byte[OUTPUT_BUFFER_SIZE];
                 int l;
-                if (this.length < 0) {
+                if (length < 0) {
                     // consume until EOF
                     while ((l = instream.read(buffer)) != -1) {
                         outstream.write(buffer, 0, l);
                     }
                 } else {
                     // consume no more than length
-                    long remaining = this.length;
+                    int remaining = length;
                     while (remaining > 0) {
-                        l = instream.read(buffer, 0, (int) Math.min(OUTPUT_BUFFER_SIZE, remaining));
+                        l = instream.read(buffer, 0, min(OUTPUT_BUFFER_SIZE, remaining));
                         if (l == -1) {
                             break;
                         }
@@ -144,9 +137,9 @@
 
          void doRelease() {
             try {
-                this.content.close();
-            } catch (Exception ex) {
-                logException("Unexpected io exception when trying to close input stream", ex);
+                content.close();
+            } catch ( ex) {
+                LogUtils.logException("Unexpected io exception when trying to close input stream", ex);
             }
         }
 
@@ -158,4 +151,4 @@
             this.closeDisabled = closeDisabled;
         }
     }
-}
+

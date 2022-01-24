@@ -1,58 +1,5 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
-package com.aliyun.oss.crypto;
-
-import java.io.BufferedOutputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.zip.CheckedInputStream;
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-
-import com.aliyun.oss.model.*;
-import org.apache.http.protocol.HTTP;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-import com.aliyun.oss.ClientException;
-import com.aliyun.oss.OSSEncryptionClient;
-import com.aliyun.oss.common.utils.BinaryUtil;
-import com.aliyun.oss.common.utils.IOUtils;
-import com.aliyun.oss.internal.Mimetypes;
-import com.aliyun.oss.internal.OSSHeaders;
-import com.aliyun.oss.internal.OSSUtils;
-import static com.aliyun.oss.common.utils.CodingUtils.assertParameterNotNull;
-import static com.aliyun.oss.common.utils.IOUtils.safeClose;
-import static com.aliyun.oss.common.utils.LogUtils.logException;
-import static com.aliyun.oss.internal.OSSUtils.OSS_RESOURCE_MANAGER;
-
-public abstract class CryptoModuleBase implements CryptoModule {
+ abstract class CryptoModuleBase implements CryptoModule {
     protected static final int DEFAULT_BUFFER_SIZE = 1024 * 2;
     protected final EncryptionMaterials encryptionMaterials;
     protected final CryptoScheme contentCryptoScheme;
@@ -71,7 +18,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
                 + OSSEncryptionClient.USER_AGENT_SUFFIX;
     }
 
-    private final static CryptoScheme getCryptoScheme(ContentCryptoMode contentCryptoMode) {
+     final static CryptoScheme getCryptoScheme(ContentCryptoMode contentCryptoMode) {
         switch (contentCryptoMode) {
         case AES_CTR_MODE:
         default:
@@ -91,7 +38,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
      * @return the result of the request.
      */
     @override
-    public PutObjectResult putObjectSecurely(PutObjectRequest req) {
+     PutObjectResult putObjectSecurely(PutObjectRequest req) {
         // Update User-Agent.
         setUserAgent(req, encryptionClientUserAgent);
 
@@ -144,7 +91,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
         return request;
     }
 
-    private void updateContentMd5(final PutObjectRequest request, final ObjectMetadata metadata) {
+     void updateContentMd5(final PutObjectRequest request, final ObjectMetadata metadata) {
         if (metadata.getContentMD5() != null) {
             metadata.addUserMetadata(CryptoHeaders.CRYPTO_UNENCRYPTION_CONTENT_MD5, metadata.getContentMD5());
             metadata.removeHeader(OSSHeaders.CONTENT_MD5);
@@ -159,7 +106,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
         request.setMetadata(metadata);
     }
 
-    private void updateContentLength(final PutObjectRequest request, final ObjectMetadata metadata) {
+     void updateContentLength(final PutObjectRequest request, final ObjectMetadata metadata) {
         final long plaintextLength = plaintextLength(request, metadata);
         if (plaintextLength >= 0) {
             metadata.addUserMetadata(CryptoHeaders.CRYPTO_UNENCRYPTION_CONTENT_LENGTH, Long.toString(plaintextLength));
@@ -177,7 +124,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
     /**
      * Checks there an encryption info in the metadata.
      */
-    public static bool hasEncryptionInfo(ObjectMetadata metadata) {
+     static bool hasEncryptionInfo(ObjectMetadata metadata) {
         Map<String, String> userMeta = metadata.getUserMetadata();
         return userMeta != null && userMeta.containsKey(CryptoHeaders.CRYPTO_KEY)
                 && userMeta.containsKey(CryptoHeaders.CRYPTO_IV);
@@ -188,7 +135,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
      * return the result, otherwise return the object directly.
      */
     @override
-    public OSSObject getObjectSecurely(GetObjectRequest req) {
+     OSSObject getObjectSecurely(GetObjectRequest req) {
         // Update User-Agent.
         setUserAgent(req, encryptionClientUserAgent);
         
@@ -278,7 +225,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
         }
     }
 
-    private void checkMultipartContext(MultipartUploadCryptoContext context) {
+     void checkMultipartContext(MultipartUploadCryptoContext context) {
         if (context == null) {
             throw ArgumentError("MultipartUploadCryptoContext should not be null.");
         }
@@ -293,7 +240,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
      * then decrypt it, otherwise wirte the object directly.
      */
     @override
-    public ObjectMetadata getObjectSecurely(GetObjectRequest getObjectRequest, File file) {
+     ObjectMetadata getObjectSecurely(GetObjectRequest getObjectRequest, File file) {
         assertParameterNotNull(file, "file");
         OSSObject ossObject = getObjectSecurely(getObjectRequest);
         OutputStream outputStream = null;
@@ -338,7 +285,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
      *         content crypto materials and other upload information will be filled after initiate request done.
      */
     @override
-    public InitiateMultipartUploadResult initiateMultipartUploadSecurely(InitiateMultipartUploadRequest req,
+     InitiateMultipartUploadResult initiateMultipartUploadSecurely(InitiateMultipartUploadRequest req,
             MultipartUploadCryptoContext context) {
         checkMultipartContext(context);
 
@@ -370,7 +317,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
      * Uploads the part secured.
      */
     @override
-    public UploadPartResult uploadPartSecurely(UploadPartRequest req, MultipartUploadCryptoContext context) {
+     UploadPartResult uploadPartSecurely(UploadPartRequest req, MultipartUploadCryptoContext context) {
         final UploadPartResult result;
 
         // Check partsize and context
@@ -405,7 +352,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
     /**
      * Wraps the inputStream with an crypto cipher.
      */
-    private CipherInputStream newOSSCryptoCipherInputStream(PutObjectRequest req, CryptoCipher cryptoCipher) {
+     CipherInputStream newOSSCryptoCipherInputStream(PutObjectRequest req, CryptoCipher cryptoCipher) {
         final File fileOrig = req.getFile();
         final InputStream isOrig = req.getInputStream();
         InputStream isCurr = isOrig;
@@ -452,7 +399,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
         return adjustedCryptoRange;
     }
 
-    private long getCipherBlockLowerBound(long leftmostBytePosition) {
+     long getCipherBlockLowerBound(long leftmostBytePosition) {
         long cipherBlockSize = CryptoScheme.BLOCK_SIZE;
         long offset = leftmostBytePosition % cipherBlockSize;
         long lowerBound = leftmostBytePosition - offset;

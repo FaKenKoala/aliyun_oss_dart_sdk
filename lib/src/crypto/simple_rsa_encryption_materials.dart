@@ -1,66 +1,26 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-package com.aliyun.oss.crypto;
-
-import java.lang.reflect.Field;
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.SecureRandom;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.RSAPrivateKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import com.aliyun.oss.ClientException;
-import com.aliyun.oss.common.utils.BinaryUtil;
-import com.aliyun.oss.common.utils.StringUtils;
 
 /**
  * This provide a simple rsa encryption materials for client-side encryption.
  */
-public class SimpleRSAEncryptionMaterials implements EncryptionMaterials {
+ class SimpleRSAEncryptionMaterials implements EncryptionMaterials {
     // Enable bouncy castle provider
     static {
         CryptoRuntime.enableBouncyCastle();
     }
-    public static final String KEY_WRAP_ALGORITHM = "RSA/NONE/PKCS1Padding";
-    private KeyPair keyPair;
-    private Map<String, String> desc;
-    private final LinkedHashMap<KeyPair, Map<String, String>> keyPairDescMaterials = 
+     static final String KEY_WRAP_ALGORITHM = "RSA/NONE/PKCS1Padding";
+     KeyPair keyPair;
+     Map<String, String> desc;
+     final LinkedHashMap<KeyPair, Map<String, String>> keyPairDescMaterials = 
                                     new LinkedHashMap<KeyPair, Map<String, String>>();
 
-    public SimpleRSAEncryptionMaterials(KeyPair keyPair) {
+     SimpleRSAEncryptionMaterials(KeyPair keyPair) {
         assertParameterNotNull(keyPair, "KeyPair");
         this.keyPair = keyPair;
         desc = <String, String>{};
         keyPairDescMaterials.put(keyPair, desc);
     }
 
-    public SimpleRSAEncryptionMaterials(KeyPair keyPair, Map<String, String> desc) {
+     SimpleRSAEncryptionMaterials(KeyPair keyPair, Map<String, String> desc) {
         assertParameterNotNull(keyPair, "KeyPair");
         this.keyPair = keyPair;
         this.desc = (desc == null) ? <String, String>{} : new HashMap<String, String>(desc);
@@ -75,7 +35,7 @@ public class SimpleRSAEncryptionMaterials implements EncryptionMaterials {
      * @param description
      *            The descripton of encryption materails.
      */
-    public synchronized void addKeyPairDescMaterial(KeyPair keyPair, Map<String, String> description) {
+     synchronized void addKeyPairDescMaterial(KeyPair keyPair, Map<String, String> description) {
         assertParameterNotNull(keyPair, "keyPair");
         if (description != null) {
             keyPairDescMaterials.put(keyPair, new HashMap<String, String>(description));
@@ -91,7 +51,7 @@ public class SimpleRSAEncryptionMaterials implements EncryptionMaterials {
      *            The encryption description.  
      * @return the lastest specifed key pair that matchs the descrption, otherwise return null.
      */
-    private KeyPair findKeyPairByDescription(Map<String, String> desc) {
+     KeyPair findKeyPairByDescription(Map<String, String> desc) {
         if (desc == null) {
             return null;
         }
@@ -106,7 +66,7 @@ public class SimpleRSAEncryptionMaterials implements EncryptionMaterials {
     /**
      * Gets the lastest key-value in the LinedHashMap.
      */
-    private <K, V> Entry<K, V> getTailByReflection(LinkedHashMap<K, V> map)
+     <K, V> Entry<K, V> getTailByReflection(LinkedHashMap<K, V> map)
             throws NoSuchFieldException, IllegalAccessException {
         Field tail = map.getClass().getDeclaredField("tail");
         tail.setAccessible(true);
@@ -124,12 +84,12 @@ public class SimpleRSAEncryptionMaterials implements EncryptionMaterials {
      *            algorithm and encryption materials description by this method.
      */
     @override
-    public void encryptCEK(ContentCryptoMaterialRW contentMaterialRW) {
+     void encryptCEK(ContentCryptoMaterialRW contentMaterialRW) {
         assertParameterNotNull(contentMaterialRW, "ContentCryptoMaterialRW");
         assertParameterNotNull(contentMaterialRW.getCEK(), "ContentCryptoMaterialRW#getCEK()");
         assertParameterNotNull(contentMaterialRW.getIV(), "ContentCryptoMaterialRW#getIV()");
         try {
-            Key key = keyPair.getPublic();
+            Key key = keyPair.get();
             Cipher cipher = Cipher.getInstance(KEY_WRAP_ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, key, new SecureRandom());
             byte[] encryptedCEK = cipher.doFinal(contentMaterialRW.getCEK().getEncoded());
@@ -156,7 +116,7 @@ public class SimpleRSAEncryptionMaterials implements EncryptionMaterials {
      *                 algothrim. Then it will be builded with the cek and iv.
      */
     @override
-    public void decryptCEK(ContentCryptoMaterialRW contentMaterialRW) {
+     void decryptCEK(ContentCryptoMaterialRW contentMaterialRW) {
         assertParameterNotNull(contentMaterialRW, "ContentCryptoMaterialRW");
         assertParameterNotNull(contentMaterialRW.getEncryptedCEK(), "ContentCryptoMaterialRW#getEncryptedCEK");
         assertParameterNotNull(contentMaterialRW.getEncryptedIV(), "ContentCryptoMaterialRW#getEncryptedIV");
@@ -174,7 +134,7 @@ public class SimpleRSAEncryptionMaterials implements EncryptionMaterials {
                 keyPair = entry.getKey();
             }
 
-            Key key = keyPair.getPrivate();
+            Key key = keyPair.get();
             Cipher cipher = Cipher.getInstance(KEY_WRAP_ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, key);
             byte[] cekBytes = cipher.doFinal(contentMaterialRW.getEncryptedCEK());
@@ -189,79 +149,79 @@ public class SimpleRSAEncryptionMaterials implements EncryptionMaterials {
     }
 
     /**
-     * Gets a rsa private key from PKCS1 pem string.
+     * Gets a rsa  key from PKCS1 pem string.
      * 
-     * @return a new rsa private key
+     * @return a new rsa  key
      */
-    public static RSAPrivateKey getPrivateKeyFromPemPKCS1(final String privateKeyStr) {
+     static RSAKey getKeyFromPemPKCS1(final String KeyStr) {
         try {
-            String adjustStr = StringUtils.replace(privateKeyStr, "-----BEGIN PRIVATE KEY-----", "");
-            adjustStr = StringUtils.replace(adjustStr, "-----BEGIN RSA PRIVATE KEY-----", "");
-            adjustStr = StringUtils.replace(adjustStr, "-----END PRIVATE KEY-----", "");
-            adjustStr = StringUtils.replace(adjustStr, "-----END RSA PRIVATE KEY-----", "");
+            String adjustStr = StringUtils.replace(KeyStr, "-----BEGIN  KEY-----", "");
+            adjustStr = StringUtils.replace(adjustStr, "-----BEGIN RSA  KEY-----", "");
+            adjustStr = StringUtils.replace(adjustStr, "-----END  KEY-----", "");
+            adjustStr = StringUtils.replace(adjustStr, "-----END RSA  KEY-----", "");
             adjustStr = adjustStr.replace("\n", "");
 
             CryptoRuntime.enableBouncyCastle();
 
             byte[] buffer = BinaryUtil.fromBase64String(adjustStr);
-            RSAPrivateKeySpec keySpec = CryptoRuntime.convertPemPKCS1ToPrivateKey(buffer);
+            RSAKeySpec keySpec = CryptoRuntime.convertPemPKCS1ToKey(buffer);
 
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 
-            return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
+            return (RSAKey) keyFactory.generate(keySpec);
 
         } catch (Exception e) {
-            throw new ClientException("get private key from PKCS1 pem String error." + e.getMessage(), e);
+            throw new ClientException("get  key from PKCS1 pem String error." + e.getMessage(), e);
         }
     }
 
     /**
-     * Gets a rsa private key from PKCS8 pem string.
+     * Gets a rsa  key from PKCS8 pem string.
      * 
-     * @return a new rsa private key
+     * @return a new rsa  key
      */
-    public static RSAPrivateKey getPrivateKeyFromPemPKCS8(final String privateKeyStr) {
+     static RSAKey getKeyFromPemPKCS8(final String KeyStr) {
         try {
-            String adjustStr = StringUtils.replace(privateKeyStr, "-----BEGIN PRIVATE KEY-----", "");
-            adjustStr = StringUtils.replace(adjustStr, "-----BEGIN RSA PRIVATE KEY-----", "");
-            adjustStr = StringUtils.replace(adjustStr, "-----END PRIVATE KEY-----", "");
-            adjustStr = StringUtils.replace(adjustStr, "-----END RSA PRIVATE KEY-----", "");
+            String adjustStr = StringUtils.replace(KeyStr, "-----BEGIN  KEY-----", "");
+            adjustStr = StringUtils.replace(adjustStr, "-----BEGIN RSA  KEY-----", "");
+            adjustStr = StringUtils.replace(adjustStr, "-----END  KEY-----", "");
+            adjustStr = StringUtils.replace(adjustStr, "-----END RSA  KEY-----", "");
             adjustStr = adjustStr.replace("\n", "");
 
             byte[] buffer = BinaryUtil.fromBase64String(adjustStr);
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(buffer);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 
-            return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
+            return (RSAKey) keyFactory.generate(keySpec);
         } catch (Exception e) {
-            throw new ClientException("Get private key from PKCS8 pem String error: " + e.getMessage(), e);
+            throw new ClientException("Get  key from PKCS8 pem String error: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Gets a rsa public key from PKCS8 pem string.
+     * Gets a rsa  key from PKCS8 pem string.
      * 
-     * @return a new rsa public key
+     * @return a new rsa  key
      */
-    public static RSAPublicKey getPublicKeyFromPemX509(final String publicKeyStr) {
+     static RSAKey getKeyFromPemX509(final String KeyStr) {
         try {
-            String adjustStr = StringUtils.replace(publicKeyStr, "-----BEGIN PUBLIC KEY-----", "");
-            adjustStr = StringUtils.replace(adjustStr, "-----BEGIN RSA PUBLIC KEY-----", "");
-            adjustStr = StringUtils.replace(adjustStr, "-----END PUBLIC KEY-----", "");
-            adjustStr = StringUtils.replace(adjustStr, "-----END RSA PUBLIC KEY-----", "");
+            String adjustStr = StringUtils.replace(KeyStr, "-----BEGIN  KEY-----", "");
+            adjustStr = StringUtils.replace(adjustStr, "-----BEGIN RSA  KEY-----", "");
+            adjustStr = StringUtils.replace(adjustStr, "-----END  KEY-----", "");
+            adjustStr = StringUtils.replace(adjustStr, "-----END RSA  KEY-----", "");
             adjustStr = adjustStr.replace("\n", "");
 
             byte[] buffer = BinaryUtil.fromBase64String(adjustStr);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(buffer);
 
-            return (RSAPublicKey) keyFactory.generatePublic(keySpec);
+            return (RSAKey) keyFactory.generate(keySpec);
         } catch (Exception e) {
-            throw new ClientException("Get public key from X509 pem String error." + e.getMessage(), e);
+            throw new ClientException("Get  key from X509 pem String error." + e.getMessage(), e);
         }
     }
 
-    private void assertParameterNotNull(Object parameterValue, String errorMessage) {
+     void assertParameterNotNull(Object parameterValue, String errorMessage) {
         if (parameterValue == null)
             throw ArgumentError(errorMessage);
     }

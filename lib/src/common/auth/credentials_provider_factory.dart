@@ -1,23 +1,19 @@
 import 'package:aliyun_oss_dart_sdk/src/common/utils/auth_utils.dart';
+import 'package:aliyun_oss_dart_sdk/src/crypto/kms_encryption_materials.dart';
 
 import 'basic_credentials.dart';
+import 'custom_session_credentials_provider.dart';
 import 'default_credential_provider.dart';
+import 'environment_variable_credentials_provider.dart';
+import 'instance_profile_credentials_provider.dart';
+import 'key_pair_credentials.dart';
+import 'sts_assume_role_session_credentials_provider.dart';
+import 'sts_key_pair_session_credentials_provider.dart';
+import 'system_properties_credentials_provider.dart';
 
 /// Credentials provider factory to share providers across potentially many
 /// clients.
 class CredentialsProviderFactory {
-  /// Create an instance of DefaultCredentialProvider.
-  ///
-  /// @param accessKeyId
-  ///            Access Key ID.
-  /// @param secretAccessKey
-  ///            Secret Access Key.
-  /// @return A {@link DefaultCredentialProvider} instance.
-  static DefaultCredentialProvider newDefaultCredentialProvider(
-      String accessKeyId, String secretAccessKey) {
-    return DefaultCredentialProvider(
-        accessKeyId: accessKeyId, secretAccessKey: secretAccessKey);
-  }
 
   /// Create an instance of DefaultCredentialProvider.
   ///
@@ -29,7 +25,7 @@ class CredentialsProviderFactory {
   ///            Security Token from STS.
   /// @return A {@link DefaultCredentialProvider} instance.
   DefaultCredentialProvider newDefaultCredentialProvider(
-      String accessKeyId, String secretAccessKey, String securityToken) {
+      String accessKeyId, String secretAccessKey, [String? securityToken]) {
     return DefaultCredentialProvider(
         accessKeyId: accessKeyId,
         secretAccessKey: secretAccessKey,
@@ -119,9 +115,9 @@ class CredentialsProviderFactory {
   ///             OSS Client side exception.
   static STSKeyPairSessionCredentialsProvider
       newSTSKeyPairSessionCredentialsProvider(
-          String regionId, String KeyId, String Key) {
+          String regionId, String keyId, String key) {
     DefaultProfile profile = DefaultProfile.getProfile(regionId);
-    KeyPairCredentials keyPairCredentials = KeyPairCredentials(KeyId, Key);
+    KeyPairCredentials keyPairCredentials = KeyPairCredentials(keyId, key);
     return STSKeyPairSessionCredentialsProvider(keyPairCredentials, profile);
   }
 

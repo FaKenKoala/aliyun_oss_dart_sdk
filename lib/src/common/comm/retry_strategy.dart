@@ -8,7 +8,7 @@ abstract class RetryStrategy {
   static const int _defaultRetryPauseScale = 300;
 
   bool shouldRetry(Exception ex, RequestMessage request,
-      ResponseMessage response, int retries);
+      ResponseMessage? response, int retries);
 
   int getPauseDelay(int retries) {
     int scale = _defaultRetryPauseScale;

@@ -56,32 +56,26 @@ class ProgressInputStream extends InputStream {
     }
   }
 
-  // @override
-  //  int read()  {
-  //     if (!hasBeenRead) {
-  //         onFirstRead();
-  //         hasBeenRead = true;
-  //     }
-  //     int ch = super.read();
-  //     if (ch == -1)
-  //         _eof();
-  //     else
-  //         _onBytesRead(1);
-  //     return ch;
-  // }
-
-  // @override
-  //  int read(Uint8List list)  {
-  //     return read(list, 0, list.length);
-  // }
-
   @override
-  int read(Uint8List list, int off, int len) {
+  int read([List<int>? list, int? off, int? len]) {
     if (!hasBeenRead) {
       onFirstRead();
       hasBeenRead = true;
     }
-    int bytesRead = super.read(list, off, len);
+    if (list == null) {
+      int ch = super.read();
+      if (ch == -1) {
+        _eof();
+      } else {
+        _onBytesRead(1);
+      }
+      return ch;
+    }
+
+    int offset = off ?? 0;
+    int length = len ?? list.length;
+
+    int bytesRead = super.read(list, offset, length);
     if (bytesRead == -1) {
       _eof();
     } else {
@@ -147,7 +141,7 @@ class InputStream {
     return false;
   }
 
-  int read([Uint8List? list, int? off, int? length]) {
+  int read([List<int>? list, int? off, int? len]) {
     return 0;
   }
 }
