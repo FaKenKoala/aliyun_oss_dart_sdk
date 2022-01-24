@@ -1,25 +1,37 @@
+import 'dart:html';
+
+import 'package:aliyun_oss_dart_sdk/src/client_configuration.dart';
+import 'package:aliyun_oss_dart_sdk/src/client_error_code.dart';
+import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/oss_error_code.dart';
+import 'package:aliyun_oss_dart_sdk/src/oss_exception.dart';
+
+import 'default_service_client.dart';
+import 'execution_context.dart';
+import 'request_message.dart';
+import 'response_message.dart';
+import 'retry_strategy.dart';
+
 /// Default implementation of {@link ServiceClient}.
  class TimeoutServiceClient extends DefaultServiceClient {
-    protected ThreadPoolExecutor executor;
+     ThreadPoolExecutor executor;
 
-     TimeoutServiceClient(ClientConfiguration config) {
-        super(config);
-
+     TimeoutServiceClient(ClientConfiguration config):super(config) {
         int processors = Runtime.getRuntime().availableProcessors();
-        executor = new ThreadPoolExecutor(processors * 5, processors * 10, 60L, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<Runnable>(processors * 100), Executors.defaultThreadFactory(),
-                new ThreadPoolExecutor.CallerRunsPolicy());
+        executor = ThreadPoolExecutor(processors * 5, processors * 10, 60, TimeUnit.SECONDS,
+                ArrayBlockingQueue<Runnable>(processors * 100), Executors.defaultThreadFactory(),
+                ThreadPoolExecutor.CallerRunsPolicy());
         executor.allowCoreThreadTimeOut(true);
     }
 
     @override
-     ResponseMessage sendRequestCore(ServiceClient.Request request, ExecutionContext context) throws IOException {
+     ResponseMessage sendRequestCore(ServiceClient.Request request, ExecutionContext context) {
         HttpRequestBase httpRequest = httpRequestFactory.createHttpRequest(request, context);
         HttpClientContext httpContext = HttpClientContext.create();
         httpContext.setRequestConfig(this.requestConfig);
 
         CloseableHttpResponse httpResponse = null;
-        HttpRequestTask httpRequestTask = new HttpRequestTask(httpRequest, httpContext);
+        HttpRequestTask httpRequestTask = HttpRequestTask(httpRequest, httpContext);
         Future<CloseableHttpResponse> future = executor.submit(httpRequestTask);
 
         try {
@@ -28,7 +40,7 @@
             logException("[ExecutorService]The current thread was interrupted while waiting: ", e);
 
             httpRequest.abort();
-            throw new ClientException(e.getMessage(), e);
+            throw ClientException(e);
         } catch (ExecutionException e) {
             RuntimeException ex;
             httpRequest.abort();
@@ -36,7 +48,7 @@
             if (e.getCause() is IOException) {
                 ex = ExceptionFactory.createNetworkException((IOException) e.getCause());
             } else {
-                ex = new OSSException(e.getMessage(), e);
+                ex = OSSException(e.getMessage(), e);
             }
 
             logException("[ExecutorService]The computation threw an exception: ", ex);
@@ -45,7 +57,7 @@
             logException("[ExecutorService]The wait " + this.config.getRequestTimeout() + " timed out: ", e);
 
             httpRequest.abort();
-            throw new ClientException(e.getMessage(), OSSErrorCode.REQUEST_TIMEOUT, "Unknown", e);
+            throw ClientException(e.getMessage(), OSSErrorCode.REQUEST_TIMEOUT, "Unknown", e);
         }
 
         return buildResponse(request, httpResponse);
@@ -69,7 +81,7 @@
         }
         super.shutdown();
     }
-
+ }
     class HttpRequestTask implements Callable<CloseableHttpResponse> {
          HttpRequestBase httpRequest;
          HttpClientContext httpContext;
@@ -83,6 +95,47 @@
          CloseableHttpResponse call() throws Exception {
             return httpClient.execute(httpRequest, httpContext);
         }
-    };
+    }
 
-}
+
+
+class DefaultRetryStrategy extends RetryStrategy {
+
+        @override
+         bool shouldRetry(Exception ex, RequestMessage request, ResponseMessage response, int retries) {
+            if (ex is ClientException) {
+                String? errorCode = ex.errorCode;
+                if ([ClientErrorCode.CONNECTION_TIMEOUT
+                        , ClientErrorCode.SOCKET_TIMEOUT
+                        , ClientErrorCode.CONNECTION_REFUSED
+                        , ClientErrorCode.UNKNOWN_HOST
+                        , ClientErrorCode.SOCKET_EXCEPTION
+                        , ClientErrorCode.SSL_EXCEPTION].contains(errorCode)) {
+                    return true;
+                }
+
+                // Don't retry when request input stream is non-repeatable
+                if (errorCode == ClientErrorCode.NONREPEATABLE_REQUEST) {
+                    return false;
+                }
+            }
+
+            if (ex is OSSException) {
+                String? errorCode = ex.errorCode;
+                // No need retry for invalid responses
+                if (errorCode == OSSErrorCode.INVALID_RESPONSE) {
+                    return false;
+                }
+            }
+
+            if (response != null) {
+                int statusCode = response.statusCode;
+                if (statusCode == HttpStatus.internalServerError || statusCode == HttpStatus.badGateway ||
+                        statusCode == HttpStatus.serviceUnavailable) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }

@@ -19,7 +19,7 @@ abstract class ClientErrorCode {
   static final String CONNECTION_REFUSED = "ConnectionRefused";
 
   ///  The input stream is not repeatable for reading.
-  static final String NON_REPEATABLE_REQUEST = "NonRepeatableRequest";
+  static final String NONREPEATABLE_REQUEST = "NonRepeatableRequest";
 
   ///  Thread interrupted while reading the input stream.
   static final String INPUTSTREAM_READING_ABORTED = "InputStreamReadingAborted";

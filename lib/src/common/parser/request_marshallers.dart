@@ -1,101 +1,58 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
-package com.aliyun.oss.common.parser;
-
-import static com.aliyun.oss.internal.OSSConstants.DEFAULT_CHARSET_NAME;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.List;
-import java.util.Map;
-
-import com.aliyun.oss.ClientException;
-import com.aliyun.oss.common.comm.io.FixedLengthInputStream;
-import com.aliyun.oss.common.utils.BinaryUtil;
-import com.aliyun.oss.common.utils.DateUtil;
-import com.aliyun.oss.internal.RequestParameters;
-import com.aliyun.oss.model.*;
-import com.aliyun.oss.model.AddBucketReplicationRequest.ReplicationAction;
-import com.aliyun.oss.model.DeleteVersionsRequest.KeyVersion;
-import com.aliyun.oss.model.LifecycleRule.AbortMultipartUpload;
-import com.aliyun.oss.model.LifecycleRule.RuleStatus;
-import com.aliyun.oss.model.LifecycleRule.StorageTransition;
-import com.aliyun.oss.model.LifecycleRule.NoncurrentVersionStorageTransition;
-import com.aliyun.oss.model.LifecycleRule.NoncurrentVersionExpiration;
-import com.aliyun.oss.model.SetBucketCORSRequest.CORSRule;
 
 /**
  * A collection of marshallers that marshall HTTP request into crossponding
  * input stream.
  */
-public final class RequestMarshallers {
+  class RequestMarshallers {
 
-    public static final StringMarshaller stringMarshaller = new StringMarshaller();
+     static final StringMarshaller stringMarshaller = new StringMarshaller();
 
-    public static final DeleteObjectsRequestMarshaller deleteObjectsRequestMarshaller = new DeleteObjectsRequestMarshaller();
-    public static final DeleteVersionsRequestMarshaller deleteVersionsRequestMarshaller = new DeleteVersionsRequestMarshaller();
+     static final DeleteObjectsRequestMarshaller deleteObjectsRequestMarshaller = new DeleteObjectsRequestMarshaller();
+     static final DeleteVersionsRequestMarshaller deleteVersionsRequestMarshaller = new DeleteVersionsRequestMarshaller();
 
-    public static final CreateBucketRequestMarshaller createBucketRequestMarshaller = new CreateBucketRequestMarshaller();
-    public static final BucketRefererMarshaller bucketRefererMarshaller = new BucketRefererMarshaller();
-    public static final SetBucketLoggingRequestMarshaller setBucketLoggingRequestMarshaller = new SetBucketLoggingRequestMarshaller();
-    public static final SetBucketWebsiteRequestMarshaller setBucketWebsiteRequestMarshaller = new SetBucketWebsiteRequestMarshaller();
-    public static final SetBucketLifecycleRequestMarshaller setBucketLifecycleRequestMarshaller = new SetBucketLifecycleRequestMarshaller();
-    public static final PutBucketImageRequestMarshaller putBucketImageRequestMarshaller = new PutBucketImageRequestMarshaller();
-    public static final PutImageStyleRequestMarshaller putImageStyleRequestMarshaller = new PutImageStyleRequestMarshaller();
-    public static final BucketImageProcessConfMarshaller bucketImageProcessConfMarshaller = new BucketImageProcessConfMarshaller();
-    public static final SetBucketCORSRequestMarshaller setBucketCORSRequestMarshaller = new SetBucketCORSRequestMarshaller();
-    public static final SetBucketTaggingRequestMarshaller setBucketTaggingRequestMarshaller = new SetBucketTaggingRequestMarshaller();
-    public static final AddBucketReplicationRequestMarshaller addBucketReplicationRequestMarshaller = new AddBucketReplicationRequestMarshaller();
-    public static final DeleteBucketReplicationRequestMarshaller deleteBucketReplicationRequestMarshaller = new DeleteBucketReplicationRequestMarshaller();
-    public static final AddBucketCnameRequestMarshaller addBucketCnameRequestMarshaller = new AddBucketCnameRequestMarshaller();
-    public static final DeleteBucketCnameRequestMarshaller deleteBucketCnameRequestMarshaller = new DeleteBucketCnameRequestMarshaller();
-    public static final SetBucketQosRequestMarshaller setBucketQosRequestMarshaller = new SetBucketQosRequestMarshaller();
-    public static final CompleteMultipartUploadRequestMarshaller completeMultipartUploadRequestMarshaller = new CompleteMultipartUploadRequestMarshaller();
-    public static final CreateLiveChannelRequestMarshaller createLiveChannelRequestMarshaller = new CreateLiveChannelRequestMarshaller();
-    public static final CreateUdfRequestMarshaller createUdfRequestMarshaller = new CreateUdfRequestMarshaller();
-    public static final CreateUdfApplicationRequestMarshaller createUdfApplicationRequestMarshaller = new CreateUdfApplicationRequestMarshaller();
-    public static final UpgradeUdfApplicationRequestMarshaller upgradeUdfApplicationRequestMarshaller = new UpgradeUdfApplicationRequestMarshaller();
-    public static final ResizeUdfApplicationRequestMarshaller resizeUdfApplicationRequestMarshaller = new ResizeUdfApplicationRequestMarshaller();
-    public static final ProcessObjectRequestMarshaller processObjectRequestMarshaller = new ProcessObjectRequestMarshaller();
-    public static final SetBucketVersioningRequestMarshaller setBucketVersioningRequestMarshaller = new SetBucketVersioningRequestMarshaller();
-    public static final SetBucketEncryptionRequestMarshaller setBucketEncryptionRequestMarshaller = new SetBucketEncryptionRequestMarshaller();
-    public static final SetBucketPolicyRequestMarshaller setBucketPolicyRequestMarshaller = new SetBucketPolicyRequestMarshaller();
-    public static final SetBucketRequestPaymentRequestMarshaller setBucketRequestPaymentRequestMarshaller = new SetBucketRequestPaymentRequestMarshaller();
-    public static final SetBucketQosInfoRequestMarshaller setBucketQosInfoRequestMarshaller = new SetBucketQosInfoRequestMarshaller();
-    public static final SetAsyncFetchTaskRequestMarshaller setAsyncFetchTaskRequestMarshaller = new SetAsyncFetchTaskRequestMarshaller();
-    public static final SetBucketInventoryRequestMarshaller setBucketInventoryRequestMarshaller = new SetBucketInventoryRequestMarshaller();
-    public static final RestoreObjectRequestMarshaller restoreObjectRequestMarshaller = new RestoreObjectRequestMarshaller();
-    public static final ExtendBucketWormRequestMarshaller extendBucketWormRequestMarshaller = new ExtendBucketWormRequestMarshaller();
-    public static final InitiateBucketWormRequestMarshaller initiateBucketWormRequestMarshaller = new InitiateBucketWormRequestMarshaller();
+     static final CreateBucketRequestMarshaller createBucketRequestMarshaller = new CreateBucketRequestMarshaller();
+     static final BucketRefererMarshaller bucketRefererMarshaller = new BucketRefererMarshaller();
+     static final SetBucketLoggingRequestMarshaller setBucketLoggingRequestMarshaller = new SetBucketLoggingRequestMarshaller();
+     static final SetBucketWebsiteRequestMarshaller setBucketWebsiteRequestMarshaller = new SetBucketWebsiteRequestMarshaller();
+     static final SetBucketLifecycleRequestMarshaller setBucketLifecycleRequestMarshaller = new SetBucketLifecycleRequestMarshaller();
+     static final PutBucketImageRequestMarshaller putBucketImageRequestMarshaller = new PutBucketImageRequestMarshaller();
+     static final PutImageStyleRequestMarshaller putImageStyleRequestMarshaller = new PutImageStyleRequestMarshaller();
+     static final BucketImageProcessConfMarshaller bucketImageProcessConfMarshaller = new BucketImageProcessConfMarshaller();
+     static final SetBucketCORSRequestMarshaller setBucketCORSRequestMarshaller = new SetBucketCORSRequestMarshaller();
+     static final SetBucketTaggingRequestMarshaller setBucketTaggingRequestMarshaller = new SetBucketTaggingRequestMarshaller();
+     static final AddBucketReplicationRequestMarshaller addBucketReplicationRequestMarshaller = new AddBucketReplicationRequestMarshaller();
+     static final DeleteBucketReplicationRequestMarshaller deleteBucketReplicationRequestMarshaller = new DeleteBucketReplicationRequestMarshaller();
+     static final AddBucketCnameRequestMarshaller addBucketCnameRequestMarshaller = new AddBucketCnameRequestMarshaller();
+     static final DeleteBucketCnameRequestMarshaller deleteBucketCnameRequestMarshaller = new DeleteBucketCnameRequestMarshaller();
+     static final SetBucketQosRequestMarshaller setBucketQosRequestMarshaller = new SetBucketQosRequestMarshaller();
+     static final CompleteMultipartUploadRequestMarshaller completeMultipartUploadRequestMarshaller = new CompleteMultipartUploadRequestMarshaller();
+     static final CreateLiveChannelRequestMarshaller createLiveChannelRequestMarshaller = new CreateLiveChannelRequestMarshaller();
+     static final CreateUdfRequestMarshaller createUdfRequestMarshaller = new CreateUdfRequestMarshaller();
+     static final CreateUdfApplicationRequestMarshaller createUdfApplicationRequestMarshaller = new CreateUdfApplicationRequestMarshaller();
+     static final UpgradeUdfApplicationRequestMarshaller upgradeUdfApplicationRequestMarshaller = new UpgradeUdfApplicationRequestMarshaller();
+     static final ResizeUdfApplicationRequestMarshaller resizeUdfApplicationRequestMarshaller = new ResizeUdfApplicationRequestMarshaller();
+     static final ProcessObjectRequestMarshaller processObjectRequestMarshaller = new ProcessObjectRequestMarshaller();
+     static final SetBucketVersioningRequestMarshaller setBucketVersioningRequestMarshaller = new SetBucketVersioningRequestMarshaller();
+     static final SetBucketEncryptionRequestMarshaller setBucketEncryptionRequestMarshaller = new SetBucketEncryptionRequestMarshaller();
+     static final SetBucketPolicyRequestMarshaller setBucketPolicyRequestMarshaller = new SetBucketPolicyRequestMarshaller();
+     static final SetBucketRequestPaymentRequestMarshaller setBucketRequestPaymentRequestMarshaller = new SetBucketRequestPaymentRequestMarshaller();
+     static final SetBucketQosInfoRequestMarshaller setBucketQosInfoRequestMarshaller = new SetBucketQosInfoRequestMarshaller();
+     static final SetAsyncFetchTaskRequestMarshaller setAsyncFetchTaskRequestMarshaller = new SetAsyncFetchTaskRequestMarshaller();
+     static final SetBucketInventoryRequestMarshaller setBucketInventoryRequestMarshaller = new SetBucketInventoryRequestMarshaller();
+     static final RestoreObjectRequestMarshaller restoreObjectRequestMarshaller = new RestoreObjectRequestMarshaller();
+     static final ExtendBucketWormRequestMarshaller extendBucketWormRequestMarshaller = new ExtendBucketWormRequestMarshaller();
+     static final InitiateBucketWormRequestMarshaller initiateBucketWormRequestMarshaller = new InitiateBucketWormRequestMarshaller();
 
-    public static final CreateSelectObjectMetadataRequestMarshaller createSelectObjectMetadataRequestMarshaller = new CreateSelectObjectMetadataRequestMarshaller();
-    public static final SelectObjectRequestMarshaller selectObjectRequestMarshaller = new SelectObjectRequestMarshaller();
+     static final CreateSelectObjectMetadataRequestMarshaller createSelectObjectMetadataRequestMarshaller = new CreateSelectObjectMetadataRequestMarshaller();
+     static final SelectObjectRequestMarshaller selectObjectRequestMarshaller = new SelectObjectRequestMarshaller();
 
-    public static final CreateVpcipRequestMarshaller createVpcipRequestMarshaller = new CreateVpcipRequestMarshaller();
-    public static final CreateBucketVpcipRequestMarshaller createBucketVpcipRequestMarshaller = new CreateBucketVpcipRequestMarshaller();
-    public static final DeleteVpcipRequestMarshaller deleteVpcipRequestMarshaller = new DeleteVpcipRequestMarshaller();
-    public static final DeleteBucketVpcipRequestMarshaller deleteBucketVpcipRequestMarshaller = new DeleteBucketVpcipRequestMarshaller();
+     static final CreateVpcipRequestMarshaller createVpcipRequestMarshaller = new CreateVpcipRequestMarshaller();
+     static final CreateBucketVpcipRequestMarshaller createBucketVpcipRequestMarshaller = new CreateBucketVpcipRequestMarshaller();
+     static final DeleteVpcipRequestMarshaller deleteVpcipRequestMarshaller = new DeleteVpcipRequestMarshaller();
+     static final DeleteBucketVpcipRequestMarshaller deleteBucketVpcipRequestMarshaller = new DeleteBucketVpcipRequestMarshaller();
 
-    public static final SetBucketResourceGroupRequestMarshaller setBucketResourceGroupRequestMarshaller = new SetBucketResourceGroupRequestMarshaller();
-    public static final PutBucketTransferAccelerationRequestMarshaller putBucketTransferAccelerationRequestMarshaller = new PutBucketTransferAccelerationRequestMarshaller();
+     static final SetBucketResourceGroupRequestMarshaller setBucketResourceGroupRequestMarshaller = new SetBucketResourceGroupRequestMarshaller();
+     static final PutBucketTransferAccelerationRequestMarshaller putBucketTransferAccelerationRequestMarshaller = new PutBucketTransferAccelerationRequestMarshaller();
 
     abstract class RequestMarshaller<R> extends Marshaller<FixedLengthInputStream, R> {
 
@@ -105,10 +62,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class StringMarshaller implements Marshaller<FixedLengthInputStream, String> {
+     static final class StringMarshaller implements Marshaller<FixedLengthInputStream, String> {
 
         @override
-        public FixedLengthInputStream marshall(String input) {
+         FixedLengthInputStream marshall(String input) {
             if (input == null) {
                 throw ArgumentError("The input should not be null.");
             }
@@ -126,9 +83,9 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class PutImageStyleRequestMarshaller implements RequestMarshaller<PutImageStyleRequest> {
+     static final class PutImageStyleRequestMarshaller implements RequestMarshaller<PutImageStyleRequest> {
         @override
-        public FixedLengthInputStream marshall(PutImageStyleRequest request) {
+         FixedLengthInputStream marshall(PutImageStyleRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<Style>");
             xmlBody.append("<Content>" + request.GetStyle() + "</Content>");
@@ -137,10 +94,10 @@ public final class RequestMarshallers {
         }
     }
 
-    public static final class BucketImageProcessConfMarshaller implements RequestMarshaller<ImageProcess> {
+     static final class BucketImageProcessConfMarshaller implements RequestMarshaller<ImageProcess> {
 
         @override
-        public FixedLengthInputStream marshall(ImageProcess imageProcessConf) {
+         FixedLengthInputStream marshall(ImageProcess imageProcessConf) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<BucketProcessConfiguration>");
             xmlBody.append("<CompliedHost>" + imageProcessConf.getCompliedHost() + "</CompliedHost>");
@@ -164,9 +121,9 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class PutBucketImageRequestMarshaller implements RequestMarshaller<PutBucketImageRequest> {
+     static final class PutBucketImageRequestMarshaller implements RequestMarshaller<PutBucketImageRequest> {
         @override
-        public FixedLengthInputStream marshall(PutBucketImageRequest request) {
+         FixedLengthInputStream marshall(PutBucketImageRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<Channel>");
             if (request.GetIsForbidOrigPicAccess()) {
@@ -206,10 +163,10 @@ public final class RequestMarshallers {
         }
     }
 
-    public static final class CreateBucketRequestMarshaller implements RequestMarshaller<CreateBucketRequest> {
+     static final class CreateBucketRequestMarshaller implements RequestMarshaller<CreateBucketRequest> {
 
         @override
-        public FixedLengthInputStream marshall(CreateBucketRequest request) {
+         FixedLengthInputStream marshall(CreateBucketRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             if (request.getLocationConstraint() != null 
                     || request.getStorageClass() != null 
@@ -231,10 +188,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class BucketRefererMarshaller implements RequestMarshaller<BucketReferer> {
+     static final class BucketRefererMarshaller implements RequestMarshaller<BucketReferer> {
 
         @override
-        public FixedLengthInputStream marshall(BucketReferer br) {
+         FixedLengthInputStream marshall(BucketReferer br) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<RefererConfiguration>");
             xmlBody.append("<AllowEmptyReferer>" + br.isAllowEmptyReferer() + "</AllowEmptyReferer>");
@@ -255,10 +212,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class SetBucketLoggingRequestMarshaller implements RequestMarshaller<SetBucketLoggingRequest> {
+     static final class SetBucketLoggingRequestMarshaller implements RequestMarshaller<SetBucketLoggingRequest> {
 
         @override
-        public FixedLengthInputStream marshall(SetBucketLoggingRequest request) {
+         FixedLengthInputStream marshall(SetBucketLoggingRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<BucketLoggingStatus>");
             if (request.getTargetBucket() != null) {
@@ -279,10 +236,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class SetBucketWebsiteRequestMarshaller implements RequestMarshaller<SetBucketWebsiteRequest> {
+     static final class SetBucketWebsiteRequestMarshaller implements RequestMarshaller<SetBucketWebsiteRequest> {
 
         @override
-        public FixedLengthInputStream marshall(SetBucketWebsiteRequest request) {
+         FixedLengthInputStream marshall(SetBucketWebsiteRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<WebsiteConfiguration>");
             if (request.getIndexDocument() != null) {
@@ -500,11 +457,11 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class SetBucketLifecycleRequestMarshaller
+     static final class SetBucketLifecycleRequestMarshaller
             implements RequestMarshaller<SetBucketLifecycleRequest> {
 
         @override
-        public FixedLengthInputStream marshall(SetBucketLifecycleRequest request) {
+         FixedLengthInputStream marshall(SetBucketLifecycleRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<LifecycleConfiguration>");
             for (LifecycleRule rule : request.getLifecycleRules()) {
@@ -600,10 +557,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class SetBucketCORSRequestMarshaller implements RequestMarshaller<SetBucketCORSRequest> {
+     static final class SetBucketCORSRequestMarshaller implements RequestMarshaller<SetBucketCORSRequest> {
 
         @override
-        public FixedLengthInputStream marshall(SetBucketCORSRequest request) {
+         FixedLengthInputStream marshall(SetBucketCORSRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<CORSConfiguration>");
             for (CORSRule rule : request.getCorsRules()) {
@@ -644,11 +601,11 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class CompleteMultipartUploadRequestMarshaller
+     static final class CompleteMultipartUploadRequestMarshaller
             implements RequestMarshaller<CompleteMultipartUploadRequest> {
 
         @override
-        public FixedLengthInputStream marshall(CompleteMultipartUploadRequest request) {
+         FixedLengthInputStream marshall(CompleteMultipartUploadRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             List<PartETag> eTags = request.getPartETags();
             xmlBody.append("<CompleteMultipartUpload>");
@@ -666,11 +623,11 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class CreateSelectObjectMetadataRequestMarshaller
+     static final class CreateSelectObjectMetadataRequestMarshaller
             implements RequestMarshaller2<CreateSelectObjectMetadataRequest> {
 
         @override
-        public byte[] marshall(CreateSelectObjectMetadataRequest request) {
+         byte[] marshall(CreateSelectObjectMetadataRequest request) {
             StringBuilder xmlBody = new StringBuilder();
             InputSerialization inputSerialization = request.getInputSerialization();
             CSVFormat csvFormat = inputSerialization.getCsvInputFormat();
@@ -707,7 +664,7 @@ public final class RequestMarshallers {
         }
     }
 
-    private static void populateSelectRange(StringBuilder xmlBody, SelectObjectRequest request) {
+     static void populateSelectRange(StringBuilder xmlBody, SelectObjectRequest request) {
         if (request.getLineRange() != null) {
             xmlBody.append("<Range>" + request.lineRangeToString(request.getLineRange()) + "</Range>");
         }
@@ -716,7 +673,7 @@ public final class RequestMarshallers {
         }
     }
 
-    private static void populateSelectJsonObjectRequest(StringBuilder xmlBody, SelectObjectRequest request) {
+     static void populateSelectJsonObjectRequest(StringBuilder xmlBody, SelectObjectRequest request) {
         InputSerialization inputSerialization = request.getInputSerialization();
         JsonFormat jsonInputFormat = inputSerialization.getJsonInputFormat();
         xmlBody.append("<InputSerialization>");
@@ -738,7 +695,7 @@ public final class RequestMarshallers {
         xmlBody.append("</OutputSerialization>");
     }
 
-    private static void populateSelectCsvObjectRequest(StringBuilder xmlBody, SelectObjectRequest request) {
+     static void populateSelectCsvObjectRequest(StringBuilder xmlBody, SelectObjectRequest request) {
         InputSerialization inputSerialization = request.getInputSerialization();
         CSVFormat csvInputFormat = inputSerialization.getCsvInputFormat();
         xmlBody.append("<InputSerialization>");
@@ -768,10 +725,10 @@ public final class RequestMarshallers {
         xmlBody.append("</OutputSerialization>");
     }
 
-    public static final class SelectObjectRequestMarshaller implements RequestMarshaller2<SelectObjectRequest> {
+     static final class SelectObjectRequestMarshaller implements RequestMarshaller2<SelectObjectRequest> {
 
         @override
-        public byte[] marshall(SelectObjectRequest request) {
+         byte[] marshall(SelectObjectRequest request) {
             StringBuilder xmlBody = new StringBuilder();
             xmlBody.append("<SelectRequest>");
 
@@ -801,10 +758,10 @@ public final class RequestMarshallers {
         }
     }
 
-    public static final class DeleteObjectsRequestMarshaller implements RequestMarshaller2<DeleteObjectsRequest> {
+     static final class DeleteObjectsRequestMarshaller implements RequestMarshaller2<DeleteObjectsRequest> {
 
         @override
-        public byte[] marshall(DeleteObjectsRequest request) {
+         byte[] marshall(DeleteObjectsRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             bool quiet = request.isQuiet();
             List<String> keysToDelete = request.getKeys();
@@ -830,10 +787,10 @@ public final class RequestMarshallers {
 
     }
     
-    public static final class DeleteVersionsRequestMarshaller implements RequestMarshaller2<DeleteVersionsRequest> {
+     static final class DeleteVersionsRequestMarshaller implements RequestMarshaller2<DeleteVersionsRequest> {
 
         @override
-        public byte[] marshall(DeleteVersionsRequest request) {
+         byte[] marshall(DeleteVersionsRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             bool quiet = request.getQuiet();
             List<KeyVersion> keysToDelete = request.getKeys();
@@ -863,10 +820,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class SetBucketTaggingRequestMarshaller implements RequestMarshaller<SetTaggingRequest> {
+     static final class SetBucketTaggingRequestMarshaller implements RequestMarshaller<SetTaggingRequest> {
 
         @override
-        public FixedLengthInputStream marshall(SetTaggingRequest request) {
+         FixedLengthInputStream marshall(SetTaggingRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             TagSet tagSet = request.getTagSet();
             xmlBody.append("<Tagging><TagSet>");
@@ -885,11 +842,11 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class AddBucketReplicationRequestMarshaller
+     static final class AddBucketReplicationRequestMarshaller
             implements RequestMarshaller<AddBucketReplicationRequest> {
 
         @override
-        public FixedLengthInputStream marshall(AddBucketReplicationRequest request) {
+         FixedLengthInputStream marshall(AddBucketReplicationRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<ReplicationConfiguration>");
             xmlBody.append("<Rule>");
@@ -949,11 +906,11 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class DeleteBucketReplicationRequestMarshaller
+     static final class DeleteBucketReplicationRequestMarshaller
             implements RequestMarshaller2<DeleteBucketReplicationRequest> {
 
         @override
-        public byte[] marshall(DeleteBucketReplicationRequest request) {
+         byte[] marshall(DeleteBucketReplicationRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<ReplicationRules>");
             xmlBody.append("<ID>" + escapeKey(request.getReplicationRuleID()) + "</ID>");
@@ -970,10 +927,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class AddBucketCnameRequestMarshaller implements RequestMarshaller2<AddBucketCnameRequest> {
+     static final class AddBucketCnameRequestMarshaller implements RequestMarshaller2<AddBucketCnameRequest> {
 
         @override
-        public byte[] marshall(AddBucketCnameRequest request) {
+         byte[] marshall(AddBucketCnameRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<BucketCnameConfiguration>");
             xmlBody.append("<Cname>");
@@ -992,15 +949,15 @@ public final class RequestMarshallers {
                     xmlBody.append(escapeKey(certConf.getPreviousId()));
                     xmlBody.append("</PreviousCertId>");
                 }
-                if (certConf.getPublicKey() != null) {
+                if (certConf.getKey() != null) {
                     xmlBody.append("<Certificate>");
-                    xmlBody.append(escapeKey(certConf.getPublicKey()));
+                    xmlBody.append(escapeKey(certConf.getKey()));
                     xmlBody.append("</Certificate>");
                 }
-                if (certConf.getPrivateKey() != null) {
-                    xmlBody.append("<PrivateKey>");
-                    xmlBody.append(escapeKey(certConf.getPrivateKey()));
-                    xmlBody.append("</PrivateKey>");
+                if (certConf.getKey() != null) {
+                    xmlBody.append("<Key>");
+                    xmlBody.append(escapeKey(certConf.getKey()));
+                    xmlBody.append("</Key>");
                 }
                 if (certConf.isForceOverwriteCert()) {
                     xmlBody.append("<Force>true</Force>");
@@ -1022,11 +979,11 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class DeleteBucketCnameRequestMarshaller
+     static final class DeleteBucketCnameRequestMarshaller
             implements RequestMarshaller2<DeleteBucketCnameRequest> {
 
         @override
-        public byte[] marshall(DeleteBucketCnameRequest request) {
+         byte[] marshall(DeleteBucketCnameRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<BucketCnameConfiguration>");
             xmlBody.append("<Cname>");
@@ -1045,10 +1002,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class SetBucketQosRequestMarshaller implements RequestMarshaller2<UserQos> {
+     static final class SetBucketQosRequestMarshaller implements RequestMarshaller2<UserQos> {
 
         @override
-        public byte[] marshall(UserQos userQos) {
+         byte[] marshall(UserQos userQos) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<BucketUserQos>");
             if (userQos.hasStorageCapacity()) {
@@ -1067,11 +1024,11 @@ public final class RequestMarshallers {
 
     }
     
-    public static final class SetBucketVersioningRequestMarshaller
+     static final class SetBucketVersioningRequestMarshaller
         implements RequestMarshaller2<SetBucketVersioningRequest> {
 
         @override
-        public byte[] marshall(SetBucketVersioningRequest setBucketVersioningRequest) {
+         byte[] marshall(SetBucketVersioningRequest setBucketVersioningRequest) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<VersioningConfiguration>");
             xmlBody
@@ -1089,11 +1046,11 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class SetBucketEncryptionRequestMarshaller
+     static final class SetBucketEncryptionRequestMarshaller
     implements RequestMarshaller2<SetBucketEncryptionRequest> {
 
     	@override
-    	public byte[] marshall(SetBucketEncryptionRequest setBucketEncryptionRequest) {
+    	 byte[] marshall(SetBucketEncryptionRequest setBucketEncryptionRequest) {
     		StringBuffer xmlBody = new StringBuffer();
     		ServerSideEncryptionConfiguration sseConfig =
     				setBucketEncryptionRequest.getServerSideEncryptionConfiguration();
@@ -1126,11 +1083,11 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class SetBucketPolicyRequestMarshaller
+     static final class SetBucketPolicyRequestMarshaller
             implements RequestMarshaller2<SetBucketPolicyRequest> {
 
         @override
-        public byte[] marshall(SetBucketPolicyRequest setBucketPolicyRequest) {
+         byte[] marshall(SetBucketPolicyRequest setBucketPolicyRequest) {
 
             byte[] rawData = null;
             try {
@@ -1143,11 +1100,11 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class CreateLiveChannelRequestMarshaller
+     static final class CreateLiveChannelRequestMarshaller
             implements RequestMarshaller2<CreateLiveChannelRequest> {
 
         @override
-        public byte[] marshall(CreateLiveChannelRequest request) {
+         byte[] marshall(CreateLiveChannelRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<LiveChannelConfiguration>");
             xmlBody.append("<Description>" + request.getLiveChannelDescription() + "</Description>");
@@ -1173,10 +1130,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class SetBucketRequestPaymentRequestMarshaller implements RequestMarshaller2<String> {
+     static final class SetBucketRequestPaymentRequestMarshaller implements RequestMarshaller2<String> {
 
         @override
-        public byte[] marshall(String payer) {
+         byte[] marshall(String payer) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<RequestPaymentConfiguration>");
             xmlBody.append("<Payer>" +payer + "</Payer>");
@@ -1193,10 +1150,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class SetBucketQosInfoRequestMarshaller implements RequestMarshaller2<BucketQosInfo> {
+     static final class SetBucketQosInfoRequestMarshaller implements RequestMarshaller2<BucketQosInfo> {
 
         @override
-        public byte[] marshall(BucketQosInfo bucketQosInfo) {
+         byte[] marshall(BucketQosInfo bucketQosInfo) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<QoSConfiguration>");
             if (bucketQosInfo.getTotalUploadBw() != null) {
@@ -1248,10 +1205,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class SetAsyncFetchTaskRequestMarshaller implements RequestMarshaller2<AsyncFetchTaskConfiguration> {
+     static final class SetAsyncFetchTaskRequestMarshaller implements RequestMarshaller2<AsyncFetchTaskConfiguration> {
 
         @override
-        public byte[] marshall(AsyncFetchTaskConfiguration asyncFetchTaskConfiguration) {
+         byte[] marshall(AsyncFetchTaskConfiguration asyncFetchTaskConfiguration) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<AsyncFetchTaskConfiguration>");
 
@@ -1293,10 +1250,10 @@ public final class RequestMarshallers {
     }
 
 
-    public static final class SetBucketInventoryRequestMarshaller implements
+     static final class SetBucketInventoryRequestMarshaller implements
             RequestMarshaller2<InventoryConfiguration> {
         @override
-        public byte[] marshall(InventoryConfiguration config) {
+         byte[] marshall(InventoryConfiguration config) {
             StringBuffer xmlBody = new StringBuffer();
 
             xmlBody.append("<InventoryConfiguration>");
@@ -1384,10 +1341,10 @@ public final class RequestMarshallers {
         }
     }
 
-    public static final class InitiateBucketWormRequestMarshaller implements
+     static final class InitiateBucketWormRequestMarshaller implements
             RequestMarshaller2<InitiateBucketWormRequest> {
         @override
-        public byte[] marshall(InitiateBucketWormRequest request) {
+         byte[] marshall(InitiateBucketWormRequest request) {
             StringBuffer xmlBody = new StringBuffer();
 
             xmlBody.append("<InitiateWormConfiguration>");
@@ -1403,10 +1360,10 @@ public final class RequestMarshallers {
         }
     }
 
-    public static final class ExtendBucketWormRequestMarshaller implements
+     static final class ExtendBucketWormRequestMarshaller implements
             RequestMarshaller2<ExtendBucketWormRequest> {
         @override
-        public byte[] marshall(ExtendBucketWormRequest request) {
+         byte[] marshall(ExtendBucketWormRequest request) {
             StringBuffer xmlBody = new StringBuffer();
 
             xmlBody.append("<ExtendWormConfiguration>");
@@ -1422,10 +1379,10 @@ public final class RequestMarshallers {
         }
     }
 
-    public static final class SetBucketResourceGroupRequestMarshaller implements RequestMarshaller2<String> {
+     static final class SetBucketResourceGroupRequestMarshaller implements RequestMarshaller2<String> {
 
         @override
-        public byte[] marshall(String resourceGroupId) {
+         byte[] marshall(String resourceGroupId) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<BucketResourceGroupConfiguration>");
             xmlBody.append("<ResourceGroupId>" + resourceGroupId + "</ResourceGroupId>");
@@ -1442,10 +1399,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class CreateUdfRequestMarshaller implements RequestMarshaller2<CreateUdfRequest> {
+     static final class CreateUdfRequestMarshaller implements RequestMarshaller2<CreateUdfRequest> {
 
         @override
-        public byte[] marshall(CreateUdfRequest request) {
+         byte[] marshall(CreateUdfRequest request) {
             StringBuffer xmlBody = new StringBuffer();
 
             xmlBody.append("<CreateUDFConfiguration>");
@@ -1469,11 +1426,11 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class CreateUdfApplicationRequestMarshaller
+     static final class CreateUdfApplicationRequestMarshaller
             implements RequestMarshaller2<CreateUdfApplicationRequest> {
 
         @override
-        public byte[] marshall(CreateUdfApplicationRequest request) {
+         byte[] marshall(CreateUdfApplicationRequest request) {
             StringBuffer xmlBody = new StringBuffer();
             UdfApplicationConfiguration config = request.getUdfApplicationConfiguration();
 
@@ -1496,11 +1453,11 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class UpgradeUdfApplicationRequestMarshaller
+     static final class UpgradeUdfApplicationRequestMarshaller
             implements RequestMarshaller2<UpgradeUdfApplicationRequest> {
 
         @override
-        public byte[] marshall(UpgradeUdfApplicationRequest request) {
+         byte[] marshall(UpgradeUdfApplicationRequest request) {
             StringBuffer xmlBody = new StringBuffer();
 
             xmlBody.append("<UpgradeUDFApplicationConfiguration>");
@@ -1518,11 +1475,11 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class ResizeUdfApplicationRequestMarshaller
+     static final class ResizeUdfApplicationRequestMarshaller
             implements RequestMarshaller2<ResizeUdfApplicationRequest> {
 
         @override
-        public byte[] marshall(ResizeUdfApplicationRequest request) {
+         byte[] marshall(ResizeUdfApplicationRequest request) {
             StringBuffer xmlBody = new StringBuffer();
 
             xmlBody.append("<ResizeUDFApplicationConfiguration>");
@@ -1540,10 +1497,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class ProcessObjectRequestMarshaller implements RequestMarshaller2<ProcessObjectRequest> {
+     static final class ProcessObjectRequestMarshaller implements RequestMarshaller2<ProcessObjectRequest> {
 
         @override
-        public byte[] marshall(ProcessObjectRequest request) {
+         byte[] marshall(ProcessObjectRequest request) {
             StringBuffer processBody = new StringBuffer();
 
             processBody.append(RequestParameters.SUBRESOURCE_PROCESS);
@@ -1560,10 +1517,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class CreateVpcipRequestMarshaller implements RequestMarshaller<CreateVpcipRequest> {
+     static final class CreateVpcipRequestMarshaller implements RequestMarshaller<CreateVpcipRequest> {
 
         @override
-        public FixedLengthInputStream marshall(CreateVpcipRequest request) {
+         FixedLengthInputStream marshall(CreateVpcipRequest request) {
             StringBuffer xmlBody = new StringBuffer();
 
             if (request.getRegion() != null || request.getVSwitchId() != null) {
@@ -1585,10 +1542,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class DeleteVpcipRequestMarshaller implements RequestMarshaller<DeleteVpcipRequest> {
+     static final class DeleteVpcipRequestMarshaller implements RequestMarshaller<DeleteVpcipRequest> {
 
         @override
-        public FixedLengthInputStream marshall(DeleteVpcipRequest deleteVpcipRequest) {
+         FixedLengthInputStream marshall(DeleteVpcipRequest deleteVpcipRequest) {
             StringBuffer xmlBody = new StringBuffer();
             VpcPolicy request = deleteVpcipRequest.getVpcPolicy();
 
@@ -1611,10 +1568,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class DeleteBucketVpcipRequestMarshaller implements RequestMarshaller<VpcPolicy> {
+     static final class DeleteBucketVpcipRequestMarshaller implements RequestMarshaller<VpcPolicy> {
 
         @override
-        public FixedLengthInputStream marshall(VpcPolicy request) {
+         FixedLengthInputStream marshall(VpcPolicy request) {
             StringBuffer xmlBody = new StringBuffer();
 
             if (request.getRegion() != null || request.getVpcId() != null || request.getVip() != null) {
@@ -1636,10 +1593,10 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class CreateBucketVpcipRequestMarshaller implements RequestMarshaller<CreateBucketVpcipRequest> {
+     static final class CreateBucketVpcipRequestMarshaller implements RequestMarshaller<CreateBucketVpcipRequest> {
 
         @override
-        public FixedLengthInputStream marshall(CreateBucketVpcipRequest bucketVpcPolicyRequest) {
+         FixedLengthInputStream marshall(CreateBucketVpcipRequest bucketVpcPolicyRequest) {
             StringBuffer xmlBody = new StringBuffer();
             VpcPolicy request = bucketVpcPolicyRequest.getVpcPolicy();
 
@@ -1663,10 +1620,10 @@ public final class RequestMarshallers {
     }
 
 
-    public static final class RestoreObjectRequestMarshaller implements RequestMarshaller2<RestoreObjectRequest> {
+     static final class RestoreObjectRequestMarshaller implements RequestMarshaller2<RestoreObjectRequest> {
 
         @override
-        public byte[] marshall(RestoreObjectRequest request) {
+         byte[] marshall(RestoreObjectRequest request) {
             StringBuffer body = new StringBuffer();
 
             body.append("<RestoreRequest>");
@@ -1692,9 +1649,9 @@ public final class RequestMarshallers {
 
     }
 
-    public static final class PutBucketTransferAccelerationRequestMarshaller implements RequestMarshaller2<SetBucketTransferAccelerationRequest> {
+     static final class PutBucketTransferAccelerationRequestMarshaller implements RequestMarshaller2<SetBucketTransferAccelerationRequest> {
         @override
-        public byte[] marshall(SetBucketTransferAccelerationRequest input) {
+         byte[] marshall(SetBucketTransferAccelerationRequest input) {
             StringBuffer xmlBody = new StringBuffer();
             xmlBody.append("<TransferAccelerationConfiguration><Enabled>");
             xmlBody.append(input.isEnabled());
@@ -1711,7 +1668,7 @@ public final class RequestMarshallers {
         }
     }
 
-    private static enum EscapedChar {
+     static enum EscapedChar {
         // "\r"
         RETURN("&#x000D;"),
 
@@ -1736,19 +1693,19 @@ public final class RequestMarshallers {
         // ">"
         GT("&gt;");
 
-        private final String escapedChar;
+         final String escapedChar;
 
-        private EscapedChar(String escapedChar) {
+         EscapedChar(String escapedChar) {
             this.escapedChar = escapedChar;
         }
 
         @override
-        public String toString() {
+         String toString() {
             return this.escapedChar;
         }
     }
 
-    private static String escapeKey(String key) {
+     static String escapeKey(String key) {
         if (key == null) {
             return "";
         }
@@ -1796,7 +1753,7 @@ public final class RequestMarshallers {
         return builder.toString();
     }
 
-    private static String joinRepliationAction(List<ReplicationAction> actions) {
+     static String joinRepliationAction(List<ReplicationAction> actions) {
         StringBuilder sb = new StringBuilder();
         bool first = true;
 

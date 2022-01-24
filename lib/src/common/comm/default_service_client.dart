@@ -1,8 +1,8 @@
 
 import 'package:aliyun_oss_dart_sdk/src/client_configuration.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/comm/service_client.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/comm/service_client.dart';
 
+import 'http_request_factory.dart';
 import 'service_client.dart';
 
 /// Default implementation of {@link ServiceClient}.
@@ -116,47 +116,7 @@ import 'service_client.dart';
         response.setContent(ByteArrayInputStream(contentBytes));
     }
 
-     static class DefaultRetryStrategy extends RetryStrategy {
-
-        @override
-         bool shouldRetry(Exception ex, RequestMessage request, ResponseMessage response, int retries) {
-            if (ex is ClientException) {
-                String errorCode = ((ClientException) ex).getErrorCode();
-                if (errorCode.equals(ClientErrorCode.CONNECTION_TIMEOUT)
-                        || errorCode.equals(ClientErrorCode.SOCKET_TIMEOUT)
-                        || errorCode.equals(ClientErrorCode.CONNECTION_REFUSED)
-                        || errorCode.equals(ClientErrorCode.UNKNOWN_HOST)
-                        || errorCode.equals(ClientErrorCode.SOCKET_EXCEPTION)
-                        || errorCode.equals(ClientErrorCode.SSL_EXCEPTION)) {
-                    return true;
-                }
-
-                // Don't retry when request input stream is non-repeatable
-                if (errorCode.equals(ClientErrorCode.NONREPEATABLE_REQUEST)) {
-                    return false;
-                }
-            }
-
-            if (ex is OSSException) {
-                String errorCode = ((OSSException) ex).getErrorCode();
-                // No need retry for invalid responses
-                if (errorCode.equals(OSSErrorCode.INVALID_RESPONSE)) {
-                    return false;
-                }
-            }
-
-            if (response != null) {
-                int statusCode = response.getStatusCode();
-                if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR || statusCode == HttpStatus.SC_BAD_GATEWAY ||
-                        statusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    }
-
+     
     @override
      RetryStrategy getDefaultRetryStrategy() {
         return DefaultRetryStrategy();

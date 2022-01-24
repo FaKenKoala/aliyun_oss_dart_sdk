@@ -1,42 +1,13 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
-package com.aliyun.oss.common.comm;
+ class RepeatableInputStreamEntity extends BasicHttpEntity {
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+     bool firstAttempt = true;
 
-import org.apache.http.entity.AbstractHttpEntity;
-import org.apache.http.entity.BasicHttpEntity;
+     NoAutoClosedInputStreamEntity innerEntity;
 
-import com.aliyun.oss.common.utils.HttpHeaders;
+     InputStream content;
 
-public class RepeatableInputStreamEntity extends BasicHttpEntity {
-
-    private bool firstAttempt = true;
-
-    private NoAutoClosedInputStreamEntity innerEntity;
-
-    private InputStream content;
-
-    public RepeatableInputStreamEntity(ServiceClient.Request request) {
+     RepeatableInputStreamEntity(ServiceClient.Request request) {
         setChunked(false);
 
         String contentType = request.getHeaders().GET(HttpHeaders.CONTENT_TYPE);
@@ -52,17 +23,17 @@ public class RepeatableInputStreamEntity extends BasicHttpEntity {
     }
 
     @override
-    public bool isChunked() {
+     bool isChunked() {
         return false;
     }
 
     @override
-    public bool isRepeatable() {
+     bool isRepeatable() {
         return content.markSupported() || innerEntity.isRepeatable();
     }
 
     @override
-    public void writeTo(OutputStream output) throws IOException {
+     void writeTo(OutputStream output) {
         if (!firstAttempt && isRepeatable()) {
             content.reset();
         }
@@ -70,21 +41,20 @@ public class RepeatableInputStreamEntity extends BasicHttpEntity {
         firstAttempt = false;
         innerEntity.writeTo(output);
     }
+ }
 
-    /**
-     * The default entity org.apache.http.entity.InputStreamEntity will close
-     * input stream after wirteTo was called. To avoid this, we custom a entity
-     * that will not close stream automatically.
-     * 
-     * @author chao.wangchaowc
-     */
-    public static class NoAutoClosedInputStreamEntity extends AbstractHttpEntity {
-        private final static int BUFFER_SIZE = 2048;
+    /// The default entity org.apache.http.entity.InputStreamEntity will close
+    /// input stream after wirteTo was called. To avoid this, we custom a entity
+    /// that will not close stream automatically.
+    /// 
+    /// @author chao.wangchaowc
+      class NoAutoClosedInputStreamEntity extends AbstractHttpEntity {
+         final static int BUFFER_SIZE = 2048;
 
-        private final InputStream content;
-        private final long length;
+         final InputStream content;
+         final long length;
 
-        public NoAutoClosedInputStreamEntity(final InputStream instream, long length) {
+         NoAutoClosedInputStreamEntity(final InputStream instream, long length) {
             super();
             if (instream == null) {
                 throw ArgumentError("Source input stream may not be null");
@@ -93,19 +63,19 @@ public class RepeatableInputStreamEntity extends BasicHttpEntity {
             this.length = length;
         }
 
-        public bool isRepeatable() {
+         bool isRepeatable() {
             return false;
         }
 
-        public long getContentLength() {
+         long getContentLength() {
             return this.length;
         }
 
-        public InputStream getContent() throws IOException {
+         InputStream getContent() throws IOException {
             return this.content;
         }
 
-        public void writeTo(final OutputStream outstream) throws IOException {
+         void writeTo(final OutputStream outstream) throws IOException {
             if (outstream == null) {
                 throw ArgumentError("Output stream may not be null");
             }
@@ -133,8 +103,8 @@ public class RepeatableInputStreamEntity extends BasicHttpEntity {
 
         }
 
-        public bool isStreaming() {
+         bool isStreaming() {
             return true;
         }
     }
-}
+

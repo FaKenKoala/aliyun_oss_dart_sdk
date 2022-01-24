@@ -1,7 +1,7 @@
 class HttpDeleteWithBody extends HttpEntityEnclosingRequestBase {
   static final String METHOD_NAME = "DELETE";
 
-  HttpDeleteWithBody([Uri? uri]) {
+  HttpDeleteWithBody([Uri? uri, String? uriStr]) {
     setURI(uri);
   }
 
