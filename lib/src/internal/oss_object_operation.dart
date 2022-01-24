@@ -42,7 +42,7 @@ import 'oss_operation.dart';
         assertParameterNotNull(requestContent, "requestContent");
 
         if (requestHeaders == null) {
-            requestHeaders = new HashMap<String, String>();
+            requestHeaders = <String, String>{};
         }
 
         RequestMessage request = new RequestMessage(null, null);
@@ -55,7 +55,7 @@ import 'oss_operation.dart';
         request.setUseChunkEncoding(useChunkEncoding);
 
         PutObjectResult result = null;
-        if (requestHeaders.get(OSSHeaders.OSS_HEADER_CALLBACK) == null) {
+        if (requestHeaders.GET(OSSHeaders.OSS_HEADER_CALLBACK) == null) {
             result = doOperation(request, putObjectReponseParser, null, null, true);
         } else {
             result = doOperation(request, putObjectProcessReponseParser, null, null, true);
@@ -97,7 +97,7 @@ import 'oss_operation.dart';
 
         GenericRequest genericRequest = new GenericRequest(
                 createSelectObjectMetadataRequest.getBucketName(), createSelectObjectMetadataRequest.getKey());
-        genericRequest.getParameters().put(RequestParameters.SUBRESOURCE_PROCESS, process);
+        genericRequest.getParameters().PUT(RequestParameters.SUBRESOURCE_PROCESS, process);
 
         String bucketName = genericRequest.getBucketName();
         String key = genericRequest.getKey();
@@ -107,7 +107,7 @@ import 'oss_operation.dart';
         ensureBucketNameValid(bucketName);
         ensureObjectKeyValid(key);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, createSelectObjectMetadataRequest.getRequestPayer());
 
         byte[] content = createSelectObjectMetadataRequestMarshaller.marshall(createSelectObjectMetadataRequest);
@@ -157,17 +157,17 @@ import 'oss_operation.dart';
         assertParameterNotNull(key, "key");
         ensureBucketNameValid(bucketName);
         ensureObjectKeyValid(key);
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateGetObjectRequestHeaders(selectObjectRequest, headers);
 
         populateRequestPayerHeader(headers, selectObjectRequest.getRequestPayer());
 
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = <String, String>{};
         populateResponseHeaderParameters(params, selectObjectRequest.getResponseHeaders());
         String process = selectObjectRequest.getProcess();
         assertParameterNotNull(process, "process");
 
-        params.put(RequestParameters.SUBRESOURCE_PROCESS, process);
+        params.PUT(RequestParameters.SUBRESOURCE_PROCESS, process);
 
         SelectObjectRequest.ExpressionType expressionType = selectObjectRequest.getExpressionType();
         if (expressionType != SelectObjectRequest.ExpressionType.SQL) {
@@ -182,7 +182,7 @@ import 'oss_operation.dart';
 
         byte[] content = selectObjectRequestMarshaller.marshall(selectObjectRequest);
 
-        headers.put(HttpHeaders.CONTENT_MD5, BinaryUtil.toBase64String(BinaryUtil.calculateMd5(content)));
+        headers.PUT(HttpHeaders.CONTENT_MD5, BinaryUtil.toBase64String(BinaryUtil.calculateMd5(content)));
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(selectObjectRequest))
                 .setMethod(HttpMethod.POST).setBucket(bucketName).setKey(key).setHeaders(headers)
                 .setInputSize(content.length).setInputStream(new ByteArrayInputStream(content))
@@ -193,7 +193,7 @@ import 'oss_operation.dart';
             OSSObject ossObject = doOperation(request, new GetObjectResponseParser(bucketName, key), bucketName, key, true);
             publishProgress(selectProgressListener, ProgressEventType.SELECT_STARTED_EVENT);
             InputStream inputStream = ossObject.getObjectContent();
-            if (!bool.parsebool(ossObject.getObjectMetadata().getRawMetadata().get(OSS_SELECT_OUTPUT_RAW).toString())) {
+            if (!bool.parsebool(ossObject.getObjectMetadata().getRawMetadata().GET(OSS_SELECT_OUTPUT_RAW).toString())) {
                 SelectInputStream selectInputStream = new SelectInputStream(inputStream, selectProgressListener,
                         selectObjectRequest.getOutputSerialization().isPayloadCrcEnabled());
                 selectInputStream.setRequestId(ossObject.getRequestId());
@@ -228,20 +228,20 @@ import 'oss_operation.dart';
             ensureBucketNameValid(bucketName);
             ensureObjectKeyValid(key);
 
-            Map<String, String> headers = new HashMap<String, String>();
+            Map<String, String> headers = <String, String>{};
             populateGetObjectRequestHeaders(getObjectRequest, headers);
 
-            Map<String, String> params = new HashMap<String, String>();
+            Map<String, String> params = <String, String>{};
             populateResponseHeaderParameters(params, getObjectRequest.getResponseHeaders());
 
             String versionId = getObjectRequest.getVersionId();
             if (versionId != null) {
-                params.put(RequestParameters.SUBRESOURCE_VRESION_ID, versionId);
+                params.PUT(RequestParameters.SUBRESOURCE_VRESION_ID, versionId);
             }
             
             String process = getObjectRequest.getProcess();
             if (process != null) {
-                params.put(RequestParameters.SUBRESOURCE_PROCESS, process);
+                params.PUT(RequestParameters.SUBRESOURCE_PROCESS, process);
             }
 
             request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(getObjectRequest))
@@ -326,14 +326,14 @@ import 'oss_operation.dart';
         ensureBucketNameValid(bucketName);
         ensureObjectKeyValid(key);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_OBJECTMETA, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_OBJECTMETA, null);
         if (genericRequest.getVersionId() != null) {
-            params.put(RequestParameters.SUBRESOURCE_VRESION_ID,
+            params.PUT(RequestParameters.SUBRESOURCE_VRESION_ID,
                     genericRequest.getVersionId());
         }
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, genericRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
@@ -359,12 +359,12 @@ import 'oss_operation.dart';
         ensureBucketNameValid(bucketName);
         ensureObjectKeyValid(key);
 
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = <String, String>{};
         if (genericRequest.getVersionId() != null) {
-            params.put(RequestParameters.SUBRESOURCE_VRESION_ID, genericRequest.getVersionId());
+            params.PUT(RequestParameters.SUBRESOURCE_VRESION_ID, genericRequest.getVersionId());
         }
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, genericRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
@@ -381,7 +381,7 @@ import 'oss_operation.dart';
 
         assertParameterNotNull(copyObjectRequest, "copyObjectRequest");
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateCopyObjectHeaders(copyObjectRequest, headers);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(copyObjectRequest))
@@ -408,7 +408,7 @@ import 'oss_operation.dart';
         assertParameterNotNull(key, "key");
         ensureObjectKeyValid(key);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, genericRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
@@ -435,10 +435,10 @@ import 'oss_operation.dart';
         ensureObjectKeyValid(key);
         assertParameterNotNull(versionId, "versionId");
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_VRESION_ID, versionId);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_VRESION_ID, versionId);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, deleteVersionRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(deleteVersionRequest))
@@ -459,11 +459,11 @@ import 'oss_operation.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_DELETE, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_DELETE, null);
 
         byte[] rawContent = deleteObjectsRequestMarshaller.marshall(deleteObjectsRequest);
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addDeleteObjectsRequiredHeaders(headers, rawContent);
         addDeleteObjectsOptionalHeaders(headers, deleteObjectsRequest);
 
@@ -487,11 +487,11 @@ import 'oss_operation.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_DELETE, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_DELETE, null);
 
         byte[] rawContent = deleteVersionsRequestMarshaller.marshall(deleteVersionsRequest);
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addDeleteVersionsRequiredHeaders(headers, rawContent);
 
         populateRequestPayerHeader(headers, deleteVersionsRequest.getRequestPayer());
@@ -519,7 +519,7 @@ import 'oss_operation.dart';
         assertParameterNotNull(key, "key");
         ensureObjectKeyValid(key);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addDateHeader(headers, OSSHeaders.HEAD_OBJECT_IF_MODIFIED_SINCE,
                 headObjectRequest.getModifiedSinceConstraint());
         addDateHeader(headers, OSSHeaders.HEAD_OBJECT_IF_UNMODIFIED_SINCE,
@@ -531,9 +531,9 @@ import 'oss_operation.dart';
 
         populateRequestPayerHeader(headers, headObjectRequest.getRequestPayer());
 
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = <String, String>{};
         if (headObjectRequest.getVersionId() != null) {
-            params.put(RequestParameters.SUBRESOURCE_VRESION_ID, headObjectRequest.getVersionId());
+            params.PUT(RequestParameters.SUBRESOURCE_VRESION_ID, headObjectRequest.getVersionId());
         }
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(headObjectRequest))
@@ -557,15 +557,15 @@ import 'oss_operation.dart';
         ensureObjectKeyValid(key);
         assertParameterNotNull(cannedAcl, "cannedAcl");
 
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put(OSSHeaders.OSS_OBJECT_ACL, cannedAcl.toString());
+        Map<String, String> headers = <String, String>{};
+        headers.PUT(OSSHeaders.OSS_OBJECT_ACL, cannedAcl.toString());
 
         populateRequestPayerHeader(headers, setObjectAclRequest.getRequestPayer());
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_ACL, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_ACL, null);
         if (setObjectAclRequest.getVersionId() != null) {
-            params.put(RequestParameters.SUBRESOURCE_VRESION_ID, setObjectAclRequest.getVersionId());
+            params.PUT(RequestParameters.SUBRESOURCE_VRESION_ID, setObjectAclRequest.getVersionId());
         }
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setObjectAclRequest))
@@ -587,13 +587,13 @@ import 'oss_operation.dart';
         assertParameterNotNull(key, "key");
         ensureObjectKeyValid(key);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_ACL, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_ACL, null);
         if (genericRequest.getVersionId() != null) {
-            params.put(RequestParameters.SUBRESOURCE_VRESION_ID, genericRequest.getVersionId());
+            params.PUT(RequestParameters.SUBRESOURCE_VRESION_ID, genericRequest.getVersionId());
         }
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, genericRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
@@ -624,13 +624,13 @@ import 'oss_operation.dart';
             }
         }
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_RESTORE, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_RESTORE, null);
         if (versionId != null) {
-            params.put(RequestParameters.SUBRESOURCE_VRESION_ID, versionId);
+            params.PUT(RequestParameters.SUBRESOURCE_VRESION_ID, versionId);
         }
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, genericRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
@@ -653,13 +653,13 @@ import 'oss_operation.dart';
         assertParameterNotNull(key, "key");
         ensureObjectKeyValid(key);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_TAGGING, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_TAGGING, null);
         if (versionId != null) {
-            params.put(RequestParameters.SUBRESOURCE_VRESION_ID, versionId);
+            params.PUT(RequestParameters.SUBRESOURCE_VRESION_ID, versionId);
         }
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, setObjectTaggingRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setObjectTaggingRequest))
@@ -682,13 +682,13 @@ import 'oss_operation.dart';
         ensureBucketNameValid(bucketName);
         ensureObjectKeyValid(key);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_TAGGING, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_TAGGING, null);
         if (versionId != null) {
-            params.put(RequestParameters.SUBRESOURCE_VRESION_ID, versionId);
+            params.PUT(RequestParameters.SUBRESOURCE_VRESION_ID, versionId);
         }
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, genericRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
@@ -710,13 +710,13 @@ import 'oss_operation.dart';
         assertParameterNotNull(key, "key");
         ensureObjectKeyValid(key);
         
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_TAGGING, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_TAGGING, null);
         if (versionId != null) {
-            params.put(RequestParameters.SUBRESOURCE_VRESION_ID, versionId);
+            params.PUT(RequestParameters.SUBRESOURCE_VRESION_ID, versionId);
         }
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, genericRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
@@ -737,10 +737,10 @@ import 'oss_operation.dart';
         ensureBucketNameValid(bucketName);
         ensureObjectKeyValid(symlink);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_SYMLINK, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_SYMLINK, null);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, genericRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
@@ -784,13 +784,13 @@ import 'oss_operation.dart';
             metadata.setContentType(Mimetypes.getInstance().getMimetype(target, symlink));
         }
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestMetadata(headers, metadata);
 
         populateRequestPayerHeader(headers, createSymlinkRequest.getRequestPayer());
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_SYMLINK, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_SYMLINK, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(createSymlinkRequest))
                 .setMethod(HttpMethod.PUT).setBucket(bucketName).setKey(symlink).setHeaders(headers)
@@ -813,10 +813,10 @@ import 'oss_operation.dart';
         ensureObjectKeyValid(key);
         assertStringNotNullOrEmpty(process, "process");
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_PROCESS, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_PROCESS, null);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, processObjectRequest.getRequestPayer());
 
         byte[] rawContent = processObjectRequestMarshaller.marshall(processObjectRequest);
@@ -881,10 +881,10 @@ import 'oss_operation.dart';
         assertParameterNotNull(directory, "directory");
         ensureObjectKeyValid(directory);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_DIR, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_DIR, null);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, createDirectoryRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(createDirectoryRequest))
@@ -905,12 +905,12 @@ import 'oss_operation.dart';
         assertParameterNotNull(directoryName, "directoryName");
         ensureObjectKeyValid(directoryName);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateDeleteDirectoryRequestHeaders(headers, deleteDirectoryRequest);
         populateRequestPayerHeader(headers, deleteDirectoryRequest.getRequestPayer());
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_DIR_DELETE, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_DIR_DELETE, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(deleteDirectoryRequest))
                 .setMethod(HttpMethod.POST).setBucket(bucketName).setKey(directoryName).setParameters(params).setHeaders(headers)
@@ -933,12 +933,12 @@ import 'oss_operation.dart';
         ensureObjectKeyValid(destObject);
         ensureObjectKeyValid(srcObject);
 
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put(OSSHeaders.OSS_RENAME_SOURCE, HttpUtil.urlEncode(srcObject, DEFAULT_CHARSET_NAME));
+        Map<String, String> headers = <String, String>{};
+        headers.PUT(OSSHeaders.OSS_RENAME_SOURCE, HttpUtil.urlEncode(srcObject, DEFAULT_CHARSET_NAME));
         populateRequestPayerHeader(headers, renameObjectRequest.getRequestPayer());
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_RENAME, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_RENAME, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(renameObjectRequest))
                 .setMethod(HttpMethod.POST).setBucket(bucketName).setKey(destObject).setParameters(params).setHeaders(headers)
@@ -1062,7 +1062,7 @@ import 'oss_operation.dart';
             }
         }
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestMetadata(headers, metadata);
         populateRequestCallback(headers, originalRequest.getCallback());
         populateRequestPayerHeader(headers, originalRequest.getRequestPayer());
@@ -1102,7 +1102,7 @@ import 'oss_operation.dart';
     }
 
      bool hasRangeInRequest(GetObjectRequest getObjectRequest) {
-        return getObjectRequest.getHeaders().get(OSSHeaders.RANGE) != null;
+        return getObjectRequest.getHeaders().GET(OSSHeaders.RANGE) != null;
     }
 
      static void populateCopyObjectHeaders(CopyObjectRequest copyObjectRequest, Map<String, String> headers) {
@@ -1113,7 +1113,7 @@ import 'oss_operation.dart';
             copySourceHeader += "?versionId=" + copyObjectRequest.getSourceVersionId();
         }
 
-        headers.put(OSSHeaders.COPY_OBJECT_SOURCE, copySourceHeader);
+        headers.PUT(OSSHeaders.COPY_OBJECT_SOURCE, copySourceHeader);
 
         addDateHeader(headers, OSSHeaders.COPY_OBJECT_SOURCE_IF_MODIFIED_SINCE,
                 copyObjectRequest.getModifiedSinceConstraint());
@@ -1130,9 +1130,9 @@ import 'oss_operation.dart';
 
         ObjectMetadata newObjectMetadata = copyObjectRequest.getNewObjectMetadata();
         if (newObjectMetadata != null) {
-            headers.put(OSSHeaders.COPY_OBJECT_METADATA_DIRECTIVE, MetadataDirective.REPLACE.toString());
-            if (newObjectMetadata.getRawMetadata().get(OSSHeaders.OSS_TAGGING) != null) {
-            	headers.put(OSSHeaders.COPY_OBJECT_TAGGING_DIRECTIVE, MetadataDirective.REPLACE.toString());
+            headers.PUT(OSSHeaders.COPY_OBJECT_METADATA_DIRECTIVE, MetadataDirective.REPLACE.toString());
+            if (newObjectMetadata.getRawMetadata().GET(OSSHeaders.OSS_TAGGING) != null) {
+            	headers.PUT(OSSHeaders.COPY_OBJECT_TAGGING_DIRECTIVE, MetadataDirective.REPLACE.toString());
             }
             populateRequestMetadata(headers, newObjectMetadata);
         }
@@ -1152,21 +1152,21 @@ import 'oss_operation.dart';
         }
 
         if (getObjectRequest.getModifiedSinceConstraint() != null) {
-            headers.put(OSSHeaders.GET_OBJECT_IF_MODIFIED_SINCE,
+            headers.PUT(OSSHeaders.GET_OBJECT_IF_MODIFIED_SINCE,
                     DateUtil.formatRfc822Date(getObjectRequest.getModifiedSinceConstraint()));
         }
 
         if (getObjectRequest.getUnmodifiedSinceConstraint() != null) {
-            headers.put(OSSHeaders.GET_OBJECT_IF_UNMODIFIED_SINCE,
+            headers.PUT(OSSHeaders.GET_OBJECT_IF_UNMODIFIED_SINCE,
                     DateUtil.formatRfc822Date(getObjectRequest.getUnmodifiedSinceConstraint()));
         }
 
         if (getObjectRequest.getMatchingETagConstraints().size() > 0) {
-            headers.put(OSSHeaders.GET_OBJECT_IF_MATCH, joinETags(getObjectRequest.getMatchingETagConstraints()));
+            headers.PUT(OSSHeaders.GET_OBJECT_IF_MATCH, joinETags(getObjectRequest.getMatchingETagConstraints()));
         }
 
         if (getObjectRequest.getNonmatchingETagConstraints().size() > 0) {
-            headers.put(OSSHeaders.GET_OBJECT_IF_NONE_MATCH,
+            headers.PUT(OSSHeaders.GET_OBJECT_IF_NONE_MATCH,
                     joinETags(getObjectRequest.getNonmatchingETagConstraints()));
         }
 
@@ -1175,21 +1175,21 @@ import 'oss_operation.dart';
     }
 
      static void addDeleteObjectsRequiredHeaders(Map<String, String> headers, byte[] rawContent) {
-        headers.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(rawContent.length));
+        headers.PUT(HttpHeaders.CONTENT_LENGTH, String.valueOf(rawContent.length));
 
         byte[] md5 = BinaryUtil.calculateMd5(rawContent);
         String md5Base64 = BinaryUtil.toBase64String(md5);
-        headers.put(HttpHeaders.CONTENT_MD5, md5Base64);
+        headers.PUT(HttpHeaders.CONTENT_MD5, md5Base64);
     }
     
      static void addDeleteVersionsRequiredHeaders(Map<String, String> headers, byte[] rawContent) {
         addDeleteObjectsRequiredHeaders(headers, rawContent);
-        headers.put(ENCODING_TYPE, OSSConstants.URL_ENCODING);
+        headers.PUT(ENCODING_TYPE, OSSConstants.URL_ENCODING);
     }
 
      static void addDeleteObjectsOptionalHeaders(Map<String, String> headers, DeleteObjectsRequest request) {
         if (request.getEncodingType() != null) {
-            headers.put(ENCODING_TYPE, request.getEncodingType());
+            headers.PUT(ENCODING_TYPE, request.getEncodingType());
         }
 
         populateRequestPayerHeader(headers, request.getRequestPayer());
@@ -1197,18 +1197,18 @@ import 'oss_operation.dart';
 
      static void addGetObjectRangeHeader(long[] range, Map<String, String> headers) {
         RangeSpec rangeSpec = RangeSpec.parse(RANGE);
-        headers.put(OSSHeaders.RANGE, rangeSpec.toString());
+        headers.PUT(OSSHeaders.RANGE, rangeSpec.toString());
     }
 
      static void populateRequestPayerHeader(Map<String, String> headers, Payer payer) {
         if (payer != null && payer.equals(Payer.Requester)) {
-            headers.put(OSSHeaders.OSS_REQUEST_PAYER, payer.toString().toLowerCase());
+            headers.PUT(OSSHeaders.OSS_REQUEST_PAYER, payer.toString().toLowerCase());
         }
     }
 
      static void populateTrafficLimitHeader(Map<String, String> headers, int limit) {
         if (limit > 0) {
-            headers.put(OSSHeaders.OSS_HEADER_TRAFFIC_LIMIT, String.valueOf(limit));
+            headers.PUT(OSSHeaders.OSS_HEADER_TRAFFIC_LIMIT, String.valueOf(limit));
         }
     }
 
@@ -1220,10 +1220,10 @@ import 'oss_operation.dart';
         }
 
         assert (originalRequest is AppendObjectRequest);
-        params.put(RequestParameters.SUBRESOURCE_APPEND, null);
+        params.PUT(RequestParameters.SUBRESOURCE_APPEND, null);
         AppendObjectRequest appendObjectRequest = (AppendObjectRequest) originalRequest;
         if (appendObjectRequest.getPosition() != null) {
-            params.put(RequestParameters.POSITION, String.valueOf(appendObjectRequest.getPosition()));
+            params.PUT(RequestParameters.POSITION, String.valueOf(appendObjectRequest.getPosition()));
         }
     }
 
@@ -1236,10 +1236,10 @@ import 'oss_operation.dart';
 
      static void populateDeleteDirectoryRequestHeaders(Map<String, String> headers, DeleteDirectoryRequest deleteDirectoryRequest) {
         if (deleteDirectoryRequest.isDeleteRecursive()) {
-            headers.put(OSSHeaders.OSS_DELETE_RECURSIVE, deleteDirectoryRequest.isDeleteRecursive().toString());
+            headers.PUT(OSSHeaders.OSS_DELETE_RECURSIVE, deleteDirectoryRequest.isDeleteRecursive().toString());
         }
         if (deleteDirectoryRequest.getNextDeleteToken() != null && !deleteDirectoryRequest.getNextDeleteToken().isEmpty()) {
-            headers.put(OSSHeaders.OSS_DELETE_TOKEN, deleteDirectoryRequest.getNextDeleteToken());
+            headers.PUT(OSSHeaders.OSS_DELETE_TOKEN, deleteDirectoryRequest.getNextDeleteToken());
         }
     }
 

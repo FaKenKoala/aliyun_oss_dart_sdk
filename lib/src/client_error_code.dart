@@ -1,29 +1,29 @@
 abstract class ClientErrorCode {
   ///  Unknown error. This means the error is not expected.
-  static final String unknown = "Unknown";
+  static final String UNKNOWN = "Unknown";
 
   ///  Unknown host. This error is returned when a
   ///  {@link java.net.UnknownHostException} is thrown.
-  static final String unknownHost = "UnknownHost";
+  static final String UNKNOWN_HOST = "UnknownHost";
 
   ///  connection times out.
-  static final String connectionTimeout = "ConnectionTimeout";
+  static final String CONNECTION_TIMEOUT = "ConnectionTimeout";
 
   ///  Socket times out
-  static final String socketTimeout = "SocketTimeout";
+  static final String SOCKET_TIMEOUT = "SocketTimeout";
 
   ///  Socket exception
-  static final String socketException = "SocketException";
+  static final String SOCKET_EXCEPTION = "SocketException";
 
   ///  Connection is refused by server side.
-  static final String connectionRefused = "ConnectionRefused";
+  static final String CONNECTION_REFUSED = "ConnectionRefused";
 
   ///  The input stream is not repeatable for reading.
-  static final String nonrepeatableRequest = "NonRepeatableRequest";
+  static final String NON_REPEATABLE_REQUEST = "NonRepeatableRequest";
 
   ///  Thread interrupted while reading the input stream.
-  static final String inputstreamReadingAborted = "InputStreamReadingAborted";
+  static final String INPUTSTREAM_READING_ABORTED = "InputStreamReadingAborted";
 
   ///  Ssl exception
-  static final String sslException = "SslException";
+  static final String SSL_EXCEPTION = "SslException";
 }

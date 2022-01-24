@@ -16,7 +16,7 @@ class RequestMessage extends HttpMessage {
   late Uri endpoint;
 
   /* The HTTP method to use when sending this request */
-  HttpMethod method = HttpMethod.get;
+  HttpMethod method = HttpMethod.GET;
 
   /* Use a LinkedHashMap to preserve the insertion order. */
   final Map<String, String> _parameters = <String, String>{};

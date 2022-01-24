@@ -128,7 +128,7 @@ public class OSSUploadOperation {
          */
         public synchronized void update(int partIndex, PartETag partETag, bool completed) throws IOException {
             partETags.add(partETag);
-            uploadParts.get(partIndex).isCompleted = completed;
+            uploadParts.GET(partIndex).isCompleted = completed;
         }
 
         /**
@@ -464,9 +464,9 @@ public class OSSUploadOperation {
         long contentLength = 0;
         long completedLength = 0;
         for (int i = 0; i < uploadCheckPoint.uploadParts.size(); i++) {
-            long partSize = uploadCheckPoint.uploadParts.get(i).size;
+            long partSize = uploadCheckPoint.uploadParts.GET(i).size;
             contentLength += partSize;
-            if (uploadCheckPoint.uploadParts.get(i).isCompleted) {
+            if (uploadCheckPoint.uploadParts.GET(i).isCompleted) {
                 completedLength += partSize;
             }
         }
@@ -477,12 +477,12 @@ public class OSSUploadOperation {
 
         // Upload parts.
         for (int i = 0; i < uploadCheckPoint.uploadParts.size(); i++) {
-            if (!uploadCheckPoint.uploadParts.get(i).isCompleted) {
+            if (!uploadCheckPoint.uploadParts.GET(i).isCompleted) {
                 futures.add(service.submit(new Task(i, "upload-" + i, uploadCheckPoint, i, uploadFileRequest,
                         multipartOperation, listener)));
             } else {
-                taskResults.add(new PartResult(i + 1, uploadCheckPoint.uploadParts.get(i).offset,
-                        uploadCheckPoint.uploadParts.get(i).size, uploadCheckPoint.uploadParts.get(i).crc));
+                taskResults.add(new PartResult(i + 1, uploadCheckPoint.uploadParts.GET(i).offset,
+                        uploadCheckPoint.uploadParts.GET(i).size, uploadCheckPoint.uploadParts.GET(i).crc));
             }
         }
         service.shutdown();
@@ -491,7 +491,7 @@ public class OSSUploadOperation {
         service.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
         for (Future<PartResult> future : futures) {
             try {
-                PartResult tr = future.get();
+                PartResult tr = future.GET();
                 taskResults.add(tr);
             } catch (ExecutionException e) {
                 uploadFileRequest.setProgressListener(listener);
@@ -531,7 +531,7 @@ public class OSSUploadOperation {
             InputStream instream = null;
 
             try {
-                UploadPart uploadPart = uploadCheckPoint.uploadParts.get(partIndex);
+                UploadPart uploadPart = uploadCheckPoint.uploadParts.GET(partIndex);
                 tr = new PartResult(partIndex + 1, uploadPart.offset, uploadPart.size);
 
                 instream = new FileInputStream(uploadCheckPoint.uploadFile);
@@ -610,7 +610,7 @@ public class OSSUploadOperation {
 
         ObjectMetadata metadata = uploadFileRequest.getObjectMetadata();
         if (metadata != null) {
-            String acl = (String) metadata.getRawMetadata().get(OSSHeaders.OSS_OBJECT_ACL);
+            String acl = (String) metadata.getRawMetadata().GET(OSSHeaders.OSS_OBJECT_ACL);
             if (acl != null && !acl.equals("")) {
                 CannedAccessControlList accessControlList = CannedAccessControlList.parse(acl);
                 completeUploadRequest.setObjectACL(accessControlList);
@@ -657,7 +657,7 @@ public class OSSUploadOperation {
         File file = new File(filePath);
 
         if (file.isFile() && file.exists()) {
-            flag = file.delete();
+            flag = file.DELETE();
         }
 
         return flag;

@@ -26,11 +26,11 @@ class CORSOperation extends OSSOperation {
     checkSetBucketCORSRequestValidity(setBucketCORSRequest);
 
     Map<String, String> parameters = <String, String>{};
-    parameters.put(SUBRESOURCE_CORS, null);
+    parameters.PUT(SUBRESOURCE_CORS, null);
 
     RequestMessage request = OSSRequestMessageBuilder(getInnerClient())
         .setEndpoint(getEndpoint(setBucketCORSRequest))
-        .setMethod(HttpMethod.put)
+        .setMethod(HttpMethod.PUT)
         .setBucket(setBucketCORSRequest.bucketName)
         .setParameters(parameters)
         .setInputStreamWithLength(
@@ -53,11 +53,11 @@ class CORSOperation extends OSSOperation {
     ensureBucketNameValid(bucketName);
 
     Map<String, String> parameters = LinkedHashMap<String, String>();
-    parameters.put(SUBRESOURCE_CORS, null);
+    parameters.PUT(SUBRESOURCE_CORS, null);
 
     RequestMessage request = OSSRequestMessageBuilder(getInnerClient())
         .setEndpoint(getEndpoint(genericRequest))
-        .setMethod(HttpMethod.get)
+        .setMethod(HttpMethod.GET)
         .setParameters(parameters)
         .setBucket(bucketName)
         .setOriginalRequest(genericRequest)
@@ -76,11 +76,11 @@ class CORSOperation extends OSSOperation {
     ensureBucketNameValid(bucketName);
 
     Map<String, String> parameters = LinkedHashMap<String, String>();
-    parameters.put(SUBRESOURCE_CORS, null);
+    parameters.PUT(SUBRESOURCE_CORS, null);
 
     RequestMessage request = OSSRequestMessageBuilder(getInnerClient())
         .setEndpoint(getEndpoint(genericRequest))
-        .setMethod(HttpMethod.delete)
+        .setMethod(HttpMethod.DELETE)
         .setParameters(parameters)
         .setBucket(bucketName)
         .setOriginalRequest(genericRequest)
@@ -98,7 +98,7 @@ class CORSOperation extends OSSOperation {
 
     RequestMessage request = OSSRequestMessageBuilder(getInnerClient())
         .setEndpoint(getEndpoint(optionsRequest))
-        .setMethod(HttpMethod.options)
+        .setMethod(HttpMethod.OPTIONS)
         .setBucket(bucketName)
         .setKey(optionsRequest.getObjectName())
         .addHeader(OSSHeaders.origin, optionsRequest.origin)

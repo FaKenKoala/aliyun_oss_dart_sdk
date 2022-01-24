@@ -16,5 +16,6 @@ dependencies:
   crypto: ^3.0.1
   cryptography: ^2.0.5
   encrypt: ^5.0.1
+  http: ^0.13.4
   intl: ^0.17.0
   xml: ^5.3.1

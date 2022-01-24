@@ -59,7 +59,7 @@ public class KmsEncryptionMaterials implements EncryptionMaterials {
         assertParameterNotNull(region, "kms cmk");
         this.region = region;
         this.cmk = cmk;
-        this.desc = new HashMap<String, String>();
+        this.desc = <String, String>{};
     }
 
     public KmsEncryptionMaterials(String region, String cmk, Map<String, String> desc) {
@@ -67,7 +67,7 @@ public class KmsEncryptionMaterials implements EncryptionMaterials {
         assertParameterNotNull(region, "kms cmk");
         this.region = region;
         this.cmk = cmk;
-        this.desc = (desc == null) ? new HashMap<String, String>() : new HashMap<String, String>(desc);
+        this.desc = (desc == null) ? <String, String>{} : new HashMap<String, String>(desc);
     }
     
     private final class KmsClientSuite {
@@ -168,7 +168,7 @@ public class KmsEncryptionMaterials implements EncryptionMaterials {
         if (description != null) {
             kmsDescMaterials.put(kmsClientSuite, new HashMap<String, String>(description));
         } else {
-            kmsDescMaterials.put(kmsClientSuite, new HashMap<String, String>());
+            kmsDescMaterials.put(kmsClientSuite, <String, String>{});
         }
     }
 

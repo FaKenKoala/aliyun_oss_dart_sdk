@@ -56,14 +56,14 @@ public class SimpleRSAEncryptionMaterials implements EncryptionMaterials {
     public SimpleRSAEncryptionMaterials(KeyPair keyPair) {
         assertParameterNotNull(keyPair, "KeyPair");
         this.keyPair = keyPair;
-        desc = new HashMap<String, String>();
+        desc = <String, String>{};
         keyPairDescMaterials.put(keyPair, desc);
     }
 
     public SimpleRSAEncryptionMaterials(KeyPair keyPair, Map<String, String> desc) {
         assertParameterNotNull(keyPair, "KeyPair");
         this.keyPair = keyPair;
-        this.desc = (desc == null) ? new HashMap<String, String>() : new HashMap<String, String>(desc);
+        this.desc = (desc == null) ? <String, String>{} : new HashMap<String, String>(desc);
         keyPairDescMaterials.put(keyPair, desc);
     }
 
@@ -80,7 +80,7 @@ public class SimpleRSAEncryptionMaterials implements EncryptionMaterials {
         if (description != null) {
             keyPairDescMaterials.put(keyPair, new HashMap<String, String>(description));
         } else {
-            keyPairDescMaterials.put(keyPair, new HashMap<String, String>());
+            keyPairDescMaterials.put(keyPair, <String, String>{});
         }
     }
 

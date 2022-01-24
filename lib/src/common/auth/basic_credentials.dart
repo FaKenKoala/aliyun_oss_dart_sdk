@@ -1,8 +1,10 @@
+import 'package:aliyun_oss_dart_sdk/src/common/utils/auth_utils.dart';
+
 import 'credentials.dart';
 
 class BasicCredentials implements Credentials {
-  BasicCredentials(this.accessKeyId, this.accessKeySecret, this.securityToken,
-      [this.expiredDurationSeconds = 0])
+  BasicCredentials(this.accessKeyId, this.accessKeySecret,
+      [this.securityToken, this.expiredDurationSeconds = 0])
       : startedTimeInMilliSeconds = DateTime.now().millisecondsSinceEpoch;
 
   @override
@@ -38,7 +40,7 @@ class BasicCredentials implements Credentials {
   final String accessKeySecret;
   final String? securityToken;
 
-  final int expiredDurationSeconds;
+  int expiredDurationSeconds = 0;
   int startedTimeInMilliSeconds = 0;
   double expiredFactor = AuthUtils.DEFAULT_EXPIRED_FACTOR;
 }

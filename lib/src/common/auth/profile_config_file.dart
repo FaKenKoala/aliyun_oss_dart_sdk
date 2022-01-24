@@ -1,11 +1,10 @@
 import 'dart:io';
 
 import 'package:aliyun_oss_dart_sdk/src/common/utils/log_utils.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/utils/string_utils.dart';
 
-import 'credentials.dart';
 import 'default_credentials.dart';
 import 'profile_config_loader.dart';
+import 'system_properties_credentials_provider.dart';
 
 /// Loads the local OSS credential profiles from the standard location
 /// (~/.oss/credentials), which can be easily overridden through the
@@ -30,8 +29,9 @@ import 'profile_config_loader.dart';
 class ProfileConfigFile {
   /// Loads the OSS credential profiles from the file. The reference to the
   /// file is specified as a parameter to the constructor.
-  ProfileConfigFile(this.profileFile, [this.profileLoader])
-      : _profileFileLastModified = profileFile.lastModifiedSync();
+  ProfileConfigFile(this.profileFile, [ProfileConfigLoader? profileLoader])
+      : profileLoader = profileLoader ?? ProfileConfigLoader(),
+        _profileFileLastModified = profileFile.lastModifiedSync();
 
   /// Returns the OSS credentials for the specified profile.
   Credentials getCredentials() {
@@ -55,8 +55,8 @@ class ProfileConfigFile {
 
       String? accessKeyId =
           StringUtils.trim(profileProperties[AuthUtils.OSS_ACCESS_KEY_ID]);
-      String? secretAccessKey = StringUtils.trim(
-          profileProperties[AuthUtils.OSS_SECRET_ACCESS_KEY]);
+      String? secretAccessKey =
+          StringUtils.trim(profileProperties[AuthUtils.OSS_SECRET_ACCESS_KEY]);
       String? sessionToken =
           StringUtils.trim(profileProperties[AuthUtils.OSS_SESSION_TOKEN]);
 
@@ -75,7 +75,7 @@ class ProfileConfigFile {
   }
 
   final File profileFile;
-  final ProfileConfigLoader? profileLoader;
+  final ProfileConfigLoader profileLoader;
   DateTime _profileFileLastModified;
   DefaultCredentials? credentials;
 }

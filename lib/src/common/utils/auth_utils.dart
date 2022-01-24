@@ -1,89 +1,36 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+ import 'dart:io';
 
-package com.aliyun.oss.common.utils;
+import 'package:aliyun_oss_dart_sdk/src/common/utils/io_utils.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/oss_upload_operation.dart';
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+class AuthUtils {
 
-import com.aliyun.oss.common.auth.PublicKey;
-import com.aliyuncs.DefaultAcsClient;
-import com.aliyuncs.exceptions.ClientException;
-import com.aliyuncs.profile.DefaultProfile;
-import com.aliyuncs.ram.model.v20150501.DeletePublicKeyRequest;
-import com.aliyuncs.ram.model.v20150501.ListPublicKeysRequest;
-import com.aliyuncs.ram.model.v20150501.ListPublicKeysResponse;
-import com.aliyuncs.ram.model.v20150501.UploadPublicKeyRequest;
-import com.aliyuncs.ram.model.v20150501.UploadPublicKeyResponse;
+    /// Default expiration time
+     static final int DEFAULT_EXPIRED_DURATION_SECONDS = 3600;
 
-public class AuthUtils {
+    /// Default expiration time adjustment factor
+     static final double DEFAULT_EXPIRED_FACTOR = 0.8;
 
-    /**
-     * Default expiration time
-     */
-    public static final int DEFAULT_EXPIRED_DURATION_SECONDS = 3600;
+    /// The maximum number of retries when getting AK/SK from ECS
+     static final int MAX_ECS_METADATA_FETCH_RETRY_TIMES = 3;
 
-    /**
-     * Default expiration time adjustment factor
-     */
-    public static final double DEFAULT_EXPIRED_FACTOR = 0.8;
+    /// AK/SK expiration time obtained from ECS Metadata Service, default 6 hours
+     static final int DEFAULT_ECS_SESSION_TOKEN_DURATION_SECONDS = 3600 * 6;
 
-    /**
-     * The maximum number of retries when getting AK/SK from ECS
-     */
-    public static final int MAX_ECS_METADATA_FETCH_RETRY_TIMES = 3;
+    /// AK/SK expire time obtained from STS, default 1 hour
+     static final int DEFAULT_STS_SESSION_TOKEN_DURATION_SECONDS = 3600 * 1;
 
-    /**
-     * AK/SK expiration time obtained from ECS Metadata Service, default 6 hours
-     */
-    public static final int DEFAULT_ECS_SESSION_TOKEN_DURATION_SECONDS = 3600 * 6;
+    /// Connection timeout when getting AK/SK, the default 5 seconds
+     static final int DEFAULT_HTTP_SOCKET_TIMEOUT_IN_MILLISECONDS = 5000;
 
-    /**
-     * AK/SK expire time obtained from STS, default 1 hour
-     */
-    public static final int DEFAULT_STS_SESSION_TOKEN_DURATION_SECONDS = 3600 * 1;
+    /// Environment variable name for the oss access key ID
+     static final String ACCESS_KEY_ENV_VAR = "OSS_ACCESS_KEY_ID";
 
-    /**
-     * Connection timeout when getting AK/SK, the default 5 seconds
-     */
-    public static final int DEFAULT_HTTP_SOCKET_TIMEOUT_IN_MILLISECONDS = 5000;
+    /// Environment variable name for the oss secret key
+     static final String SECRET_KEY_ENV_VAR = "OSS_ACCESS_KEY_SECRET";
 
-    /**
-     * Environment variable name for the oss access key ID
-     */
-    public static final String ACCESS_KEY_ENV_VAR = "OSS_ACCESS_KEY_ID";
-
-    /**
-     * Environment variable name for the oss secret key
-     */
-    public static final String SECRET_KEY_ENV_VAR = "OSS_ACCESS_KEY_SECRET";
-
-    /**
-     * Environment variable name for the oss session token
-     */
-    public static final String SESSION_TOKEN_ENV_VAR = "OSS_SESSION_TOKEN";
+    /// Environment variable name for the oss session token
+     static final String SESSION_TOKEN_ENV_VAR = "OSS_SESSION_TOKEN";
 
     /**
      * System property used when starting up the JVM to enable the default
@@ -93,14 +40,14 @@ public class AuthUtils {
      * Example: -Doss.accessKeyId
      * </pre>
      */
-    /** System property name for the OSS access key ID */
-    public static final String ACCESS_KEY_SYSTEM_PROPERTY = "oss.accessKeyId";
+    /// System property name for the OSS access key ID */
+     static final String ACCESS_KEY_SYSTEM_PROPERTY = "oss.accessKeyId";
 
-    /** System property name for the OSS secret key */
-    public static final String SECRET_KEY_SYSTEM_PROPERTY = "oss.accessKeySecret";
+    /// System property name for the OSS secret key */
+     static final String SECRET_KEY_SYSTEM_PROPERTY = "oss.accessKeySecret";
 
-    /** System property name for the OSS session token */
-    public static final String SESSION_TOKEN_SYSTEM_PROPERTY = "oss.sessionToken";
+    /// System property name for the OSS session token */
+     static final String SESSION_TOKEN_SYSTEM_PROPERTY = "oss.sessionToken";
 
     /**
      * Loads the local OSS credential profiles from the standard location
@@ -122,178 +69,166 @@ public class AuthUtils {
      * oss_session_token=testSessionToken
      * </pre>
      */
-    /** Credential profile file at the default location */
-    public static final String DEFAULT_PROFILE_PATH = defaultProfilePath();
+    /// Credential profile file at the default location */
+     static final String DEFAULT_PROFILE_PATH = defaultProfilePath();
 
-    /** Default section name in the profile file */
-    public static final String DEFAULT_SECTION_NAME = "default";
+    /// Default section name in the profile file */
+     static final String DEFAULT_SECTION_NAME = "default";
 
-    /** Property name for specifying the OSS Access Key */
-    public static final String OSS_ACCESS_KEY_ID = "oss_access_key_id";
+    /// Property name for specifying the OSS Access Key */
+     static final String OSS_ACCESS_KEY_ID = "oss_access_key_id";
 
-    /** Property name for specifying the OSS Secret Access Key */
-    public static final String OSS_SECRET_ACCESS_KEY = "oss_secret_access_key";
+    /// Property name for specifying the OSS Secret Access Key */
+     static final String OSS_SECRET_ACCESS_KEY = "oss_secret_access_key";
 
-    /** Property name for specifying the OSS Session Token */
-    public static final String OSS_SESSION_TOKEN = "oss_session_token";
+    /// Property name for specifying the OSS Session Token */
+     static final String OSS_SESSION_TOKEN = "oss_session_token";
 
-    /**
-     * Get the default profile path.
-     * 
-     * @return Default profile path
-     */
-    public static String defaultProfilePath() {
-        return System.getProperty("user.home") + File.separator + ".oss" + File.separator + "credentials";
+    /// Get the default profile path.
+    /// 
+    /// @return Default profile path
+     static String defaultProfilePath() {
+        return System.getProperty("user.home") + Platform.pathSeparator + ".oss" + Platform.pathSeparator + "credentials";
     }
 
-    /**
-     * Upload the public key of RSA key pair.
-     * 
-     * @param regionId
-     *            RAM's available area.
-     * @param accessKeyId
-     *            Access Key ID of the root user.
-     * @param accessKeySecret
-     *            Secret Access Key of the root user.
-     * @param publicKey
-     *            Public key content.
-     * @return Public key description, include public key id etc.
-     * @throws ClientException
-     */
-    public static PublicKey uploadPublicKey(String regionId, String accessKeyId, String accessKeySecret,
-            String publicKey) throws ClientException {
+    /// Upload the  key of RSA key pair.
+    /// 
+    /// @param regionId
+    ///            RAM's available area.
+    /// @param accessKeyId
+    ///            Access Key ID of the root user.
+    /// @param accessKeySecret
+    ///            Secret Access Key of the root user.
+    /// @param Key
+    ///             key content.
+    /// @return  key description, include  key id etc.
+    /// @throws ClientException
+     static Key uploadKey(String regionId, String accessKeyId, String accessKeySecret,
+            String Key) {
         DefaultProfile profile = DefaultProfile.getProfile(regionId, accessKeyId, accessKeySecret);
-        DefaultAcsClient client = new DefaultAcsClient(profile);
+        DefaultAcsClient client = DefaultAcsClient(profile);
 
-        UploadPublicKeyRequest uploadPublicKeyRequest = new UploadPublicKeyRequest();
-        uploadPublicKeyRequest.setPublicKeySpec(publicKey);
+        UploadKeyRequest uploadKeyRequest = UploadKeyRequest();
+        uploadKeyRequest.setKeySpec(Key);
 
-        UploadPublicKeyResponse uploadPublicKeyResponse = client.getAcsResponse(uploadPublicKeyRequest);
-        com.aliyuncs.ram.model.v20150501.UploadPublicKeyResponse.PublicKey pubKey = uploadPublicKeyResponse
-                .getPublicKey();
+        UploadKeyResponse uploadKeyResponse = client.getAcsResponse(uploadKeyRequest);
+        com.aliyuncs.ram.model.v20150501.UploadKeyResponse.Key pubKey = uploadKeyResponse
+                .getKey();
 
-        return new PublicKey(pubKey);
+        return Key(pubKey);
     }
 
-    /**
-     * List the public keys that has been uploaded.
-     * 
-     * @param regionId
-     *            RAM's available area.
-     * @param accessKeyId
-     *            Access Key ID of the root user.
-     * @param accessKeySecret
-     *            Secret Access Key of the root user.
-     * @return Public keys.
-     * @throws ClientException
-     */
-    public static List<PublicKey> listPublicKeys(String regionId, String accessKeyId, String accessKeySecret)
-            throws ClientException {
+    /// List the  keys that has been uploaded.
+    /// 
+    /// @param regionId
+    ///            RAM's available area.
+    /// @param accessKeyId
+    ///            Access Key ID of the root user.
+    /// @param accessKeySecret
+    ///            Secret Access Key of the root user.
+    /// @return  keys.
+    /// @throws ClientException
+     static List<Key> listKeys(String regionId, String accessKeyId, String accessKeySecret)
+             {
         DefaultProfile profile = DefaultProfile.getProfile(regionId, accessKeyId, accessKeySecret);
-        DefaultAcsClient client = new DefaultAcsClient(profile);
+        DefaultAcsClient client = DefaultAcsClient(profile);
 
-        ListPublicKeysRequest listPublicKeysRequest = new ListPublicKeysRequest();
-        ListPublicKeysResponse listPublicKeysResponse = client.getAcsResponse(listPublicKeysRequest);
+        ListKeysRequest listKeysRequest = ListKeysRequest();
+        ListKeysResponse listKeysResponse = client.getAcsResponse(listKeysRequest);
 
-        List<PublicKey> publicKeys = [];
-        for (com.aliyuncs.ram.model.v20150501.ListPublicKeysResponse.PublicKey publicKey : listPublicKeysResponse
-                .getPublicKeys()) {
-            publicKeys.add(new PublicKey(publicKey));
+        List<Key> Keys = [];
+        for (com.aliyuncs.ram.model.v20150501.ListKeysResponse.Key Key : listKeysResponse
+                .getKeys()) {
+            Keys.add(Key(Key));
         }
 
-        return publicKeys;
+        return Keys;
     }
 
-    /**
-     * Delete the uploaded public key.
-     * 
-     * @param regionId
-     *            RAM's available area.
-     * @param accessKeyId
-     *            Access Key ID of the root user.
-     * @param accessKeySecret
-     *            Secret Access Key of the root user.
-     * @param publicKeyId
-     *            Public Key Id.
-     * @throws ClientException
-     */
-    public static void deletePublicKey(String regionId, String accessKeyId, String accessKeySecret, String publicKeyId)
-            throws ClientException {
+    /// Delete the uploaded  key.
+    /// 
+    /// @param regionId
+    ///            RAM's available area.
+    /// @param accessKeyId
+    ///            Access Key ID of the root user.
+    /// @param accessKeySecret
+    ///            Secret Access Key of the root user.
+    /// @param KeyId
+    ///             Key Id.
+    /// @throws ClientException
+     static void deleteKey(String regionId, String accessKeyId, String accessKeySecret, String KeyId)
+             {
         DefaultProfile profile = DefaultProfile.getProfile(regionId, accessKeyId, accessKeySecret);
-        DefaultAcsClient client = new DefaultAcsClient(profile);
+        DefaultAcsClient client = DefaultAcsClient(profile);
 
-        DeletePublicKeyRequest deletePublicKeyRequest = new DeletePublicKeyRequest();
-        deletePublicKeyRequest.setUserPublicKeyId(publicKeyId);
+        DeleteKeyRequest deleteKeyRequest = DeleteKeyRequest();
+        deleteKeyRequest.setUserKeyId(KeyId);
 
-        client.getAcsResponse(deletePublicKeyRequest);
+        client.getAcsResponse(deleteKeyRequest);
     }
 
-    /**
-     * Load public key content from file and format.
-     * 
-     * @param publicKeyPath
-     *            Public key file path.
-     * @return Formatted public key content.
-     * @throws IOException
-     */
-    public static String loadPublicKeyFromFile(String publicKeyPath) throws IOException {
-        File file = new File(publicKeyPath);
-        byte[] filecontent = new byte[(int) file.length()];
-        InputStream in = null;
+    /// Load  key content from file and format.
+    /// 
+    /// @param KeyPath
+    ///             key file path.
+    /// @return Formatted  key content.
+    /// @throws IOException
+     static String loadKeyFromFile(String KeyPath) {
+        File file = File(KeyPath);
+        byte[] filecontent = byte[(int) file.length()];
+        InputStream? inputStream ;
 
         try {
-            in = new FileInputStream(file);
-            in.read(filecontent);
+            inputStream = FileInputStream(file);
+            inputStream?.read(filecontent);
         } finally {
-            if (in != null) {
+            if (inputStream != null) {
                 try {
-                    in.close();
-                } catch (IOException e) {
+                    inputStream.close();
+                } catch ( e) {
                 }
             }
         }
 
-        return new String(filecontent);
+        return String(filecontent);
     }
 
-    /**
-     * Load private key content from file and format.
-     * 
-     * @param privateKeyPath
-     *            Private key file path.
-     * @return Formatted private key content.
-     * @throws IOException
-     */
-    public static String loadPrivateKeyFromFile(String privateKeyPath) throws IOException {
-        BufferedReader reader = null;
-        StringBuilder builder = new StringBuilder();
+    /// Load  key content from file and format.
+    /// 
+    /// @param KeyPath
+    ///             key file path.
+    /// @return Formatted  key content.
+    /// @throws IOException
+     static String loadKeyFromFile(String keyPath) {
+        BufferedReader? reader;
+        StringBuffer builder = StringBuffer();
 
         try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(privateKeyPath)));
-            String str = null;
+            reader = BufferedReader(InputStreamReader(FileInputStream(keyPath)));
+            String? str;
             while (true) {
                 str = reader.readLine();
                 if (str == null) {
                     break;
                 }
 
-                if (str.indexOf("-----BEGIN PRIVATE KEY-----") != -1) {
+                if (str.contains("-----BEGIN  KEY-----")) {
                     continue;
                 }
 
-                if (str.indexOf("-----END PRIVATE KEY-----") != -1) {
+                if (str.contains("-----END  KEY-----")) {
                     break;
                 }
 
                 if (str != null) {
-                    builder.append(str + "\n");
+                    builder.write(str + "\n");
                 }
             }
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException e) {
+                } catch ( e) {
                 }
             }
         }

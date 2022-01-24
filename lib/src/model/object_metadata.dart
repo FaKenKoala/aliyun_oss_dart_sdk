@@ -72,12 +72,12 @@ class ObjectMetadata {
   }
 
   int getContentLength() {
-    int? contentLength = metadata[HttpHeaders.contentLength] as int?;
+    int? contentLength = metadata[HttpHeaders.CONTENT_LENGTH] as int?;
     return contentLength ?? 0;
   }
 
   void setContentLength(int contentLength) {
-    metadata[HttpHeaders.contentLength] = contentLength;
+    metadata[HttpHeaders.CONTENT_LENGTH] = contentLength;
   }
 
   String? getContentType() {
@@ -97,27 +97,27 @@ class ObjectMetadata {
   }
 
   String? getContentEncoding() {
-    return metadata[HttpHeaders.contentEncoding] as String?;
+    return metadata[HttpHeaders.CONTENT_ENCODING] as String?;
   }
 
   void setContentEncoding(String encoding) {
-    metadata[HttpHeaders.contentEncoding] = encoding;
+    metadata[HttpHeaders.CONTENT_ENCODING] = encoding;
   }
 
   String? getCacheControl() {
-    return metadata[HttpHeaders.cacheControl] as String?;
+    return metadata[HttpHeaders.CACHE_CONTROL] as String?;
   }
 
   void setCacheControl(String cacheControl) {
-    metadata[HttpHeaders.cacheControl] = cacheControl;
+    metadata[HttpHeaders.CACHE_CONTROL] = cacheControl;
   }
 
   String? getContentDisposition() {
-    return metadata[HttpHeaders.contentDisposition] as String?;
+    return metadata[HttpHeaders.CONTENT_DISPOSITION] as String?;
   }
 
   void setContentDisposition(String disposition) {
-    metadata[HttpHeaders.contentDisposition] = disposition;
+    metadata[HttpHeaders.CONTENT_DISPOSITION] = disposition;
   }
 
   String? getETag() {
@@ -125,36 +125,36 @@ class ObjectMetadata {
   }
 
   String? getServerSideEncryption() {
-    return metadata[OSSHeaders.ossServerSideEncryption] as String?;
+    return metadata[OSSHeaders.OSS_SERVER_SIDE_ENCRYPTION] as String?;
   }
 
   void setServerSideEncryption(String serverSideEncryption) {
-    metadata[OSSHeaders.ossServerSideEncryption] = serverSideEncryption;
+    metadata[OSSHeaders.OSS_SERVER_SIDE_ENCRYPTION] = serverSideEncryption;
   }
 
   String? getServerSideEncryptionKeyId() {
-    return metadata[OSSHeaders.ossServerSideEncryptionKeyId] as String?;
+    return metadata[OSSHeaders.OSS_SERVER_SIDE_ENCRYPTION_KEY_ID] as String?;
   }
 
   void setServerSideEncryptionKeyId(String serverSideEncryptionKeyId) {
-    metadata[OSSHeaders.ossServerSideEncryptionKeyId] =
+    metadata[OSSHeaders.OSS_SERVER_SIDE_ENCRYPTION_KEY_ID] =
         serverSideEncryptionKeyId;
   }
 
   void setServerSideDataEncryption(String serverSideDataEncryption) {
-    metadata[OSSHeaders.ossServerSideDataEncryption] = serverSideDataEncryption;
+    metadata[OSSHeaders.OSS_SERVER_SIDE_DATA_ENCRYPTION] = serverSideDataEncryption;
   }
 
   String? getServerSideDataEncryption() {
-    return metadata[OSSHeaders.ossServerSideDataEncryption] as String?;
+    return metadata[OSSHeaders.OSS_SERVER_SIDE_DATA_ENCRYPTION] as String?;
   }
 
   String? getObjectType() {
-    return metadata[OSSHeaders.ossObjectType] as String?;
+    return metadata[OSSHeaders.OSS_OBJECT_TYPE] as String?;
   }
 
   void setObjectAcl(CannedAccessControlList? cannedAcl) {
-    metadata[OSSHeaders.ossObjectAcl] =
+    metadata[OSSHeaders.OSS_OBJECT_ACL] =
         cannedAcl != null ? cannedAcl.toString() : "";
   }
 
@@ -163,15 +163,15 @@ class ObjectMetadata {
   }
 
   String? getRequestId() {
-    return metadata[OSSHeaders.ossHeaderRequestId] as String?;
+    return metadata[OSSHeaders.OSS_HEADER_REQUEST_ID] as String?;
   }
 
   String? getVersionId() {
-    return metadata[OSSHeaders.ossHeaderVersionId] as String?;
+    return metadata[OSSHeaders.OSS_HEADER_VERSION_ID] as String?;
   }
 
   int? getServerCRC() {
-    String? strSrvCrc = metadata[OSSHeaders.ossHashCrc64Ecma] as String?;
+    String? strSrvCrc = metadata[OSSHeaders.OSS_HASH_CRC64_ECMA] as String?;
 
     if (strSrvCrc != null) {
       return int.tryParse(strSrvCrc);
@@ -181,7 +181,7 @@ class ObjectMetadata {
 
   StorageClass? getObjectStorageClass() {
     String? storageClassString =
-        metadata[OSSHeaders.ossStorageClass] as String?;
+        metadata[OSSHeaders.OSS_STORAGE_CLASS] as String?;
     if (storageClassString != null) {
       return StorageClassX.parse(storageClassString);
     }
@@ -189,7 +189,7 @@ class ObjectMetadata {
   }
 
   String? getObjectRawRestore() {
-    return metadata[OSSHeaders.ossRestore] as String?;
+    return metadata[OSSHeaders.OSS_RESTORE] as String?;
   }
 
   bool isRestoreCompleted() {
@@ -198,7 +198,7 @@ class ObjectMetadata {
       throw NullThrownError();
     }
 
-    return restoreString != OSSHeaders.ossOngoingRestore;
+    return restoreString != OSSHeaders.OSS_ONGOING_RESTORE;
   }
 
   void setObjectTagging(Map<String?, String?>? tags) {
@@ -220,6 +220,6 @@ class ObjectMetadata {
       builder.write(SignV2Utils.uriEncoding(value));
     });
 
-    metadata[OSSHeaders.ossTagging] = builder.toString();
+    metadata[OSSHeaders.OSS_TAGGING] = builder.toString();
   }
 }

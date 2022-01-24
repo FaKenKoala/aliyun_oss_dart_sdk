@@ -43,7 +43,7 @@ import 'service_client.dart';
                         NTCredentials(proxyUsername, proxyPassword, proxyWorkstation, proxyDomain));
 
                 authCache = BasicAuthCache();
-                authCache.put(proxyHttpHost, BasicScheme());
+                authCache.PUT(proxyHttpHost, BasicScheme());
             }
         }
 

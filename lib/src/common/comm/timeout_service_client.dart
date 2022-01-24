@@ -23,7 +23,7 @@
         Future<CloseableHttpResponse> future = executor.submit(httpRequestTask);
 
         try {
-            httpResponse = future.get(this.config.getRequestTimeout(), TimeUnit.MILLISECONDS);
+            httpResponse = future.GET(this.config.getRequestTimeout(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             logException("[ExecutorService]The current thread was interrupted while waiting: ", e);
 

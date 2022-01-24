@@ -683,9 +683,9 @@ class ResponseParsers {
                 String key = it.next();
 
                 if (key.equalsIgnoreCase(OSSHeaders.OSS_BUCKET_REGION)) {
-                    bucketMetadata.setBucketRegion(headers.get(key));
+                    bucketMetadata.setBucketRegion(headers.GET(key));
                 } else {
-                    bucketMetadata.addHttpMetadata(key, headers.get(key));
+                    bucketMetadata.addHttpMetadata(key, headers.GET(key));
                 }
             }
 
@@ -709,19 +709,19 @@ class ResponseParsers {
 
                 if (key.equalsIgnoreCase(OSSHeaders.LAST_MODIFIED)) {
                     try {
-                        objectMeta.setLastModified(DateUtil.parseRfc822Date(headers.get(key)));
+                        objectMeta.setLastModified(DateUtil.parseRfc822Date(headers.GET(key)));
                     } catch (ParseException pe) {
                         throw new ResponseParseException(pe.getMessage(), pe);
                     }
                 } else if (key.equalsIgnoreCase(OSSHeaders.CONTENT_LENGTH)) {
-                    Long value = Long.valueOf(headers.get(key));
+                    Long value = Long.valueOf(headers.GET(key));
                     objectMeta.setSize(value);
                 } else if (key.equalsIgnoreCase(OSSHeaders.ETAG)) {
-                    objectMeta.setETag(trimQuotes(headers.get(key)));
+                    objectMeta.setETag(trimQuotes(headers.GET(key)));
                 } else if (key.equalsIgnoreCase(OSSHeaders.OSS_HEADER_REQUEST_ID)) {
-                    objectMeta.setRequestId(headers.get(key));
+                    objectMeta.setRequestId(headers.GET(key));
                 } else if (key.equalsIgnoreCase(OSSHeaders.OSS_HEADER_VERSION_ID)) {
-                    objectMeta.setVersionId(headers.get(key));
+                    objectMeta.setVersionId(headers.GET(key));
                 }
             }
 
@@ -766,20 +766,20 @@ class ResponseParsers {
 
                 if (key.indexOf(OSSHeaders.OSS_USER_METADATA_PREFIX) >= 0) {
                     key = key.substring(OSSHeaders.OSS_USER_METADATA_PREFIX.length());
-                    objectMetadata.addUserMetadata(key, headers.get(OSSHeaders.OSS_USER_METADATA_PREFIX + key));
+                    objectMetadata.addUserMetadata(key, headers.GET(OSSHeaders.OSS_USER_METADATA_PREFIX + key));
                 } else if (key.equalsIgnoreCase(OSSHeaders.LAST_MODIFIED)||key.equalsIgnoreCase(OSSHeaders.DATE)) {
                     try {
-                        objectMetadata.setHeader(key, DateUtil.parseRfc822Date(headers.get(key)));
+                        objectMetadata.setHeader(key, DateUtil.parseRfc822Date(headers.GET(key)));
                     } catch (ParseException pe) {
                         throw new ResponseParseException(pe.getMessage(), pe);
                     }
                 } else if (key.equalsIgnoreCase(OSSHeaders.CONTENT_LENGTH)) {
-                    Long value = Long.valueOf(headers.get(key));
+                    Long value = Long.valueOf(headers.GET(key));
                     objectMetadata.setHeader(key, value);
                 } else if (key.equalsIgnoreCase(OSSHeaders.ETAG)) {
-                    objectMetadata.setHeader(key, trimQuotes(headers.get(key)));
+                    objectMetadata.setHeader(key, trimQuotes(headers.GET(key)));
                 } else {
-                    objectMetadata.setHeader(key, headers.get(key));
+                    objectMetadata.setHeader(key, headers.GET(key));
                 }
             }
 
@@ -1241,9 +1241,9 @@ class ResponseParsers {
                         if (setElementList != null && setElementList.size() > 0) {
                             List<Map<String, String>> setList = [];
                             for (Element setElement : setElementList) {
-                                Map<String, String> map = new HashMap<String, String>();
-                                map.put("Key", setElement.getChildText("Key"));
-                                map.put("Value", setElement.getChildText("Value"));
+                                Map<String, String> map = <String, String>{};
+                                map.PUT("Key", setElement.getChildText("Key"));
+                                map.PUT("Value", setElement.getChildText("Value"));
                                 setList.add(map);
                             }
                             mirrorHeaders.setSet(setList);
@@ -2575,7 +2575,7 @@ class ResponseParsers {
 
         try {
             InitiateBucketWormResult result = new InitiateBucketWormResult();
-            result.setWormId(headers.get(OSS_HEADER_WORM_ID));
+            result.setWormId(headers.GET(OSS_HEADER_WORM_ID));
             return result;
         } catch (Exception e) {
             throw new ResponseParseException(e.getMessage(), e);

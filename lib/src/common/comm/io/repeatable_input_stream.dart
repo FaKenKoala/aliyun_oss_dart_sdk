@@ -1,38 +1,15 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
-package com.aliyun.oss.common.comm.io;
+ import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
 
-import static com.aliyun.oss.common.utils.LogUtils.getLog;
+class RepeatableInputStream extends InputStream {
 
-import java.io.IOException;
-import java.io.InputStream;
+     InputStream is = null;
+     int bufferSize = 0;
+     int bufferOffset = 0;
+     long bytesReadFromMark = 0;
+     byte[] buffer = null;
 
-public class RepeatableInputStream extends InputStream {
-
-    private InputStream is = null;
-    private int bufferSize = 0;
-    private int bufferOffset = 0;
-    private long bytesReadFromMark = 0;
-    private byte[] buffer = null;
-
-    public RepeatableInputStream(InputStream inputStream, int bufferSize) {
+     RepeatableInputStream(InputStream inputStream, int bufferSize) {
         if (inputStream == null) {
             throw ArgumentError("inputStream should not be null");
         }
@@ -42,7 +19,7 @@ public class RepeatableInputStream extends InputStream {
         this.buffer = new byte[this.bufferSize];
     }
 
-    public void reset() throws IOException {
+     void reset() throws IOException {
         if (bytesReadFromMark <= bufferSize) {
             getLog().debug("Reset after reading " + bytesReadFromMark + " bytes.");
             bufferOffset = 0;
@@ -52,11 +29,11 @@ public class RepeatableInputStream extends InputStream {
         }
     }
 
-    public bool markSupported() {
+     bool markSupported() {
         return true;
     }
 
-    public synchronized void mark(int readlimit) {
+     synchronized void mark(int readlimit) {
         if (bytesReadFromMark <= bufferSize && buffer != null) {
             byte[] newBuffer = new byte[this.bufferSize];
             System.arraycopy(buffer, bufferOffset, newBuffer, 0, (int) (bytesReadFromMark - bufferOffset));
@@ -70,15 +47,15 @@ public class RepeatableInputStream extends InputStream {
         }
     }
 
-    public int available() throws IOException {
+     int available() throws IOException {
         return is.available();
     }
 
-    public void close() throws IOException {
+     void close() throws IOException {
         is.close();
     }
 
-    public int read(byte[] out, int outOffset, int outLength) throws IOException {
+     int read(byte[] out, int outOffset, int outLength) throws IOException {
         byte[] tmp = new byte[outLength];
 
         if (bufferOffset < bytesReadFromMark && buffer != null) {
@@ -113,7 +90,7 @@ public class RepeatableInputStream extends InputStream {
         return count;
     }
 
-    public int read() throws IOException {
+     int read() throws IOException {
         byte[] tmp = new byte[1];
         int count = read(tmp);
         if (count != -1) {
@@ -123,7 +100,7 @@ public class RepeatableInputStream extends InputStream {
         }
     }
 
-    public InputStream getWrappedInputStream() {
+     InputStream getWrappedInputStream() {
         return is;
     }
 

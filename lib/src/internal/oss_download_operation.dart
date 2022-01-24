@@ -114,7 +114,7 @@ public class OSSDownloadOperation {
          * @throws IOException
          */
         public synchronized void update(int index, bool completed) throws IOException {
-            downloadParts.get(index).isCompleted = completed;
+            downloadParts.GET(index).isCompleted = completed;
         }
 
         /**
@@ -527,10 +527,10 @@ public class OSSDownloadOperation {
         long completedLength = 0;
         long contentLength = 0;
         for (int i = 0; i < downloadCheckPoint.downloadParts.size(); i++) {
-            long partSize = downloadCheckPoint.downloadParts.get(i).end -
-                    downloadCheckPoint.downloadParts.get(i).start + 1;
+            long partSize = downloadCheckPoint.downloadParts.GET(i).end -
+                    downloadCheckPoint.downloadParts.GET(i).start + 1;
             contentLength += partSize;
-            if (downloadCheckPoint.downloadParts.get(i).isCompleted) {
+            if (downloadCheckPoint.downloadParts.GET(i).isCompleted) {
                 completedLength += partSize;
             }
         }
@@ -541,15 +541,15 @@ public class OSSDownloadOperation {
 
         // Concurrently download parts.
         for (int i = 0; i < downloadCheckPoint.downloadParts.size(); i++) {
-            if (!downloadCheckPoint.downloadParts.get(i).isCompleted) {
+            if (!downloadCheckPoint.downloadParts.GET(i).isCompleted) {
                 Task task = new Task(i, "download-" + i, downloadCheckPoint, i, downloadFileRequest, objectOperation,
                         listener);
                 futures.add(service.submit(task));
                 tasks.add(task);
             } else {
-                taskResults.add(new PartResult(i + 1, downloadCheckPoint.downloadParts.get(i).start,
-                        downloadCheckPoint.downloadParts.get(i).end, downloadCheckPoint.downloadParts.get(i).length,
-                        downloadCheckPoint.downloadParts.get(i).crc));
+                taskResults.add(new PartResult(i + 1, downloadCheckPoint.downloadParts.GET(i).start,
+                        downloadCheckPoint.downloadParts.GET(i).end, downloadCheckPoint.downloadParts.GET(i).length,
+                        downloadCheckPoint.downloadParts.GET(i).crc));
             }
         }
         service.shutdown();
@@ -558,7 +558,7 @@ public class OSSDownloadOperation {
         service.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
         for (Future<PartResult> future : futures) {
             try {
-                PartResult tr = future.get();
+                PartResult tr = future.GET();
                 taskResults.add(tr);
             } catch (ExecutionException e) {
                 downloadFileRequest.setProgressListener(listener);
@@ -577,7 +577,7 @@ public class OSSDownloadOperation {
         // sets the return value.
         downloadResult.setPartResults(taskResults);
         if (tasks.size() > 0) {
-            downloadResult.setObjectMetadata(tasks.get(0).GetobjectMetadata());
+            downloadResult.setObjectMetadata(tasks.GET(0).GetobjectMetadata());
         }
         downloadFileRequest.setProgressListener(listener);
 
@@ -609,7 +609,7 @@ public class OSSDownloadOperation {
             InputStream content = null;
 
             try {
-                DownloadPart downloadPart = downloadCheckPoint.downloadParts.get(partIndex);
+                DownloadPart downloadPart = downloadCheckPoint.downloadParts.GET(partIndex);
                 tr = new PartResult(partIndex + 1, downloadPart.start, downloadPart.end);
 
                 output = new RandomAccessFile(downloadFileRequest.getTempDownloadFile(), "rw");
@@ -768,7 +768,7 @@ public class OSSDownloadOperation {
         File file = new File(filePath);
 
         if (file.isFile() && file.exists()) {
-            flag = file.delete();
+            flag = file.DELETE();
         }
 
         return flag;
@@ -797,7 +797,7 @@ public class OSSDownloadOperation {
             throw new IOException("Destination '" + destFile + "' is a directory");
         }
         if (destFile.exists()) {
-            if (!destFile.delete()) {
+            if (!destFile.DELETE()) {
                 throw new IOException("Failed to delete original file '" + srcFile + "'");
             }
         }
@@ -805,7 +805,7 @@ public class OSSDownloadOperation {
         final bool rename = srcFile.renameTo(destFile);
         if (!rename) {
             copyFile(srcFile, destFile);
-            if (!srcFile.delete()) {
+            if (!srcFile.DELETE()) {
                 throw new IOException(
                         "Failed to delete original file '" + srcFile + "' after copy to '" + destFile + "'");
             }

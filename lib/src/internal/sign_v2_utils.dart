@@ -171,7 +171,7 @@ class SignV2Utils {
     String accessId = currentCreds.getAccessKeyId();
     String accessKey = currentCreds.getSecretAccessKey();
     bool useSecurityToken = currentCreds.useSecurityToken();
-    HttpMethod method = request.getMethod() ?? HttpMethod.get;
+    HttpMethod method = request.getMethod() ?? HttpMethod.GET;
 
     String expires =
         ((request.expiration?.millisecondsSinceEpoch ?? 0) / 1000).toString();

@@ -236,7 +236,7 @@ class OSSUtils {
                         key = key.trim();
                     if (value != null)
                         value = value.trim();
-                    headers.put(OSSHeaders.OSS_USER_METADATA_PREFIX + key, value);
+                    headers.PUT(OSSHeaders.OSS_USER_METADATA_PREFIX + key, value);
                 }
             }
         }
@@ -244,19 +244,19 @@ class OSSUtils {
 
      static void addHeader(Map<String, String> headers, String header, String value) {
         if (value != null) {
-            headers.put(header, value);
+            headers.PUT(header, value);
         }
     }
 
      static void addDateHeader(Map<String, String> headers, String header, Date value) {
         if (value != null) {
-            headers.put(header, DateUtil.formatRfc822Date(value));
+            headers.PUT(header, DateUtil.formatRfc822Date(value));
         }
     }
 
      static void addStringListHeader(Map<String, String> headers, String header, List<String> values) {
         if (values != null && !values.isEmpty()) {
-            headers.put(header, join(values));
+            headers.PUT(header, join(values));
         }
     }
 
@@ -305,30 +305,30 @@ class OSSUtils {
 
         if (responseHeaders != null) {
             if (responseHeaders.getCacheControl() != null) {
-                params.put(ResponseHeaderoverrides.RESPONSE_HEADER_CACHE_CONTROL, responseHeaders.getCacheControl());
+                params.PUT(ResponseHeaderoverrides.RESPONSE_HEADER_CACHE_CONTROL, responseHeaders.getCacheControl());
             }
 
             if (responseHeaders.getContentDisposition() != null) {
-                params.put(ResponseHeaderoverrides.RESPONSE_HEADER_CONTENT_DISPOSITION,
+                params.PUT(ResponseHeaderoverrides.RESPONSE_HEADER_CONTENT_DISPOSITION,
                         responseHeaders.getContentDisposition());
             }
 
             if (responseHeaders.getContentEncoding() != null) {
-                params.put(ResponseHeaderoverrides.RESPONSE_HEADER_CONTENT_ENCODING,
+                params.PUT(ResponseHeaderoverrides.RESPONSE_HEADER_CONTENT_ENCODING,
                         responseHeaders.getContentEncoding());
             }
 
             if (responseHeaders.getContentLangauge() != null) {
-                params.put(ResponseHeaderoverrides.RESPONSE_HEADER_CONTENT_LANGUAGE,
+                params.PUT(ResponseHeaderoverrides.RESPONSE_HEADER_CONTENT_LANGUAGE,
                         responseHeaders.getContentLangauge());
             }
 
             if (responseHeaders.getContentType() != null) {
-                params.put(ResponseHeaderoverrides.RESPONSE_HEADER_CONTENT_TYPE, responseHeaders.getContentType());
+                params.PUT(ResponseHeaderoverrides.RESPONSE_HEADER_CONTENT_TYPE, responseHeaders.getContentType());
             }
 
             if (responseHeaders.getExpires() != null) {
-                params.put(ResponseHeaderoverrides.RESPONSE_HEADER_EXPIRES, responseHeaders.getExpires());
+                params.PUT(ResponseHeaderoverrides.RESPONSE_HEADER_EXPIRES, responseHeaders.getExpires());
             }
         }
     }
@@ -454,13 +454,13 @@ class OSSUtils {
             String jsonCb = jsonizeCallback(callback);
             String base64Cb = BinaryUtil.toBase64String(jsonCb.getBytes());
 
-            headers.put(OSSHeaders.OSS_HEADER_CALLBACK, base64Cb);
+            headers.PUT(OSSHeaders.OSS_HEADER_CALLBACK, base64Cb);
 
             if (callback.hasCallbackVar()) {
                 String jsonCbVar = jsonizeCallbackVar(callback);
                 String base64CbVar = BinaryUtil.toBase64String(jsonCbVar.getBytes());
                 base64CbVar = base64CbVar.replaceAll("\n", "").replaceAll("\r", "");
-                headers.put(OSSHeaders.OSS_HEADER_CALLBACK_VAR, base64CbVar);
+                headers.PUT(OSSHeaders.OSS_HEADER_CALLBACK_VAR, base64CbVar);
             }
         }
     }

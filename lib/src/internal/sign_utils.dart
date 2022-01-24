@@ -96,7 +96,7 @@ canonicalString..write(key)..write(':')..write(value);
         String accessId = currentCreds.getAccessKeyId();
         String accessKey = currentCreds.getSecretAccessKey();
         bool useSecurityToken = currentCreds.useSecurityToken();
-        HttpMethod method = request.getMethod() ?? HttpMethod.get;
+        HttpMethod method = request.getMethod() ?? HttpMethod.GET;
 
         String expires = String.valueOf(request.expiration.getTime() / 1000);
         String? key = request.key;
@@ -148,9 +148,9 @@ canonicalString..write(key)..write(':')..write(value);
         String signature = ServiceSignature.create().computeSignature(accessKey, canonicalString);
 
         Map<String, String> params = <String, String>{};
-        params.put(HttpHeaders.EXPIRES, expires);
-        params.put(OSS_ACCESS_KEY_ID, accessId);
-        params.put(SIGNATURE, signature);
+        params.PUT(HttpHeaders.EXPIRES, expires);
+        params.PUT(OSS_ACCESS_KEY_ID, accessId);
+        params.PUT(SIGNATURE, signature);
         params.putAll(requestMessage.getParameters());
 
         String queryString = HttpUtil.paramToQueryString(params, DEFAULT_CHARSET_NAME);
@@ -182,7 +182,7 @@ canonicalString..write(key)..write(':')..write(value);
 
                 builder.append(separator);
                 builder.append(paramName);
-                String paramValue = parameters.get(paramName);
+                String paramValue = parameters.GET(paramName);
                 if (paramValue != null) {
                     builder.append("=").append(paramValue);
                 }

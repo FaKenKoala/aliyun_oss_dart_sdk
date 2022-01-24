@@ -1,6 +1,18 @@
+import 'package:aliyun_oss_dart_sdk/src/common/comm/request_message.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/comm/response_handler.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/comm/response_message.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/access_control_list.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/bucket.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/generic_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/pub_bucket_image_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/put_image_style_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/set_bucket_referer_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/void_result.dart';
+
+import '../http_method.dart';
+import 'oss_request_message_builder.dart';
+import 'response_parsers.dart';
 
 /// Bucket operation.
  class OSSBucketOperation extends OSSOperation {
@@ -20,7 +32,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameCreationValid(bucketName);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addOptionalACLHeader(headers, createBucketRequest.getCannedACL());
         addOptionalHnsHeader(headers, createBucketRequest.getHnsStatus());
         addOptionalResourceGroupIdHeader(headers, createBucketRequest.getResourceGroupId());
@@ -37,11 +49,11 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Delete a bucket.
      */
-     VoidResult deleteBucket(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucket(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
@@ -54,7 +66,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * List all my buckets.
      */
-     List<Bucket> listBuckets() throws OSSException, ClientException {
+     List<Bucket> listBuckets() 
         BucketList bucketList = listBuckets(new ListBucketsRequest(null, null, null));
         List<Bucket> buckets = bucketList.getBucketList();
         while (bucketList.isTruncated()) {
@@ -67,30 +79,30 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * List all my buckets.
      */
-     BucketList listBuckets(ListBucketsRequest listBucketRequest) throws OSSException, ClientException {
+     BucketList listBuckets(ListBucketsRequest listBucketRequest) 
 
         assertParameterNotNull(listBucketRequest, "listBucketRequest");
 
         Map<String, String> params = new LinkedHashMap<String, String>();
         if (listBucketRequest.getPrefix() != null) {
-            params.put(PREFIX, listBucketRequest.getPrefix());
+            params.PUT(PREFIX, listBucketRequest.getPrefix());
         }
         if (listBucketRequest.getMarker() != null) {
-            params.put(MARKER, listBucketRequest.getMarker());
+            params.PUT(MARKER, listBucketRequest.getMarker());
         }
         if (listBucketRequest.getMaxKeys() != null) {
-            params.put(MAX_KEYS, Integer.toString(listBucketRequest.getMaxKeys()));
+            params.PUT(MAX_KEYS, Integer.toString(listBucketRequest.getMaxKeys()));
         }
         if (listBucketRequest.getBid() != null) {
-            params.put(BID, listBucketRequest.getBid());
+            params.PUT(BID, listBucketRequest.getBid());
         }
 
         if (listBucketRequest.getTagKey() != null && listBucketRequest.getTagValue() != null) {
-            params.put(TAG_KEY, listBucketRequest.getTagKey());
-            params.put(TAG_VALUE, listBucketRequest.getTagValue());
+            params.PUT(TAG_KEY, listBucketRequest.getTagKey());
+            params.PUT(TAG_VALUE, listBucketRequest.getTagValue());
         }
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addOptionalResourceGroupIdHeader(headers, listBucketRequest.getResourceGroupId());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(listBucketRequest))
@@ -102,7 +114,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Set bucket's canned ACL.
      */
-     VoidResult setBucketAcl(SetBucketAclRequest setBucketAclRequest) throws OSSException, ClientException {
+     VoidResult setBucketAcl(SetBucketAclRequest setBucketAclRequest) {
 
         assertParameterNotNull(setBucketAclRequest, "setBucketAclRequest");
 
@@ -110,11 +122,11 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addOptionalACLHeader(headers, setBucketAclRequest.getCannedACL());
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_ACL, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_ACL, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setBucketAclRequest))
                 .setMethod(HttpMethod.PUT).setBucket(bucketName).setHeaders(headers).setParameters(params)
@@ -126,16 +138,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Get bucket's ACL.
      */
-     AccessControlList getBucketAcl(GenericRequest genericRequest) throws OSSException, ClientException {
+     AccessControlList getBucketAcl(GenericRequest genericRequest){
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_ACL, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_ACL, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -144,11 +156,11 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, getBucketAclResponseParser, bucketName, null, true);
     }
 
-     BucketMetadata getBucketMetadata(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketMetadata getBucketMetadata(GenericRequest genericRequest) {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
@@ -158,7 +170,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         List<ResponseHandler> reponseHandlers = [];
         reponseHandlers.add(new ResponseHandler() {
             @override
-             void handle(ResponseMessage response) throws ServiceException, ClientException {
+             void handle(ResponseMessage response) 
                 if (response.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
                     safeCloseResponse(response);
                     throw ExceptionFactory.createOSSException(
@@ -175,11 +187,9 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Set bucket referer.
      */
-     VoidResult setBucketReferer(SetBucketRefererRequest setBucketRefererRequest) throws OSSException, ClientException {
+     VoidResult setBucketReferer(SetBucketRefererRequest setBucketRefererRequest) {
 
-        assertParameterNotNull(setBucketRefererRequest, "setBucketRefererRequest");
-
-        String bucketName = setBucketRefererRequest.getBucketName();
+        String bucketName = setBucketRefererRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
@@ -188,8 +198,8 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
             referer = new BucketReferer();
         }
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_REFERER, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_REFERER, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setBucketRefererRequest))
                 .setMethod(HttpMethod.PUT).setBucket(bucketName).setParameters(params)
@@ -202,16 +212,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Get bucket referer.
      */
-     BucketReferer getBucketReferer(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketReferer getBucketReferer(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_REFERER, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_REFERER, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -227,12 +237,12 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_LOCATION, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_LOCATION, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -244,11 +254,11 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Determine whether a bucket exists or not.
      */
-     bool doesBucketExists(GenericRequest genericRequest) throws OSSException, ClientException {
+     bool doesBucketExists(GenericRequest genericRequest) {
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
@@ -265,7 +275,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * List objects under the specified bucket.
      */
-     ObjectListing listObjects(ListObjectsRequest listObjectsRequest) throws OSSException, ClientException {
+     ObjectListing listObjects(ListObjectsRequest listObjectsRequest) {
 
         assertParameterNotNull(listObjectsRequest, "listObjectsRequest");
 
@@ -276,7 +286,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         Map<String, String> params = new LinkedHashMap<String, String>();
         populateListObjectsRequestParameters(listObjectsRequest, params);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, listObjectsRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(listObjectsRequest))
@@ -289,7 +299,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * List objects under the specified bucket.
      */
-     ListObjectsV2Result listObjectsV2(ListObjectsV2Request listObjectsV2Request) throws OSSException, ClientException {
+     ListObjectsV2Result listObjectsV2(ListObjectsV2Request listObjectsV2Request) 
 
         assertParameterNotNull(listObjectsV2Request, "listObjectsRequest");
 
@@ -300,7 +310,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         Map<String, String> params = new LinkedHashMap<String, String>();
         populateListObjectsV2RequestParameters(listObjectsV2Request, params);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, listObjectsV2Request.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(listObjectsV2Request))
@@ -313,7 +323,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * List versions under the specified bucket.
      */
-     VersionListing listVersions(ListVersionsRequest listVersionsRequest) throws OSSException, ClientException {
+     VersionListing listVersions(ListVersionsRequest listVersionsRequest) 
 
         assertParameterNotNull(listVersionsRequest, "listVersionsRequest");
 
@@ -324,7 +334,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         Map<String, String> params = new LinkedHashMap<String, String>();
         populateListVersionsRequestParameters(listVersionsRequest, params);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, listVersionsRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(listVersionsRequest))
@@ -337,7 +347,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Set bucket logging.
      */
-     VoidResult setBucketLogging(SetBucketLoggingRequest setBucketLoggingRequest) throws OSSException, ClientException {
+     VoidResult setBucketLogging(SetBucketLoggingRequest setBucketLoggingRequest) 
 
         assertParameterNotNull(setBucketLoggingRequest, "setBucketLoggingRequest");
 
@@ -345,8 +355,8 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_LOGGING, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_LOGGING, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setBucketLoggingRequest))
                 .setMethod(HttpMethod.PUT).setBucket(bucketName).setParameters(params)
@@ -365,8 +375,8 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_IMG, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_IMG, null);
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(putBucketImageRequest))
                 .setMethod(HttpMethod.PUT).setBucket(bucketName).setParameters(params)
                 .setOriginalRequest(putBucketImageRequest)
@@ -382,8 +392,8 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_IMG, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_IMG, null);
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
                 .setOriginalRequest(genericRequest).build();
@@ -394,12 +404,12 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
      * Delete bucket image attributes.
      */
      VoidResult deleteBucketImage(String bucketName, GenericRequest genericRequest)
-            throws OSSException, ClientException {
+            
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_IMG, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_IMG, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.DELETE).setBucket(bucketName).setParameters(params)
@@ -411,7 +421,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * put image style
      */
-     VoidResult putImageStyle(PutImageStyleRequest putImageStyleRequest) throws OSSException, ClientException {
+     VoidResult putImageStyle(PutImageStyleRequest putImageStyleRequest) 
         assertParameterNotNull(putImageStyleRequest, "putImageStyleRequest");
         String bucketName = putImageStyleRequest.GetBucketName();
         String styleName = putImageStyleRequest.GetStyleName();
@@ -419,9 +429,9 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_STYLE, null);
-        params.put(STYLE_NAME, styleName);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_STYLE, null);
+        params.PUT(STYLE_NAME, styleName);
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(putImageStyleRequest))
                 .setMethod(HttpMethod.PUT).setBucket(bucketName).setParameters(params)
                 .setOriginalRequest(putImageStyleRequest)
@@ -431,14 +441,14 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     }
 
      VoidResult deleteImageStyle(String bucketName, String styleName, GenericRequest genericRequest)
-            throws OSSException, ClientException {
+            
         assertParameterNotNull(bucketName, "bucketName");
         assertParameterNotNull(styleName, "styleName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_STYLE, null);
-        params.put(STYLE_NAME, styleName);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_STYLE, null);
+        params.PUT(STYLE_NAME, styleName);
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.DELETE).setBucket(bucketName).setParameters(params)
                 .setOriginalRequest(genericRequest).build();
@@ -447,13 +457,13 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     }
 
      GetImageStyleResult getImageStyle(String bucketName, String styleName, GenericRequest genericRequest)
-            throws OSSException, ClientException {
+            
         assertParameterNotNull(bucketName, "bucketName");
         assertParameterNotNull(styleName, "styleName");
         ensureBucketNameValid(bucketName);
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_STYLE, null);
-        params.put(STYLE_NAME, styleName);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_STYLE, null);
+        params.PUT(STYLE_NAME, styleName);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -466,13 +476,13 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
      * List image style.
      */
      List<Style> listImageStyle(String bucketName, GenericRequest genericRequest)
-            throws OSSException, ClientException {
+            
 
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_STYLE, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_STYLE, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -481,7 +491,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, listImageStyleResponseParser, bucketName, null, true);
     }
 
-     VoidResult setBucketProcess(SetBucketProcessRequest setBucketProcessRequest) throws OSSException, ClientException {
+     VoidResult setBucketProcess(SetBucketProcessRequest setBucketProcessRequest) 
 
         assertParameterNotNull(setBucketProcessRequest, "setBucketProcessRequest");
 
@@ -492,8 +502,8 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_PROCESS_CONF, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_PROCESS_CONF, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setBucketProcessRequest))
                 .setMethod(HttpMethod.PUT).setBucket(bucketName).setParameters(params)
@@ -503,16 +513,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-     BucketProcess getBucketProcess(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketProcess getBucketProcess(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_PROCESS_CONF, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_PROCESS_CONF, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -524,16 +534,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Get bucket logging.
      */
-     BucketLoggingResult getBucketLogging(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketLoggingResult getBucketLogging(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_LOGGING, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_LOGGING, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -545,16 +555,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Delete bucket logging.
      */
-     VoidResult deleteBucketLogging(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketLogging(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_LOGGING, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_LOGGING, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.DELETE).setBucket(bucketName).setParameters(params)
@@ -566,7 +576,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Set bucket website.
      */
-     VoidResult setBucketWebsite(SetBucketWebsiteRequest setBucketWebSiteRequest) throws OSSException, ClientException {
+     VoidResult setBucketWebsite(SetBucketWebsiteRequest setBucketWebSiteRequest) 
 
         assertParameterNotNull(setBucketWebSiteRequest, "setBucketWebSiteRequest");
 
@@ -579,8 +589,8 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
             throw ArgumentError(String.format("IndexDocument/ErrorDocument/RoutingRules must have one"));
         }
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_WEBSITE, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_WEBSITE, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setBucketWebSiteRequest))
                 .setMethod(HttpMethod.PUT).setBucket(bucketName).setParameters(params)
@@ -593,16 +603,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Get bucket website.
      */
-     BucketWebsiteResult getBucketWebsite(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketWebsiteResult getBucketWebsite(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_WEBSITE, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_WEBSITE, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -614,16 +624,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Delete bucket website.
      */
-     VoidResult deleteBucketWebsite(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketWebsite(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_WEBSITE, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_WEBSITE, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.DELETE).setBucket(bucketName).setParameters(params)
@@ -636,7 +646,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
      * Set bucket lifecycle.
      */
      VoidResult setBucketLifecycle(SetBucketLifecycleRequest setBucketLifecycleRequest)
-            throws OSSException, ClientException {
+            
 
         assertParameterNotNull(setBucketLifecycleRequest, "setBucketLifecycleRequest");
 
@@ -644,8 +654,8 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_LIFECYCLE, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_LIFECYCLE, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setBucketLifecycleRequest))
                 .setMethod(HttpMethod.PUT).setBucket(bucketName).setParameters(params)
@@ -658,16 +668,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Get bucket lifecycle.
      */
-     List<LifecycleRule> getBucketLifecycle(GenericRequest genericRequest) throws OSSException, ClientException {
+     List<LifecycleRule> getBucketLifecycle(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_LIFECYCLE, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_LIFECYCLE, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -679,16 +689,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Delete bucket lifecycle.
      */
-     VoidResult deleteBucketLifecycle(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketLifecycle(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_LIFECYCLE, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_LIFECYCLE, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.DELETE).setBucket(bucketName).setParameters(params)
@@ -700,7 +710,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Set bucket tagging.
      */
-     VoidResult setBucketTagging(SetBucketTaggingRequest setBucketTaggingRequest) throws OSSException, ClientException {
+     VoidResult setBucketTagging(SetBucketTaggingRequest setBucketTaggingRequest) 
 
         assertParameterNotNull(setBucketTaggingRequest, "setBucketTaggingRequest");
 
@@ -708,8 +718,8 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_TAGGING, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_TAGGING, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setBucketTaggingRequest))
                 .setMethod(HttpMethod.PUT).setBucket(bucketName).setParameters(params)
@@ -722,16 +732,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Get bucket tagging.
      */
-     TagSet getBucketTagging(GenericRequest genericRequest) throws OSSException, ClientException {
+     TagSet getBucketTagging(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_TAGGING, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_TAGGING, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -743,16 +753,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Delete bucket tagging.
      */
-     VoidResult deleteBucketTagging(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketTagging(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_TAGGING, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_TAGGING, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.DELETE).setBucket(bucketName).setParameters(params)
@@ -765,16 +775,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
      * Get bucket versioning.
      */
      BucketVersioningConfiguration getBucketVersioning(GenericRequest genericRequest)
-        throws OSSException, ClientException {
+        
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_VRESIONING, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_VRESIONING, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
             .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -787,7 +797,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
      * Set bucket versioning.
      */
      VoidResult setBucketVersioning(SetBucketVersioningRequest setBucketVersioningRequest)
-        throws OSSException, ClientException {
+        
         assertParameterNotNull(setBucketVersioningRequest, "setBucketVersioningRequest");
         assertParameterNotNull(setBucketVersioningRequest.getVersioningConfiguration(), "versioningConfiguration");
 
@@ -795,11 +805,11 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_VRESIONING, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_VRESIONING, null);
 
         byte[] rawContent = setBucketVersioningRequestMarshaller.marshall(setBucketVersioningRequest);
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addRequestRequiredHeaders(headers, rawContent);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setBucketVersioningRequest))
@@ -814,7 +824,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
      * Add bucket replication.
      */
      VoidResult addBucketReplication(AddBucketReplicationRequest addBucketReplicationRequest)
-            throws OSSException, ClientException {
+            
 
         assertParameterNotNull(addBucketReplicationRequest, "addBucketReplicationRequest");
         assertParameterNotNull(addBucketReplicationRequest.getTargetBucketName(), "targetBucketName");
@@ -824,8 +834,8 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         ensureBucketNameValid(bucketName);
 
         Map<String, String> params = new LinkedHashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_REPLICATION, null);
-        params.put(RequestParameters.SUBRESOURCE_COMP, RequestParameters.COMP_ADD);
+        params.PUT(RequestParameters.SUBRESOURCE_REPLICATION, null);
+        params.PUT(RequestParameters.SUBRESOURCE_COMP, RequestParameters.COMP_ADD);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(addBucketReplicationRequest))
                 .setMethod(HttpMethod.POST).setBucket(bucketName).setParameters(params)
@@ -839,16 +849,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
      * Get bucket replication.
      */
      List<ReplicationRule> getBucketReplication(GenericRequest genericRequest)
-            throws OSSException, ClientException {
+            
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_REPLICATION, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_REPLICATION, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -861,7 +871,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
      * Delete bucket replication.
      */
      VoidResult deleteBucketReplication(DeleteBucketReplicationRequest deleteBucketReplicationRequest)
-            throws OSSException, ClientException {
+            
 
         assertParameterNotNull(deleteBucketReplicationRequest, "deleteBucketReplicationRequest");
         assertParameterNotNull(deleteBucketReplicationRequest.getReplicationRuleID(), "replicationRuleID");
@@ -871,11 +881,11 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         ensureBucketNameValid(bucketName);
 
         Map<String, String> params = new LinkedHashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_REPLICATION, null);
-        params.put(RequestParameters.SUBRESOURCE_COMP, RequestParameters.COMP_DELETE);
+        params.PUT(RequestParameters.SUBRESOURCE_REPLICATION, null);
+        params.PUT(RequestParameters.SUBRESOURCE_COMP, RequestParameters.COMP_DELETE);
 
         byte[] rawContent = deleteBucketReplicationRequestMarshaller.marshall(deleteBucketReplicationRequest);
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addRequestRequiredHeaders(headers, rawContent);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(deleteBucketReplicationRequest))
@@ -887,11 +897,11 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     }
 
      static void addRequestRequiredHeaders(Map<String, String> headers, byte[] rawContent) {
-        headers.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(rawContent.length));
+        headers.PUT(HttpHeaders.CONTENT_LENGTH, String.valueOf(rawContent.length));
 
         byte[] md5 = BinaryUtil.calculateMd5(rawContent);
         String md5Base64 = BinaryUtil.toBase64String(md5);
-        headers.put(HttpHeaders.CONTENT_MD5, md5Base64);
+        headers.PUT(HttpHeaders.CONTENT_MD5, md5Base64);
     }
 
     /**
@@ -899,7 +909,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
      */
      BucketReplicationProgress getBucketReplicationProgress(
             GetBucketReplicationProgressRequest getBucketReplicationProgressRequest)
-            throws OSSException, ClientException {
+            
 
         assertParameterNotNull(getBucketReplicationProgressRequest, "getBucketReplicationProgressRequest");
         assertParameterNotNull(getBucketReplicationProgressRequest.getReplicationRuleID(), "replicationRuleID");
@@ -908,9 +918,9 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_REPLICATION_PROGRESS, null);
-        params.put(RequestParameters.RULE_ID, getBucketReplicationProgressRequest.getReplicationRuleID());
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_REPLICATION_PROGRESS, null);
+        params.PUT(RequestParameters.RULE_ID, getBucketReplicationProgressRequest.getReplicationRuleID());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(getBucketReplicationProgressRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -923,16 +933,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
      * Get bucket replication progress.
      */
      List<String> getBucketReplicationLocation(GenericRequest genericRequest)
-            throws OSSException, ClientException {
+            
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_REPLICATION_LOCATION, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_REPLICATION_LOCATION, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -941,7 +951,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, getBucketReplicationLocationResponseParser, bucketName, null, true);
     }
 
-     AddBucketCnameResult addBucketCname(AddBucketCnameRequest addBucketCnameRequest) throws OSSException, ClientException {
+     AddBucketCnameResult addBucketCname(AddBucketCnameRequest addBucketCnameRequest) 
 
         assertParameterNotNull(addBucketCnameRequest, "addBucketCnameRequest");
         assertParameterNotNull(addBucketCnameRequest.getDomain(), "addBucketCnameRequest.domain");
@@ -950,12 +960,12 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_CNAME, null);
-        params.put(RequestParameters.SUBRESOURCE_COMP, RequestParameters.COMP_ADD);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_CNAME, null);
+        params.PUT(RequestParameters.SUBRESOURCE_COMP, RequestParameters.COMP_ADD);
 
         byte[] rawContent = addBucketCnameRequestMarshaller.marshall(addBucketCnameRequest);
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addRequestRequiredHeaders(headers, rawContent);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(addBucketCnameRequest))
@@ -966,16 +976,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, addBucketCnameResponseParser, bucketName, null);
     }
 
-     List<CnameConfiguration> getBucketCname(GenericRequest genericRequest) throws OSSException, ClientException {
+     List<CnameConfiguration> getBucketCname(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_CNAME, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_CNAME, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -985,7 +995,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     }
 
      VoidResult deleteBucketCname(DeleteBucketCnameRequest deleteBucketCnameRequest)
-            throws OSSException, ClientException {
+            
 
         assertParameterNotNull(deleteBucketCnameRequest, "deleteBucketCnameRequest");
         assertParameterNotNull(deleteBucketCnameRequest.getDomain(), "deleteBucketCnameRequest.domain");
@@ -994,12 +1004,12 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_CNAME, null);
-        params.put(RequestParameters.SUBRESOURCE_COMP, RequestParameters.COMP_DELETE);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_CNAME, null);
+        params.PUT(RequestParameters.SUBRESOURCE_COMP, RequestParameters.COMP_DELETE);
 
         byte[] rawContent = deleteBucketCnameRequestMarshaller.marshall(deleteBucketCnameRequest);
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addRequestRequiredHeaders(headers, rawContent);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(deleteBucketCnameRequest))
@@ -1010,16 +1020,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-     BucketInfo getBucketInfo(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketInfo getBucketInfo(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_BUCKET_INFO, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_BUCKET_INFO, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -1028,16 +1038,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, getBucketInfoResponseParser, bucketName, null, true);
     }
 
-     BucketStat getBucketStat(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketStat getBucketStat(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_STAT, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_STAT, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -1047,7 +1057,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     }
 
      VoidResult setBucketStorageCapacity(SetBucketStorageCapacityRequest setBucketStorageCapacityRequest)
-            throws OSSException, ClientException {
+            
 
         assertParameterNotNull(setBucketStorageCapacityRequest, "setBucketStorageCapacityRequest");
         assertParameterNotNull(setBucketStorageCapacityRequest.getUserQos(), "setBucketStorageCapacityRequest.userQos");
@@ -1059,11 +1069,11 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         UserQos userQos = setBucketStorageCapacityRequest.getUserQos();
         assertParameterNotNull(userQos.getStorageCapacity(), "StorageCapacity");
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_QOS, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_QOS, null);
 
         byte[] rawContent = setBucketQosRequestMarshaller.marshall(userQos);
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addRequestRequiredHeaders(headers, rawContent);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setBucketStorageCapacityRequest))
@@ -1074,16 +1084,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-     UserQos getBucketStorageCapacity(GenericRequest genericRequest) throws OSSException, ClientException {
+     UserQos getBucketStorageCapacity(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_QOS, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_QOS, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -1097,7 +1107,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
      * Set bucket encryption.
      */
      VoidResult setBucketEncryption(SetBucketEncryptionRequest setBucketEncryptionRequest)
-        throws OSSException, ClientException {
+        
 
         assertParameterNotNull(setBucketEncryptionRequest, "setBucketEncryptionRequest");
 
@@ -1105,11 +1115,11 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_ENCRYPTION, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_ENCRYPTION, null);
 
         byte[] rawContent = setBucketEncryptionRequestMarshaller.marshall(setBucketEncryptionRequest);
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addRequestRequiredHeaders(headers, rawContent);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setBucketEncryptionRequest))
@@ -1124,16 +1134,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
      * get bucket encryption.
      */
      ServerSideEncryptionConfiguration getBucketEncryption(GenericRequest genericRequest)
-        throws OSSException, ClientException {
+        
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_ENCRYPTION, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_ENCRYPTION, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
             .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -1145,16 +1155,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     /**
      * Delete bucket encryption.
      */
-     VoidResult deleteBucketEncryption(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketEncryption(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_ENCRYPTION, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_ENCRYPTION, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
             .setMethod(HttpMethod.DELETE).setBucket(bucketName).setParameters(params)
@@ -1163,18 +1173,18 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-     VoidResult setBucketPolicy(SetBucketPolicyRequest setBucketPolicyRequest) throws OSSException, ClientException {
+     VoidResult setBucketPolicy(SetBucketPolicyRequest setBucketPolicyRequest) 
 
         assertParameterNotNull(setBucketPolicyRequest, "setBucketPolicyRequest");
 
         String bucketName = setBucketPolicyRequest.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
-     	Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_POLICY, null);
+     	Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_POLICY, null);
 
         byte[] rawContent = setBucketPolicyRequestMarshaller.marshall(setBucketPolicyRequest);
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addRequestRequiredHeaders(headers, rawContent);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setBucketPolicyRequest))
@@ -1185,30 +1195,30 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-     GetBucketPolicyResult getBucketPolicy(GenericRequest genericRequest) throws OSSException, ClientException {
+     GetBucketPolicyResult getBucketPolicy(GenericRequest genericRequest) 
     	assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_POLICY, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_POLICY, null);
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
                 .setOriginalRequest(genericRequest).build();
         return doOperation(request, getBucketPolicyResponseParser, bucketName, null, true);
     }
     
-     VoidResult deleteBucketPolicy(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketPolicy(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_POLICY, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_POLICY, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.DELETE).setBucket(bucketName).setParameters(params)
@@ -1218,7 +1228,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     }
 
      VoidResult setBucketRequestPayment(SetBucketRequestPaymentRequest setBucketRequestPaymentRequest)
-            throws OSSException, ClientException {
+            
 
         assertParameterNotNull(setBucketRequestPaymentRequest, "setBucketRequestPaymentRequest");
         assertParameterNotNull(setBucketRequestPaymentRequest.getPayer(), "setBucketRequestPaymentRequest.payer");
@@ -1227,12 +1237,12 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_REQUEST_PAYMENT, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_REQUEST_PAYMENT, null);
 
         Payer payer = setBucketRequestPaymentRequest.getPayer();
         byte[] rawContent = setBucketRequestPaymentRequestMarshaller.marshall(payer.toString());
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addRequestRequiredHeaders(headers, rawContent);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setBucketRequestPaymentRequest))
@@ -1243,16 +1253,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-     GetBucketRequestPaymentResult getBucketRequestPayment(GenericRequest genericRequest) throws OSSException, ClientException {
+     GetBucketRequestPaymentResult getBucketRequestPayment(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_REQUEST_PAYMENT, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_REQUEST_PAYMENT, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -1261,7 +1271,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, getBucketRequestPaymentResponseParser, bucketName, null, true);
     }
 
-     VoidResult setBucketQosInfo(SetBucketQosInfoRequest setBucketQosInfoRequest) throws OSSException, ClientException {
+     VoidResult setBucketQosInfo(SetBucketQosInfoRequest setBucketQosInfoRequest) 
 
         assertParameterNotNull(setBucketQosInfoRequest, "setBucketQosInfoRequest");
         assertParameterNotNull(setBucketQosInfoRequest.getBucketQosInfo(), "setBucketQosInfoRequest.getBucketQosInfo");
@@ -1270,11 +1280,11 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_QOS_INFO, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_QOS_INFO, null);
 
         byte[] rawContent = setBucketQosInfoRequestMarshaller.marshall(setBucketQosInfoRequest.getBucketQosInfo());
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addRequestRequiredHeaders(headers, rawContent);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setBucketQosInfoRequest))
@@ -1285,16 +1295,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-     BucketQosInfo getBucketQosInfo(GenericRequest genericRequest) throws OSSException, ClientException {
+     BucketQosInfo getBucketQosInfo(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_QOS_INFO, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_QOS_INFO, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -1303,16 +1313,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, getBucketQosInfoResponseParser, bucketName, null, true);
     }
 
-     VoidResult deleteBucketQosInfo(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketQosInfo(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_QOS_INFO, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_QOS_INFO, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.DELETE).setBucket(bucketName).setParameters(params)
@@ -1321,10 +1331,10 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-     UserQosInfo getUserQosInfo() throws OSSException, ClientException {
+     UserQosInfo getUserQosInfo() 
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_QOS_INFO, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_QOS_INFO, null);
 
         GenericRequest gGenericRequest = new GenericRequest();
 
@@ -1335,7 +1345,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     }
 
      SetAsyncFetchTaskResult setAsyncFetchTask(SetAsyncFetchTaskRequest setAsyncFetchTaskRequest)
-            throws OSSException, ClientException {
+            
         assertParameterNotNull(setAsyncFetchTaskRequest, "setAsyncFetchTaskRequest");
 
         String bucketName = setAsyncFetchTaskRequest.getBucketName();
@@ -1345,11 +1355,11 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         AsyncFetchTaskConfiguration taskConfiguration = setAsyncFetchTaskRequest.getAsyncFetchTaskConfiguration();
         assertParameterNotNull(taskConfiguration, "taskConfiguration");
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_ASYNC_FETCH, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_ASYNC_FETCH, null);
 
         byte[] rawContent = setAsyncFetchTaskRequestMarshaller.marshall(setAsyncFetchTaskRequest.getAsyncFetchTaskConfiguration());
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addRequestRequiredHeaders(headers, rawContent);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setAsyncFetchTaskRequest))
@@ -1361,7 +1371,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     }
 
      GetAsyncFetchTaskResult getAsyncFetchTask(GetAsyncFetchTaskRequest getAsyncFetchTaskRequest)
-            throws OSSException, ClientException {
+            
         assertParameterNotNull(getAsyncFetchTaskRequest, "getAsyncFetchTaskInfoRequest");
 
         String bucketName = getAsyncFetchTaskRequest.getBucketName();
@@ -1371,11 +1381,11 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         String taskId = getAsyncFetchTaskRequest.getTaskId();
         assertParameterNotNull(taskId, "taskId");
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_ASYNC_FETCH, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_ASYNC_FETCH, null);
 
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put(OSSHeaders.OSS_HEADER_TASK_ID, taskId);
+        Map<String, String> headers = <String, String>{};
+        headers.PUT(OSSHeaders.OSS_HEADER_TASK_ID, taskId);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(getAsyncFetchTaskRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setHeaders(headers).setParameters(params)
@@ -1393,8 +1403,8 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(region, "region");
         assertParameterNotNull(vSwitchId, "vSwitchId");
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.VPCIP, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.VPCIP, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(createVpcipRequest)).setParameters(params)
                 .setMethod(HttpMethod.POST).setInputStreamWithLength(createVpcipRequestMarshaller.marshall(createVpcipRequest))
@@ -1408,8 +1418,8 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
 
      List<Vpcip> listVpcip() {
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.VPCIP, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.VPCIP, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint())
                 .setMethod(HttpMethod.GET).setParameters(params).build();
@@ -1429,8 +1439,8 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(vpcId, "vpcId");
         assertParameterNotNull(vip, "vip");
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.VPCIP, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.VPCIP, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(deleteVpcipRequest))
                 .setParameters(params).setMethod(HttpMethod.DELETE)
@@ -1454,9 +1464,9 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(vpcId, "vpcId");
         assertParameterNotNull(vip, "vip");
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.VIP, null);
-        params.put(RequestParameters.SUBRESOURCE_COMP, RequestParameters.COMP_ADD);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.VIP, null);
+        params.PUT(RequestParameters.SUBRESOURCE_COMP, RequestParameters.COMP_ADD);
 
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(createBucketVpcipRequest))
@@ -1481,9 +1491,9 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(vpcId, "vpcId");
         assertParameterNotNull(vip, "vip");
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.VIP, null);
-        params.put(RequestParameters.SUBRESOURCE_COMP, RequestParameters.COMP_DELETE);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.VIP, null);
+        params.PUT(RequestParameters.SUBRESOURCE_COMP, RequestParameters.COMP_DELETE);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(deleteBucketVpcipRequest))
                 .setMethod(HttpMethod.POST).setParameters(params).setBucket(bucketName)
@@ -1495,11 +1505,11 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
 
      List<VpcPolicy> getBucketVpcip(GenericRequest genericRequest) {
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.VIP, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.VIP, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params).build();
@@ -1508,7 +1518,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     }
 
      VoidResult setBucketInventoryConfiguration(SetBucketInventoryConfigurationRequest
-            setBucketInventoryConfigurationRequest) throws OSSException, ClientException {
+            setBucketInventoryConfigurationRequest) 
         assertParameterNotNull(setBucketInventoryConfigurationRequest, "SetBucketInventoryConfigurationRequest");
         String bucketName = setBucketInventoryConfigurationRequest.getBucketName();
         String inventoryId = setBucketInventoryConfigurationRequest.getInventoryConfiguration().getInventoryId();
@@ -1518,11 +1528,11 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
 
         byte[] rawContent = setBucketInventoryRequestMarshaller.marshall(
                 setBucketInventoryConfigurationRequest.getInventoryConfiguration());
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_INVENTORY, null);
-        params.put(SUBRESOURCE_INVENTORY_ID, inventoryId);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_INVENTORY, null);
+        params.PUT(SUBRESOURCE_INVENTORY_ID, inventoryId);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addRequestRequiredHeaders(headers, rawContent);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setBucketInventoryConfigurationRequest))
@@ -1535,7 +1545,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     }
 
      GetBucketInventoryConfigurationResult getBucketInventoryConfiguration(GetBucketInventoryConfigurationRequest
-            getBucketInventoryConfigurationRequest) throws OSSException, ClientException {
+            getBucketInventoryConfigurationRequest) 
         assertParameterNotNull(getBucketInventoryConfigurationRequest, "getBucketInventoryConfigurationRequest");
         String bucketName = getBucketInventoryConfigurationRequest.getBucketName();
         String inventoryId = getBucketInventoryConfigurationRequest.getInventoryId();
@@ -1543,9 +1553,9 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_INVENTORY, null);
-        params.put(SUBRESOURCE_INVENTORY_ID, inventoryId);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_INVENTORY, null);
+        params.PUT(SUBRESOURCE_INVENTORY_ID, inventoryId);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(getBucketInventoryConfigurationRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -1556,17 +1566,17 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     }
 
      ListBucketInventoryConfigurationsResult listBucketInventoryConfigurations(ListBucketInventoryConfigurationsRequest
-            listBucketInventoryConfigurationsRequest) throws OSSException, ClientException {
+            listBucketInventoryConfigurationsRequest) 
         assertParameterNotNull(listBucketInventoryConfigurationsRequest, "listBucketInventoryConfigurationsRequest");
         String bucketName = listBucketInventoryConfigurationsRequest.getBucketName();
         String continuationToken = listBucketInventoryConfigurationsRequest.getContinuationToken();
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_INVENTORY, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_INVENTORY, null);
         if (continuationToken != null && !continuationToken.isEmpty()) {
-            params.put(SUBRESOURCE_CONTINUATION_TOKEN, continuationToken);
+            params.PUT(SUBRESOURCE_CONTINUATION_TOKEN, continuationToken);
         }
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(listBucketInventoryConfigurationsRequest))
@@ -1578,7 +1588,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     }
 
      VoidResult deleteBucketInventoryConfiguration(DeleteBucketInventoryConfigurationRequest
-            deleteBucketInventoryConfigurationRequest) throws OSSException, ClientException {
+            deleteBucketInventoryConfigurationRequest) 
         assertParameterNotNull(deleteBucketInventoryConfigurationRequest, "deleteBucketInventoryConfigurationRequest");
         String bucketName = deleteBucketInventoryConfigurationRequest.getBucketName();
         String inventoryId = deleteBucketInventoryConfigurationRequest.getInventoryId();
@@ -1586,9 +1596,9 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_INVENTORY, null);
-        params.put(SUBRESOURCE_INVENTORY_ID, inventoryId);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_INVENTORY, null);
+        params.PUT(SUBRESOURCE_INVENTORY_ID, inventoryId);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(deleteBucketInventoryConfigurationRequest))
                 .setMethod(HttpMethod.DELETE).setBucket(bucketName).setParameters(params)
@@ -1597,17 +1607,17 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-     InitiateBucketWormResult initiateBucketWorm(InitiateBucketWormRequest initiateBucketWormRequest) throws OSSException, ClientException {
+     InitiateBucketWormResult initiateBucketWorm(InitiateBucketWormRequest initiateBucketWormRequest) 
         assertParameterNotNull(initiateBucketWormRequest, "initiateBucketWormRequest");
         String bucketName = initiateBucketWormRequest.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_WORM, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_WORM, null);
 
         byte[] rawContent = initiateBucketWormRequestMarshaller.marshall(initiateBucketWormRequest);
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addRequestRequiredHeaders(headers, rawContent);
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(initiateBucketWormRequest))
                 .setMethod(HttpMethod.POST).setBucket(bucketName).setParameters(params).setHeaders(headers)
@@ -1619,14 +1629,14 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, initiateBucketWormResponseParser, bucketName, null);
     }
 
-     VoidResult abortBucketWorm(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult abortBucketWorm(GenericRequest genericRequest) 
         assertParameterNotNull(genericRequest, "genericRequest");
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_WORM, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_WORM, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.DELETE).setBucket(bucketName).setParameters(params)
@@ -1636,7 +1646,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-     VoidResult completeBucketWorm(CompleteBucketWormRequest completeBucketWormRequest) throws OSSException, ClientException {
+     VoidResult completeBucketWorm(CompleteBucketWormRequest completeBucketWormRequest) 
         assertParameterNotNull(completeBucketWormRequest, "completeBucketWormRequest");
         String bucketName = completeBucketWormRequest.getBucketName();
         String wormId = completeBucketWormRequest.getWormId();
@@ -1644,8 +1654,8 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_WORM_ID, wormId);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_WORM_ID, wormId);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(completeBucketWormRequest))
                 .setMethod(HttpMethod.POST).setBucket(bucketName).setParameters(params)
@@ -1656,7 +1666,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-     VoidResult extendBucketWorm(ExtendBucketWormRequest extendBucketWormRequest) throws OSSException, ClientException {
+     VoidResult extendBucketWorm(ExtendBucketWormRequest extendBucketWormRequest) 
         assertParameterNotNull(extendBucketWormRequest, "extendBucketWormRequest");
         String bucketName = extendBucketWormRequest.getBucketName();
         String wormId = extendBucketWormRequest.getWormId();
@@ -1664,12 +1674,12 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_WORM_ID, wormId);
-        params.put(SUBRESOURCE_WORM_EXTEND, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_WORM_ID, wormId);
+        params.PUT(SUBRESOURCE_WORM_EXTEND, null);
 
         byte[] rawContent = extendBucketWormRequestMarshaller.marshall(extendBucketWormRequest);
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addRequestRequiredHeaders(headers, rawContent);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(extendBucketWormRequest))
@@ -1681,14 +1691,14 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-     GetBucketWormResult getBucketWorm(GenericRequest genericRequest) throws OSSException, ClientException {
+     GetBucketWormResult getBucketWorm(GenericRequest genericRequest) 
         assertParameterNotNull(genericRequest, "genericRequest");
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_WORM, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_WORM, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -1699,7 +1709,7 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
     }
 
      VoidResult setBucketResourceGroup(SetBucketResourceGroupRequest setBucketResourceGroupRequest)
-            throws OSSException, ClientException {
+            
 
         assertParameterNotNull(setBucketResourceGroupRequest, "setBucketResourceGroupRequest");
         assertParameterNotNull(setBucketResourceGroupRequest.getResourceGroupId(), "setBucketResourceGroupRequest.resourceGroupId");
@@ -1708,11 +1718,11 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_RESOURCE_GROUP, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_RESOURCE_GROUP, null);
 
         byte[] rawContent = setBucketResourceGroupRequestMarshaller.marshall(setBucketResourceGroupRequest.getResourceGroupId());
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         addRequestRequiredHeaders(headers, rawContent);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setBucketResourceGroupRequest))
@@ -1723,16 +1733,16 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, requestIdResponseParser, bucketName, null);
     }
 
-     GetBucketResourceGroupResult getBucketResourceGroup(GenericRequest genericRequest) throws OSSException, ClientException {
+     GetBucketResourceGroupResult getBucketResourceGroup(GenericRequest genericRequest) 
 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(RequestParameters.SUBRESOURCE_RESOURCE_GROUP, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(RequestParameters.SUBRESOURCE_RESOURCE_GROUP, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -1745,57 +1755,57 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
             Map<String, String> params) {
 
         if (listObjectsRequest.getPrefix() != null) {
-            params.put(PREFIX, listObjectsRequest.getPrefix());
+            params.PUT(PREFIX, listObjectsRequest.getPrefix());
         }
 
         if (listObjectsRequest.getMarker() != null) {
-            params.put(MARKER, listObjectsRequest.getMarker());
+            params.PUT(MARKER, listObjectsRequest.getMarker());
         }
 
         if (listObjectsRequest.getDelimiter() != null) {
-            params.put(DELIMITER, listObjectsRequest.getDelimiter());
+            params.PUT(DELIMITER, listObjectsRequest.getDelimiter());
         }
 
         if (listObjectsRequest.getMaxKeys() != null) {
-            params.put(MAX_KEYS, Integer.toString(listObjectsRequest.getMaxKeys()));
+            params.PUT(MAX_KEYS, Integer.toString(listObjectsRequest.getMaxKeys()));
         }
 
         if (listObjectsRequest.getEncodingType() != null) {
-            params.put(ENCODING_TYPE, listObjectsRequest.getEncodingType());
+            params.PUT(ENCODING_TYPE, listObjectsRequest.getEncodingType());
         }
     }
 
      static void populateListObjectsV2RequestParameters(ListObjectsV2Request listObjectsV2Request,
             Map<String, String> params) {
 
-        params.put(LIST_TYPE, "2");
+        params.PUT(LIST_TYPE, "2");
 
         if (listObjectsV2Request.getPrefix() != null) {
-            params.put(PREFIX, listObjectsV2Request.getPrefix());
+            params.PUT(PREFIX, listObjectsV2Request.getPrefix());
         }
 
         if (listObjectsV2Request.getDelimiter() != null) {
-            params.put(DELIMITER, listObjectsV2Request.getDelimiter());
+            params.PUT(DELIMITER, listObjectsV2Request.getDelimiter());
         }
 
         if (listObjectsV2Request.getMaxKeys() != null) {
-            params.put(MAX_KEYS, Integer.toString(listObjectsV2Request.getMaxKeys()));
+            params.PUT(MAX_KEYS, Integer.toString(listObjectsV2Request.getMaxKeys()));
         }
 
         if (listObjectsV2Request.getEncodingType() != null) {
-            params.put(ENCODING_TYPE, listObjectsV2Request.getEncodingType());
+            params.PUT(ENCODING_TYPE, listObjectsV2Request.getEncodingType());
         }
 
         if (listObjectsV2Request.getStartAfter() != null) {
-            params.put(START_AFTER, listObjectsV2Request.getStartAfter());
+            params.PUT(START_AFTER, listObjectsV2Request.getStartAfter());
         }
 
         if (listObjectsV2Request.isFetchOwner()) {
-            params.put(FETCH_OWNER, bool.toString(listObjectsV2Request.isFetchOwner()));
+            params.PUT(FETCH_OWNER, bool.toString(listObjectsV2Request.isFetchOwner()));
         }
 
         if (listObjectsV2Request.getContinuationToken() != null) {
-            params.put(SUBRESOURCE_CONTINUATION_TOKEN, listObjectsV2Request.getContinuationToken());
+            params.PUT(SUBRESOURCE_CONTINUATION_TOKEN, listObjectsV2Request.getContinuationToken());
         }
 
     }
@@ -1804,48 +1814,48 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
      static void populateListVersionsRequestParameters(ListVersionsRequest listVersionsRequest,
         Map<String, String> params) {
 
-        params.put(SUBRESOURCE_VRESIONS, null);
+        params.PUT(SUBRESOURCE_VRESIONS, null);
 
         if (listVersionsRequest.getPrefix() != null) {
-            params.put(PREFIX, listVersionsRequest.getPrefix());
+            params.PUT(PREFIX, listVersionsRequest.getPrefix());
         }
 
         if (listVersionsRequest.getKeyMarker() != null) {
-            params.put(KEY_MARKER, listVersionsRequest.getKeyMarker());
+            params.PUT(KEY_MARKER, listVersionsRequest.getKeyMarker());
         }
 
         if (listVersionsRequest.getDelimiter() != null) {
-            params.put(DELIMITER, listVersionsRequest.getDelimiter());
+            params.PUT(DELIMITER, listVersionsRequest.getDelimiter());
         }
 
         if (listVersionsRequest.getMaxResults() != null) {
-            params.put(MAX_KEYS, Integer.toString(listVersionsRequest.getMaxResults()));
+            params.PUT(MAX_KEYS, Integer.toString(listVersionsRequest.getMaxResults()));
         }
 
         if (listVersionsRequest.getVersionIdMarker() != null) {
-            params.put(VERSION_ID_MARKER, listVersionsRequest.getVersionIdMarker());
+            params.PUT(VERSION_ID_MARKER, listVersionsRequest.getVersionIdMarker());
         }
 
         if (listVersionsRequest.getEncodingType() != null) {
-            params.put(ENCODING_TYPE, listVersionsRequest.getEncodingType());
+            params.PUT(ENCODING_TYPE, listVersionsRequest.getEncodingType());
         }
     }
 
      static void addOptionalACLHeader(Map<String, String> headers, CannedAccessControlList cannedAcl) {
         if (cannedAcl != null) {
-            headers.put(OSSHeaders.OSS_CANNED_ACL, cannedAcl.toString());
+            headers.PUT(OSSHeaders.OSS_CANNED_ACL, cannedAcl.toString());
         }
     }
 
-     VoidResult setBucketTransferAcceleration(SetBucketTransferAccelerationRequest setBucketTransferAccelerationRequest) throws OSSException, ClientException {
+     VoidResult setBucketTransferAcceleration(SetBucketTransferAccelerationRequest setBucketTransferAccelerationRequest) 
         assertParameterNotNull(setBucketTransferAccelerationRequest, "putBucketTransferAccelerationRequest");
 
         String bucketName = setBucketTransferAccelerationRequest.getBucketName();
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_TRANSFER_ACCELERATION, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_TRANSFER_ACCELERATION, null);
 
         byte[] rawContent = putBucketTransferAccelerationRequestMarshaller.marshall(setBucketTransferAccelerationRequest);
 
@@ -1856,15 +1866,15 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, requestIdResponseParser, bucketName, null, true);
     }
 
-     TransferAcceleration getBucketTransferAcceleration(GenericRequest genericRequest) throws OSSException, ClientException {
+     TransferAcceleration getBucketTransferAcceleration(GenericRequest genericRequest) 
         assertParameterNotNull(genericRequest, "genericRequest");
 
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_TRANSFER_ACCELERATION, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_TRANSFER_ACCELERATION, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.GET).setBucket(bucketName).setParameters(params)
@@ -1873,14 +1883,14 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
         return doOperation(request, getBucketTransferAccelerationResponseParser, bucketName, null, true);
     }
 
-     VoidResult deleteBucketTransferAcceleration(GenericRequest genericRequest) throws OSSException, ClientException {
+     VoidResult deleteBucketTransferAcceleration(GenericRequest genericRequest) 
         assertParameterNotNull(genericRequest, "genericRequest");
-        String bucketName = genericRequest.getBucketName();
+        String bucketName = genericRequest.bucketName;
         assertParameterNotNull(bucketName, "bucketName");
         ensureBucketNameValid(bucketName);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_TRANSFER_ACCELERATION, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_TRANSFER_ACCELERATION, null);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(genericRequest))
                 .setMethod(HttpMethod.DELETE).setBucket(bucketName).setParameters(params)
@@ -1891,18 +1901,18 @@ import 'package:aliyun_oss_dart_sdk/src/model/create_bucket_request.dart';
 
      static void addOptionalHnsHeader(Map<String, String> headers, String hnsStatus) {
         if (hnsStatus != null ) {
-            headers.put(OSSHeaders.OSS_HNS_STATUS, hnsStatus.toLowerCase());
+            headers.PUT(OSSHeaders.OSS_HNS_STATUS, hnsStatus.toLowerCase());
         }
     }
      static void addOptionalResourceGroupIdHeader(Map<String, String> headers, String resourceGroupId) {
         if (resourceGroupId != null) {
-            headers.put(OSSHeaders.OSS_RESOURCE_GROUP_ID, resourceGroupId);
+            headers.PUT(OSSHeaders.OSS_RESOURCE_GROUP_ID, resourceGroupId);
         }
     }
 
      static void populateRequestPayerHeader (Map<String, String> headers, Payer payer) {
         if (payer != null && payer.equals(Payer.Requester)) {
-            headers.put(OSSHeaders.OSS_REQUEST_PAYER, payer.toString().toLowerCase());
+            headers.PUT(OSSHeaders.OSS_REQUEST_PAYER, payer.toString().toLowerCase());
         }
     }
 }

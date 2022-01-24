@@ -3,6 +3,7 @@ class SdkRuntime {
   /// interrupted status of the thread is cleared by this method.
   ///
   static bool shouldAbort() {
-    return Thread.interrupted();
+    // return Thread.interrupted();
+    return true;
   }
 }

@@ -45,10 +45,10 @@ import 'oss_operation.dart';
         ensureObjectKeyValid(key);
         assertStringNotNullOrEmpty(uploadId, "uploadId");
 
-        Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put(UPLOAD_ID, uploadId);
+        Map<String, String> parameters = <String, String>{};
+        parameters.PUT(UPLOAD_ID, uploadId);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, abortMultipartUploadRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(abortMultipartUploadRequest))
@@ -77,14 +77,14 @@ import 'oss_operation.dart';
         assertStringNotNullOrEmpty(uploadId, "uploadId");
         ensureCallbackValid(completeMultipartUploadRequest.getCallback());
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateCompleteMultipartUploadOptionalHeaders(completeMultipartUploadRequest, headers);
         populateRequestCallback(headers, completeMultipartUploadRequest.getCallback());
 
         populateRequestPayerHeader(headers, completeMultipartUploadRequest.getRequestPayer());
 
-        Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put(UPLOAD_ID, uploadId);
+        Map<String, String> parameters = <String, String>{};
+        parameters.PUT(UPLOAD_ID, uploadId);
 
         List<PartETag> partETags = completeMultipartUploadRequest.getPartETags();
         FixedLengthInputStream requestInstream;
@@ -143,7 +143,7 @@ import 'oss_operation.dart';
         assertParameterNotNull(key, "key");
         ensureObjectKeyValid(key);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         if (initiateMultipartUploadRequest.getObjectMetadata() != null) {
             populateRequestMetadata(headers, initiateMultipartUploadRequest.getObjectMetadata());
         }
@@ -154,12 +154,12 @@ import 'oss_operation.dart';
         // length for the InitiateMultipartUpload request.
         removeHeader(headers, OSSHeaders.CONTENT_LENGTH);
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put(SUBRESOURCE_UPLOADS, null);
+        Map<String, String> params = <String, String>{};
+        params.PUT(SUBRESOURCE_UPLOADS, null);
 
         bool sequentialMode = initiateMultipartUploadRequest.getSequentialMode();
         if (sequentialMode != null && sequentialMode.equals(true)) {
-            params.put(SEQUENTIAL, null);
+            params.PUT(SEQUENTIAL, null);
         }
 
         // Set the request content to be empty (but not null) to avoid putting
@@ -190,7 +190,7 @@ import 'oss_operation.dart';
         Map<String, String> params = new LinkedHashMap<String, String>();
         populateListMultipartUploadsRequestParameters(listMultipartUploadsRequest, params);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, listMultipartUploadsRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(listMultipartUploadsRequest))
@@ -221,7 +221,7 @@ import 'oss_operation.dart';
         Map<String, String> params = new LinkedHashMap<String, String>();
         populateListPartsRequestParameters(listPartsRequest, params);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateRequestPayerHeader(headers, listPartsRequest.getRequestPayer());
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(listPartsRequest))
@@ -265,7 +265,7 @@ import 'oss_operation.dart';
             throw ArgumentError(OSS_RESOURCE_MANAGER.getString("PartNumberOutOfRange"));
         }
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateUploadPartOptionalHeaders(uploadPartRequest, headers);
 
         populateRequestPayerHeader(headers, uploadPartRequest.getRequestPayer());
@@ -273,8 +273,8 @@ import 'oss_operation.dart';
 
         // Use a LinkedHashMap to preserve the insertion order.
         Map<String, String> params = new LinkedHashMap<String, String>();
-        params.put(PART_NUMBER, Integer.toString(partNumber));
-        params.put(UPLOAD_ID, uploadId);
+        params.PUT(PART_NUMBER, Integer.toString(partNumber));
+        params.PUT(UPLOAD_ID, uploadId);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(uploadPartRequest))
                 .setMethod(HttpMethod.PUT).setBucket(bucketName).setKey(key).setParameters(params).setHeaders(headers)
@@ -295,7 +295,7 @@ import 'oss_operation.dart';
 
         UploadPartResult result = new UploadPartResult();
         result.setPartNumber(partNumber);
-        result.setETag(trimQuotes(response.getHeaders().get(OSSHeaders.ETAG)));
+        result.setETag(trimQuotes(response.getHeaders().GET(OSSHeaders.ETAG)));
         result.setRequestId(response.getRequestId());
         result.setPartSize(uploadPartRequest.getPartSize());
         result.setResponse(response);
@@ -338,13 +338,13 @@ import 'oss_operation.dart';
             throw ArgumentError(OSS_RESOURCE_MANAGER.getString("PartNumberOutOfRange"));
         }
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = <String, String>{};
         populateCopyPartRequestHeaders(uploadPartCopyRequest, headers);
 
         // Use a LinkedHashMap to preserve the insertion order.
         Map<String, String> params = new LinkedHashMap<String, String>();
-        params.put(PART_NUMBER, Integer.toString(partNumber));
-        params.put(UPLOAD_ID, uploadId);
+        params.PUT(PART_NUMBER, Integer.toString(partNumber));
+        params.PUT(UPLOAD_ID, uploadId);
 
         RequestMessage request = new OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(uploadPartCopyRequest))
                 .setMethod(HttpMethod.PUT).setBucket(bucketName).setKey(key).setParameters(params).setHeaders(headers)
@@ -357,14 +357,14 @@ import 'oss_operation.dart';
             ListMultipartUploadsRequest listMultipartUploadsRequest, Map<String, String> params) {
 
         // Make sure 'uploads' be the first parameter.
-        params.put(SUBRESOURCE_UPLOADS, null);
+        params.PUT(SUBRESOURCE_UPLOADS, null);
 
         if (listMultipartUploadsRequest.getDelimiter() != null) {
-            params.put(DELIMITER, listMultipartUploadsRequest.getDelimiter());
+            params.PUT(DELIMITER, listMultipartUploadsRequest.getDelimiter());
         }
 
         if (listMultipartUploadsRequest.getKeyMarker() != null) {
-            params.put(KEY_MARKER, listMultipartUploadsRequest.getKeyMarker());
+            params.PUT(KEY_MARKER, listMultipartUploadsRequest.getKeyMarker());
         }
 
         Integer maxUploads = listMultipartUploadsRequest.getMaxUploads();
@@ -373,26 +373,26 @@ import 'oss_operation.dart';
                 throw ArgumentError(
                         OSS_RESOURCE_MANAGER.getFormattedString("MaxUploadsOutOfRange", LIST_UPLOAD_MAX_RETURNS));
             }
-            params.put(MAX_UPLOADS, listMultipartUploadsRequest.getMaxUploads().toString());
+            params.PUT(MAX_UPLOADS, listMultipartUploadsRequest.getMaxUploads().toString());
         }
 
         if (listMultipartUploadsRequest.getPrefix() != null) {
-            params.put(PREFIX, listMultipartUploadsRequest.getPrefix());
+            params.PUT(PREFIX, listMultipartUploadsRequest.getPrefix());
         }
 
         if (listMultipartUploadsRequest.getUploadIdMarker() != null) {
-            params.put(UPLOAD_ID_MARKER, listMultipartUploadsRequest.getUploadIdMarker());
+            params.PUT(UPLOAD_ID_MARKER, listMultipartUploadsRequest.getUploadIdMarker());
         }
 
         if (listMultipartUploadsRequest.getEncodingType() != null) {
-            params.put(ENCODING_TYPE, listMultipartUploadsRequest.getEncodingType());
+            params.PUT(ENCODING_TYPE, listMultipartUploadsRequest.getEncodingType());
         }
     }
 
      static void populateListPartsRequestParameters(ListPartsRequest listPartsRequest,
             Map<String, String> params) {
 
-        params.put(UPLOAD_ID, listPartsRequest.getUploadId());
+        params.PUT(UPLOAD_ID, listPartsRequest.getUploadId());
 
         Integer maxParts = listPartsRequest.getMaxParts();
         if (maxParts != null) {
@@ -400,7 +400,7 @@ import 'oss_operation.dart';
                 throw ArgumentError(
                         OSS_RESOURCE_MANAGER.getFormattedString("MaxPartsOutOfRange", LIST_PART_MAX_RETURNS));
             }
-            params.put(MAX_PARTS, maxParts.toString());
+            params.PUT(MAX_PARTS, maxParts.toString());
         }
 
         Integer partNumberMarker = listPartsRequest.getPartNumberMarker();
@@ -408,11 +408,11 @@ import 'oss_operation.dart';
             if (!checkParamRange(partNumberMarker, 0, false, MAX_PART_NUMBER, true)) {
                 throw ArgumentError(OSS_RESOURCE_MANAGER.getString("PartNumberMarkerOutOfRange"));
             }
-            params.put(PART_NUMBER_MARKER, partNumberMarker.toString());
+            params.PUT(PART_NUMBER_MARKER, partNumberMarker.toString());
         }
 
         if (listPartsRequest.getEncodingType() != null) {
-            params.put(ENCODING_TYPE, listPartsRequest.getEncodingType());
+            params.PUT(ENCODING_TYPE, listPartsRequest.getEncodingType());
         }
     }
 
@@ -420,11 +420,11 @@ import 'oss_operation.dart';
             Map<String, String> headers) {
 
         if (uploadPartCopyRequest.getPartSize() != null) {
-            headers.put(OSSHeaders.CONTENT_LENGTH, Long.toString(uploadPartCopyRequest.getPartSize()));
+            headers.PUT(OSSHeaders.CONTENT_LENGTH, Long.toString(uploadPartCopyRequest.getPartSize()));
         }
 
         if (uploadPartCopyRequest.getMd5Digest() != null) {
-            headers.put(OSSHeaders.CONTENT_MD5, uploadPartCopyRequest.getMd5Digest());
+            headers.PUT(OSSHeaders.CONTENT_MD5, uploadPartCopyRequest.getMd5Digest());
         }
 
         String copySource = "/" + uploadPartCopyRequest.getSourceBucketName() + "/"
@@ -432,16 +432,16 @@ import 'oss_operation.dart';
         if (uploadPartCopyRequest.getSourceVersionId() != null) {
             copySource += "?versionId=" + uploadPartCopyRequest.getSourceVersionId();
         }
-        headers.put(OSSHeaders.COPY_OBJECT_SOURCE, copySource);
+        headers.PUT(OSSHeaders.COPY_OBJECT_SOURCE, copySource);
 
         if (uploadPartCopyRequest.getBeginIndex() != null && uploadPartCopyRequest.getPartSize() != null) {
             String range = "bytes=" + uploadPartCopyRequest.getBeginIndex() + "-"
                     + Long.toString(uploadPartCopyRequest.getBeginIndex() + uploadPartCopyRequest.getPartSize() - 1);
-            headers.put(OSSHeaders.COPY_SOURCE_RANGE, range);
+            headers.PUT(OSSHeaders.COPY_SOURCE_RANGE, range);
         }
 
         if (uploadPartCopyRequest.getRequestPayer() != null) {
-            headers.put(OSSHeaders.OSS_REQUEST_PAYER, uploadPartCopyRequest.getRequestPayer().toString().toLowerCase());
+            headers.PUT(OSSHeaders.OSS_REQUEST_PAYER, uploadPartCopyRequest.getRequestPayer().toString().toLowerCase());
         }
 
         addDateHeader(headers, OSSHeaders.COPY_OBJECT_SOURCE_IF_MODIFIED_SINCE,
@@ -464,11 +464,11 @@ import 'oss_operation.dart';
                 throw ArgumentError(OSS_RESOURCE_MANAGER.getString("FileSizeOutOfRange"));
             }
 
-            headers.put(OSSHeaders.CONTENT_LENGTH, Long.toString(partSize));
+            headers.PUT(OSSHeaders.CONTENT_LENGTH, Long.toString(partSize));
         }
 
         if (uploadPartRequest.getMd5Digest() != null) {
-            headers.put(OSSHeaders.CONTENT_MD5, uploadPartRequest.getMd5Digest());
+            headers.PUT(OSSHeaders.CONTENT_MD5, uploadPartRequest.getMd5Digest());
         }
     }
 
@@ -477,19 +477,19 @@ import 'oss_operation.dart';
 
         CannedAccessControlList cannedACL = completeMultipartUploadRequest.getObjectACL();
         if (cannedACL != null) {
-            headers.put(OSSHeaders.OSS_OBJECT_ACL, cannedACL.toString());
+            headers.PUT(OSSHeaders.OSS_OBJECT_ACL, cannedACL.toString());
         }
     }
 
      static void populateRequestPayerHeader (Map<String, String> headers, Payer payer) {
         if (payer != null && payer.equals(Payer.Requester)) {
-            headers.put(OSSHeaders.OSS_REQUEST_PAYER, payer.toString().toLowerCase());
+            headers.PUT(OSSHeaders.OSS_REQUEST_PAYER, payer.toString().toLowerCase());
         }
     }
 
      static void populateTrafficLimitHeader(Map<String, String> headers, int limit) {
         if (limit > 0) {
-            headers.put(OSSHeaders.OSS_HEADER_TRAFFIC_LIMIT, String.valueOf(limit));
+            headers.PUT(OSSHeaders.OSS_HEADER_TRAFFIC_LIMIT, String.valueOf(limit));
         }
     }
 

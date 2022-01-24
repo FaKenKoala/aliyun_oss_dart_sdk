@@ -75,7 +75,7 @@ import 'request_parameters.dart';
         parameters[RequestParameters.SUBRESOURCE_STATUS] =  setLiveChannelRequest.status.toString();
 
         RequestMessage request = OSSRequestMessageBuilder(getInnerClient()).setEndpoint(getEndpoint(setLiveChannelRequest))
-                .setMethod(HttpMethod.put).setBucket(bucketName).setKey(liveChannelName).setParameters(parameters)
+                .setMethod(HttpMethod.PUT).setBucket(bucketName).setKey(liveChannelName).setParameters(parameters)
                 .setOriginalRequest(setLiveChannelRequest).build();
 
         return doOperation(request, requestIdResponseParser, bucketName, liveChannelName);

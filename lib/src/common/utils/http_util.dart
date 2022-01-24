@@ -2,7 +2,7 @@ import 'coding_utils.dart';
 
 class HttpUtil {
   /// Encode a URL segment with special chars replaceAlld.
-  static String urlEncode(String value, String encoding) {
+  static String urlEncode(String? value, String encoding) {
     if (value == null) {
       return "";
     }

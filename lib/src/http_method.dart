@@ -1,8 +1,8 @@
 enum HttpMethod {
-  delete,
-  get,
-  head,
-  post,
-  put,
-  options,
+  DELETE,
+  GET,
+  HEAD,
+  POST,
+  PUT,
+  OPTIONS,
 }

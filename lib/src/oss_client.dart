@@ -1,6 +1,7 @@
 import 'client_configuration.dart';
 import 'common/auth/credentials_provider.dart';
 import 'common/comm/service_client.dart';
+import 'common/comm/sign_version.dart';
 import 'common/comm/timeout_service_client.dart';
 import 'event/progress_input_stream.dart';
 import 'http_method.dart';
@@ -12,10 +13,13 @@ import 'internal/oss_multipart_operation.dart';
 import 'internal/oss_object_operation.dart';
 import 'internal/oss_upload_operation.dart';
 import 'internal/sign_utils.dart';
+import 'model/access_control_list.dart';
 import 'model/async_fetch_task_configuration.dart';
 import 'model/bucket.dart';
 import 'model/bucket_list.dart';
+import 'model/bucket_metadata.dart';
 import 'model/bucket_qos_info.dart';
+import 'model/bucket_referer.dart';
 import 'model/create_bucket_request.dart';
 import 'model/create_bucket_vpcip_request.dart';
 import 'model/create_directory_request.dart';
@@ -41,6 +45,9 @@ import 'model/inventory_configuration.dart';
 import 'model/list_bucket_inventory_configurations_request.dart';
 import 'model/list_bucket_inventory_configurations_result.dart';
 import 'model/list_buckets_request.dart';
+import 'model/list_objects_request.dart';
+import 'model/list_objects_v2_request.dart';
+import 'model/list_objects_v2_result.dart';
 import 'model/list_versions_request.dart';
 import 'model/object_metadata.dart';
 import 'model/oss_object.dart';
@@ -70,6 +77,112 @@ import 'model/version_listing.dart';
 import 'model/void_result.dart';
 import 'model/vpc_policy.dart';
 import 'oss.dart';
+
+import 'dart:io';
+
+import 'common/auth/credentials.dart';
+import 'model/abort_multipart_upload_request.dart';
+import 'model/add_bucket_cname_request.dart';
+import 'model/add_bucket_cname_result.dart';
+import 'model/add_bucket_replication_request.dart';
+import 'model/append_object_request.dart';
+import 'model/append_object_result.dart';
+import 'model/bucket_info.dart';
+import 'model/bucket_logging_result.dart';
+import 'model/bucket_process.dart';
+import 'model/bucket_replication_progress.dart';
+import 'model/bucket_stat.dart';
+import 'model/bucket_versioning_configuration.dart';
+import 'model/bucket_website_result.dart';
+import 'model/canned_access_control_list.dart';
+import 'model/cname_configuration.dart';
+import 'model/complete_bucket_worm_request.dart';
+import 'model/complete_multipart_upload_request.dart';
+import 'model/complete_multipart_upload_result.dart';
+import 'model/copy_object_request.dart';
+import 'model/copy_object_result.dart';
+import 'model/cors_configuration.dart';
+import 'model/create_live_channel_request.dart';
+import 'model/create_live_channel_result.dart';
+import 'model/create_select_object_metadata_request.dart';
+import 'model/create_vpcip_request.dart';
+import 'model/create_vpcip_result.dart';
+import 'model/delete_bucket_cname_request.dart';
+import 'model/delete_bucket_replication_request.dart';
+import 'model/delete_objects_request.dart';
+import 'model/delete_objects_result.dart';
+import 'model/delete_version_request.dart';
+import 'model/delete_versions_request.dart';
+import 'model/delete_versions_result.dart';
+import 'model/download_file_request.dart';
+import 'model/download_file_result.dart';
+import 'model/extend_bucket_worm_request.dart';
+import 'model/generate_presigned_url_request.dart';
+import 'model/generate_vod_playlist_request.dart';
+import 'model/get_bucket_image_result.dart';
+import 'model/get_bucket_inventory_configuration_result.dart';
+import 'model/get_bucket_policy_result.dart';
+import 'model/get_bucket_replication_progress_request.dart';
+import 'model/get_bucket_worm_result.dart';
+import 'model/get_image_style_result.dart';
+import 'model/get_object_request.dart';
+import 'model/head_object_request.dart';
+import 'model/initiate_bucket_worm_request.dart';
+import 'model/initiate_bucket_worm_result.dart';
+import 'model/initiate_multipart_upload_request.dart';
+import 'model/initiate_multipart_upload_result.dart';
+import 'model/lifecycle_rule.dart';
+import 'model/list_live_channels_request.dart';
+import 'model/list_multipart_uploads_request.dart';
+import 'model/list_parts_request.dart';
+import 'model/live_channel.dart';
+import 'model/live_channel_generic_request.dart';
+import 'model/live_channel_info.dart';
+import 'model/live_channel_listing.dart';
+import 'model/live_channel_stat.dart';
+import 'model/live_channel_status.dart';
+import 'model/live_record.dart';
+import 'model/multipart_upload_listing.dart';
+import 'model/object_acl.dart';
+import 'model/object_listing.dart';
+import 'model/part_listing.dart';
+import 'model/policy_conditions.dart';
+import 'model/pub_bucket_image_request.dart';
+import 'model/put_image_style_request.dart';
+import 'model/replication_rule.dart';
+import 'model/restore_configuration.dart';
+import 'model/restore_object_request.dart';
+import 'model/restore_object_result.dart';
+import 'model/select_object_metadata.dart';
+import 'model/select_object_request.dart';
+import 'model/server_side_encryption_configuration.dart';
+import 'model/set_bucket_cors_request.dart';
+import 'model/set_bucket_encryption_request.dart';
+import 'model/set_bucket_lifecycle_request.dart';
+import 'model/set_bucket_logging_request.dart';
+import 'model/set_bucket_policy_request.dart';
+import 'model/set_bucket_process_request.dart';
+import 'model/set_bucket_referer_request.dart';
+import 'model/set_bucket_storage_capacity_request.dart';
+import 'model/set_bucket_tagging_request.dart';
+import 'model/set_bucket_versioning_request.dart';
+import 'model/set_bucket_website_request.dart';
+import 'model/set_live_channel_request.dart';
+import 'model/set_object_acl_request.dart';
+import 'model/set_object_tagging_request.dart';
+import 'model/simplified_object_meta.dart';
+import 'model/style.dart';
+import 'model/tag_set.dart';
+import 'model/udf_image_info.dart';
+import 'model/upload_file_request.dart';
+import 'model/upload_file_result.dart';
+import 'model/upload_part_copy_request.dart';
+import 'model/upload_part_copy_result.dart';
+import 'model/upload_part_request.dart';
+import 'model/upload_part_result.dart';
+import 'model/user_qos.dart';
+import 'model/vpc_ip.dart';
+
 
 /// The entry point class of OSS that implements the OSS interface.
  class OSSClient implements OSS {
@@ -121,8 +234,7 @@ import 'oss.dart';
     ///            Credentials provider.
     /// @param config
     ///            client configuration.
-     OSSClient(String endpoint, CredentialsProvider credsProvider, ClientConfiguration config) {
-        this.credsProvider = credsProvider;
+     OSSClient(String endpoint, this.credsProvider, ClientConfiguration config) {
         config = config == null ? ClientConfiguration() : config;
         if (config.requestTimeoutEnabled) {
             serviceClient = TimeoutServiceClient(config);
@@ -186,8 +298,8 @@ import 'oss.dart';
         return false;
     }
 
-     URI toURI(String endpoint) throws IllegalArgumentException {
-        return OSSUtils.toEndpointURI(endpoint, serviceClient.getClientConfiguration().getProtocol().toString());
+     Uri toURI(String endpoint) {
+        return OSSUtils.toEndpointURI(endpoint, serviceClient.config.protocol.toString());
     }
 
      void initOperations() {
@@ -210,12 +322,12 @@ import 'oss.dart';
     }
 
     @override
-     void switchSignatureVersion(SignVersion signatureVersion) {
+     void switchSignatureVersion(SignVersion? signatureVersion) {
         if (signatureVersion == null) {
             throw ArgumentError("signatureVersion should not be null.");
         }
 
-        getClientConfiguration().setSignatureVersion(signatureVersion);
+        getClientConfiguration().signatureVersion = signatureVersion;
     }
 
      CredentialsProvider getCredentialsProvider() {
@@ -223,26 +335,26 @@ import 'oss.dart';
     }
 
      ClientConfiguration getClientConfiguration() {
-        return serviceClient.getClientConfiguration();
+        return serviceClient.config;
     }
 
     @override
      Bucket createBucket(String bucketName)  {
-        return createBucket(CreateBucketRequest(bucketName));
+        return createBucketWithRequest(CreateBucketRequest(bucketName));
     }
 
     @override
-     Bucket createBucket(CreateBucketRequest createBucketRequest)  {
+     Bucket createBucketWithRequest(CreateBucketRequest createBucketRequest)  {
         return bucketOperation.createBucket(createBucketRequest);
     }
 
     @override
      VoidResult deleteBucket(String bucketName)  {
-        return deleteBucket(GenericRequest(bucketName: bucketName));
+        return deleteBucketWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     VoidResult deleteBucket(GenericRequest genericRequest)  {
+     VoidResult deleteBucketWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.deleteBucket(genericRequest);
     }
 
@@ -252,8 +364,8 @@ import 'oss.dart';
     }
 
     @override
-     BucketList listBuckets(ListBucketsRequest listBucketsRequest)  {
-        return bucketOperation.listBuckets(listBucketsRequest);
+     BucketList listBucketsWithRequest(ListBucketsRequest listBucketsRequest)  {
+        return bucketOperation.listBucketsWithRequest(listBucketsRequest);
     }
 
     @override
@@ -264,11 +376,11 @@ import 'oss.dart';
     @override
      VoidResult setBucketAcl(String bucketName, CannedAccessControlList cannedACL)
              {
-        return setBucketAcl(SetBucketAclRequest(bucketName, cannedACL));
+        return setBucketAclWithRequest(SetBucketAclRequest(bucketName, cannedACL));
     }
 
     @override
-     VoidResult setBucketAcl(SetBucketAclRequest setBucketAclRequest)  {
+     VoidResult setBucketAclWithRequest(SetBucketAclRequest setBucketAclRequest)  {
         return bucketOperation.setBucketAcl(setBucketAclRequest);
     }
 
@@ -698,7 +810,7 @@ import 'oss.dart';
 
     @override
      URL generatePresignedUrl(String bucketName, String key, DateTime expiration)  {
-        return generatePresignedUrl(bucketName, key, expiration, HttpMethod.get);
+        return generatePresignedUrl(bucketName, key, expiration, HttpMethod.GET);
     }
 
     @override

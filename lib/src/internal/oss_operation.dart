@@ -157,7 +157,7 @@ abstract class OSSOperation {
     context.setSigner(createSigner(method, bucketName, key, credentials,
         client.getClientConfiguration().getSignatureVersion()));
     context.addResponseHandler(errorResponseHandler);
-    if (method == HttpMethod.post && !isRetryablePostRequest(originalRequest)) {
+    if (method == HttpMethod.POST && !isRetryablePostRequest(originalRequest)) {
       context.setRetryStrategy(noRetryStrategy);
     }
 

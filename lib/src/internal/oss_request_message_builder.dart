@@ -14,7 +14,7 @@ import 'oss_constants.dart';
 /// HTTP request message builder.
 class OSSRequestMessageBuilder {
   Uri? endpoint;
-  HttpMethod method = HttpMethod.get;
+  HttpMethod method = HttpMethod.GET;
   String? bucket;
   String? key;
   Map<String, String> headers = <String, String>{};

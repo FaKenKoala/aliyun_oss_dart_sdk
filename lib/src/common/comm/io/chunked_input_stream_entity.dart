@@ -1,50 +1,10 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+ class ChunkedInputStreamEntity extends BasicHttpEntity {
 
-package com.aliyun.oss.common.comm.io;
+     bool firstAttempt = true;
+     ReleasableInputStreamEntity notClosableRequestEntity;
+     InputStream content;
 
-import static com.aliyun.oss.common.utils.LogUtils.logException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import org.apache.http.entity.AbstractHttpEntity;
-import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.util.Args;
-
-import com.aliyun.oss.common.comm.ServiceClient;
-import com.aliyun.oss.common.utils.HttpHeaders;
-
-/**
- * A repeatable HTTP entity that obtains its content from an non-auto-close
- * {@link ReleasableInputStreamEntity} and sends its content using chunked
- * encoding.
- */
-public class ChunkedInputStreamEntity extends BasicHttpEntity {
-
-    private bool firstAttempt = true;
-    private ReleasableInputStreamEntity notClosableRequestEntity;
-    private InputStream content;
-
-    public ChunkedInputStreamEntity(ServiceClient.Request request) {
+     ChunkedInputStreamEntity(ServiceClient.Request request) {
         setChunked(true);
 
         long contentLength = -1;
@@ -70,17 +30,17 @@ public class ChunkedInputStreamEntity extends BasicHttpEntity {
     }
 
     @override
-    public bool isChunked() {
+     bool isChunked() {
         return true;
     }
 
     @override
-    public bool isRepeatable() {
+     bool isRepeatable() {
         return content.markSupported() || notClosableRequestEntity.isRepeatable();
     }
 
     @override
-    public void writeTo(OutputStream output) throws IOException {
+     void writeTo(OutputStream output) throws IOException {
         if (!firstAttempt && isRepeatable())
             content.reset();
 
@@ -93,26 +53,26 @@ public class ChunkedInputStreamEntity extends BasicHttpEntity {
      * auto-close functionality on/off, and it will try to close its inner
      * inputstream by default when the inputstream reaches EOF.
      */
-    public static class ReleasableInputStreamEntity extends AbstractHttpEntity implements Releasable {
+     static class ReleasableInputStreamEntity extends AbstractHttpEntity implements Releasable {
 
-        private final InputStream content;
-        private final long length;
+         final InputStream content;
+         final long length;
 
-        private bool closeDisabled;
+         bool closeDisabled;
 
-        public ReleasableInputStreamEntity(final InputStream instream) {
+         ReleasableInputStreamEntity(final InputStream instream) {
             this(instream, -1);
         }
 
-        public ReleasableInputStreamEntity(final InputStream instream, final long length) {
+         ReleasableInputStreamEntity(final InputStream instream, final long length) {
             this(instream, length, null);
         }
 
-        public ReleasableInputStreamEntity(final InputStream instream, final ContentType contentType) {
+         ReleasableInputStreamEntity(final InputStream instream, final ContentType contentType) {
             this(instream, -1, contentType);
         }
 
-        public ReleasableInputStreamEntity(final InputStream instream, final long length,
+         ReleasableInputStreamEntity(final InputStream instream, final long length,
                 final ContentType contentType) {
             super();
             this.content = Args.notNull(instream, "Source input stream");
@@ -124,22 +84,22 @@ public class ChunkedInputStreamEntity extends BasicHttpEntity {
         }
 
         @override
-        public bool isRepeatable() {
+         bool isRepeatable() {
             return this.content.markSupported();
         }
 
         @override
-        public long getContentLength() {
+         long getContentLength() {
             return this.length;
         }
 
         @override
-        public InputStream getContent() throws IOException {
+         InputStream getContent() throws IOException {
             return this.content;
         }
 
         @override
-        public void writeTo(final OutputStream outstream) throws IOException {
+         void writeTo(final OutputStream outstream) throws IOException {
             Args.notNull(outstream, "Output stream");
             final InputStream instream = this.content;
             try {
@@ -168,21 +128,21 @@ public class ChunkedInputStreamEntity extends BasicHttpEntity {
         }
 
         @override
-        public bool isStreaming() {
+         bool isStreaming() {
             return true;
         }
 
-        public void close() {
+         void close() {
             if (!closeDisabled)
                 doRelease();
         }
 
         @override
-        public void release() {
+         void release() {
             doRelease();
         }
 
-        private void doRelease() {
+         void doRelease() {
             try {
                 this.content.close();
             } catch (Exception ex) {
@@ -190,11 +150,11 @@ public class ChunkedInputStreamEntity extends BasicHttpEntity {
             }
         }
 
-        public bool isCloseDisabled() {
+         bool isCloseDisabled() {
             return closeDisabled;
         }
 
-        public void setCloseDisabled(bool closeDisabled) {
+         void setCloseDisabled(bool closeDisabled) {
             this.closeDisabled = closeDisabled;
         }
     }

@@ -133,11 +133,21 @@ class InputStream {
 
   void reset() {}
 
+  int skip(int n) {
+    return 0;
+  }
+
+  void mark(int readlimit) {}
+
+  int available() {
+    return 0;
+  }
+
   bool markSupported() {
     return false;
   }
 
-  int read(Uint8List list, int off, int length) {
+  int read([Uint8List? list, int? off, int? length]) {
     return 0;
   }
 }

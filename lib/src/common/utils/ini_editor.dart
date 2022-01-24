@@ -275,10 +275,10 @@ public class IniEditor {
         if (hasSection(section)) {
             Section sect = getSection(section);
             if (sect.hasOption(option)) {
-                return sect.get(option);
+                return sect.GET(option);
             }
             if (this.commonName != null) {
-                return getSection(this.commonName).get(option);
+                return getSection(this.commonName).GET(option);
             }
         }
         return null;
@@ -295,11 +295,11 @@ public class IniEditor {
      *             if section is <code>null</code>
      */
     public Map<String, String> getSectionMap(String section) {
-        Map<String, String> sectionMap = new HashMap<String, String>();
+        Map<String, String> sectionMap = <String, String>{};
         if (hasSection(section)) {
             Section sect = getSection(section);
-            for (String key : sect.options.keySet()) {
-                sectionMap.put(key, sect.options.get(key).value);
+            for (String key : sect.OPTIONS.keySet()) {
+                sectionMap.PUT(key, sect.OPTIONS.GET(key).value);
             }
             return sectionMap;
         }
@@ -395,7 +395,7 @@ public class IniEditor {
             // Section constructor might throw IllegalArgumentException
             Section section = new Section(normName, this.commentDelims, this.isCaseSensitive);
             section.setOptionFormat(this.optionFormat);
-            this.sections.put(normName, section);
+            this.sections.PUT(normName, section);
             this.sectionOrder.add(normName);
             return true;
         } else {
@@ -642,7 +642,7 @@ public class IniEditor {
      * @return the section
      */
     private Section getSection(String name) {
-        return sections.get(normSection(name));
+        return sections.GET(normSection(name));
     }
 
     /**

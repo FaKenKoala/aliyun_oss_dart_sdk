@@ -11,26 +11,26 @@ import 'package:aliyun_oss_dart_sdk/src/oss_exception.dart';
 class ExceptionFactory {
   static ClientException createNetworkException(IOException ex) {
     String requestId = "Unknown";
-    String errorCode = ClientErrorCode.unknown;
+    String errorCode = ClientErrorCode.UNKNOWN;
 
     if (ex is SocketTimeoutException) {
-      errorCode = ClientErrorCode.socketTimeout;
+      errorCode = ClientErrorCode.SOCKET_TIMEOUT;
     } else if (ex is SocketException) {
-      errorCode = ClientErrorCode.socketException;
+      errorCode = ClientErrorCode.SOCKET_EXCEPTION;
     } else if (ex is ConnectTimeoutException) {
-      errorCode = ClientErrorCode.connectionTimeout;
+      errorCode = ClientErrorCode.CONNECTION_TIMEOUT;
     } else if (ex is UnknownHostException) {
-      errorCode = ClientErrorCode.unknownHost;
+      errorCode = ClientErrorCode.UNKNOWN_HOST;
     } else if (ex is HttpHostConnectException) {
-      errorCode = ClientErrorCode.connectionRefused;
+      errorCode = ClientErrorCode.CONNECTION_REFUSED;
     } else if (ex is NoHttpResponseException) {
-      errorCode = ClientErrorCode.connectionTimeout;
+      errorCode = ClientErrorCode.CONNECTION_TIMEOUT;
     } else if (ex is SSLException) {
-      errorCode = ClientErrorCode.sslException;
+      errorCode = ClientErrorCode.SSL_EXCEPTION;
     } else if (ex is ClientProtocolException) {
       Exception cause = ex.getCause();
       if (cause is NonRepeatableRequestException) {
-        errorCode = ClientErrorCode.nonrepeatableRequest;
+        errorCode = ClientErrorCode.NON_REPEATABLE_REQUEST;
         return ClientException(cause.getMessage(), errorCode, requestId, cause);
       }
     }
@@ -79,6 +79,6 @@ class ExceptionFactory {
       String requestId, int statusCode) {
     String message = "No body in response, http status code $statusCode";
     return OSSException(
-        message, ClientErrorCode.unknown, requestId, null, null, null, null);
+        message, ClientErrorCode.UNKNOWN, requestId, null, null, null, null);
   }
 }

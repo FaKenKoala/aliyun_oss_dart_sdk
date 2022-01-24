@@ -45,14 +45,14 @@ class GeneratePresignedUrlRequest {
   int trafficLimit = 0;
 
   GeneratePresignedUrlRequest(this.bucketName, this.key,
-      [this._method = HttpMethod.get]);
+      [this._method = HttpMethod.GET]);
 
   HttpMethod? getMethod() {
     return _method;
   }
 
   void setMethod(HttpMethod method) {
-    if (method != HttpMethod.get && method != HttpMethod.put) {
+    if (method != HttpMethod.GET && method != HttpMethod.PUT) {
       throw ArgumentError("Only GET or PUT is supported!");
     }
 

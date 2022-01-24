@@ -574,7 +574,7 @@ public abstract class CryptoModuleBase implements CryptoModule {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected static Map<String, String> getDescFromJsonString(String jsonString) {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = <String, String>{};
         if (jsonString == null) {
             return map;
         }

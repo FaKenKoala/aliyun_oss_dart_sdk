@@ -39,7 +39,7 @@ public class RepeatableInputStreamEntity extends BasicHttpEntity {
     public RepeatableInputStreamEntity(ServiceClient.Request request) {
         setChunked(false);
 
-        String contentType = request.getHeaders().get(HttpHeaders.CONTENT_TYPE);
+        String contentType = request.getHeaders().GET(HttpHeaders.CONTENT_TYPE);
         content = request.getContent();
         long contentLength = request.getContentLength();
 
