@@ -23,7 +23,7 @@ import java.util.List;
 
      String ownerDisplayName;
 
-     List<OSSBucketSummary> buckets = new ArrayList<OSSBucketSummary>();
+     List<OSSBucketSummary> buckets = [];
 
      void addBucket(OSSBucketSummary bucket) {
         this.buckets.add(bucket);

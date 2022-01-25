@@ -173,7 +173,7 @@ import java.util.zip.CheckedInputStream;
         ResumableDownloadResult resumableDownloadResult = new ResumableDownloadResult();
 
         final DownloadFileResult result = new DownloadFileResult();
-        result.partResults = new ArrayList<DownloadPartResult>();
+        result.partResults = [];
 
         for (final DownloadPart part : mCheckPoint.parts) {
             checkException();
@@ -257,7 +257,7 @@ import java.util.zip.CheckedInputStream;
             part.length = 0;
             part.partNumber = 0;
 
-            ArrayList<DownloadPart> parts = new ArrayList<DownloadPart>();
+            ArrayList<DownloadPart> parts = [];
             parts.add(part);
             return parts;
         }
@@ -269,7 +269,7 @@ import java.util.zip.CheckedInputStream;
             count += 1;
         }
 
-        ArrayList<DownloadPart> parts = new ArrayList<DownloadPart>();
+        ArrayList<DownloadPart> parts = [];
         for (int i = 0; i < count; i++) {
             DownloadPart part = new DownloadPart();
             part.start = start + partSize * i;

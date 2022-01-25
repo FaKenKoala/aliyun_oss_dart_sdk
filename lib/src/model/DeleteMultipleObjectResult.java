@@ -24,14 +24,14 @@ import java.util.List;
 
      void addDeletedObject(String object) {
         if (deletedObjects == null) {
-            deletedObjects = new ArrayList<String>();
+            deletedObjects = [];
         }
         deletedObjects.add(object);
     }
 
      void addFailedObjects(String object) {
         if (failedObjects == null) {
-            failedObjects = new ArrayList<String>();
+            failedObjects = [];
         }
         failedObjects.add(object);
     }

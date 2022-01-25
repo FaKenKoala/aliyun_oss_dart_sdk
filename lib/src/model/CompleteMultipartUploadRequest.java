@@ -27,7 +27,7 @@ import java.util.Map;
     /**
      * The list of part numbers and ETags to use when completing the multipart upload
      */
-     List<PartETag> partETags = new ArrayList<PartETag>();
+     List<PartETag> partETags = [];
 
      Map<String, String> callbackParam;
 

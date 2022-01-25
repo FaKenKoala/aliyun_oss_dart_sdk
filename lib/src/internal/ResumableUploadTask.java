@@ -46,7 +46,7 @@ import java.util.concurrent.Callable;
         ResumableUploadResult> implements Callable<ResumableUploadResult> {
 
      File mRecordFile;
-     List<Integer> mAlreadyUploadIndex = new ArrayList<Integer>();
+     List<Integer> mAlreadyUploadIndex = [];
      OSSSharedPreferences mSp;
      File mCRC64RecordFile;
 

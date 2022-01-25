@@ -1,19 +1,4 @@
-/**
- * Copyright (C) Alibaba Cloud Computing, 2015
- * All rights reserved.
- * <p>
- * 版权所有 （C）阿里巴巴云计算，2015
- */
-
-package com.alibaba.sdk.android.oss;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-/**
- * Client configuration for access to Ali cloud services
- */
+/// Client configuration for access to Ali cloud services
  class ClientConfiguration {
 
      static final int DEFAULT_MAX_RETRIES = 2;
@@ -22,7 +7,7 @@ import java.util.List;
      int connectionTimeout = 60 * 1000;
      int max_log_size = 5 * 1024 * 1024;
      int maxErrorRetry = DEFAULT_MAX_RETRIES;
-     List<String> customCnameExcludeList = new ArrayList<String>();
+     List<String> customCnameExcludeList = [];
      String proxyHost;
      int proxyPort;
      String mUserAgentMark;
@@ -32,71 +17,55 @@ import java.util.List;
      bool pathStyleAccessEnable = false;
      bool customPathPrefixEnable = false;
 
-    /**
-     * Constructor
-     */
+    /// Constructor
      ClientConfiguration() {
     }
 
-    /**
-     * Gets the default configuration instance
-     */
+    /// Gets the default configuration instance
      static ClientConfiguration getDefaultConf() {
         return new ClientConfiguration();
     }
 
-    /**
-     * Gets the max concurrent request count
-     *
-     * @return
-     */
+    /// Gets the max concurrent request count
+    ///
+    /// @return
      int getMaxConcurrentRequest() {
         return maxConcurrentRequest;
     }
 
-    /**
-     * Sets the max concurrent request count
-     *
-     * @param maxConcurrentRequest The max HTTP request count
-     */
+    /// Sets the max concurrent request count
+    ///
+    /// @param maxConcurrentRequest The max HTTP request count
      void setMaxConcurrentRequest(int maxConcurrentRequest) {
         this.maxConcurrentRequest = maxConcurrentRequest;
     }
 
-    /**
-     * Gets the socket timeout in milliseconds
-     * 0 means infinite (not recommended)
-     *
-     * @return the socket timeout in milliseconds
-     */
+    /// Gets the socket timeout in milliseconds
+    /// 0 means infinite (not recommended)
+    ///
+    /// @return the socket timeout in milliseconds
      int getSocketTimeout() {
         return socketTimeout;
     }
 
-    /**
-     * Gets the socket timeout in milliseconds
-     * 0 means infinite (not recommended)
-     *
-     * @param socketTimeout the socket timeout in milliseconds
-     */
+    /// Gets the socket timeout in milliseconds
+    /// 0 means infinite (not recommended)
+    ///
+    /// @param socketTimeout the socket timeout in milliseconds
      void setSocketTimeout(int socketTimeout) {
         this.socketTimeout = socketTimeout;
     }
 
-    /**
-     * Gets the connection timeout in milliseconds
-     *
-     * @return The connection timeout in milliseconds
-     */
+    /// Gets the connection timeout in milliseconds
+    ///
+    /// @return The connection timeout in milliseconds
      int getConnectionTimeout() {
         return connectionTimeout;
     }
 
-    /**
-     * Sets the connection timeout in milliseconds
-     *
-     * @param connectionTimeout The connection timeout in milliseconds
-     */
+    /// Sets the connection timeout in milliseconds
+    ///
+    /// @param connectionTimeout The connection timeout in milliseconds
      void setConnectionTimeout(int connectionTimeout) {
         this.connectionTimeout = connectionTimeout;
     }
@@ -105,47 +74,37 @@ import java.util.List;
         return max_log_size;
     }
 
-    /**
-     * set max log file size  default 5mb
-     *
-     * @param max_log_size
-     */
+    /// set max log file size  default 5mb
+    ///
+    /// @param max_log_size
      void setMaxLogSize(int max_log_size) {
         this.max_log_size = max_log_size;
     }
 
-    /**
-     * Gets the max retry count after the recoverable failure. By default it's 2.
-     *
-     * @return The max retry count after the recoverable failure.
-     */
+    /// Gets the max retry count after the recoverable failure. By default it's 2.
+    ///
+    /// @return The max retry count after the recoverable failure.
      int getMaxErrorRetry() {
         return maxErrorRetry;
     }
 
-    /**
-     * Sets the max retry count after the recoverable failure. By default it's 2.
-     *
-     * @param maxErrorRetry The max retry count after the recoverable failure.
-     */
+    /// Sets the max retry count after the recoverable failure. By default it's 2.
+    ///
+    /// @param maxErrorRetry The max retry count after the recoverable failure.
      void setMaxErrorRetry(int maxErrorRetry) {
         this.maxErrorRetry = maxErrorRetry;
     }
 
-    /**
-     * Gets the immutable CName excluded list. The element in this list will skip the CName resolution.
-     *
-     * @return CNAME excluded list.
-     */
+    /// Gets the immutable CName excluded list. The element in this list will skip the CName resolution.
+    ///
+    /// @return CNAME excluded list.
      List<String> getCustomCnameExcludeList() {
         return Collections.unmodifiableList(this.customCnameExcludeList);
     }
 
-    /**
-     * Sets CNAME excluded list
-     *
-     * @param customCnameExcludeList CNAME excluded list
-     */
+    /// Sets CNAME excluded list
+    ///
+    /// @param customCnameExcludeList CNAME excluded list
      void setCustomCnameExcludeList(List<String> customCnameExcludeList) {
         if (customCnameExcludeList == null || customCnameExcludeList.size() == 0) {
             throw new IllegalArgumentException("cname exclude list should not be null.");
@@ -197,11 +156,9 @@ import java.util.List;
         return checkCRC64;
     }
 
-    /**
-     * set check file with CRC64
-     *
-     * @param checkCRC64
-     */
+    /// set check file with CRC64
+    ///
+    /// @param checkCRC64
      void setCheckCRC64(bool checkCRC64) {
         this.checkCRC64 = checkCRC64;
     }
@@ -214,46 +171,38 @@ import java.util.List;
         this.ipWithHeader = ipWithHeader;
     }
 
-    /**
-     * Gets the flag of using Second Level Domain style to access the
-     * endpoint. By default it's false. When using Second Level Domain, then the bucket endpoint
-     * would be: http://host/bucket. Otherwise, it will be http://bucket.host
-     *
-     * @return True if it's enabled; False if it's disabled.
-     */
+    /// Gets the flag of using Second Level Domain style to access the
+    /// endpoint. By default it's false. When using Second Level Domain, then the bucket endpoint
+    /// would be: http://host/bucket. Otherwise, it will be http://bucket.host
+    ///
+    /// @return True if it's enabled; False if it's disabled.
      bool isPathStyleAccessEnable() {
         return pathStyleAccessEnable;
     }
 
-    /**
-     * Sets the flag of using Second Level Domain style to access the
-     * endpoint. By default it's false.
-     *
-     * @param pathStyleAccessEnable
-     *            True if it's enabled; False if it's disabled.
-     */
+    /// Sets the flag of using Second Level Domain style to access the
+    /// endpoint. By default it's false.
+    ///
+    /// @param pathStyleAccessEnable
+    ///            True if it's enabled; False if it's disabled.
      void setPathStyleAccessEnable(bool pathStyleAccessEnable) {
         this.pathStyleAccessEnable = pathStyleAccessEnable;
     }
 
-    /**
-     * Gets the flag of using custom path prefix to access the
-     * endpoint. By default it's false. When using custom path prefix, then the bucket endpoint
-     * would be: http://host/customPath. Otherwise, it will be http://host
-     *
-     * @return True if it's enabled; False if it's disabled.
-     */
+    /// Gets the flag of using custom path prefix to access the
+    /// endpoint. By default it's false. When using custom path prefix, then the bucket endpoint
+    /// would be: http://host/customPath. Otherwise, it will be http://host
+    ///
+    /// @return True if it's enabled; False if it's disabled.
      bool isCustomPathPrefixEnable() {
         return customPathPrefixEnable;
     }
 
-    /**
-     * Sets the flag of using custom path prefix to access the
-     * endpoint. By default it's false.
-     *
-     * @param customPathPrefixEnable
-     *            True if it's enabled; False if it's disabled.
-     */
+    /// Sets the flag of using custom path prefix to access the
+    /// endpoint. By default it's false.
+    ///
+    /// @param customPathPrefixEnable
+    ///            True if it's enabled; False if it's disabled.
      void setCustomPathPrefixEnable(bool customPathPrefixEnable) {
         this.customPathPrefixEnable = customPathPrefixEnable;
     }

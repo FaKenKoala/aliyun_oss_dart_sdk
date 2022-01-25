@@ -11,9 +11,9 @@ import java.util.List;
     /**
      * A list of summary information describing the objects stored in the bucket
      */
-     List<OSSObjectSummary> objectSummaries = new ArrayList<OSSObjectSummary>();
+     List<OSSObjectSummary> objectSummaries = [];
 
-     List<String> commonPrefixes = new ArrayList<String>();
+     List<String> commonPrefixes = [];
 
      String bucketName;
 

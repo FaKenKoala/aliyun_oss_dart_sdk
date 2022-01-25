@@ -24,7 +24,7 @@ import java.util.List;
 
      int nextPartNumberMarker = 0;
 
-     List<PartSummary> parts = new ArrayList<PartSummary>();
+     List<PartSummary> parts = [];
 
     /**
      * Gets bucket name

@@ -48,11 +48,11 @@ import java.util.List;
 
     // The ETag matching constraints. If the source object's ETag matches the one user provided, copy the file.
     // Otherwise returns 412 (precondition failed).
-     List<String> matchingETagConstraints = new ArrayList<String>();
+     List<String> matchingETagConstraints = [];
 
     // The ETag non-matching constraints. If the source object's ETag does not match the one user provided, copy the file.
     // Otherwise returns 412 (precondition failed).
-     List<String> nonmatchingEtagConstraints = new ArrayList<String>();
+     List<String> nonmatchingEtagConstraints = [];
 
     // The unmodified since constraint. If the parameter value is same or later than the actual file's modified time, copy the file.
     // Otherwise returns 412 (precondition failed).

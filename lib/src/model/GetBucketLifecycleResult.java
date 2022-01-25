@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
      void addLifecycleRule(BucketLifecycleRule lifecycleRule) {
         if (mLifecycleRules == null) {
-            mLifecycleRules = new ArrayList<BucketLifecycleRule>();
+            mLifecycleRules = [];
         }
 
         mLifecycleRules.add(lifecycleRule);

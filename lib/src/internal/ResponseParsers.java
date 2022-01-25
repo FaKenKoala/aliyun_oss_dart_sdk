@@ -96,7 +96,7 @@ import java.util.Map;
      static ListPartsResult parseListPartsResponseXML(InputStream in, ListPartsResult result)
             throws Exception {
 
-        List<PartSummary> partEtagList = new ArrayList<PartSummary>();
+        List<PartSummary> partEtagList = [];
         PartSummary partSummary = null;
         XmlPullParser parser = Xml.newPullParser();
         parser.setInput(in, "utf-8");

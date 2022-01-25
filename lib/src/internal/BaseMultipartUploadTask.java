@@ -61,7 +61,7 @@ import java.util.concurrent.TimeUnit;
                     return new Thread(runnable, "oss-android-multipart-thread");
                 }
             });
-     List<PartETag> mPartETags = new ArrayList<PartETag>();
+     List<PartETag> mPartETags = [];
      Object mLock = new Object();
      InternalRequestOperation mApiOperation;
      ExecutionContext mContext;

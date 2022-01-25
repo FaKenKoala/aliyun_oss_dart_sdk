@@ -25,7 +25,7 @@ import java.util.List;
 
      void addReferer(String object) {
         if (mReferers == null) {
-            mReferers = new ArrayList<String>();
+            mReferers = [];
         }
         mReferers.add(object);
     }

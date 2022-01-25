@@ -35,9 +35,9 @@ import java.util.List;
 
      String nextUploadIdMarker;
 
-     List<MultipartUpload> multipartUploads = new ArrayList<MultipartUpload>();
+     List<MultipartUpload> multipartUploads = [];
 
-     List<String> commonPrefixes = new ArrayList<String>();
+     List<String> commonPrefixes = [];
 
      String getBucketName() {
         return bucketName;
@@ -142,7 +142,7 @@ import java.util.List;
     }
 
      ListMultipartUploadsResult parseData(ResponseMessage responseMessage) throws Exception {
-        List<MultipartUpload> uploadList = new ArrayList<MultipartUpload>();
+        List<MultipartUpload> uploadList = [];
         MultipartUpload upload = null;
         bool isCommonPrefixes = false;
         XmlPullParser parser = Xml.newPullParser();

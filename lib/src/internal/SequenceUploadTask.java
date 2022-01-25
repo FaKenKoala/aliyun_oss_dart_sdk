@@ -55,7 +55,7 @@ import java.util.zip.CheckedInputStream;
         ResumableUploadResult> implements Callable<ResumableUploadResult> {
 
      File mRecordFile;
-     List<Integer> mAlreadyUploadIndex = new ArrayList<Integer>();
+     List<Integer> mAlreadyUploadIndex = [];
      int mFirstPartSize;
      OSSSharedPreferences mSp;
      File mCRC64RecordFile;
