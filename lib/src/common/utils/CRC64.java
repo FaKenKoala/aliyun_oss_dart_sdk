@@ -16,7 +16,7 @@ import java.util.zip.Checksum;
      static final int GF2_DIM = 64;
 
     static {
-        table = new int[8][256];
+        table = int[8][256];
 
         for (int n = 0; n < 256; n++) {
             int crc = n;
@@ -79,8 +79,8 @@ import java.util.zip.Checksum;
 
         int n;
         int row;
-        int[] even = new int[GF2_DIM]; // even-power-of-two zeros operator
-        int[] odd = new int[GF2_DIM]; // odd-power-of-two zeros operator
+        int[] even = int[GF2_DIM]; // even-power-of-two zeros operator
+        int[] odd = int[GF2_DIM]; // odd-power-of-two zeros operator
 
         // put operator for one zero bit in odd
         odd[0] = POLY; // CRC-64 polynomial
@@ -140,13 +140,13 @@ import java.util.zip.Checksum;
 
     @override
      void update(int val) {
-        byte[] b = new byte[1];
+        byte[] b = byte[1];
         b[0] = (byte) (val & 0xff);
         update(b, b.length);
     }
 
     /**
-     * Update CRC64 with new byte block.
+     * Update CRC64 with byte block.
      */
      void update(byte[] b, int len) {
         update(b, 0, len);

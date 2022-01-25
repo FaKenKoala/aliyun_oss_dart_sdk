@@ -33,7 +33,7 @@ import java.util.Map.Entry;
             return encoded.replace("+", "%20").replace("*", "%2A")
                     .replace("%7E", "~").replace("%2F", "/");
         } catch (Exception e) {
-            throw new IllegalArgumentException("failed to encode url!", e);
+            throw IllegalArgumentException("failed to encode url!", e);
         }
     }
 
@@ -46,7 +46,7 @@ import java.util.Map.Entry;
             return null;
         }
 
-        StringBuilder paramString = new StringBuilder();
+        StringBuilder paramString = StringBuilder();
         bool first = true;
         for (Entry<String, String> p : params.entrySet()) {
             String key = p.getKey();

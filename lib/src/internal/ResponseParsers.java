@@ -134,7 +134,7 @@ import java.util.Map;
                     } else if ("StorageClass".equals(name)) {
                         result.setStorageClass(parser.nextText());
                     } else if ("Part".equals(name)) {
-                        partSummary = new PartSummary();
+                        partSummary = PartSummary();
                     } else if ("PartNumber".equals(name)) {
                         String partNum = parser.nextText();
                         if (!OSSUtils.isEmptyString(partNum)) {
@@ -284,7 +284,7 @@ import java.util.Map;
                     }
 
                     if ("Owner".equals(name)) {
-                        owner = new Owner();
+                        owner = Owner();
                     } else if ("ID".equals(name)) {
                         if (owner != null) {
                             owner.setId(parser.nextText());
@@ -294,7 +294,7 @@ import java.util.Map;
                             owner.setDisplayName(parser.nextText());
                         }
                     } else if ("Bucket".equals(name)) {
-                        bucket = new OSSBucketSummary();
+                        bucket = OSSBucketSummary();
                     } else if ("CreationDate".equals(name)) {
                         if (bucket != null) {
                             bucket.createDate = DateUtil.parseIso8601Date(parser.nextText());
@@ -451,7 +451,7 @@ import java.util.Map;
                 case XmlPullParser.START_TAG:
                     String name = parser.getName();
                     if ("Rule".equals(name)) {
-                        lifecycleRule = new BucketLifecycleRule();
+                        lifecycleRule = BucketLifecycleRule();
                     } else if ("ID".equals(name)) {
                         lifecycleRule.setIdentifier(parser.nextText());
                     } else if ("Prefix".equals(name)) {
@@ -607,7 +607,7 @@ import java.util.Map;
                     } else if ("DisplayName".equals(name)) {
                         result.setOwnerDisplayName(parser.nextText());
                     } else if ("Bucket".equals(name)) {
-                        bucket = new OSSBucketSummary();
+                        bucket = OSSBucketSummary();
                     } else if ("CreationDate".equals(name)) {
                         if (bucket != null) {
                             bucket.createDate = DateUtil.parseIso8601Date(parser.nextText());
@@ -703,7 +703,7 @@ import java.util.Map;
                             result.setTruncated(bool.valueOf(isTruncated));
                         }
                     } else if ("Contents".equals(name)) {
-                        object = new OSSObjectSummary();
+                        object = OSSObjectSummary();
                     } else if ("Key".equals(name)) {
                         object.setKey(parser.nextText());
                     } else if ("LastModified".equals(name)) {
@@ -720,7 +720,7 @@ import java.util.Map;
                     } else if ("StorageClass".equals(name)) {
                         object.setStorageClass(parser.nextText());
                     } else if ("Owner".equals(name)) {
-                        owner = new Owner();
+                        owner = Owner();
                     } else if ("ID".equals(name)) {
                         owner.setId(parser.nextText());
                     } else if ("DisplayName".equals(name)) {
@@ -772,7 +772,7 @@ import java.util.Map;
             throws Exception {
 
         try {
-            ObjectMetadata objectMetadata = new ObjectMetadata();
+            ObjectMetadata objectMetadata = ObjectMetadata();
 
             for (Iterator<String> it = headers.keySet().iterator(); it.hasNext(); ) {
                 String key = it.next();
@@ -783,7 +783,7 @@ import java.util.Map;
                     try {
                         objectMetadata.setHeader(key, DateUtil.parseRfc822Date(headers.get(key)));
                     } catch (ParseException pe) {
-                        throw new IOException(pe.getMessage(), pe);
+                        throw IOException(pe.getMessage(), pe);
                     }
                 } else if (key.equalsIgnoreCase(OSSHeaders.CONTENT_LENGTH)) {
                     int value = int.valueOf(headers.get(key));
@@ -797,7 +797,7 @@ import java.util.Map;
 
             return objectMetadata;
         } catch (Exception e) {
-            throw new IOException(e.getMessage(), e);
+            throw IOException(e.getMessage(), e);
         }
     }
 
@@ -815,7 +815,7 @@ import java.util.Map;
             try {
                 errorMessage = response.getResponse().body().string();
                 OSSLog.logDebug("errorMessage  ： " + " \n " +  errorMessage);
-                InputStream inputStream = new ByteArrayInputStream(errorMessage.getBytes());
+                InputStream inputStream = ByteArrayInputStream(errorMessage.getBytes());
                 XmlPullParser parser = Xml.newPullParser();
                 parser.setInput(inputStream, "utf-8");
                 int eventType = parser.getEventType();
@@ -843,13 +843,13 @@ import java.util.Map;
                     }
                 }
             } catch (IOException e) {
-                return new OSSClientException(e.getMessage(), e);
+                return OSSClientException(e.getMessage(), e);
             } catch (XmlPullParserException e) {
-                return new OSSClientException(e.getMessage(), e);
+                return OSSClientException(e.getMessage(), e);
             }
         }
 
-        OSSServiceException serviceException = new OSSServiceException(statusCode, message, code, requestId, hostId, errorMessage);
+        OSSServiceException serviceException = OSSServiceException(statusCode, message, code, requestId, hostId, errorMessage);
         if (!TextUtils.isEmpty(partEtag)) {
             serviceException.setPartEtag(partEtag);
         }
@@ -905,8 +905,8 @@ import java.util.Map;
             result.setMetadata(parseObjectMetadata(result.getResponseHeader()));
             result.setContentLength(response.getContentLength());
             if (response.getRequest().isCheckCRC64()) {
-                result.setObjectContent(new CheckCRC64DownloadInputStream(response.getContent()
-                        , new CRC64(), response.getContentLength()
+                result.setObjectContent(CheckCRC64DownloadInputStream(response.getContent()
+                        , CRC64(), response.getContentLength()
                         , result.getServerCRC(), result.getRequestId()));
             } else {
                 result.setObjectContent(response.getContent());

@@ -98,7 +98,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
 
      static final String NEW_LINE = "\n";
 
-     static final List<String> SIGNED_PARAMTERS = Arrays.asList(new String[]{
+     static final List<String> SIGNED_PARAMTERS = Arrays.asList(String[]{
             SUBRESOURCE_BUCKETINFO, SUBRESOURCE_ACL, SUBRESOURCE_UPLOADS, SUBRESOURCE_LOCATION,
             SUBRESOURCE_CORS, SUBRESOURCE_LOGGING, SUBRESOURCE_WEBSITE,
             SUBRESOURCE_REFERER, SUBRESOURCE_LIFECYCLE, SUBRESOURCE_DELETE,
@@ -267,7 +267,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
     }
 
      static String buildXMLFromPartEtagList(List<PartETag> partETagList) {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = StringBuilder();
         builder.append("<CompleteMultipartUpload>\n");
         for (PartETag partETag : partETagList) {
             builder.append("<Part>\n");
@@ -305,7 +305,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
     }
 
      static String join(List<String> strings) {
-        StringBuilder result = new StringBuilder();
+        StringBuilder result = StringBuilder();
 
         bool first = true;
         for (String s : strings) {
@@ -331,11 +331,11 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
 
      static String buildCanonicalString(RequestMessage request) {
 
-        StringBuilder canonicalString = new StringBuilder();
+        StringBuilder canonicalString = StringBuilder();
         canonicalString.append(request.getMethod().toString() + NEW_LINE);
 
         Map<String, String> headers = request.getHeaders();
-        TreeMap<String, String> headersToSign = new TreeMap<String, String>();
+        TreeMap<String, String> headersToSign = TreeMap<String, String>();
 
         if (headers != null) {
             for (Map.Entry<String, String> header : headers.entrySet()) {
@@ -395,12 +395,12 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
 
      static String buildCanonicalizedResource(String resourcePath, Map<String, String> parameters) {
 
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = StringBuilder();
         builder.append(resourcePath);
 
         if (parameters != null) {
             String[] parameterNames = parameters.keySet().toArray(
-                    new String[parameters.size()]);
+                    String[parameters.size()]);
             Arrays.sort(parameterNames);
 
             char separater = '?';
@@ -432,7 +432,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
             return null;
         }
 
-        StringBuilder paramString = new StringBuilder();
+        StringBuilder paramString = StringBuilder();
         bool first = true;
         for (Map.Entry<String, String> p : params.entrySet()) {
             String key = p.getKey();
@@ -455,7 +455,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
     }
 
      static String populateMapToBase64JsonString(Map<String, String> map) {
-        JSONObject jsonObj = new JSONObject(map);
+        JSONObject jsonObj = JSONObject(map);
         return Base64.encodeToString(jsonObj.toString().getBytes(), Base64.NO_WRAP);
     }
 
@@ -472,10 +472,10 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
         String signature;
 
         try {
-            signature = new HmacSHA1Signature().computeSignature(screctKey, content);
+            signature = HmacSHA1Signature().computeSignature(screctKey, content);
             signature = signature.trim();
         } catch (Exception e) {
-            throw new IllegalStateException("Compute signature failed!", e);
+            throw IllegalStateException("Compute signature failed!", e);
         }
 
         return "OSS " + accessKey + ":" + signature;
@@ -522,7 +522,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
 
      static void assertTrue(bool condition, String message) {
         if (!condition) {
-            throw new IllegalArgumentException(message);
+            throw IllegalArgumentException(message);
         }
     }
 
@@ -542,7 +542,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
 
      static void ensureBucketNameValid(String bucketName) {
         if (!validateBucketName(bucketName)) {
-            throw new IllegalArgumentException("The bucket name is invalid. \n" +
+            throw IllegalArgumentException("The bucket name is invalid. \n" +
                     "A bucket name must: \n" +
                     "1) be comprised of lower-case characters, numbers or dash(-); \n" +
                     "2) start with lower case or numbers; \n" +
@@ -584,7 +584,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
 
      static void ensureObjectKeyValid(String objectKey) {
         if (!validateObjectKey(objectKey)) {
-            throw new IllegalArgumentException("The object key is invalid. \n" +
+            throw IllegalArgumentException("The object key is invalid. \n" +
                     "An object name should be: \n" +
                     "1) between 1 - 1023 bytes int when encoded as UTF-8 \n" +
                     "2) cannot contain LF or CR or unsupported chars in XML1.0, \n" +
@@ -669,7 +669,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
             return;
         } else {
             if (message.getCredentialProvider() == null) {
-                throw new IllegalStateException("当前CredentialProvider为空！！！"
+                throw IllegalStateException("当前CredentialProvider为空！！！"
                         + "\n1. 请检查您是否在初始化OSSService时设置CredentialProvider;"
                         + "\n2. 如果您bucket为公共权限，请确认获取到Bucket后已经调用Bucket中接口声明ACL;");
             }
@@ -681,7 +681,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
             federationToken = ((OSSFederationCredentialProvider) credentialProvider).getValidFederationToken();
             if (federationToken == null) {
                 OSSLog.logError("Can't get a federation token");
-                throw new IOException("Can't get a federation token");
+                throw IOException("Can't get a federation token");
             }
             message.getHeaders().put(OSSHeaders.OSS_SECURITY_TOKEN, federationToken.getSecurityToken());
         } else if (credentialProvider instanceof OSSStsTokenCredentialProvider) {
@@ -710,7 +710,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
     }
 
      static String buildBaseLogInfo(Context context) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = StringBuilder();
         sb.append("=====[device info]=====\n");
         sb.append("[INFO]: android_version：" + Build.VERSION.RELEASE + "\n");
         sb.append("[INFO]: mobile_model：" + Build.MODEL + "\n");
@@ -723,7 +723,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
      static void checkChecksum(int clientChecksum, int serverChecksum, String requestId) throws InconsistentException {
         if (clientChecksum != null && serverChecksum != null &&
                 !clientChecksum.equals(serverChecksum)) {
-            throw new InconsistentException(clientChecksum, serverChecksum, requestId);
+            throw InconsistentException(clientChecksum, serverChecksum, requestId);
         }
     }
 
@@ -754,7 +754,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
      */
      static bool isValidateIP(String host) throws Exception {
         if (host == null) {
-            throw new Exception("host is null");
+            throw Exception("host is null");
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -780,18 +780,18 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
     }
 
      static String buildTriggerCallbackBody(Map<String, String> callbackParams, Map<String, String> callbackVars) {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = StringBuilder();
         builder.append("x-oss-process=trigger/callback,callback_");
 
         if (callbackParams != null && callbackParams.size() > 0) {
-            JSONObject jsonObj = new JSONObject(callbackParams);
+            JSONObject jsonObj = JSONObject(callbackParams);
             String paramsJsonString = Base64.encodeToString(jsonObj.toString().getBytes(), Base64.NO_WRAP);
             builder.append(paramsJsonString);
         }
         builder.append("," + "callback-var_");
 
         if (callbackVars != null && callbackVars.size() > 0) {
-            JSONObject jsonObj = new JSONObject(callbackVars);
+            JSONObject jsonObj = JSONObject(callbackVars);
             String varsJsonString = Base64.encodeToString(jsonObj.toString().getBytes(), Base64.NO_WRAP);
             builder.append(varsJsonString);
         }
@@ -800,7 +800,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
     }
 
      static String buildImagePersistentBody(String toBucketName, String toObjectKey, String action) {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = StringBuilder();
         builder.append("x-oss-process=");
         if (action.startsWith("image/")) {
             builder.append(action);

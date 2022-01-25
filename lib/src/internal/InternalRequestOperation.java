@@ -55,10 +55,10 @@ import okhttp3.OkHttpClient;
      static final int LIST_PART_MAX_RETURNS = 1000;
      static final int MAX_PART_NUMBER = 10000;
      static ExecutorService executorService =
-            Executors.newFixedThreadPool(OSSConstants.DEFAULT_BASE_THREAD_POOL_SIZE, new ThreadFactory() {
+            Executors.newFixedThreadPool(OSSConstants.DEFAULT_BASE_THREAD_POOL_SIZE, ThreadFactory() {
                 @override
                  Thread newThread(Runnable r) {
-                    return new Thread(r, "oss-android-api-thread");
+                    return Thread(r, "oss-android-api-thread");
                 }
             });
      volatile URI endpoint;
@@ -75,12 +75,12 @@ import okhttp3.OkHttpClient;
         this.credentialProvider = credentialProvider;
         this.conf = conf;
 
-        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+        OkHttpClient.Builder builder = OkHttpClient.Builder()
                 .followRedirects(false)
                 .followSslRedirects(false)
                 .retryOnConnectionFailure(false)
                 .cache(null)
-                .hostnameVerifier(new HostnameVerifier() {
+                .hostnameVerifier(HostnameVerifier() {
                     @override
                      bool verify(String hostname, SSLSession session) {
                         return HttpsURLConnection.getDefaultHostnameVerifier().verify(endpoint.getHost(), session);
@@ -88,7 +88,7 @@ import okhttp3.OkHttpClient;
                 });
 
         if (conf != null) {
-            Dispatcher dispatcher = new Dispatcher();
+            Dispatcher dispatcher = Dispatcher();
             dispatcher.setMaxRequests(conf.getMaxConcurrentRequest());
 
             builder.connectTimeout(conf.getConnectionTimeout(), TimeUnit.MILLISECONDS)
@@ -97,7 +97,7 @@ import okhttp3.OkHttpClient;
                     .dispatcher(dispatcher);
 
             if (conf.getProxyHost() != null && conf.getProxyPort() != 0) {
-                builder.proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(conf.getProxyHost(), conf.getProxyPort())));
+                builder.proxy(Proxy(Proxy.Type.HTTP, new InetSocketAddress(conf.getProxyHost(), conf.getProxyPort())));
             }
 
             this.maxRetryCount = conf.getMaxErrorRetry();
@@ -107,21 +107,21 @@ import okhttp3.OkHttpClient;
 
      InternalRequestOperation(Context context, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
         try {
-            service = new URI("http://oss.aliyuncs.com");
-            endpoint = new URI("http://127.0.0.1"); //构造假的endpoint
+            service = URI("http://oss.aliyuncs.com");
+            endpoint = URI("http://127.0.0.1"); //构造假的endpoint
         } catch (Exception e) {
-            throw new IllegalArgumentException("Endpoint must be a string like 'http://oss-cn-****.aliyuncs.com'," +
+            throw IllegalArgumentException("Endpoint must be a string like 'http://oss-cn-****.aliyuncs.com'," +
                     "or your cname like 'http://image.cnamedomain.com'!");
         }
         this.applicationContext = context;
         this.credentialProvider = credentialProvider;
         this.conf = conf;
-        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+        OkHttpClient.Builder builder = OkHttpClient.Builder()
                 .followRedirects(false)
                 .followSslRedirects(false)
                 .retryOnConnectionFailure(false)
                 .cache(null)
-                .hostnameVerifier(new HostnameVerifier() {
+                .hostnameVerifier(HostnameVerifier() {
                     @override
                      bool verify(String hostname, SSLSession session) {
                         return HttpsURLConnection.getDefaultHostnameVerifier().verify(service.getHost(), session);
@@ -129,7 +129,7 @@ import okhttp3.OkHttpClient;
                 });
 
         if (conf != null) {
-            Dispatcher dispatcher = new Dispatcher();
+            Dispatcher dispatcher = Dispatcher();
             dispatcher.setMaxRequests(conf.getMaxConcurrentRequest());
 
             builder.connectTimeout(conf.getConnectionTimeout(), TimeUnit.MILLISECONDS)
@@ -138,7 +138,7 @@ import okhttp3.OkHttpClient;
                     .dispatcher(dispatcher);
 
             if (conf.getProxyHost() != null && conf.getProxyPort() != 0) {
-                builder.proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(conf.getProxyHost(), conf.getProxyPort())));
+                builder.proxy(Proxy(Proxy.Type.HTTP, new InetSocketAddress(conf.getProxyHost(), conf.getProxyPort())));
             }
 
             this.maxRetryCount = conf.getMaxErrorRetry();
@@ -156,7 +156,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<PutObjectResult> putObject(
             PutObjectRequest request, final OSSCompletedCallback<PutObjectRequest, PutObjectResult> completedCallback) {
         OSSLog.logDebug(" Internal putObject Start ");
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.PUT);
@@ -182,9 +182,9 @@ import okhttp3.OkHttpClient;
         OSSLog.logDebug(" canonicalizeRequestMessage ");
         canonicalizeRequestMessage(requestMessage, request);
         OSSLog.logDebug(" ExecutionContext ");
-        ExecutionContext<PutObjectRequest, PutObjectResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<PutObjectRequest, PutObjectResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
-            executionContext.setCompletedCallback(new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
+            executionContext.setCompletedCallback(OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
                 @override
                  void onSuccess(PutObjectRequest request, PutObjectResult result) {
                     checkCRC64(request, result, completedCallback);
@@ -202,16 +202,16 @@ import okhttp3.OkHttpClient;
         }
 
         executionContext.setProgressCallback(request.getProgressCallback());
-        ResponseParser<PutObjectResult> parser = new ResponseParsers.PutObjectResponseParser();
+        ResponseParser<PutObjectResult> parser = ResponseParsers.PutObjectResponseParser();
 
-        Callable<PutObjectResult> callable = new OSSRequestTask<PutObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<PutObjectResult> callable = OSSRequestTask<PutObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
         OSSLog.logDebug(" call OSSRequestTask ");
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
      OSSAsyncTask<CreateBucketResult> createBucket(
             CreateBucketRequest request, OSSCompletedCallback<CreateBucketRequest, CreateBucketResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.PUT);
@@ -220,7 +220,7 @@ import okhttp3.OkHttpClient;
             requestMessage.getHeaders().put(OSSHeaders.OSS_CANNED_ACL, request.getBucketACL().toString());
         }
         try {
-            Map<String, String> configures = new HashMap<String, String>();
+            Map<String, String> configures = HashMap<String, String>();
             if (request.getLocationConstraint() != null) {
                 configures.put(CreateBucketRequest.TAB_LOCATIONCONSTRAINT, request.getLocationConstraint());
             }
@@ -231,38 +231,38 @@ import okhttp3.OkHttpClient;
             return null;
         }
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<CreateBucketRequest, CreateBucketResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<CreateBucketRequest, CreateBucketResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<CreateBucketResult> parser = new ResponseParsers.CreateBucketResponseParser();
+        ResponseParser<CreateBucketResult> parser = ResponseParsers.CreateBucketResponseParser();
 
-        Callable<CreateBucketResult> callable = new OSSRequestTask<CreateBucketResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<CreateBucketResult> callable = OSSRequestTask<CreateBucketResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
      OSSAsyncTask<DeleteBucketResult> deleteBucket(
             DeleteBucketRequest request, OSSCompletedCallback<DeleteBucketRequest, DeleteBucketResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.DELETE);
         requestMessage.setBucketName(request.getBucketName());
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<DeleteBucketRequest, DeleteBucketResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<DeleteBucketRequest, DeleteBucketResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<DeleteBucketResult> parser = new ResponseParsers.DeleteBucketResponseParser();
-        Callable<DeleteBucketResult> callable = new OSSRequestTask<DeleteBucketResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<DeleteBucketResult> parser = ResponseParsers.DeleteBucketResponseParser();
+        Callable<DeleteBucketResult> callable = OSSRequestTask<DeleteBucketResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
      OSSAsyncTask<GetBucketInfoResult> getBucketInfo(
             GetBucketInfoRequest request, OSSCompletedCallback<GetBucketInfoRequest, GetBucketInfoResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put("bucketInfo", "");
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -271,19 +271,19 @@ import okhttp3.OkHttpClient;
         requestMessage.setBucketName(request.getBucketName());
         requestMessage.setParameters(query);
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<GetBucketInfoRequest, GetBucketInfoResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<GetBucketInfoRequest, GetBucketInfoResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<GetBucketInfoResult> parser = new ResponseParsers.GetBucketInfoResponseParser();
-        Callable<GetBucketInfoResult> callable = new OSSRequestTask<GetBucketInfoResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<GetBucketInfoResult> parser = ResponseParsers.GetBucketInfoResponseParser();
+        Callable<GetBucketInfoResult> callable = OSSRequestTask<GetBucketInfoResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
      OSSAsyncTask<GetBucketACLResult> getBucketACL(
             GetBucketACLRequest request, OSSCompletedCallback<GetBucketACLRequest, GetBucketACLResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put("acl", "");
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -292,19 +292,19 @@ import okhttp3.OkHttpClient;
         requestMessage.setBucketName(request.getBucketName());
         requestMessage.setParameters(query);
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<GetBucketACLRequest, GetBucketACLResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<GetBucketACLRequest, GetBucketACLResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<GetBucketACLResult> parser = new ResponseParsers.GetBucketACLResponseParser();
-        Callable<GetBucketACLResult> callable = new OSSRequestTask<GetBucketACLResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<GetBucketACLResult> parser = ResponseParsers.GetBucketACLResponseParser();
+        Callable<GetBucketACLResult> callable = OSSRequestTask<GetBucketACLResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
      OSSAsyncTask<PutBucketRefererResult> putBucketReferer(
             PutBucketRefererRequest request, OSSCompletedCallback<PutBucketRefererRequest, PutBucketRefererResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put("referer", "");
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -321,19 +321,19 @@ import okhttp3.OkHttpClient;
         }
 
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<PutBucketRefererRequest, PutBucketRefererResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<PutBucketRefererRequest, PutBucketRefererResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<PutBucketRefererResult> parser = new ResponseParsers.PutBucketRefererResponseParser();
-        Callable<PutBucketRefererResult> callable = new OSSRequestTask<PutBucketRefererResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<PutBucketRefererResult> parser = ResponseParsers.PutBucketRefererResponseParser();
+        Callable<PutBucketRefererResult> callable = OSSRequestTask<PutBucketRefererResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
      OSSAsyncTask<GetBucketRefererResult> getBucketReferer(
             GetBucketRefererRequest request, OSSCompletedCallback<GetBucketRefererRequest, GetBucketRefererResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put("referer", "");
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -342,19 +342,19 @@ import okhttp3.OkHttpClient;
         requestMessage.setBucketName(request.getBucketName());
         requestMessage.setParameters(query);
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<GetBucketRefererRequest, GetBucketRefererResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<GetBucketRefererRequest, GetBucketRefererResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<GetBucketRefererResult> parser = new ResponseParsers.GetBucketRefererResponseParser();
-        Callable<GetBucketRefererResult> callable = new OSSRequestTask<GetBucketRefererResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<GetBucketRefererResult> parser = ResponseParsers.GetBucketRefererResponseParser();
+        Callable<GetBucketRefererResult> callable = OSSRequestTask<GetBucketRefererResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
      OSSAsyncTask<PutBucketLoggingResult> putBucketLogging(
             PutBucketLoggingRequest request, OSSCompletedCallback<PutBucketLoggingRequest, PutBucketLoggingResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put("logging", "");
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -371,19 +371,19 @@ import okhttp3.OkHttpClient;
         }
 
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<PutBucketLoggingRequest, PutBucketLoggingResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<PutBucketLoggingRequest, PutBucketLoggingResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<PutBucketLoggingResult> parser = new ResponseParsers.PutBucketLoggingResponseParser();
-        Callable<PutBucketLoggingResult> callable = new OSSRequestTask<PutBucketLoggingResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<PutBucketLoggingResult> parser = ResponseParsers.PutBucketLoggingResponseParser();
+        Callable<PutBucketLoggingResult> callable = OSSRequestTask<PutBucketLoggingResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
      OSSAsyncTask<GetBucketLoggingResult> getBucketLogging(
             GetBucketLoggingRequest request, OSSCompletedCallback<GetBucketLoggingRequest, GetBucketLoggingResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put("logging", "");
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -392,19 +392,19 @@ import okhttp3.OkHttpClient;
         requestMessage.setBucketName(request.getBucketName());
         requestMessage.setParameters(query);
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<GetBucketLoggingRequest, GetBucketLoggingResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<GetBucketLoggingRequest, GetBucketLoggingResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<GetBucketLoggingResult> parser = new ResponseParsers.GetBucketLoggingResponseParser();
-        Callable<GetBucketLoggingResult> callable = new OSSRequestTask<GetBucketLoggingResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<GetBucketLoggingResult> parser = ResponseParsers.GetBucketLoggingResponseParser();
+        Callable<GetBucketLoggingResult> callable = OSSRequestTask<GetBucketLoggingResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
      OSSAsyncTask<DeleteBucketLoggingResult> deleteBucketLogging(
             DeleteBucketLoggingRequest request, OSSCompletedCallback<DeleteBucketLoggingRequest, DeleteBucketLoggingResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put("logging", "");
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -413,19 +413,19 @@ import okhttp3.OkHttpClient;
         requestMessage.setBucketName(request.getBucketName());
         requestMessage.setParameters(query);
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<DeleteBucketLoggingRequest, DeleteBucketLoggingResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<DeleteBucketLoggingRequest, DeleteBucketLoggingResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<DeleteBucketLoggingResult> parser = new ResponseParsers.DeleteBucketLoggingResponseParser();
-        Callable<DeleteBucketLoggingResult> callable = new OSSRequestTask<DeleteBucketLoggingResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<DeleteBucketLoggingResult> parser = ResponseParsers.DeleteBucketLoggingResponseParser();
+        Callable<DeleteBucketLoggingResult> callable = OSSRequestTask<DeleteBucketLoggingResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
      OSSAsyncTask<PutBucketLifecycleResult> putBucketLifecycle(
             PutBucketLifecycleRequest request, OSSCompletedCallback<PutBucketLifecycleRequest, PutBucketLifecycleResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put("lifecycle", "");
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -442,19 +442,19 @@ import okhttp3.OkHttpClient;
         }
 
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<PutBucketLifecycleRequest, PutBucketLifecycleResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<PutBucketLifecycleRequest, PutBucketLifecycleResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<PutBucketLifecycleResult> parser = new ResponseParsers.PutBucketLifecycleResponseParser();
-        Callable<PutBucketLifecycleResult> callable = new OSSRequestTask<PutBucketLifecycleResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<PutBucketLifecycleResult> parser = ResponseParsers.PutBucketLifecycleResponseParser();
+        Callable<PutBucketLifecycleResult> callable = OSSRequestTask<PutBucketLifecycleResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
      OSSAsyncTask<GetBucketLifecycleResult> getBucketLifecycle(
             GetBucketLifecycleRequest request, OSSCompletedCallback<GetBucketLifecycleRequest, GetBucketLifecycleResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put("lifecycle", "");
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -463,19 +463,19 @@ import okhttp3.OkHttpClient;
         requestMessage.setBucketName(request.getBucketName());
         requestMessage.setParameters(query);
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<GetBucketLifecycleRequest, GetBucketLifecycleResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<GetBucketLifecycleRequest, GetBucketLifecycleResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<GetBucketLifecycleResult> parser = new ResponseParsers.GetBucketLifecycleResponseParser();
-        Callable<GetBucketLifecycleResult> callable = new OSSRequestTask<GetBucketLifecycleResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<GetBucketLifecycleResult> parser = ResponseParsers.GetBucketLifecycleResponseParser();
+        Callable<GetBucketLifecycleResult> callable = OSSRequestTask<GetBucketLifecycleResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
      OSSAsyncTask<DeleteBucketLifecycleResult> deleteBucketLifecycle(
             DeleteBucketLifecycleRequest request, OSSCompletedCallback<DeleteBucketLifecycleRequest, DeleteBucketLifecycleResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put("lifecycle", "");
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -484,12 +484,12 @@ import okhttp3.OkHttpClient;
         requestMessage.setBucketName(request.getBucketName());
         requestMessage.setParameters(query);
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<DeleteBucketLifecycleRequest, DeleteBucketLifecycleResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<DeleteBucketLifecycleRequest, DeleteBucketLifecycleResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<DeleteBucketLifecycleResult> parser = new ResponseParsers.DeleteBucketLifecycleResponseParser();
-        Callable<DeleteBucketLifecycleResult> callable = new OSSRequestTask<DeleteBucketLifecycleResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<DeleteBucketLifecycleResult> parser = ResponseParsers.DeleteBucketLifecycleResponseParser();
+        Callable<DeleteBucketLifecycleResult> callable = OSSRequestTask<DeleteBucketLifecycleResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
@@ -508,7 +508,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<AppendObjectResult> appendObject(
             AppendObjectRequest request, final OSSCompletedCallback<AppendObjectRequest, AppendObjectResult> completedCallback) {
 
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.POST);
@@ -531,9 +531,9 @@ import okhttp3.OkHttpClient;
 
         canonicalizeRequestMessage(requestMessage, request);
 
-        ExecutionContext<AppendObjectRequest, AppendObjectResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<AppendObjectRequest, AppendObjectResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
-            executionContext.setCompletedCallback(new OSSCompletedCallback<AppendObjectRequest, AppendObjectResult>() {
+            executionContext.setCompletedCallback(OSSCompletedCallback<AppendObjectRequest, AppendObjectResult>() {
                 @override
                  void onSuccess(AppendObjectRequest request, AppendObjectResult result) {
                     bool checkCRC = request.getCRC64() == OSSRequest.CRC64Config.YES ? true : false;
@@ -551,9 +551,9 @@ import okhttp3.OkHttpClient;
             });
         }
         executionContext.setProgressCallback(request.getProgressCallback());
-        ResponseParser<AppendObjectResult> parser = new ResponseParsers.AppendObjectResponseParser();
+        ResponseParser<AppendObjectResult> parser = ResponseParsers.AppendObjectResponseParser();
 
-        Callable<AppendObjectResult> callable = new OSSRequestTask<AppendObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<AppendObjectResult> callable = OSSRequestTask<AppendObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
@@ -561,7 +561,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<HeadObjectResult> headObject(
             HeadObjectRequest request, OSSCompletedCallback<HeadObjectRequest, HeadObjectResult> completedCallback) {
 
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.HEAD);
@@ -570,13 +570,13 @@ import okhttp3.OkHttpClient;
 
         canonicalizeRequestMessage(requestMessage, request);
 
-        ExecutionContext<HeadObjectRequest, HeadObjectResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<HeadObjectRequest, HeadObjectResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<HeadObjectResult> parser = new ResponseParsers.HeadObjectResponseParser();
+        ResponseParser<HeadObjectResult> parser = ResponseParsers.HeadObjectResponseParser();
 
-        Callable<HeadObjectResult> callable = new OSSRequestTask<HeadObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<HeadObjectResult> callable = OSSRequestTask<HeadObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
@@ -584,7 +584,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<GetObjectResult> getObject(
             GetObjectRequest request, OSSCompletedCallback<GetObjectRequest, GetObjectResult> completedCallback) {
 
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.GET);
@@ -607,22 +607,22 @@ import okhttp3.OkHttpClient;
             }
         }
 
-        ExecutionContext<GetObjectRequest, GetObjectResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<GetObjectRequest, GetObjectResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
         executionContext.setProgressCallback(request.getProgressListener());
-        ResponseParser<GetObjectResult> parser = new ResponseParsers.GetObjectResponseParser();
+        ResponseParser<GetObjectResult> parser = ResponseParsers.GetObjectResponseParser();
 
-        Callable<GetObjectResult> callable = new OSSRequestTask<GetObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<GetObjectResult> callable = OSSRequestTask<GetObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
      OSSAsyncTask<GetObjectACLResult> getObjectACL(GetObjectACLRequest request, OSSCompletedCallback<GetObjectACLRequest, GetObjectACLResult> completedCallback) {
 
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put("acl", "");
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -634,13 +634,13 @@ import okhttp3.OkHttpClient;
 
         canonicalizeRequestMessage(requestMessage, request);
 
-        ExecutionContext<GetObjectACLRequest, GetObjectACLResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<GetObjectACLRequest, GetObjectACLResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<GetObjectACLResult> parser = new ResponseParsers.GetObjectACLResponseParser();
+        ResponseParser<GetObjectACLResult> parser = ResponseParsers.GetObjectACLResponseParser();
 
-        Callable<GetObjectACLResult> callable = new OSSRequestTask<GetObjectACLResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<GetObjectACLResult> callable = OSSRequestTask<GetObjectACLResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
@@ -648,7 +648,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<CopyObjectResult> copyObject(
             CopyObjectRequest request, OSSCompletedCallback<CopyObjectRequest, CopyObjectResult> completedCallback) {
 
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.PUT);
@@ -659,13 +659,13 @@ import okhttp3.OkHttpClient;
 
         canonicalizeRequestMessage(requestMessage, request);
 
-        ExecutionContext<CopyObjectRequest, CopyObjectResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<CopyObjectRequest, CopyObjectResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<CopyObjectResult> parser = new ResponseParsers.CopyObjectResponseParser();
+        ResponseParser<CopyObjectResult> parser = ResponseParsers.CopyObjectResponseParser();
 
-        Callable<CopyObjectResult> callable = new OSSRequestTask<CopyObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<CopyObjectResult> callable = OSSRequestTask<CopyObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
@@ -673,7 +673,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<DeleteObjectResult> deleteObject(
             DeleteObjectRequest request, OSSCompletedCallback<DeleteObjectRequest, DeleteObjectResult> completedCallback) {
 
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.DELETE);
@@ -682,21 +682,21 @@ import okhttp3.OkHttpClient;
 
         canonicalizeRequestMessage(requestMessage, request);
 
-        ExecutionContext<DeleteObjectRequest, DeleteObjectResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<DeleteObjectRequest, DeleteObjectResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<DeleteObjectResult> parser = new ResponseParsers.DeleteObjectResponseParser();
+        ResponseParser<DeleteObjectResult> parser = ResponseParsers.DeleteObjectResponseParser();
 
-        Callable<DeleteObjectResult> callable = new OSSRequestTask<DeleteObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<DeleteObjectResult> callable = OSSRequestTask<DeleteObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
      OSSAsyncTask<DeleteMultipleObjectResult> deleteMultipleObject(
             DeleteMultipleObjectRequest request, OSSCompletedCallback<DeleteMultipleObjectRequest, DeleteMultipleObjectResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put("delete", "");
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -716,13 +716,13 @@ import okhttp3.OkHttpClient;
         }
 
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<DeleteMultipleObjectRequest, DeleteMultipleObjectResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<DeleteMultipleObjectRequest, DeleteMultipleObjectResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<DeleteMultipleObjectResult> parser = new ResponseParsers.DeleteMultipleObjectResponseParser();
+        ResponseParser<DeleteMultipleObjectResult> parser = ResponseParsers.DeleteMultipleObjectResponseParser();
 
-        Callable<DeleteMultipleObjectResult> callable = new OSSRequestTask<DeleteMultipleObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<DeleteMultipleObjectResult> callable = OSSRequestTask<DeleteMultipleObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
 
@@ -731,7 +731,7 @@ import okhttp3.OkHttpClient;
 
      OSSAsyncTask<ListBucketsResult> listBuckets(
             ListBucketsRequest request, OSSCompletedCallback<ListBucketsRequest, ListBucketsResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setMethod(HttpMethod.GET);
         requestMessage.setService(service);
@@ -740,12 +740,12 @@ import okhttp3.OkHttpClient;
         canonicalizeRequestMessage(requestMessage, request);
 
         OSSUtils.populateListBucketRequestParameters(request, requestMessage.getParameters());
-        ExecutionContext<ListBucketsRequest, ListBucketsResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<ListBucketsRequest, ListBucketsResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<ListBucketsResult> parser = new ResponseParsers.ListBucketResponseParser();
-        Callable<ListBucketsResult> callable = new OSSRequestTask<ListBucketsResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<ListBucketsResult> parser = ResponseParsers.ListBucketResponseParser();
+        Callable<ListBucketsResult> callable = OSSRequestTask<ListBucketsResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
@@ -753,7 +753,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<ListObjectsResult> listObjects(
             ListObjectsRequest request, OSSCompletedCallback<ListObjectsRequest, ListObjectsResult> completedCallback) {
 
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.GET);
@@ -763,13 +763,13 @@ import okhttp3.OkHttpClient;
 
         OSSUtils.populateListObjectsRequestParameters(request, requestMessage.getParameters());
 
-        ExecutionContext<ListObjectsRequest, ListObjectsResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<ListObjectsRequest, ListObjectsResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<ListObjectsResult> parser = new ResponseParsers.ListObjectsResponseParser();
+        ResponseParser<ListObjectsResult> parser = ResponseParsers.ListObjectsResponseParser();
 
-        Callable<ListObjectsResult> callable = new OSSRequestTask<ListObjectsResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<ListObjectsResult> callable = OSSRequestTask<ListObjectsResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
@@ -777,7 +777,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<InitiateMultipartUploadResult> initMultipartUpload(
             InitiateMultipartUploadRequest request, OSSCompletedCallback<InitiateMultipartUploadRequest, InitiateMultipartUploadResult> completedCallback) {
 
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.POST);
@@ -793,13 +793,13 @@ import okhttp3.OkHttpClient;
 
         canonicalizeRequestMessage(requestMessage, request);
 
-        ExecutionContext<InitiateMultipartUploadRequest, InitiateMultipartUploadResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<InitiateMultipartUploadRequest, InitiateMultipartUploadResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<InitiateMultipartUploadResult> parser = new ResponseParsers.InitMultipartResponseParser();
+        ResponseParser<InitiateMultipartUploadResult> parser = ResponseParsers.InitMultipartResponseParser();
 
-        Callable<InitiateMultipartUploadResult> callable = new OSSRequestTask<InitiateMultipartUploadResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<InitiateMultipartUploadResult> callable = OSSRequestTask<InitiateMultipartUploadResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
@@ -814,7 +814,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<UploadPartResult> uploadPart(
             UploadPartRequest request, final OSSCompletedCallback<UploadPartRequest, UploadPartResult> completedCallback) {
 
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.PUT);
@@ -830,9 +830,9 @@ import okhttp3.OkHttpClient;
 
         canonicalizeRequestMessage(requestMessage, request);
 
-        ExecutionContext<UploadPartRequest, UploadPartResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<UploadPartRequest, UploadPartResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
-            executionContext.setCompletedCallback(new OSSCompletedCallback<UploadPartRequest, UploadPartResult>() {
+            executionContext.setCompletedCallback(OSSCompletedCallback<UploadPartRequest, UploadPartResult>() {
                 @override
                  void onSuccess(UploadPartRequest request, UploadPartResult result) {
                     checkCRC64(request, result, completedCallback);
@@ -845,9 +845,9 @@ import okhttp3.OkHttpClient;
             });
         }
         executionContext.setProgressCallback(request.getProgressCallback());
-        ResponseParser<UploadPartResult> parser = new ResponseParsers.UploadPartResponseParser();
+        ResponseParser<UploadPartResult> parser = ResponseParsers.UploadPartResponseParser();
 
-        Callable<UploadPartResult> callable = new OSSRequestTask<UploadPartResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<UploadPartResult> callable = OSSRequestTask<UploadPartResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
@@ -866,7 +866,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<CompleteMultipartUploadResult> completeMultipartUpload(
             CompleteMultipartUploadRequest request, final OSSCompletedCallback<CompleteMultipartUploadRequest, CompleteMultipartUploadResult> completedCallback) {
 
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.POST);
@@ -887,9 +887,9 @@ import okhttp3.OkHttpClient;
 
         canonicalizeRequestMessage(requestMessage, request);
 
-        ExecutionContext<CompleteMultipartUploadRequest, CompleteMultipartUploadResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<CompleteMultipartUploadRequest, CompleteMultipartUploadResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
-            executionContext.setCompletedCallback(new OSSCompletedCallback<CompleteMultipartUploadRequest, CompleteMultipartUploadResult>() {
+            executionContext.setCompletedCallback(OSSCompletedCallback<CompleteMultipartUploadRequest, CompleteMultipartUploadResult>() {
                 @override
                  void onSuccess(CompleteMultipartUploadRequest request, CompleteMultipartUploadResult result) {
                     if (result.getServerCRC() != null) {
@@ -905,9 +905,9 @@ import okhttp3.OkHttpClient;
                 }
             });
         }
-        ResponseParser<CompleteMultipartUploadResult> parser = new ResponseParsers.CompleteMultipartUploadResponseParser();
+        ResponseParser<CompleteMultipartUploadResult> parser = ResponseParsers.CompleteMultipartUploadResponseParser();
 
-        Callable<CompleteMultipartUploadResult> callable = new OSSRequestTask<CompleteMultipartUploadResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<CompleteMultipartUploadResult> callable = OSSRequestTask<CompleteMultipartUploadResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
@@ -915,7 +915,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<AbortMultipartUploadResult> abortMultipartUpload(
             AbortMultipartUploadRequest request, OSSCompletedCallback<AbortMultipartUploadRequest, AbortMultipartUploadResult> completedCallback) {
 
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.DELETE);
@@ -926,13 +926,13 @@ import okhttp3.OkHttpClient;
 
         canonicalizeRequestMessage(requestMessage, request);
 
-        ExecutionContext<AbortMultipartUploadRequest, AbortMultipartUploadResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<AbortMultipartUploadRequest, AbortMultipartUploadResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<AbortMultipartUploadResult> parser = new ResponseParsers.AbortMultipartUploadResponseParser();
+        ResponseParser<AbortMultipartUploadResult> parser = ResponseParsers.AbortMultipartUploadResponseParser();
 
-        Callable<AbortMultipartUploadResult> callable = new OSSRequestTask<AbortMultipartUploadResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<AbortMultipartUploadResult> callable = OSSRequestTask<AbortMultipartUploadResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
@@ -940,7 +940,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<ListPartsResult> listParts(
             ListPartsRequest request, OSSCompletedCallback<ListPartsRequest, ListPartsResult> completedCallback) {
 
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.GET);
@@ -952,7 +952,7 @@ import okhttp3.OkHttpClient;
         Integer maxParts = request.getMaxParts();
         if (maxParts != null) {
             if (!OSSUtils.checkParamRange(maxParts, 0, true, LIST_PART_MAX_RETURNS, true)) {
-                throw new IllegalArgumentException("MaxPartsOutOfRange: " + LIST_PART_MAX_RETURNS);
+                throw IllegalArgumentException("MaxPartsOutOfRange: " + LIST_PART_MAX_RETURNS);
             }
             requestMessage.getParameters().put(RequestParameters.MAX_PARTS, maxParts.toString());
         }
@@ -960,20 +960,20 @@ import okhttp3.OkHttpClient;
         Integer partNumberMarker = request.getPartNumberMarker();
         if (partNumberMarker != null) {
             if (!OSSUtils.checkParamRange(partNumberMarker, 0, false, MAX_PART_NUMBER, true)) {
-                throw new IllegalArgumentException("PartNumberMarkerOutOfRange: " + MAX_PART_NUMBER);
+                throw IllegalArgumentException("PartNumberMarkerOutOfRange: " + MAX_PART_NUMBER);
             }
             requestMessage.getParameters().put(RequestParameters.PART_NUMBER_MARKER, partNumberMarker.toString());
         }
 
         canonicalizeRequestMessage(requestMessage, request);
 
-        ExecutionContext<ListPartsRequest, ListPartsResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<ListPartsRequest, ListPartsResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<ListPartsResult> parser = new ResponseParsers.ListPartsResponseParser();
+        ResponseParser<ListPartsResult> parser = ResponseParsers.ListPartsResponseParser();
 
-        Callable<ListPartsResult> callable = new OSSRequestTask<ListPartsResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<ListPartsResult> callable = OSSRequestTask<ListPartsResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
@@ -981,7 +981,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<ListMultipartUploadsResult> listMultipartUploads(
             ListMultipartUploadsRequest request, OSSCompletedCallback<ListMultipartUploadsRequest, ListMultipartUploadsResult> completedCallback) {
 
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.GET);
@@ -993,13 +993,13 @@ import okhttp3.OkHttpClient;
 
         canonicalizeRequestMessage(requestMessage, request);
 
-        ExecutionContext<ListMultipartUploadsRequest, ListMultipartUploadsResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<ListMultipartUploadsRequest, ListMultipartUploadsResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<ListMultipartUploadsResult> parser = new ResponseParsers.ListMultipartUploadsResponseParser();
+        ResponseParser<ListMultipartUploadsResult> parser = ResponseParsers.ListMultipartUploadsResponseParser();
 
-        Callable<ListMultipartUploadsResult> callable = new OSSRequestTask<ListMultipartUploadsResult>(requestMessage, parser, executionContext, maxRetryCount);
+        Callable<ListMultipartUploadsResult> callable = OSSRequestTask<ListMultipartUploadsResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
@@ -1084,7 +1084,7 @@ import okhttp3.OkHttpClient;
             try {
                 OSSUtils.checkChecksum(result.getClientCRC(), result.getServerCRC(), result.getRequestId());
             } catch (InconsistentException e) {
-                throw new OSSClientException(e.getMessage(), e);
+                throw OSSClientException(e.getMessage(), e);
             }
         }
     }
@@ -1123,8 +1123,8 @@ import okhttp3.OkHttpClient;
     }
 
      OSSAsyncTask<TriggerCallbackResult> triggerCallback(TriggerCallbackRequest request, OSSCompletedCallback<TriggerCallbackRequest, TriggerCallbackResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put(RequestParameters.X_OSS_PROCESS, "");
 
         requestMessage.setEndpoint(endpoint);
@@ -1140,12 +1140,12 @@ import okhttp3.OkHttpClient;
         requestMessage.getHeaders().put(HttpHeaders.CONTENT_MD5, md5String);
 
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<TriggerCallbackRequest, TriggerCallbackResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<TriggerCallbackRequest, TriggerCallbackResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<TriggerCallbackResult> parser = new ResponseParsers.TriggerCallbackResponseParser();
-        Callable<TriggerCallbackResult> callable = new OSSRequestTask<TriggerCallbackResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<TriggerCallbackResult> parser = ResponseParsers.TriggerCallbackResponseParser();
+        Callable<TriggerCallbackResult> callable = OSSRequestTask<TriggerCallbackResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
@@ -1154,8 +1154,8 @@ import okhttp3.OkHttpClient;
     }
 
      OSSAsyncTask<ImagePersistResult> imageActionPersist(ImagePersistRequest request, OSSCompletedCallback<ImagePersistRequest, ImagePersistResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put(RequestParameters.X_OSS_PROCESS, "");
 
         requestMessage.setEndpoint(endpoint);
@@ -1168,12 +1168,12 @@ import okhttp3.OkHttpClient;
         requestMessage.setStringBody(bodyString);
 
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<ImagePersistRequest, ImagePersistResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<ImagePersistRequest, ImagePersistResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<ImagePersistResult> parser = new ResponseParsers.ImagePersistResponseParser();
-        Callable<ImagePersistResult> callable = new OSSRequestTask<ImagePersistResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<ImagePersistResult> parser = ResponseParsers.ImagePersistResponseParser();
+        Callable<ImagePersistResult> callable = OSSRequestTask<ImagePersistResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
@@ -1184,8 +1184,8 @@ import okhttp3.OkHttpClient;
     ;
 
      OSSAsyncTask<PutSymlinkResult> putSymlink(PutSymlinkRequest request, OSSCompletedCallback<PutSymlinkRequest, PutSymlinkResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put(RequestParameters.X_OSS_SYMLINK, "");
 
         requestMessage.setEndpoint(endpoint);
@@ -1202,12 +1202,12 @@ import okhttp3.OkHttpClient;
         OSSUtils.populateRequestMetadata(requestMessage.getHeaders(), request.getMetadata());
 
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<PutSymlinkRequest, PutSymlinkResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<PutSymlinkRequest, PutSymlinkResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<PutSymlinkResult> parser = new ResponseParsers.PutSymlinkResponseParser();
-        Callable<PutSymlinkResult> callable = new OSSRequestTask<PutSymlinkResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<PutSymlinkResult> parser = ResponseParsers.PutSymlinkResponseParser();
+        Callable<PutSymlinkResult> callable = OSSRequestTask<PutSymlinkResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
@@ -1216,8 +1216,8 @@ import okhttp3.OkHttpClient;
     }
 
      OSSAsyncTask<GetSymlinkResult> getSymlink(GetSymlinkRequest request, OSSCompletedCallback<GetSymlinkRequest, GetSymlinkResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put(RequestParameters.X_OSS_SYMLINK, "");
 
         requestMessage.setEndpoint(endpoint);
@@ -1227,12 +1227,12 @@ import okhttp3.OkHttpClient;
         requestMessage.setParameters(query);
 
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<GetSymlinkRequest, GetSymlinkResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<GetSymlinkRequest, GetSymlinkResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<GetSymlinkResult> parser = new ResponseParsers.GetSymlinkResponseParser();
-        Callable<GetSymlinkResult> callable = new OSSRequestTask<GetSymlinkResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<GetSymlinkResult> parser = ResponseParsers.GetSymlinkResponseParser();
+        Callable<GetSymlinkResult> callable = OSSRequestTask<GetSymlinkResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
@@ -1241,8 +1241,8 @@ import okhttp3.OkHttpClient;
     }
 
      OSSAsyncTask<RestoreObjectResult> restoreObject(RestoreObjectRequest request, OSSCompletedCallback<RestoreObjectRequest, RestoreObjectResult> completedCallback) {
-        RequestMessage requestMessage = new RequestMessage();
-        Map<String, String> query = new LinkedHashMap<String, String>();
+        RequestMessage requestMessage = RequestMessage();
+        Map<String, String> query = LinkedHashMap<String, String>();
         query.put(RequestParameters.X_OSS_RESTORE, "");
 
         requestMessage.setEndpoint(endpoint);
@@ -1252,12 +1252,12 @@ import okhttp3.OkHttpClient;
         requestMessage.setParameters(query);
 
         canonicalizeRequestMessage(requestMessage, request);
-        ExecutionContext<RestoreObjectRequest, RestoreObjectResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
+        ExecutionContext<RestoreObjectRequest, RestoreObjectResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(completedCallback);
         }
-        ResponseParser<RestoreObjectResult> parser = new ResponseParsers.RestoreObjectResponseParser();
-        Callable<RestoreObjectResult> callable = new OSSRequestTask<RestoreObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
+        ResponseParser<RestoreObjectResult> parser = ResponseParsers.RestoreObjectResponseParser();
+        Callable<RestoreObjectResult> callable = OSSRequestTask<RestoreObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 }

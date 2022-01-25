@@ -12,7 +12,7 @@ import java.util.Map;
  */
 
 abstract class HttpMessage {
-     Map<String, String> headers = new CaseInsensitiveHashMap<String, String>();
+     Map<String, String> headers = CaseInsensitiveHashMap<String, String>();
      InputStream content;
      int contentLength;
      String stringBody;
@@ -23,7 +23,7 @@ abstract class HttpMessage {
 
      void setHeaders(Map<String, String> headers) {
         if (this.headers == null) {
-            this.headers = new CaseInsensitiveHashMap<String, String>();
+            this.headers = CaseInsensitiveHashMap<String, String>();
         }
         if (this.headers != null && this.headers.size() > 0) {
             this.headers.clear();

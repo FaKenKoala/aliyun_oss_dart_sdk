@@ -54,15 +54,15 @@ import java.util.concurrent.TimeUnit;
      final int MAX_QUEUE_SIZE = 5000;
      final int PART_SIZE_ALIGN_NUM = 4 * 1024;
      ThreadPoolExecutor mPoolExecutor =
-            new ThreadPoolExecutor(MAX_CORE_POOL_SIZE, MAX_IMUM_POOL_SIZE, KEEP_ALIVE_TIME,
-                    TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(MAX_QUEUE_SIZE), new ThreadFactory() {
+            ThreadPoolExecutor(MAX_CORE_POOL_SIZE, MAX_IMUM_POOL_SIZE, KEEP_ALIVE_TIME,
+                    TimeUnit.MILLISECONDS, ArrayBlockingQueue<Runnable>(MAX_QUEUE_SIZE), new ThreadFactory() {
                 @override
                  Thread newThread(Runnable runnable) {
-                    return new Thread(runnable, "oss-android-multipart-thread");
+                    return Thread(runnable, "oss-android-multipart-thread");
                 }
             });
      List<PartETag> mPartETags = [];
-     Object mLock = new Object();
+     Object mLock = Object();
      InternalRequestOperation mApiOperation;
      ExecutionContext mContext;
      Exception mUploadException;
@@ -77,7 +77,7 @@ import java.util.concurrent.TimeUnit;
      Request mRequest;
      OSSCompletedCallback<Request, Result> mCompletedCallback;
      OSSProgressCallback<Request> mProgressCallback;
-     int[] mPartAttr = new int[2];
+     int[] mPartAttr = int[2];
      String mUploadFilePath;
      int mLastPartSize;//最后一个分片的大小
      Uri mUploadUri;
@@ -125,8 +125,8 @@ import java.util.concurrent.TimeUnit;
      */
      void checkCancel() throws OSSClientException {
         if (mContext.getCancellationHandler().isCancelled()) {
-            TaskCancelException e = new TaskCancelException("multipart cancel");
-            throw new OSSClientException(e.getMessage(), e, true);
+            TaskCancelException e = TaskCancelException("multipart cancel");
+            throw OSSClientException(e.getMessage(), e, true);
         }
     }
 
@@ -159,7 +159,7 @@ import java.util.concurrent.TimeUnit;
             if (e instanceof OSSClientException) {
                 temp = (OSSClientException) e;
             } else {
-                temp = new OSSClientException(e.toString(), e);
+                temp = OSSClientException(e.toString(), e);
             }
             if (mCompletedCallback != null) {
                 mCompletedCallback.onFailure(mRequest, temp, null);
@@ -172,7 +172,7 @@ import java.util.concurrent.TimeUnit;
         if (mRequest.getUploadFilePath() != null) {
             mUploadFilePath = mRequest.getUploadFilePath();
             mUploadedLength = 0;
-            mUploadFile = new File(mUploadFilePath);
+            mUploadFile = File(mUploadFilePath);
             mFileLength = mUploadFile.length();
 
         } else if (mRequest.getUploadUri() != null) {
@@ -182,7 +182,7 @@ import java.util.concurrent.TimeUnit;
                 mUploadFileDescriptor = mContext.getApplicationContext().getContentResolver().openFileDescriptor(mUploadUri, "r");
                 mFileLength = mUploadFileDescriptor.getStatSize();
             } catch (IOException e) {
-                throw new OSSClientException(e.getMessage(), e, true);
+                throw OSSClientException(e.getMessage(), e, true);
             } finally {
                 try {
                     if (mUploadFileDescriptor != null) {
@@ -194,7 +194,7 @@ import java.util.concurrent.TimeUnit;
             }
         }
         if (mFileLength == 0) {
-            throw new OSSClientException("file length must not be 0");
+            throw OSSClientException("file length must not be 0");
         }
 
         checkPartSize(mPartAttr);
@@ -207,7 +207,7 @@ import java.util.concurrent.TimeUnit;
 
 
         if (partNumber > 1 && partSize < 102400) {
-            throw new OSSClientException("Part size must be greater than or equal to 100KB!");
+            throw OSSClientException("Part size must be greater than or equal to 100KB!");
         }
     }
 
@@ -229,21 +229,21 @@ import java.util.concurrent.TimeUnit;
 
             preUploadPart(readIndex, byteCount, partNumber);
 
-            byte[] partContent = new byte[byteCount];
+            byte[] partContent = byte[byteCount];
             int skip = readIndex * mRequest.getPartSize();
             if (mUploadUri != null) {
                 inputStream = mContext.getApplicationContext().getContentResolver().openInputStream(mUploadUri);
-                bufferedInputStream = new BufferedInputStream(inputStream);
+                bufferedInputStream = BufferedInputStream(inputStream);
                 bufferedInputStream.skip(skip);
                 bufferedInputStream.read(partContent, 0, byteCount);
             } else {
-                raf = new RandomAccessFile(mUploadFile, "r");
+                raf = RandomAccessFile(mUploadFile, "r");
 
                 raf.seek(skip);
                 raf.readFully(partContent, 0, byteCount);
             }
 
-            UploadPartRequest uploadPart = new UploadPartRequest(
+            UploadPartRequest uploadPart = UploadPartRequest(
                     mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId, readIndex + 1);
             uploadPart.setPartContent(partContent);
             uploadPart.setMd5Digest(BinaryUtil.calculateBase64Md5(partContent));
@@ -251,7 +251,7 @@ import java.util.concurrent.TimeUnit;
             UploadPartResult uploadPartResult = mApiOperation.syncUploadPart(uploadPart);
             //check isComplete
             synchronized (mLock) {
-                PartETag partETag = new PartETag(uploadPart.getPartNumber(), uploadPartResult.getETag());
+                PartETag partETag = PartETag(uploadPart.getPartNumber(), uploadPartResult.getETag());
                 partETag.setPartSize(byteCount);
                 if (mCheckCRC64) {
                     partETag.setCRC64(uploadPartResult.getClientCRC());
@@ -264,9 +264,9 @@ import java.util.concurrent.TimeUnit;
 
                 if (mContext.getCancellationHandler().isCancelled()) {
                     if (mPartETags.size() == (mRunPartTaskCount - mPartExceptionCount)) {
-                        TaskCancelException e = new TaskCancelException("multipart cancel");
+                        TaskCancelException e = TaskCancelException("multipart cancel");
 
-                        throw new OSSClientException(e.getMessage(), e, true);
+                        throw OSSClientException(e.getMessage(), e, true);
                     }
                 } else {
                     if (mPartETags.size() == (partNumber - mPartExceptionCount)) {
@@ -306,7 +306,7 @@ import java.util.concurrent.TimeUnit;
         //complete sort
         CompleteMultipartUploadResult completeResult = null;
         if (mPartETags.size() > 0) {
-            Collections.sort(mPartETags, new Comparator<PartETag>() {
+            Collections.sort(mPartETags, Comparator<PartETag>() {
                 @override
                  int compare(PartETag lhs, PartETag rhs) {
                     if (lhs.getPartNumber() < rhs.getPartNumber()) {
@@ -319,7 +319,7 @@ import java.util.concurrent.TimeUnit;
                 }
             });
 
-            CompleteMultipartUploadRequest complete = new CompleteMultipartUploadRequest(
+            CompleteMultipartUploadRequest complete = CompleteMultipartUploadRequest(
                     mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId, mPartETags);
             if (mRequest.getCallbackParam() != null) {
                 complete.setCallbackParam(mRequest.getCallbackParam());
@@ -328,7 +328,7 @@ import java.util.concurrent.TimeUnit;
                 complete.setCallbackVars(mRequest.getCallbackVars());
             }
             if (mRequest.getMetadata() != null) {
-                ObjectMetadata metadata = new ObjectMetadata();
+                ObjectMetadata metadata = ObjectMetadata();
                 for (String key : mRequest.getMetadata().getRawMetadata().keySet()) {
                     if (!key.equals(OSSHeaders.STORAGE_CLASS)) {
                         metadata.setHeader(key, mRequest.getMetadata().getRawMetadata().get(key));
@@ -362,7 +362,7 @@ import java.util.concurrent.TimeUnit;
                 throw (OSSClientException) mUploadException;
             } else {
                 OSSClientException clientException =
-                        new OSSClientException(mUploadException.getMessage(), mUploadException);
+                        OSSClientException(mUploadException.getMessage(), mUploadException);
                 throw clientException;
             }
         }

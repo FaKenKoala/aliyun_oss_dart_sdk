@@ -184,7 +184,7 @@ import java.util.List;
                     } else if ("NextUploadIdMarker".equals(name)) {
                         setNextUploadIdMarker(parser.nextText());
                     } else if ("Upload".equals(name)) {
-                        upload = new MultipartUpload();
+                        upload = MultipartUpload();
                     } else if ("Key".equals(name)) {
                         upload.setKey(parser.nextText());
                     } else if ("UploadId".equals(name)) {

@@ -29,13 +29,13 @@ package com.alibaba.sdk.android.oss.common;
 
      static final int OBJECT_NAME_MAX_LENGTH = 1024;
 
-     static final String[] DEFAULT_CNAME_EXCLUDE_LIST = new String[]{
+     static final String[] DEFAULT_CNAME_EXCLUDE_LIST = String[]{
             "aliyuncs.com",
             "aliyun-inc.com",
             "aliyun.com"
     };
 
-     static final String[] OSS_ORIGN_HOST = new String[]{
+     static final String[] OSS_ORIGN_HOST = String[]{
             "aliyuncs.com",
             "aliyun-inc.com",
             "aliyun.com"

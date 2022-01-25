@@ -47,7 +47,7 @@ import java.net.URL;
         OSSFederationToken authToken;
         String authData;
         try {
-            URL stsUrl = new URL(mAuthServerUrl);
+            URL stsUrl = URL(mAuthServerUrl);
             HttpURLConnection conn = (HttpURLConnection) stsUrl.openConnection();
             conn.setConnectTimeout(10000);
             InputStream input = conn.getInputStream();
@@ -55,22 +55,22 @@ import java.net.URL;
             if (mDecoder != null) {
                 authData = mDecoder.decode(authData);
             }
-            JSONObject jsonObj = new JSONObject(authData);
+            JSONObject jsonObj = JSONObject(authData);
             int statusCode = jsonObj.getInt("StatusCode");
             if (statusCode == 200) {
                 String ak = jsonObj.getString("AccessKeyId");
                 String sk = jsonObj.getString("AccessKeySecret");
                 String token = jsonObj.getString("SecurityToken");
                 String expiration = jsonObj.getString("Expiration");
-                authToken = new OSSFederationToken(ak, sk, token, expiration);
+                authToken = OSSFederationToken(ak, sk, token, expiration);
             } else {
                 String errorCode = jsonObj.getString("ErrorCode");
                 String errorMessage = jsonObj.getString("ErrorMessage");
-                throw new OSSClientException("ErrorCode: " + errorCode + "| ErrorMessage: " + errorMessage);
+                throw OSSClientException("ErrorCode: " + errorCode + "| ErrorMessage: " + errorMessage);
             }
             return authToken;
         } catch (Exception e) {
-            throw new OSSClientException(e);
+            throw OSSClientException(e);
         }
     }
 

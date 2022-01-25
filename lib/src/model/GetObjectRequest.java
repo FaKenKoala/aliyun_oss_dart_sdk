@@ -35,7 +35,7 @@ import java.util.Map;
     }
 
     /**
-     * Creates the new request to get the specified object
+     * Creates the request to get the specified object
      *
      * @param bucketName Bucket name
      * @param objectKey  Object key

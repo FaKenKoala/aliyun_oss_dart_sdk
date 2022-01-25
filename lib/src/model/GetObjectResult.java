@@ -10,7 +10,7 @@ import java.io.InputStream;
  class GetObjectResult extends OSSResult {
 
     // object metadata
-     ObjectMetadata metadata = new ObjectMetadata();
+     ObjectMetadata metadata = ObjectMetadata();
 
     // content length
      int contentLength;

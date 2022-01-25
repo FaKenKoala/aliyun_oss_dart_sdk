@@ -55,6 +55,6 @@ package com.alibaba.sdk.android.oss.common.auth;
     }
 
      OSSFederationToken getFederationToken() {
-        return new OSSFederationToken(accessKeyId, secretKeyId, securityToken, int.MAX_VALUE);
+        return OSSFederationToken(accessKeyId, secretKeyId, securityToken, int.MAX_VALUE);
     }
 }

@@ -56,11 +56,11 @@ import java.util.zip.CheckedInputStream;
      final int KEEP_ALIVE_TIME = 3000;
      final int MAX_QUEUE_SIZE = 5000;
      ThreadPoolExecutor mPoolExecutor =
-            new ThreadPoolExecutor(MAX_CORE_POOL_SIZE, MAX_IMUM_POOL_SIZE, KEEP_ALIVE_TIME,
-                    TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(MAX_QUEUE_SIZE), new ThreadFactory() {
+            ThreadPoolExecutor(MAX_CORE_POOL_SIZE, MAX_IMUM_POOL_SIZE, KEEP_ALIVE_TIME,
+                    TimeUnit.MILLISECONDS, ArrayBlockingQueue<Runnable>(MAX_QUEUE_SIZE), new ThreadFactory() {
                 @override
                  Thread newThread(Runnable runnable) {
-                    return new Thread(runnable, "oss-android-multipart-thread");
+                    return Thread(runnable, "oss-android-multipart-thread");
                 }
             });
      ResumableDownloadRequest mRequest;
@@ -69,7 +69,7 @@ import java.util.zip.CheckedInputStream;
      ExecutionContext mContext;
      OSSProgressCallback mProgressCallback;
      CheckPoint mCheckPoint;
-     Object mLock = new Object();
+     Object mLock = Object();
      Exception mDownloadException;
      int completedPartSize;
      int downloadPartSize;
@@ -107,7 +107,7 @@ import java.util.zip.CheckedInputStream;
             if (e instanceof OSSClientException) {
                 temp = (OSSClientException) e;
             } else {
-                temp = new OSSClientException(e.toString(), e);
+                temp = OSSClientException(e.toString(), e);
             }
             if (mCompletedCallback != null) {
                 mCompletedCallback.onFailure(mRequest, temp, null);
@@ -119,13 +119,13 @@ import java.util.zip.CheckedInputStream;
      void checkInitData() throws OSSClientException, OSSServiceException, IOException {
 
         if (mRequest.getRange() != null && !mRequest.getRange().checkIsValid()) {
-            throw new OSSClientException("Range is invalid");
+            throw OSSClientException("Range is invalid");
         };
         String recordFileName = BinaryUtil.calculateMd5Str((mRequest.getBucketName() + mRequest.getObjectKey()
                 + String.valueOf(mRequest.getPartSize()) + (mRequest.getCRC64() == OSSRequest.CRC64Config.YES ? "-crc64" : "")).getBytes());
         checkpointPath = mRequest.getCheckPointFilePath() + File.separator + recordFileName;
 
-        mCheckPoint = new CheckPoint();
+        mCheckPoint = CheckPoint();
 
         if (mRequest.getEnableCheckPoint()) {
             try {
@@ -147,7 +147,7 @@ import java.util.zip.CheckedInputStream;
 
      bool removeFile(String filePath) {
         bool flag = false;
-        File file = new File(filePath);
+        File file = File(filePath);
 
         if (file.isFile() && file.exists()) {
             flag = file.delete();
@@ -170,15 +170,15 @@ import java.util.zip.CheckedInputStream;
 
      ResumableDownloadResult doMultipartDownload() throws OSSClientException, OSSServiceException, IOException, InterruptedException {
         checkCancel();
-        ResumableDownloadResult resumableDownloadResult = new ResumableDownloadResult();
+        ResumableDownloadResult resumableDownloadResult = ResumableDownloadResult();
 
-        final DownloadFileResult result = new DownloadFileResult();
+        final DownloadFileResult result = DownloadFileResult();
         result.partResults = [];
 
         for (final DownloadPart part : mCheckPoint.parts) {
             checkException();
             if (mPoolExecutor != null && !part.isCompleted) {
-                mPoolExecutor.execute(new Runnable() {
+                mPoolExecutor.execute(Runnable() {
                     @override
                      void run() {
                         downloadPart(result, part);
@@ -186,7 +186,7 @@ import java.util.zip.CheckedInputStream;
                     }
                 });
             } else {
-                DownloadPartResult partResult = new DownloadPartResult();
+                DownloadPartResult partResult = DownloadPartResult();
                 partResult.partNumber = part.partNumber;
                 partResult.requestId = mCheckPoint.fileStat.requestId;
                 partResult.length = part.length;
@@ -205,7 +205,7 @@ import java.util.zip.CheckedInputStream;
             }
         }
         checkException();
-        Collections.sort(result.partResults, new Comparator<DownloadPartResult>() {
+        Collections.sort(result.partResults, Comparator<DownloadPartResult>() {
             @override
              int compare(DownloadPartResult downloadPartResult, DownloadPartResult t1) {
                 return downloadPartResult.partNumber - t1.partNumber;
@@ -224,8 +224,8 @@ import java.util.zip.CheckedInputStream;
         }
         removeFile(checkpointPath);
 
-        File fromFile = new File(mRequest.getTempFilePath());
-        File toFile = new File(mRequest.getDownloadToFilePath());
+        File fromFile = File(mRequest.getTempFilePath());
+        File toFile = File(mRequest.getDownloadToFilePath());
         moveFile(fromFile, toFile);
 
         resumableDownloadResult.setServerCRC(mCheckPoint.fileStat.serverCRC);
@@ -245,13 +245,13 @@ import java.util.zip.CheckedInputStream;
             }
             crc = CRC64.combine(crc, partResult.clientCRC, partResult.length);
         }
-        return new int(crc);
+        return int(crc);
     }
 
      ArrayList<DownloadPart> splitFile(Range range, int fileSize, int partSize) {
 
         if (fileSize <= 0) {
-            DownloadPart part = new DownloadPart();
+            DownloadPart part = DownloadPart();
             part.start = 0;
             part.end = -1;
             part.length = 0;
@@ -271,7 +271,7 @@ import java.util.zip.CheckedInputStream;
 
         ArrayList<DownloadPart> parts = [];
         for (int i = 0; i < count; i++) {
-            DownloadPart part = new DownloadPart();
+            DownloadPart part = DownloadPart();
             part.start = start + partSize * i;
             part.end = start + partSize * (i + 1) - 1;
             part.length = part.end - part.start + 1;
@@ -299,7 +299,7 @@ import java.util.zip.CheckedInputStream;
                 size = totalSize - start;
             }
         }
-        return new Range(start, start + size);
+        return Range(start, start + size);
     }
 
      void downloadPart(DownloadFileResult downloadResult, DownloadPart part) {
@@ -314,22 +314,22 @@ import java.util.zip.CheckedInputStream;
 
             downloadPartSize += 1;
 
-            output = new RandomAccessFile(mRequest.getTempFilePath(), "rw");
+            output = RandomAccessFile(mRequest.getTempFilePath(), "rw");
             output.seek(part.fileStart);
 
             Map<String, String> requestHeader = mRequest.getRequestHeader();
 
-            GetObjectRequest request = new GetObjectRequest(mRequest.getBucketName(), mRequest.getObjectKey());
-            request.setRange(new Range(part.start, part.end));
+            GetObjectRequest request = GetObjectRequest(mRequest.getBucketName(), mRequest.getObjectKey());
+            request.setRange(Range(part.start, part.end));
             request.setRequestHeaders(requestHeader);
             GetObjectResult result =  mOperation.getObject(request, null).getResult();
 
             content = result.getObjectContent();
 
-            byte[] buffer = new byte[(int)(part.length)];
+            byte[] buffer = byte[(int)(part.length)];
             int readLength = 0;
             if (mRequest.getCRC64() == OSSRequest.CRC64Config.YES) {
-                content = new CheckedInputStream(content, new CRC64());
+                content = CheckedInputStream(content, new CRC64());
             }
 
             while ((readLength = content.read(buffer)) != -1) {
@@ -338,7 +338,7 @@ import java.util.zip.CheckedInputStream;
 
             synchronized (mLock) {
 
-                DownloadPartResult partResult = new DownloadPartResult();
+                DownloadPartResult partResult = DownloadPartResult();
                 partResult.partNumber = part.partNumber;
                 partResult.requestId = result.getRequestId();
                 partResult.length = result.getContentLength();
@@ -392,11 +392,11 @@ import java.util.zip.CheckedInputStream;
     }
 
      void createFile(String filePath, int length) throws IOException {
-        File file = new File(filePath);
+        File file = File(filePath);
         RandomAccessFile accessFile = null;
 
         try {
-            accessFile = new RandomAccessFile(file, "rw");
+            accessFile = RandomAccessFile(file, "rw");
             accessFile.setLength(length);
         } finally {
             if (accessFile != null) {
@@ -413,11 +413,11 @@ import java.util.zip.CheckedInputStream;
             InputStream ist = null;
             OutputStream ost = null;
             try {
-                ist = new FileInputStream(fromFile);
-                ost = new FileOutputStream(toFile);
+                ist = FileInputStream(fromFile);
+                ost = FileOutputStream(toFile);
                 copyFile(ist, ost);
                 if (!fromFile.delete()) {
-                    throw new IOException("Failed to delete original file '" + fromFile + "'");
+                    throw IOException("Failed to delete original file '" + fromFile + "'");
                 }
             } catch (FileNotFoundException e) {
                 throw e;
@@ -433,7 +433,7 @@ import java.util.zip.CheckedInputStream;
     }
 
      void copyFile(InputStream ist, OutputStream ost) throws IOException {
-        byte[] buffer = new byte[4096];
+        byte[] buffer = byte[4096];
         int byteCount;
         while ((byteCount = ist.read(buffer)) != -1) {
             ost.write(buffer, 0, byteCount);
@@ -473,7 +473,7 @@ import java.util.zip.CheckedInputStream;
                 throw (OSSClientException) mDownloadException;
             } else {
                 OSSClientException clientException =
-                        new OSSClientException(mDownloadException.getMessage(), mDownloadException);
+                        OSSClientException(mDownloadException.getMessage(), mDownloadException);
                 throw clientException;
             }
         }
@@ -488,8 +488,8 @@ import java.util.zip.CheckedInputStream;
 
      void checkCancel() throws OSSClientException {
         if (mContext.getCancellationHandler().isCancelled()) {
-            TaskCancelException e = new TaskCancelException("Resumable download cancel");
-            throw new OSSClientException(e.getMessage(), e, true);
+            TaskCancelException e = TaskCancelException("Resumable download cancel");
+            throw OSSClientException(e.getMessage(), e, true);
         }
     }
 
@@ -536,8 +536,8 @@ import java.util.zip.CheckedInputStream;
             FileInputStream fileIn = null;
             ObjectInputStream in = null;
             try {
-                fileIn = new FileInputStream(cpFile);
-                in = new ObjectInputStream(fileIn);
+                fileIn = FileInputStream(cpFile);
+                in = ObjectInputStream(fileIn);
                 CheckPoint dcp = (CheckPoint) in.readObject();
                 assign(dcp);
             } finally {
@@ -558,8 +558,8 @@ import java.util.zip.CheckedInputStream;
             FileOutputStream fileOut = null;
             ObjectOutputStream outStream = null;
             try {
-                fileOut = new FileOutputStream(cpFile);
-                outStream = new ObjectOutputStream(fileOut);
+                fileOut = FileOutputStream(cpFile);
+                outStream = ObjectOutputStream(fileOut);
                 outStream.writeObject(this);
             } finally {
                 if (outStream != null) {
@@ -643,10 +643,10 @@ import java.util.zip.CheckedInputStream;
          String requestId;
 
          static FileStat getFileStat(InternalRequestOperation operation, String bucketName, String objectKey) throws OSSClientException, OSSServiceException {
-            HeadObjectRequest request = new HeadObjectRequest(bucketName, objectKey);
+            HeadObjectRequest request = HeadObjectRequest(bucketName, objectKey);
             HeadObjectResult result = operation.headObject(request, null).getResult();
 
-            FileStat fileStat = new FileStat();
+            FileStat fileStat = FileStat();
             fileStat.fileLength = result.getMetadata().getContentLength();
             fileStat.etag = result.getMetadata().getETag();
             fileStat.lastModified = result.getMetadata().getLastModified();

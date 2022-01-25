@@ -16,7 +16,7 @@ package com.alibaba.sdk.android.oss.model;
      String objectKey;
 
     /**
-     * The URL identifying the new multipart object.
+     * The URL identifying the multipart object.
      */
      String location;
 

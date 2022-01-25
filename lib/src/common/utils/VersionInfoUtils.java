@@ -41,7 +41,7 @@ import com.alibaba.sdk.android.oss.common.OSSLog;
      * @return
      */
      static String getSystemInfo() {
-        StringBuilder customUA = new StringBuilder();
+        StringBuilder customUA = StringBuilder();
         customUA.append("(");
         customUA.append(System.getProperty("os.name"));
         customUA.append("/Android " + Build.VERSION.RELEASE);

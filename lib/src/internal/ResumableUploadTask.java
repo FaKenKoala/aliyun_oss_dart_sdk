@@ -85,9 +85,9 @@ import java.util.concurrent.Callable;
             String recordPath = mRequest.getRecordDirectory() + File.separator + recordFileName;
 
 
-            mRecordFile = new File(recordPath);
+            mRecordFile = File(recordPath);
             if (mRecordFile.exists()) {
-                BufferedReader br = new BufferedReader(new FileReader(mRecordFile));
+                BufferedReader br = BufferedReader(new FileReader(mRecordFile));
                 mUploadId = br.readLine();
                 br.close();
             }
@@ -97,10 +97,10 @@ import java.util.concurrent.Callable;
             if (!OSSUtils.isEmptyString(mUploadId)) {
                 if (mCheckCRC64) {
                     String filePath = mRequest.getRecordDirectory() + File.separator + mUploadId;
-                    File crc64Record = new File(filePath);
+                    File crc64Record = File(filePath);
                     if (crc64Record.exists()) {
-                        FileInputStream fs = new FileInputStream(crc64Record);//创建文件字节输出流对象
-                        ObjectInputStream ois = new ObjectInputStream(fs);
+                        FileInputStream fs = FileInputStream(crc64Record);//创建文件字节输出流对象
+                        ObjectInputStream ois = ObjectInputStream(fs);
 
                         try {
                             recordCrc64 = (Map<Integer, int>) ois.readObject();
@@ -120,7 +120,7 @@ import java.util.concurrent.Callable;
 
 
                 do{
-                    ListPartsRequest listParts = new ListPartsRequest(mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId);
+                    ListPartsRequest listParts = ListPartsRequest(mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId);
                     if (nextPartNumberMarker > 0){
                         listParts.setPartNumberMarker(nextPartNumberMarker);
                     }
@@ -135,7 +135,7 @@ import java.util.concurrent.Callable;
                         int partTotalNumber = mPartAttr[1];
                         for (int i = 0; i < parts.size(); i++) {
                             PartSummary part = parts.get(i);
-                            PartETag partETag = new PartETag(part.getPartNumber(), part.getETag());
+                            PartETag partETag = PartETag(part.getPartNumber(), part.getETag());
                             partETag.setPartSize(part.getSize());
 
                             if (recordCrc64 != null && recordCrc64.size() > 0) {
@@ -150,20 +150,20 @@ import java.util.concurrent.Callable;
                             bool isTotal = part.getPartNumber() == partTotalNumber;
 
                             if (isTotal && part.getSize() != mLastPartSize){
-                                throw new OSSClientException("current part size " + part.getSize() + " setting is inconsistent with PartSize : " + partSize + " or lastPartSize : " + mLastPartSize);
+                                throw OSSClientException("current part size " + part.getSize() + " setting is inconsistent with PartSize : " + partSize + " or lastPartSize : " + mLastPartSize);
                             }
 
                             if (!isTotal && part.getSize() != partSize){
-                                throw new OSSClientException("current part size " + part.getSize() + " setting is inconsistent with PartSize : " + partSize + " or lastPartSize : " + mLastPartSize);
+                                throw OSSClientException("current part size " + part.getSize() + " setting is inconsistent with PartSize : " + partSize + " or lastPartSize : " + mLastPartSize);
                             }
 
 //                            if (part.getPartNumber() == partTotalNumber){
 //                                if (part.getSize() != mLastPartSize){
-//                                    throw new OSSClientException("current part size " + partSize + " setting is inconsistent with PartSize : " + mPartAttr[0] + " or lastPartSize : " + mLastPartSize);
+//                                    throw OSSClientException("current part size " + partSize + " setting is inconsistent with PartSize : " + mPartAttr[0] + " or lastPartSize : " + mLastPartSize);
 //                                }
 //                            }else{
 //                                if (part.getSize() != partSize){
-//                                    throw new OSSClientException("current part size " + partSize + " setting is inconsistent with PartSize : " + mPartAttr[0] + " or lastPartSize : " + mLastPartSize);
+//                                    throw OSSClientException("current part size " + partSize + " setting is inconsistent with PartSize : " + mPartAttr[0] + " or lastPartSize : " + mLastPartSize);
 //                                }
 //                            }
 
@@ -188,13 +188,13 @@ import java.util.concurrent.Callable;
             }
 
             if (!mRecordFile.exists() && !mRecordFile.createNewFile()) {
-                throw new OSSClientException("Can't create file at path: " + mRecordFile.getAbsolutePath()
+                throw OSSClientException("Can't create file at path: " + mRecordFile.getAbsolutePath()
                         + "\nPlease make sure the directory exist!");
             }
         }
 
         if (OSSUtils.isEmptyString(mUploadId)) {
-            InitiateMultipartUploadRequest init = new InitiateMultipartUploadRequest(
+            InitiateMultipartUploadRequest init = InitiateMultipartUploadRequest(
                     mRequest.getBucketName(), mRequest.getObjectKey(), mRequest.getMetadata());
 
             InitiateMultipartUploadResult initResult = mApiOperation.initMultipartUpload(init, null).getResult();
@@ -202,7 +202,7 @@ import java.util.concurrent.Callable;
             mUploadId = initResult.getUploadId();
 
             if (mRecordFile != null) {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(mRecordFile));
+                BufferedWriter bw = BufferedWriter(new FileWriter(mRecordFile));
                 bw.write(mUploadId);
                 bw.close();
             }
@@ -216,20 +216,20 @@ import java.util.concurrent.Callable;
 
         int tempUploadedLength = mUploadedLength;
         checkCancel();
-//        int[] mPartAttr = new int[2];
+//        int[] mPartAttr = int[2];
 //        checkPartSize(mPartAttr);
         int readByte = mPartAttr[0];
         final int partNumber = mPartAttr[1];
 
         if (mPartETags.size() > 0 && mAlreadyUploadIndex.size() > 0) { //revert progress
             if (mUploadedLength > mFileLength) {
-                throw new OSSClientException("The uploading file is inconsistent with before");
+                throw OSSClientException("The uploading file is inconsistent with before");
             }
 
 //            int firstPartSize = mPartETags.get(0).getPartSize();
 //            OSSLog.logDebug("[initUploadId] - firstPartSize : " + firstPartSize);
 //            if (firstPartSize > 0 && firstPartSize != readByte && firstPartSize < mFileLength) {
-//                throw new OSSClientException("current part size " + readByte + " setting is inconsistent with before " + firstPartSize);
+//                throw OSSClientException("current part size " + readByte + " setting is inconsistent with before " + firstPartSize);
 //            }
 
             int revertUploadedLength = mUploadedLength;
@@ -261,7 +261,7 @@ import java.util.concurrent.Callable;
                 final int byteCount = readByte;
                 final int readIndex = i;
                 tempUploadedLength += byteCount;
-                mPoolExecutor.execute(new Runnable() {
+                mPoolExecutor.execute(Runnable() {
                     @override
                      void run() {
                         uploadPart(readIndex, byteCount, partNumber);
@@ -281,7 +281,7 @@ import java.util.concurrent.Callable;
         CompleteMultipartUploadResult completeResult = completeMultipartUploadResult();
         ResumableUploadResult result = null;
         if (completeResult != null) {
-            result = new ResumableUploadResult(completeResult);
+            result = ResumableUploadResult(completeResult);
         }
         if (mRecordFile != null) {
             mRecordFile.delete();
@@ -304,18 +304,18 @@ import java.util.concurrent.Callable;
                 }
             } else {
                 if (mPartETags != null && mPartETags.size() > 0 && mCheckCRC64 && mRequest.getRecordDirectory() != null) {
-                    Map<Integer, int> maps = new HashMap<Integer, int>();
+                    Map<Integer, int> maps = HashMap<Integer, int>();
                     for (PartETag eTag : mPartETags) {
                         maps.put(eTag.getPartNumber(), eTag.getCRC64());
                     }
                     ObjectOutputStream oot = null;
                     try {
                         String filePath = mRequest.getRecordDirectory() + File.separator + mUploadId;
-                        mCRC64RecordFile = new File(filePath);
+                        mCRC64RecordFile = File(filePath);
                         if (!mCRC64RecordFile.exists()) {
                             mCRC64RecordFile.createNewFile();
                         }
-                        oot = new ObjectOutputStream(new FileOutputStream(mCRC64RecordFile));
+                        oot = ObjectOutputStream(new FileOutputStream(mCRC64RecordFile));
                         oot.writeObject(maps);
                     } catch (IOException e) {
                         OSSLog.logThrowable2Local(e);
@@ -333,7 +333,7 @@ import java.util.concurrent.Callable;
     @override
      void abortThisUpload() {
         if (mUploadId != null) {
-            AbortMultipartUploadRequest abort = new AbortMultipartUploadRequest(
+            AbortMultipartUploadRequest abort = AbortMultipartUploadRequest(
                     mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId);
             mApiOperation.abortMultipartUpload(abort, null).waitUntilFinished();
         }

@@ -50,7 +50,7 @@ import okio.Source;
     }
 
      Source source(Source source) {
-        return new ForwardingSource(source) {
+        return ForwardingSource(source) {
              int totalBytesRead = 0L;
 
             @override

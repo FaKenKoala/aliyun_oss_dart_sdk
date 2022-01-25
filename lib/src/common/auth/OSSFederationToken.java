@@ -20,7 +20,7 @@ import java.util.TimeZone;
      int expiration;
 
     /**
-     * Creates a new instance of OSSFederationToken
+     * Creates a instance of OSSFederationToken
      *
      * @param tempAK        AccessKeyId returned from STS
      * @param tempSK        AccessKeySecret returned from STS
@@ -35,7 +35,7 @@ import java.util.TimeZone;
     }
 
     /**
-     * Creates a new instance of OSSFederationToken
+     * Creates a instance of OSSFederationToken
      *
      * @param tempAK                AccessKeyId returned from STS
      * @param tempSK                AccessKeySecret returned from STS
@@ -92,7 +92,7 @@ import java.util.TimeZone;
     // Sets the expiration time according to the value from STS. The time is in GMT format which is the original format returned from STS.
      void setExpirationInGMTFormat(String expirationInGMTFormat) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            SimpleDateFormat sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
             Date date = sdf.parse(expirationInGMTFormat);
             this.expiration = date.getTime() / 1000;

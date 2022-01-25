@@ -20,7 +20,7 @@ import java.util.zip.Checksum;
      int mClientCRC64;
 
     /**
-     * Constructs a new {@code CheckedInputStream} on {@code InputStream}
+     * Constructs a {@code CheckedInputStream} on {@code InputStream}
      * {@code is}. The checksum will be calculated using the algorithm
      * implemented by {@code csum}.
      * <p>

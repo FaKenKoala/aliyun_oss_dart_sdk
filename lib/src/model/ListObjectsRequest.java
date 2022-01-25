@@ -125,7 +125,7 @@ package com.alibaba.sdk.android.oss.model;
      */
      void setMaxKeys(Integer maxKeys) {
         if (maxKeys < 0 || maxKeys > MAX_RETURNED_KEYS_LIMIT) {
-            throw new IllegalArgumentException("Maxkeys should less can not exceed 1000.");
+            throw IllegalArgumentException("Maxkeys should less can not exceed 1000.");
         }
 
         this.maxKeys = maxKeys;

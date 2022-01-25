@@ -121,13 +121,13 @@ class OSSImpl implements OSS {
             if (!endpoint.startsWith("http")) {
                 endpoint = "http://" + endpoint;
             }
-            this.endpointURI = new URI(endpoint);
+            this.endpointURI = URI(endpoint);
         } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("Endpoint must be a string like 'http://oss-cn-****.aliyuncs.com'," +
+            throw IllegalArgumentException("Endpoint must be a string like 'http://oss-cn-****.aliyuncs.com'," +
                     "or your cname like 'http://image.cnamedomain.com'!");
         }
         if (credentialProvider == null) {
-            throw new IllegalArgumentException("CredentialProvider can't be null.");
+            throw IllegalArgumentException("CredentialProvider can't be null.");
         }
 
         bool hostIsIP = false;
@@ -138,21 +138,21 @@ class OSSImpl implements OSS {
         }
 
         if (this.endpointURI.getScheme().equals("https") && hostIsIP) {
-            throw new IllegalArgumentException("endpoint should not be format with https://ip.");
+            throw IllegalArgumentException("endpoint should not be format with https://ip.");
         }
 
         this.credentialProvider = credentialProvider;
         this.conf = (conf == null ? ClientConfiguration.getDefaultConf() : conf);
 
-        internalRequestOperation = new InternalRequestOperation(context.getApplicationContext(), endpointURI, credentialProvider, this.conf);
-        extensionRequestOperation = new ExtensionRequestOperation(internalRequestOperation);
+        internalRequestOperation = InternalRequestOperation(context.getApplicationContext(), endpointURI, credentialProvider, this.conf);
+        extensionRequestOperation = ExtensionRequestOperation(internalRequestOperation);
     }
 
      OSSImpl(Context context, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
         this.credentialProvider = credentialProvider;
         this.conf = (conf == null ? ClientConfiguration.getDefaultConf() : conf);
-        internalRequestOperation = new InternalRequestOperation(context.getApplicationContext(), credentialProvider, this.conf);
-        extensionRequestOperation = new ExtensionRequestOperation(internalRequestOperation);
+        internalRequestOperation = InternalRequestOperation(context.getApplicationContext(), credentialProvider, this.conf);
+        extensionRequestOperation = ExtensionRequestOperation(internalRequestOperation);
     }
 
     @override
@@ -544,7 +544,7 @@ class OSSImpl implements OSS {
 
     @override
      String presignConstrainedObjectURL(GeneratePresignedUrlRequest request) throws OSSClientException {
-        return new ObjectURLPresigner(this.endpointURI, this.credentialProvider, this.conf)
+        return ObjectURLPresigner(this.endpointURI, this.credentialProvider, this.conf)
                 .presignConstrainedURL(request);
     }
 
@@ -552,14 +552,14 @@ class OSSImpl implements OSS {
      String presignConstrainedObjectURL(String bucketName, String objectKey, int expiredTimeInSeconds)
             throws OSSClientException {
 
-        return new ObjectURLPresigner(this.endpointURI, this.credentialProvider, this.conf)
+        return ObjectURLPresigner(this.endpointURI, this.credentialProvider, this.conf)
                 .presignConstrainedURL(bucketName, objectKey, expiredTimeInSeconds);
     }
 
     @override
      String presignObjectURL(String bucketName, String objectKey) {
 
-        return new ObjectURLPresigner(this.endpointURI, this.credentialProvider, this.conf)
+        return ObjectURLPresigner(this.endpointURI, this.credentialProvider, this.conf)
                 .presignURL(bucketName, objectKey);
     }
 

@@ -20,12 +20,12 @@ import okhttp3.Response;
      static OkHttpClient addProgressResponseListener(OkHttpClient client,
                                                            final ExecutionContext context) {
         OkHttpClient newClient = client.newBuilder()
-                .addNetworkInterceptor(new Interceptor() {
+                .addNetworkInterceptor(Interceptor() {
                     @override
                      Response intercept(Chain chain) throws IOException {
                         Response originalResponse = chain.proceed(chain.request());
                         return originalResponse.newBuilder()
-                                .body(new ProgressTouchableResponseBody(originalResponse.body(),
+                                .body(ProgressTouchableResponseBody(originalResponse.body(),
                                         context))
                                 .build();
                     }
@@ -41,6 +41,6 @@ import okhttp3.Response;
                                                                       int contentLength,
                                                                       String contentType,
                                                                       ExecutionContext context) {
-        return new ProgressTouchableRequestBody(input, contentLength, contentType, context);
+        return ProgressTouchableRequestBody(input, contentLength, contentType, context);
     }
 }

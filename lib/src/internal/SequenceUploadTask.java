@@ -90,9 +90,9 @@ import java.util.zip.CheckedInputStream;
                     + mRequest.getObjectKey() + String.valueOf(mRequest.getPartSize()) + (mCheckCRC64 ? "-crc64" : "") + "-sequence").getBytes());
             String recordPath = mRequest.getRecordDirectory() + File.separator + recordFileName;
 
-            mRecordFile = new File(recordPath);
+            mRecordFile = File(recordPath);
             if (mRecordFile.exists()) {
-                BufferedReader br = new BufferedReader(new FileReader(mRecordFile));
+                BufferedReader br = BufferedReader(new FileReader(mRecordFile));
                 mUploadId = br.readLine();
                 br.close();
                 OSSLog.logDebug("sequence [initUploadId] - Found record file, uploadid: " + mUploadId);
@@ -101,10 +101,10 @@ import java.util.zip.CheckedInputStream;
             if (!OSSUtils.isEmptyString(mUploadId)) {
                 if (mCheckCRC64) {
                     String filePath = mRequest.getRecordDirectory() + File.separator + mUploadId;
-                    File crc64Record = new File(filePath);
+                    File crc64Record = File(filePath);
                     if (crc64Record.exists()) {
-                        FileInputStream fs = new FileInputStream(crc64Record);//创建文件字节输出流对象
-                        ObjectInputStream ois = new ObjectInputStream(fs);
+                        FileInputStream fs = FileInputStream(crc64Record);//创建文件字节输出流对象
+                        ObjectInputStream ois = ObjectInputStream(fs);
 
                         try {
                             recordCrc64 = (Map<Integer, int>) ois.readObject();
@@ -123,7 +123,7 @@ import java.util.zip.CheckedInputStream;
                 int nextPartNumberMarker = 0;
 
                 do {
-                    ListPartsRequest listParts = new ListPartsRequest(mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId);
+                    ListPartsRequest listParts = ListPartsRequest(mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId);
                     if (nextPartNumberMarker > 0){
                         listParts.setPartNumberMarker(nextPartNumberMarker);
                     }
@@ -139,7 +139,7 @@ import java.util.zip.CheckedInputStream;
 
                         for (int i = 0; i < parts.size(); i++) {
                             PartSummary part = parts.get(i);
-                            PartETag partETag = new PartETag(part.getPartNumber(), part.getETag());
+                            PartETag partETag = PartETag(part.getPartNumber(), part.getETag());
                             partETag.setPartSize(part.getSize());
 
                             if (recordCrc64 != null && recordCrc64.size() > 0) {
@@ -172,13 +172,13 @@ import java.util.zip.CheckedInputStream;
             }
 
             if (!mRecordFile.exists() && !mRecordFile.createNewFile()) {
-                throw new OSSClientException("Can't create file at path: " + mRecordFile.getAbsolutePath()
+                throw OSSClientException("Can't create file at path: " + mRecordFile.getAbsolutePath()
                         + "\nPlease make sure the directory exist!");
             }
         }
 
         if (OSSUtils.isEmptyString(mUploadId)) {
-            InitiateMultipartUploadRequest init = new InitiateMultipartUploadRequest(
+            InitiateMultipartUploadRequest init = InitiateMultipartUploadRequest(
                     mRequest.getBucketName(), mRequest.getObjectKey(), mRequest.getMetadata());
             init.isSequential = true;
             InitiateMultipartUploadResult initResult = mApiOperation.initMultipartUpload(init, null).getResult();
@@ -186,7 +186,7 @@ import java.util.zip.CheckedInputStream;
             mUploadId = initResult.getUploadId();
 
             if (mRecordFile != null) {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(mRecordFile));
+                BufferedWriter bw = BufferedWriter(new FileWriter(mRecordFile));
                 bw.write(mUploadId);
                 bw.close();
             }
@@ -202,7 +202,7 @@ import java.util.zip.CheckedInputStream;
 
         checkCancel();
 
-//        int[] mPartAttr = new int[2];
+//        int[] mPartAttr = int[2];
 //        checkPartSize(mPartAttr);
 
         int readByte = mPartAttr[0];
@@ -210,11 +210,11 @@ import java.util.zip.CheckedInputStream;
 
         if (mPartETags.size() > 0 && mAlreadyUploadIndex.size() > 0) { //revert progress
             if (mUploadedLength > mFileLength) {
-                throw new OSSClientException("The uploading file is inconsistent with before");
+                throw OSSClientException("The uploading file is inconsistent with before");
             }
 
             if (mFirstPartSize != readByte) {
-                throw new OSSClientException("The part size setting is inconsistent with before");
+                throw OSSClientException("The part size setting is inconsistent with before");
             }
 
             int revertUploadedLength = mUploadedLength;
@@ -256,7 +256,7 @@ import java.util.zip.CheckedInputStream;
         CompleteMultipartUploadResult completeResult = completeMultipartUploadResult();
         ResumableUploadResult result = null;
         if (completeResult != null) {
-            result = new ResumableUploadResult(completeResult);
+            result = ResumableUploadResult(completeResult);
         }
         if (mRecordFile != null) {
             mRecordFile.delete();
@@ -283,28 +283,28 @@ import java.util.zip.CheckedInputStream;
 
             preUploadPart(readIndex, byteCount, partNumber);
             int skip = readIndex * mRequest.getPartSize();
-            byte[] partContent = new byte[byteCount];
+            byte[] partContent = byte[byteCount];
 
             if (mUploadUri != null) {
                 inputStream = mContext.getApplicationContext().getContentResolver().openInputStream(mUploadUri);
-                bufferedInputStream = new BufferedInputStream(inputStream);
+                bufferedInputStream = BufferedInputStream(inputStream);
                 bufferedInputStream.skip(skip);
                 bufferedInputStream.read(partContent, 0, byteCount);
             } else {
-                raf = new RandomAccessFile(mUploadFile, "r");
+                raf = RandomAccessFile(mUploadFile, "r");
 
                 raf.seek(skip);
                 raf.readFully(partContent, 0, byteCount);
             }
 
-            uploadPartRequest = new UploadPartRequest(
+            uploadPartRequest = UploadPartRequest(
                     mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId, readIndex + 1);
             uploadPartRequest.setPartContent(partContent);
             uploadPartRequest.setMd5Digest(BinaryUtil.calculateBase64Md5(partContent));
             uploadPartRequest.setCRC64(mRequest.getCRC64());
             UploadPartResult uploadPartResult = mApiOperation.syncUploadPart(uploadPartRequest);
             //check isComplete，throw exception when error occur
-            PartETag partETag = new PartETag(uploadPartRequest.getPartNumber(), uploadPartResult.getETag());
+            PartETag partETag = PartETag(uploadPartRequest.getPartNumber(), uploadPartResult.getETag());
             partETag.setPartSize(byteCount);
             if (mCheckCRC64) {
                 partETag.setCRC64(uploadPartResult.getClientCRC());
@@ -317,8 +317,8 @@ import java.util.zip.CheckedInputStream;
 
             if (mContext.getCancellationHandler().isCancelled()) {
                 //cancel immediately for sequence upload
-                TaskCancelException e = new TaskCancelException("sequence upload task cancel");
-                throw new OSSClientException(e.getMessage(), e, true);
+                TaskCancelException e = TaskCancelException("sequence upload task cancel");
+                throw OSSClientException(e.getMessage(), e, true);
             } else {
                 onProgressCallback(mRequest, mUploadedLength, mFileLength);
             }
@@ -327,12 +327,12 @@ import java.util.zip.CheckedInputStream;
             if (e.getStatusCode() != 409) {
                 processException(e);
             } else {
-                PartETag partETag = new PartETag(uploadPartRequest.getPartNumber(), e.getPartEtag());
+                PartETag partETag = PartETag(uploadPartRequest.getPartNumber(), e.getPartEtag());
                 partETag.setPartSize(uploadPartRequest.getPartContent().length);
                 if (mCheckCRC64) {
                     byte[] partContent = uploadPartRequest.getPartContent();
-                    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(partContent);
-                    CheckedInputStream checkedInputStream = new CheckedInputStream(byteArrayInputStream, new CRC64());
+                    ByteArrayInputStream byteArrayInputStream = ByteArrayInputStream(partContent);
+                    CheckedInputStream checkedInputStream = CheckedInputStream(byteArrayInputStream, new CRC64());
 
                     partETag.setCRC64(checkedInputStream.getChecksum().getValue());
                 }
@@ -367,18 +367,18 @@ import java.util.zip.CheckedInputStream;
                 }
             } else {
                 if (mPartETags != null && mPartETags.size() > 0 && mCheckCRC64 && mRequest.getRecordDirectory() != null) {
-                    Map<Integer, int> maps = new HashMap<Integer, int>();
+                    Map<Integer, int> maps = HashMap<Integer, int>();
                     for (PartETag eTag : mPartETags) {
                         maps.put(eTag.getPartNumber(), eTag.getCRC64());
                     }
                     ObjectOutputStream oot = null;
                     try {
                         String filePath = mRequest.getRecordDirectory() + File.separator + mUploadId;
-                        mCRC64RecordFile = new File(filePath);
+                        mCRC64RecordFile = File(filePath);
                         if (!mCRC64RecordFile.exists()) {
                             mCRC64RecordFile.createNewFile();
                         }
-                        oot = new ObjectOutputStream(new FileOutputStream(mCRC64RecordFile));
+                        oot = ObjectOutputStream(new FileOutputStream(mCRC64RecordFile));
                         oot.writeObject(maps);
                     } catch (IOException e) {
                         OSSLog.logThrowable2Local(e);
@@ -396,7 +396,7 @@ import java.util.zip.CheckedInputStream;
     @override
      void abortThisUpload() {
         if (mUploadId != null) {
-            AbortMultipartUploadRequest abort = new AbortMultipartUploadRequest(
+            AbortMultipartUploadRequest abort = AbortMultipartUploadRequest(
                     mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId);
             mApiOperation.abortMultipartUpload(abort, null).waitUntilFinished();
         }

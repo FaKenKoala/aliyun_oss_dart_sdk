@@ -28,7 +28,7 @@ import java.util.concurrent.Callable;
 
     @override
      void initMultipartUploadId() throws OSSClientException, OSSServiceException {
-        InitiateMultipartUploadRequest init = new InitiateMultipartUploadRequest(
+        InitiateMultipartUploadRequest init = InitiateMultipartUploadRequest(
                 mRequest.getBucketName(), mRequest.getObjectKey(), mRequest.getMetadata());
 
         InitiateMultipartUploadResult initResult = mApiOperation.initMultipartUpload(init, null).getResult();
@@ -53,7 +53,7 @@ import java.util.concurrent.Callable;
                 final int byteCount = readByte;
                 final int readIndex = i;
                 currentLength += byteCount;
-                mPoolExecutor.execute(new Runnable() {
+                mPoolExecutor.execute(Runnable() {
                     @override
                      void run() {
                         uploadPart(readIndex, byteCount, partNumber);
@@ -81,7 +81,7 @@ import java.util.concurrent.Callable;
     @override
      void abortThisUpload() {
         if (mUploadId != null) {
-            AbortMultipartUploadRequest abort = new AbortMultipartUploadRequest(
+            AbortMultipartUploadRequest abort = AbortMultipartUploadRequest(
                     mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId);
             mApiOperation.abortMultipartUpload(abort, null).waitUntilFinished();
         }

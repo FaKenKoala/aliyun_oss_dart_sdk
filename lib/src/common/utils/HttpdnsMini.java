@@ -33,7 +33,7 @@ import java.util.concurrent.Executors;
      static final int MAX_HOLD_HOST_NUM = 100;
      static final int EMPTY_RESULT_HOST_TTL = 30;
      static HttpdnsMini instance;
-     ConcurrentMap<String, HostObject> hostManager = new ConcurrentHashMap<String, HostObject>();
+     ConcurrentMap<String, HostObject> hostManager = ConcurrentHashMap<String, HostObject>();
      ExecutorService pool = Executors.newFixedThreadPool(MAX_THREAD_NUM);
 
      HttpdnsMini() {
@@ -43,7 +43,7 @@ import java.util.concurrent.Executors;
         if (instance == null) {
             synchronized (HttpdnsMini.class) {
                 if (instance == null) {
-                    instance = new HttpdnsMini();
+                    instance = HttpdnsMini();
                 }
             }
         }
@@ -54,7 +54,7 @@ import java.util.concurrent.Executors;
         HostObject host = hostManager.get(hostName);
         if (host == null || host.isExpired()) {
             OSSLog.logDebug("[httpdnsmini] - refresh host: " + hostName);
-            pool.submit(new QueryHostTask(hostName));
+            pool.submit(QueryHostTask(hostName));
         }
         if (host != null) {
             return (host.isStillAvailable() ? host.getIp() : null);
@@ -132,20 +132,20 @@ import java.util.concurrent.Executors;
             InputStream in = null;
             OSSLog.logDebug("[httpdnsmini] - buildUrl: " + resolveUrl);
             try {
-                HttpURLConnection conn = (HttpURLConnection) new URL(resolveUrl).openConnection();
+                HttpURLConnection conn = (HttpURLConnection) URL(resolveUrl).openConnection();
                 conn.setConnectTimeout(RESOLVE_TIMEOUT_IN_SEC * 1000);
                 conn.setReadTimeout(RESOLVE_TIMEOUT_IN_SEC * 1000);
                 if (conn.getResponseCode() != 200) {
                     OSSLog.logError("[httpdnsmini] - responseCodeNot 200, but: " + conn.getResponseCode());
                 } else {
                     in = conn.getInputStream();
-                    BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-                    StringBuilder sb = new StringBuilder();
+                    BufferedReader streamReader = BufferedReader(new InputStreamReader(in, "UTF-8"));
+                    StringBuilder sb = StringBuilder();
                     String line;
                     while ((line = streamReader.readLine()) != null) {
                         sb.append(line);
                     }
-                    JSONObject json = new JSONObject(sb.toString());
+                    JSONObject json = JSONObject(sb.toString());
                     String host = json.getString("host");
                     int ttl = json.getint("ttl");
                     JSONArray ips = json.getJSONArray("ips");
@@ -156,7 +156,7 @@ import java.util.concurrent.Executors;
                             // 避免一直请求同一个ip冲击sever
                             ttl = EMPTY_RESULT_HOST_TTL;
                         }
-                        HostObject hostObject = new HostObject();
+                        HostObject hostObject = HostObject();
                         String ip = (ips == null) ? null : ips.getString(0);
                         hostObject.setHostName(host);
                         hostObject.setTtl(ttl);

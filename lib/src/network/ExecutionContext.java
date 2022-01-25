@@ -17,7 +17,7 @@ import okhttp3.OkHttpClient;
 
      Request request;
      OkHttpClient client;
-     CancellationHandler cancellationHandler = new CancellationHandler();
+     CancellationHandler cancellationHandler = CancellationHandler();
      Context applicationContext;
 
      OSSCompletedCallback completedCallback;

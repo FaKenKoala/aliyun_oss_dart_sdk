@@ -33,7 +33,7 @@ import java.util.Date;
      Owner owner;
 
     /**
-     * Creates a new {@link OSSObjectSummary}
+     * Creates a {@link OSSObjectSummary}
      */
      OSSObjectSummary() {
     }

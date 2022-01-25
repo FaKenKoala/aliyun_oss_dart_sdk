@@ -115,11 +115,11 @@ import java.io.IOException;
      * @param conf               Client side configuration
      */
      OSSClient(Context context, String endpoint, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
-        mOss = new OSSImpl(context, endpoint, credentialProvider, conf);
+        mOss = OSSImpl(context, endpoint, credentialProvider, conf);
     }
 
      OSSClient(Context context, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
-        mOss = new OSSImpl(context, credentialProvider, conf);
+        mOss = OSSImpl(context, credentialProvider, conf);
     }
 
     @override

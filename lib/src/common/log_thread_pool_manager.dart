@@ -6,8 +6,8 @@ class LogThreadPoolManager {
   static final int PERIOD_TASK_QOS = 1000;
   static final int SIZE_CACHE_QUEUE = 200;
   static LogThreadPoolManager sThreadPoolManager = LogThreadPoolManager();
-  //  final Queue<Runnable> mTaskQueue = new LinkedList<Runnable>();
-  //  final RejectedExecutionHandler mHandler = new RejectedExecutionHandler() {
+  //  final Queue<Runnable> mTaskQueue = LinkedList<Runnable>();
+  //  final RejectedExecutionHandler mHandler = RejectedExecutionHandler() {
   //     @override
   //      void rejectedExecution(Runnable task, ThreadPoolExecutor executor) {
   //         if (mTaskQueue.size() >= SIZE_CACHE_QUEUE) {
@@ -17,14 +17,14 @@ class LogThreadPoolManager {
   //     }
   // };
   //  final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-  //  final ThreadPoolExecutor mThreadPool = new ThreadPoolExecutor(SIZE_CORE_POOL, SIZE_MAX_POOL,
-  //         TIME_KEEP_ALIVE, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(SIZE_WORK_QUEUE), new ThreadFactory() {
+  //  final ThreadPoolExecutor mThreadPool = ThreadPoolExecutor(SIZE_CORE_POOL, SIZE_MAX_POOL,
+  //         TIME_KEEP_ALIVE, TimeUnit.MILLISECONDS, ArrayBlockingQueue<Runnable>(SIZE_WORK_QUEUE), new ThreadFactory() {
   //     @override
   //      Thread newThread(Runnable r) {
-  //         return new Thread(r, "oss-android-log-thread");
+  //         return Thread(r, "oss-android-log-thread");
   //     }
   // }, mHandler);
-  //  final Runnable mAccessBufferThread = new Runnable() {
+  //  final Runnable mAccessBufferThread = Runnable() {
   //     @override
   //      void run() {
   //         if (hasMoreAcquire()) {
@@ -40,7 +40,7 @@ class LogThreadPoolManager {
 
   //  static LogThreadPoolManager newInstance() {
   //     if (sThreadPoolManager == null) {
-  //         sThreadPoolManager = new LogThreadPoolManager();
+  //         sThreadPoolManager = LogThreadPoolManager();
   //     }
   //     return sThreadPoolManager;
   // }

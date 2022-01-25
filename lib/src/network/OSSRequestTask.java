@@ -63,7 +63,7 @@ import okhttp3.Response;
         this.message = message;
         this.context = context;
         this.client = context.getClient();
-        this.retryHandler = new OSSRetryHandler(maxRetry);
+        this.retryHandler = OSSRetryHandler(maxRetry);
     }
 
     @override
@@ -89,10 +89,10 @@ import okhttp3.Response;
             OSSUtils.signRequest(message);
 
             if (context.getCancellationHandler().isCancelled()) {
-                throw new InterruptedIOException("This task is cancelled!");
+                throw InterruptedIOException("This task is cancelled!");
             }
 
-            Request.Builder requestBuilder = new Request.Builder();
+            Request.Builder requestBuilder = Request.Builder();
 
             // build request url
             String url;
@@ -120,14 +120,14 @@ import okhttp3.Response;
                     String stringBody = null;
                     int length = 0;
                     if (message.getUploadData() != null) {
-                        inputStream = new ByteArrayInputStream(message.getUploadData());
+                        inputStream = ByteArrayInputStream(message.getUploadData());
                         length = message.getUploadData().length;
                     } else if (message.getUploadFilePath() != null) {
-                        File file = new File(message.getUploadFilePath());
-                        inputStream = new FileInputStream(file);
+                        File file = File(message.getUploadFilePath());
+                        inputStream = FileInputStream(file);
                         length = file.length();
                         if (length <= 0) {
-                            throw new OSSClientException("the length of file is 0!");
+                            throw OSSClientException("the length of file is 0!");
                         }
                     } else if (message.getUploadUri() != null) {
                         inputStream = context.getApplicationContext().getContentResolver().openInputStream(message.getUploadUri());
@@ -149,7 +149,7 @@ import okhttp3.Response;
 
                     if (inputStream != null) {
                         if (message.isCheckCRC64()) {
-                            inputStream = new CheckedInputStream(inputStream, new CRC64());
+                            inputStream = CheckedInputStream(inputStream, new CRC64());
                         }
                         message.setContent(inputStream);
                         message.setContentLength(length);
@@ -160,7 +160,7 @@ import okhttp3.Response;
                                 , RequestBody.create(MediaType.parse(contentType), stringBody.getBytes("UTF-8")));
                     } else {
                         requestBuilder = requestBuilder.method(message.getMethod().toString()
-                                , RequestBody.create(null, new byte[0]));
+                                , RequestBody.create(null, byte[0]));
                     }
                     break;
                 case GET:
@@ -193,7 +193,7 @@ import okhttp3.Response;
             if (OSSLog.isEnableLog()) {
                 // response log
                 Map<String, List<String>> headerMap = response.headers().toMultimap();
-                StringBuilder printRsp = new StringBuilder();
+                StringBuilder printRsp = StringBuilder();
                 printRsp.append("response:---------------------\n");
                 printRsp.append("response code: " + response.code() + " for url: " + request.url() + "\n");
 //                printRsp.append("response body: " + response.body().string() + "\n");
@@ -211,7 +211,7 @@ import okhttp3.Response;
             if (OSSLog.isEnableLog()) {
                 e.printStackTrace();
             }
-            exception = new OSSClientException(e.getMessage(), e);
+            exception = OSSClientException(e.getMessage(), e);
         }
 
         if (exception == null && (responseMessage.getStatusCode() == 203 || responseMessage.getStatusCode() >= 300)) {
@@ -225,14 +225,14 @@ import okhttp3.Response;
                 }
                 return result;
             } catch (IOException e) {
-                exception = new OSSClientException(e.getMessage(), e);
+                exception = OSSClientException(e.getMessage(), e);
             }
         }
 
         // reconstruct exception caused by manually cancelling
         if ((call != null && call.isCanceled())
                 || context.getCancellationHandler().isCancelled()) {
-            exception = new OSSClientException("Task is cancelled!", exception.getCause(), true);
+            exception = OSSClientException("Task is cancelled!", exception.getCause(), true);
         }
 
         OSSRetryType retryType = retryHandler.shouldRetry(exception, currentRetryCount);
@@ -286,10 +286,10 @@ import okhttp3.Response;
     }
 
      ResponseMessage buildResponseMessage(RequestMessage request, Response response) {
-        ResponseMessage responseMessage = new ResponseMessage();
+        ResponseMessage responseMessage = ResponseMessage();
         responseMessage.setRequest(request);
         responseMessage.setResponse(response);
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = HashMap<String, String>();
         Headers responseHeaders = response.headers();
         for (int i = 0; i < responseHeaders.size(); i++) {
             headers.put(responseHeaders.name(i), responseHeaders.value(i));

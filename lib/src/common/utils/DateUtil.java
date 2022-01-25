@@ -53,8 +53,8 @@ import java.util.SimpleTimeZone;
 
      static DateFormat getRfc822DateFormat() {
         SimpleDateFormat rfc822DateFormat =
-                new SimpleDateFormat(RFC822_DATE_FORMAT, Locale.US);
-        rfc822DateFormat.setTimeZone(new SimpleTimeZone(0, "GMT"));
+                SimpleDateFormat(RFC822_DATE_FORMAT, Locale.US);
+        rfc822DateFormat.setTimeZone(SimpleTimeZone(0, "GMT"));
 
         return rfc822DateFormat;
     }
@@ -84,16 +84,16 @@ import java.util.SimpleTimeZone;
 
      static DateFormat getIso8601DateFormat() {
         SimpleDateFormat df =
-                new SimpleDateFormat(ISO8601_DATE_FORMAT, Locale.US);
-        df.setTimeZone(new SimpleTimeZone(0, "GMT"));
+                SimpleDateFormat(ISO8601_DATE_FORMAT, Locale.US);
+        df.setTimeZone(SimpleTimeZone(0, "GMT"));
 
         return df;
     }
 
      static DateFormat getAlternativeIso8601DateFormat() {
         SimpleDateFormat df =
-                new SimpleDateFormat(ALTERNATIVE_ISO8601_DATE_FORMAT, Locale.US);
-        df.setTimeZone(new SimpleTimeZone(0, "GMT"));
+                SimpleDateFormat(ALTERNATIVE_ISO8601_DATE_FORMAT, Locale.US);
+        df.setTimeZone(SimpleTimeZone(0, "GMT"));
 
         return df;
     }
@@ -103,7 +103,7 @@ import java.util.SimpleTimeZone;
     }
 
      static synchronized String currentFixedSkewedTimeInRFC822Format() {
-        return formatRfc822Date(new Date(getFixedSkewedTimeMillis()));
+        return formatRfc822Date(Date(getFixedSkewedTimeMillis()));
     }
 
      static synchronized void setCurrentServerTime(int serverTime) {

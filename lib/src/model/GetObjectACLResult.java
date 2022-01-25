@@ -13,7 +13,7 @@ package com.alibaba.sdk.android.oss.model;
      CannedAccessControlList objectACL;
 
      GetObjectACLResult() {
-        objectOwner = new Owner();
+        objectOwner = Owner();
     }
 
      Owner getOwner() {

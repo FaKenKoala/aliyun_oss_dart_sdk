@@ -48,7 +48,7 @@ import java.util.Map;
      */
      String contentMD5;
 
-     Map<String, String> queryParam = new HashMap<String, String>();
+     Map<String, String> queryParam = HashMap<String, String>();
 
     /**
      * Constructor with GET as the httpMethod
@@ -138,7 +138,7 @@ import java.util.Map;
      */
      void setMethod(HttpMethod method) {
         if (method != HttpMethod.GET && method != HttpMethod.PUT)
-            throw new IllegalArgumentException("Only GET or PUT is supported!");
+            throw IllegalArgumentException("Only GET or PUT is supported!");
 
         this.method = method;
     }
@@ -206,7 +206,7 @@ import java.util.Map;
      */
      void setQueryParameter(Map<String, String> queryParam) {
         if (queryParam == null) {
-            throw new NullPointerException("The argument 'queryParameter' is null.");
+            throw NullPointerException("The argument 'queryParameter' is null.");
         }
         if (this.queryParam != null && this.queryParam.size() > 0) {
             this.queryParam.clear();

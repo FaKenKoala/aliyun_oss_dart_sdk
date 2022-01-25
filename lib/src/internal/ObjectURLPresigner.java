@@ -46,7 +46,7 @@ import java.util.Map;
         String expires = String.valueOf(DateUtil.getFixedSkewedTimeMillis() / 1000 + request.getExpiration());
         HttpMethod method = request.getMethod() != null ? request.getMethod() : HttpMethod.GET;
 
-        RequestMessage requestMessage = new RequestMessage();
+        RequestMessage requestMessage = RequestMessage();
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(method);
         requestMessage.setBucketName(bucketName);
@@ -77,7 +77,7 @@ import java.util.Map;
             token = ((OSSFederationCredentialProvider) credentialProvider).getValidFederationToken();
             requestMessage.getParameters().put(RequestParameters.SECURITY_TOKEN, token.getSecurityToken());
             if (token == null) {
-                throw new OSSClientException("Can not get a federation token!");
+                throw OSSClientException("Can not get a federation token!");
             }
         } else if (credentialProvider instanceof OSSStsTokenCredentialProvider) {
             token = ((OSSStsTokenCredentialProvider) credentialProvider).getFederationToken();
@@ -97,7 +97,7 @@ import java.util.Map;
         } else if (credentialProvider instanceof OSSCustomSignerCredentialProvider) {
             signature = ((OSSCustomSignerCredentialProvider) credentialProvider).signContent(contentToSign);
         } else {
-            throw new OSSClientException("Unknown credentialProvider!");
+            throw OSSClientException("Unknown credentialProvider!");
         }
 
         String accessKey = signature.split(":")[0].substring(4);
@@ -105,7 +105,7 @@ import java.util.Map;
 
         String host = buildCanonicalHost(endpoint, bucketName, conf);
 
-        Map<String, String> params = new LinkedHashMap<String, String>();
+        Map<String, String> params = LinkedHashMap<String, String>();
         params.put(HttpHeaders.EXPIRES, expires);
         params.put(RequestParameters.OSS_ACCESS_KEY_ID, accessKey);
         params.put(RequestParameters.SIGNATURE, signature);
@@ -120,7 +120,7 @@ import java.util.Map;
 
      String presignConstrainedURL(String bucketName, String objectKey, int expiredTimeInSeconds)
             throws OSSClientException {
-        GeneratePresignedUrlRequest presignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, objectKey);
+        GeneratePresignedUrlRequest presignedUrlRequest = GeneratePresignedUrlRequest(bucketName, objectKey);
         presignedUrlRequest.setExpiration(expiredTimeInSeconds);
         return presignConstrainedURL(presignedUrlRequest);
     }

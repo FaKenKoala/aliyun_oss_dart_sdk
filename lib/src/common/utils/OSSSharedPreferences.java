@@ -21,7 +21,7 @@ import android.content.SharedPreferences;
         if (sInstance == null) {
             synchronized (OSSSharedPreferences.class) {
                 if (sInstance == null) {
-                    sInstance = new OSSSharedPreferences(context);
+                    sInstance = OSSSharedPreferences(context);
                 }
             }
         }

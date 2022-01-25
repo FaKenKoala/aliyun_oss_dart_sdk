@@ -59,7 +59,7 @@ import okhttp3.Response;
             }
             return result;
         } catch (Exception e) {
-            IOException ioException = new IOException(e.getMessage(), e);
+            IOException ioException = IOException(e.getMessage(), e);
             e.printStackTrace();
             OSSLog.logThrowable2Local(e);
             throw ioException;
@@ -72,7 +72,7 @@ import okhttp3.Response;
 
     //处理返回信息的信息头
      CaseInsensitiveHashMap<String, String> parseResponseHeader(Response response) {
-        CaseInsensitiveHashMap<String, String> result = new CaseInsensitiveHashMap<String, String>();
+        CaseInsensitiveHashMap<String, String> result = CaseInsensitiveHashMap<String, String>();
         Headers headers = response.headers();
         for (int i = 0; i < headers.size(); i++) {
             result.put(headers.name(i), headers.value(i));
@@ -90,7 +90,7 @@ import okhttp3.Response;
 
         String strSrvCrc = response.getHeaders().get(OSSHeaders.OSS_HASH_CRC64_ECMA);
         if (strSrvCrc != null) {
-            BigInteger bi = new BigInteger(strSrvCrc);
+            BigInteger bi = BigInteger(strSrvCrc);
             result.setServerCRC(bi.intValue());
         }
     }

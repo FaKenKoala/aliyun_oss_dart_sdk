@@ -12,7 +12,7 @@ package com.alibaba.sdk.android.oss.model;
      CannedAccessControlList bucketACL;
 
      GetBucketACLResult() {
-        bucketOwner = new Owner();
+        bucketOwner = Owner();
     }
 
      Owner getOwner() {

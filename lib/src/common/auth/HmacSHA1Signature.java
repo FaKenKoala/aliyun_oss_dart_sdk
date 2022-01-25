@@ -24,7 +24,7 @@ import javax.crypto.spec.SecretKeySpec;
      static final String DEFAULT_ENCODING = "UTF-8"; // Default encoding
      static final String ALGORITHM = "HmacSHA1"; // Signature method.
      static final String VERSION = "1"; // Signature version.
-     static final Object LOCK = new Object();
+     static final Object LOCK = Object();
      static Mac macInstance; // Prototype of the Mac instance.
 
      HmacSHA1Signature() {
@@ -50,7 +50,7 @@ import javax.crypto.spec.SecretKeySpec;
             OSSLog.logDebug("base64 start");
             sign = BinaryUtil.toBase64String(signData);
         } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException("Unsupported algorithm: " + DEFAULT_ENCODING);
+            throw RuntimeException("Unsupported algorithm: " + DEFAULT_ENCODING);
         }
         return sign;
     }
@@ -74,15 +74,15 @@ import javax.crypto.spec.SecretKeySpec;
             try {
                 mac = (Mac) macInstance.clone();
             } catch (CloneNotSupportedException e) {
-                // If it is not clonable, create a new one.
+                // If it is not clonable, create a one.
                 mac = Mac.getInstance(getAlgorithm());
             }
-            mac.init(new SecretKeySpec(key, getAlgorithm()));
+            mac.init(SecretKeySpec(key, getAlgorithm()));
             sign = mac.doFinal(data);
         } catch (NoSuchAlgorithmException ex) {
-            throw new RuntimeException("Unsupported algorithm: " + ALGORITHM);
+            throw RuntimeException("Unsupported algorithm: " + ALGORITHM);
         } catch (InvalidKeyException ex) {
-            throw new RuntimeException("key must not be null");
+            throw RuntimeException("key must not be null");
         }
         return sign;
     }

@@ -20,7 +20,7 @@ import java.util.concurrent.Future;
      volatile bool canceled;
 
      static OSSAsyncTask wrapRequestTask(Future future, ExecutionContext context) {
-        OSSAsyncTask asynTask = new OSSAsyncTask();
+        OSSAsyncTask asynTask = OSSAsyncTask();
         asynTask.future = future;
         asynTask.context = context;
         return asynTask;
@@ -57,7 +57,7 @@ import java.util.concurrent.Future;
             T result = future.get();
             return result;
         } catch (InterruptedException e) {
-            throw new OSSClientException(" InterruptedException and message : " + e.getMessage(), e);
+            throw OSSClientException(" InterruptedException and message : " + e.getMessage(), e);
         } catch (ExecutionException e) {
             Throwable cause = e.getCause();
             if (cause instanceof OSSClientException) {
@@ -66,7 +66,7 @@ import java.util.concurrent.Future;
                 throw (OSSServiceException) cause;
             } else {
                 cause.printStackTrace();
-                throw new OSSClientException("Unexpected exception!" + cause.getMessage());
+                throw OSSClientException("Unexpected exception!" + cause.getMessage());
             }
         }
     }

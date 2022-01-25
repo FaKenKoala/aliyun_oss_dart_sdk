@@ -33,7 +33,7 @@ import java.util.Map;
      String objectKey;
      HttpMethod method;
      bool isAuthorizationRequired = true;
-     Map<String, String> parameters = new LinkedHashMap<String, String>();
+     Map<String, String> parameters = LinkedHashMap<String, String>();
      bool checkCRC64;
      OSSCredentialProvider credentialProvider;
      bool httpDnsEnable = false;
@@ -183,7 +183,7 @@ import java.util.Map;
     }
 
      void createBucketRequestBodyMarshall(Map<String, String> configures) throws UnsupportedEncodingException {
-        StringBuffer xmlBody = new StringBuffer();
+        StringBuffer xmlBody = StringBuffer();
         if (configures != null) {
             xmlBody.append("<CreateBucketConfiguration>");
             for (Map.Entry<String, String> entry : configures.entrySet()) {
@@ -192,14 +192,14 @@ import java.util.Map;
             xmlBody.append("</CreateBucketConfiguration>");
             byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
             int length = binaryData.length;
-            InputStream inStream = new ByteArrayInputStream(binaryData);
+            InputStream inStream = ByteArrayInputStream(binaryData);
             setContent(inStream);
             setContentLength(length);
         }
     }
 
      void putBucketRefererRequestBodyMarshall(ArrayList<String> referers, bool allowEmpty) throws UnsupportedEncodingException {
-        StringBuffer xmlBody = new StringBuffer();
+        StringBuffer xmlBody = StringBuffer();
         xmlBody.append("<RefererConfiguration>");
         xmlBody.append("<AllowEmptyReferer>" + (allowEmpty ? "true" : "false") + "</AllowEmptyReferer>");
         if (referers != null && referers.size() > 0) {
@@ -213,13 +213,13 @@ import java.util.Map;
 
         byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
         int length = binaryData.length;
-        InputStream inStream = new ByteArrayInputStream(binaryData);
+        InputStream inStream = ByteArrayInputStream(binaryData);
         setContent(inStream);
         setContentLength(length);
     }
 
      void putBucketLoggingRequestBodyMarshall(String targetBucketName, String targetPrefix) throws UnsupportedEncodingException {
-        StringBuffer xmlBody = new StringBuffer();
+        StringBuffer xmlBody = StringBuffer();
         xmlBody.append("<BucketLoggingStatus>");
         if (targetBucketName != null) {
             xmlBody.append("<LoggingEnabled><TargetBucket>" + targetBucketName + "</TargetBucket>");
@@ -233,13 +233,13 @@ import java.util.Map;
 
         byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
         int length = binaryData.length;
-        InputStream inStream = new ByteArrayInputStream(binaryData);
+        InputStream inStream = ByteArrayInputStream(binaryData);
         setContent(inStream);
         setContentLength(length);
     }
 
      void putBucketLifecycleRequestBodyMarshall(ArrayList<BucketLifecycleRule> lifecycleRules) throws UnsupportedEncodingException {
-        StringBuffer xmlBody = new StringBuffer();
+        StringBuffer xmlBody = StringBuffer();
         xmlBody.append("<LifecycleConfiguration>");
         for (BucketLifecycleRule rule : lifecycleRules) {
             xmlBody.append("<Rule>");
@@ -279,13 +279,13 @@ import java.util.Map;
 
         byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
         int length = binaryData.length;
-        InputStream inStream = new ByteArrayInputStream(binaryData);
+        InputStream inStream = ByteArrayInputStream(binaryData);
         setContent(inStream);
         setContentLength(length);
     }
 
      byte[] deleteMultipleObjectRequestBodyMarshall(List<String> objectKeys, bool isQuiet) throws UnsupportedEncodingException {
-        StringBuffer xmlBody = new StringBuffer();
+        StringBuffer xmlBody = StringBuffer();
         xmlBody.append("<Delete>");
         if (isQuiet) {
             xmlBody.append("<Quiet>true</Quiet>");
@@ -300,7 +300,7 @@ import java.util.Map;
         xmlBody.append("</Delete>");
         byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
         int length = binaryData.length;
-        InputStream inStream = new ByteArrayInputStream(binaryData);
+        InputStream inStream = ByteArrayInputStream(binaryData);
         setContent(inStream);
         setContentLength(length);
         return binaryData;
@@ -411,7 +411,7 @@ import java.util.Map;
         String queryString = OSSUtils.paramToQueryString(this.parameters, OSSConstants.DEFAULT_CHARSET_NAME);
 
         //输入请求信息日志
-        StringBuilder printReq = new StringBuilder();
+        StringBuilder printReq = StringBuilder();
         printReq.append("request---------------------\n");
         printReq.append("request url=" + baseURL + "\n");
         printReq.append("request params=" + queryString + "\n");

@@ -27,13 +27,13 @@ import java.io.Writer;
             return "";
 
         Reader reader = null;
-        Writer writer = new StringWriter();
+        Writer writer = StringWriter();
         String result;
 
-        char[] buffer = new char[BUFFER_SIZE];
+        char[] buffer = char[BUFFER_SIZE];
         try {
-            reader = new BufferedReader(
-                    new InputStreamReader(in, charset));
+            reader = BufferedReader(
+                    InputStreamReader(in, charset));
 
             int n;
             while ((n = reader.read(buffer)) > 0) {
@@ -57,11 +57,11 @@ import java.io.Writer;
      static byte[] readStreamAsBytesArray(InputStream in)
             throws IOException {
         if (in == null) {
-            return new byte[0];
+            return byte[0];
         }
 
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        byte[] buffer = new byte[BUFFER_SIZE];
+        ByteArrayOutputStream output = ByteArrayOutputStream();
+        byte[] buffer = byte[BUFFER_SIZE];
         int len;
         while ((len = in.read(buffer)) > -1) {
             output.write(buffer, 0, len);
@@ -74,11 +74,11 @@ import java.io.Writer;
      static byte[] readStreamAsBytesArray(InputStream in, int readLength)
             throws IOException {
         if (in == null) {
-            return new byte[0];
+            return byte[0];
         }
 
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        byte[] buffer = new byte[BUFFER_SIZE];
+        ByteArrayOutputStream output = ByteArrayOutputStream();
+        byte[] buffer = byte[BUFFER_SIZE];
         int len;
         int readed = 0;
         while (readed < readLength && (len = in.read(buffer, 0, Math.min(2048, (int) (readLength - readed)))) > -1) {

@@ -20,7 +20,7 @@ import java.security.NoSuchAlgorithmException;
 
  class BinaryUtil {
      static String toBase64String(byte[] binaryData) {
-        return new String(Base64.encode(binaryData,Base64.DEFAULT)).trim();
+        return String(Base64.encode(binaryData,Base64.DEFAULT)).trim();
     }
 
     /**
@@ -37,8 +37,8 @@ import java.security.NoSuchAlgorithmException;
         byte[] md5;
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
-            byte[] buffer = new byte[10 * 1024];
-            FileInputStream is = new FileInputStream(fileDescriptor);
+            byte[] buffer = byte[10 * 1024];
+            FileInputStream is = FileInputStream(fileDescriptor);
             int len;
             while ((len = is.read(buffer)) != -1) {
                 digest.update(buffer, 0, len);
@@ -46,7 +46,7 @@ import java.security.NoSuchAlgorithmException;
             is.close();
             md5 = digest.digest();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 algorithm not found.");
+            throw RuntimeException("MD5 algorithm not found.");
         }
         return md5;
     }
@@ -59,7 +59,7 @@ import java.security.NoSuchAlgorithmException;
         try {
             messageDigest = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 algorithm not found.");
+            throw RuntimeException("MD5 algorithm not found.");
         }
         messageDigest.update(binaryData);
         return messageDigest.digest();
@@ -73,8 +73,8 @@ import java.security.NoSuchAlgorithmException;
         byte[] md5;
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
-            byte[] buffer = new byte[10 * 1024];
-            FileInputStream is = new FileInputStream(new File(filePath));
+            byte[] buffer = byte[10 * 1024];
+            FileInputStream is = FileInputStream(new File(filePath));
             int len;
             while ((len = is.read(buffer)) != -1) {
                 digest.update(buffer, 0, len);
@@ -82,7 +82,7 @@ import java.security.NoSuchAlgorithmException;
             is.close();
             md5 = digest.digest();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 algorithm not found.");
+            throw RuntimeException("MD5 algorithm not found.");
         }
         return md5;
     }
@@ -136,7 +136,7 @@ import java.security.NoSuchAlgorithmException;
         if (md5bytes == null) {
             return "";
         }
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = StringBuilder();
         for (int i = 0; i < md5bytes.length; i++) {
             sb.append(String.format("%02x", md5bytes[i]));
         }
@@ -152,8 +152,8 @@ import java.security.NoSuchAlgorithmException;
      static String fileToSHA1(String filePath) {
         InputStream inputStream = null;
         try {
-            inputStream = new FileInputStream(filePath); // Create an FileInputStream instance according to the filepath
-            byte[] buffer = new byte[1024]; // The buffer to read the file
+            inputStream = FileInputStream(filePath); // Create an FileInputStream instance according to the filepath
+            byte[] buffer = byte[1024]; // The buffer to read the file
             MessageDigest digest = MessageDigest.getInstance("SHA-1"); // Get a SHA-1 instance
             int numRead = 0; // Record how many bytes have been read
             while (numRead != -1) {
@@ -179,8 +179,8 @@ import java.security.NoSuchAlgorithmException;
      static String fileToSHA1(FileDescriptor fileDescriptor) {
         InputStream inputStream = null;
         try {
-            inputStream = new FileInputStream(fileDescriptor); // Create an FileInputStream instance according to the filepath
-            byte[] buffer = new byte[1024]; // The buffer to read the file
+            inputStream = FileInputStream(fileDescriptor); // Create an FileInputStream instance according to the filepath
+            byte[] buffer = byte[1024]; // The buffer to read the file
             MessageDigest digest = MessageDigest.getInstance("SHA-1"); // Get a SHA-1 instance
             int numRead = 0; // Record how many bytes have been read
             while (numRead != -1) {

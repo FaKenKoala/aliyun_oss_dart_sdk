@@ -20,9 +20,9 @@ import java.util.Map;
      static final String AES_256_SERVER_SIDE_ENCRYPTION = "AES256";
     // User's custom metadata dictionary. All keys  will be prefixed with x-oss-meta-in the HTTP headers.
     // The keys in this dictionary should include the prefix 'x-oss-meta-'.
-     Map<String, String> userMetadata = new CaseInsensitiveHashMap<String, String>();
+     Map<String, String> userMetadata = CaseInsensitiveHashMap<String, String>();
     // Standard metadata
-     Map<String, Object> metadata = new CaseInsensitiveHashMap<String, Object>();
+     Map<String, Object> metadata = CaseInsensitiveHashMap<String, Object>();
 
     /**
      * <p>
@@ -143,7 +143,7 @@ import java.util.Map;
      */
      void setContentLength(int contentLength) {
         if (contentLength > OSSConstants.DEFAULT_FILE_SIZE_LIMIT) {
-            throw new IllegalArgumentException("The content length could not be more than 5GB.");
+            throw IllegalArgumentException("The content length could not be more than 5GB.");
         }
 
         metadata.put(OSSHeaders.CONTENT_LENGTH, contentLength);

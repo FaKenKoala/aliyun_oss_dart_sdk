@@ -130,9 +130,9 @@ import java.io.File;
      */
      void setRecordDirectory(String recordDirectory) {
         if (!OSSUtils.isEmptyString(recordDirectory)) {
-            File file = new File(recordDirectory);
+            File file = File(recordDirectory);
             if (!file.exists() || !file.isDirectory()) {
-                throw new IllegalArgumentException("Record directory must exist, and it should be a directory!");
+                throw IllegalArgumentException("Record directory must exist, and it should be a directory!");
             }
         }
         this.recordDirectory = recordDirectory;

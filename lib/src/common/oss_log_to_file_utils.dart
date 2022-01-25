@@ -18,7 +18,7 @@
 //     /**
 //      * time format
 //      */
-//      static SimpleDateFormat sLogSDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//      static SimpleDateFormat sLogSDF = SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //     /**
 //      * default 5M
 //      */
@@ -41,7 +41,7 @@
 //         if (null == sContext || null == instance || null == sLogFile || !sLogFile.exists()) {
 //             sContext = context.getApplicationContext();
 //             instance = getInstance();
-//             logService.addExecuteTask(new Runnable() {
+//             logService.addExecuteTask(Runnable() {
 //                 @override
 //                  void run() {
 //                     sLogFile = instance.getLogFile();
@@ -66,7 +66,7 @@
 //         if (instance == null) {
 //             synchronized (OSSLogToFileUtils.class) {
 //                 if (instance == null) {
-//                     instance = new OSSLogToFileUtils();
+//                     instance = OSSLogToFileUtils();
 //                 }
 //             }
 //         }
@@ -108,7 +108,7 @@
 //         if (Environment.MEDIA_MOUNTED.equals(state)) {
 //             File sdcardDir = Environment.getExternalStorageDirectory();
 //             try {
-//                 StatFs sf = new StatFs(sdcardDir.getPath());
+//                 StatFs sf = StatFs(sdcardDir.getPath());
 //                 int blockSize = sf.getBlockSize();
 //                 int availCount = 0;
 //                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
@@ -129,7 +129,7 @@
 //         File root = Environment.getDataDirectory();
 //         int systemSpaceSize = 0;
 //         try {
-//             StatFs sf = new StatFs(root.getPath());
+//             StatFs sf = StatFs(root.getPath());
 //             int blockSize = sf.getBlockSize();
 //             int availCount = 0;
 //             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
@@ -160,7 +160,7 @@
 //             OSSLog.logDebug("Reset Log make File dir ... ", false);
 //             sLogFile.getParentFile().mkdir();
 //         }
-//         File logFile = new File(sLogFile.getParent() + "/logs.csv");
+//         File logFile = File(sLogFile.getParent() + "/logs.csv");
 //         if (logFile.exists()) {
 //             logFile.delete();
 //         }
@@ -170,7 +170,7 @@
 
 //      void deleteLogFile() {
 //         // 创建log.csv，若存在则删除
-//         File logFile = new File(sLogFile.getParent() + "/logs.csv");
+//         File logFile = File(sLogFile.getParent() + "/logs.csv");
 //         if (logFile.exists()) {
 //             OSSLog.logDebug("delete Log File ... ", false);
 //             logFile.delete();
@@ -180,7 +180,7 @@
 //      void deleteLogFileDir() {
 //         // 创建log.csv，若存在则删除
 //         deleteLogFile();
-//         File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + LOG_DIR_NAME);
+//         File dir = File(Environment.getExternalStorageDirectory().getPath() + File.separator + LOG_DIR_NAME);
 //         if (dir.exists()) {
 //             OSSLog.logDebug("delete Log FileDir ... ", false);
 //             dir.delete();
@@ -202,12 +202,12 @@
 //                 // 有SD卡则使用SD - PS:没SD卡但是有外部存储器，会使用外部存储器
 //                 // SD\OSSLog\logs.csv
 //                 canStorage = readSDCardSpace() > LOG_MAX_SIZE / 1024;
-//                 file = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + LOG_DIR_NAME);
+//                 file = File(Environment.getExternalStorageDirectory().getPath() + File.separator + LOG_DIR_NAME);
 //             } else {
 //                 // 没有SD卡或者外部存储器，使用内部存储器
 //                 // \data\data\包名\files\OSSLog\logs.csv
 //                 canStorage = readSystemSpace() > LOG_MAX_SIZE / 1024;
-//                 file = new File(sContext.getFilesDir().getPath() + File.separator + LOG_DIR_NAME);
+//                 file = File(sContext.getFilesDir().getPath() + File.separator + LOG_DIR_NAME);
 //             }
 //         } catch (Exception e) {
 //             canStorage = false;
@@ -217,7 +217,7 @@
 //             if (!file.exists()) {
 //                 file.mkdirs();
 //             }
-//             logFile = new File(file.getPath() + "/logs.csv");
+//             logFile = File(file.getPath() + "/logs.csv");
 //             if (!logFile.exists()) {
 //                 createNewFile(logFile);
 //             }
@@ -231,7 +231,7 @@
 
 //         uri = queryLogUri();
 //         if (uri == null) {
-//             ContentValues values = new ContentValues();
+//             ContentValues values = ContentValues();
 //             values.put(MediaStore.Files.FileColumns.DISPLAY_NAME, "logs.csv");
 //             values.put(MediaStore.Files.FileColumns.MIME_TYPE, "file/csv");
 //             values.put(MediaStore.Files.FileColumns.TITLE, "logs.csv");
@@ -256,8 +256,8 @@
 //         Uri external = MediaStore.Files.getContentUri("external");
 //         String selection =MediaStore.Files.FileColumns.RELATIVE_PATH+" like ? AND "
 //                 + MediaStore.Files.FileColumns.DISPLAY_NAME + "=?";
-//         String[] args = new String[]{"Documents/" + LOG_DIR_NAME + "%", "logs.csv"};
-//         String[] projection = new String[]{MediaStore.Files.FileColumns._ID};
+//         String[] args = String[]{"Documents/" + LOG_DIR_NAME + "%", "logs.csv"};
+//         String[] projection = String[]{MediaStore.Files.FileColumns._ID};
 //         Cursor cursor = contentResolver.query(external, projection, selection, args, null);
 
 //         if (cursor != null && cursor.moveToFirst()) {
@@ -279,7 +279,7 @@
 //      String getFunctionInfo(StackTraceElement[] ste) {
 //         String msg = null;
 //         if (ste == null) {
-//             msg = "[" + sLogSDF.format(new java.util.Date()) + "]";
+//             msg = "[" + sLogSDF.format(java.util.Date()) + "]";
 //         }
 //         return msg;
 //     }
@@ -293,7 +293,7 @@
 //             if (!sLogFile.exists()) {
 //                 resetLogFile();
 //             }
-//             WriteCall writeCall = new WriteCall(str);
+//             WriteCall writeCall = WriteCall(str);
 //             logService.addExecuteTask(writeCall);
 //         }
 //     }
@@ -317,7 +317,7 @@
 //                 //输出流操作 输出日志信息至本地存储空间内
 //                 PrintWriter pw;
 //                 try {
-//                     pw = new PrintWriter(new FileWriter(sLogFile, true), true);
+//                     pw = PrintWriter(new FileWriter(sLogFile, true), true);
 //                     if (pw != null) {
 //                         if (mStr instanceof Throwable) {
 //                             //写入异常信息
@@ -337,7 +337,7 @@
 //         }
 
 //          PrintWriter printEx(PrintWriter pw) {
-//             pw.println("crash_time：" + sLogSDF.format(new Date()));
+//             pw.println("crash_time：" + sLogSDF.format(Date()));
 //             ((Throwable) mStr).printStackTrace(pw);
 //             return pw;
 //         }

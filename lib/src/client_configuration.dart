@@ -1,6 +1,9 @@
 /// Client configuration for access to Ali cloud services
  class ClientConfiguration {
 
+     ClientConfiguration(); 
+
+
      static final int DEFAULT_MAX_RETRIES = 2;
      int maxConcurrentRequest = 5;
      int socketTimeout = 60 * 1000;
@@ -17,13 +20,10 @@
      bool pathStyleAccessEnable = false;
      bool customPathPrefixEnable = false;
 
-    /// Constructor
-     ClientConfiguration() {
-    }
 
     /// Gets the default configuration instance
      static ClientConfiguration getDefaultConf() {
-        return new ClientConfiguration();
+        return ClientConfiguration();
     }
 
     /// Gets the max concurrent request count
@@ -107,7 +107,7 @@
     /// @param customCnameExcludeList CNAME excluded list
      void setCustomCnameExcludeList(List<String> customCnameExcludeList) {
         if (customCnameExcludeList == null || customCnameExcludeList.size() == 0) {
-            throw new IllegalArgumentException("cname exclude list should not be null.");
+            throw IllegalArgumentException("cname exclude list should not be null.");
         }
 
         this.customCnameExcludeList.clear();
