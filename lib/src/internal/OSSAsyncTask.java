@@ -1,7 +1,7 @@
 package com.alibaba.sdk.android.oss.internal;
 
-import com.alibaba.sdk.android.oss.ClientException;
-import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.OSSClientException;
+import com.alibaba.sdk.android.oss.OSSServiceException;
 import com.alibaba.sdk.android.oss.model.OSSResult;
 import com.alibaba.sdk.android.oss.network.ExecutionContext;
 
@@ -49,24 +49,24 @@ import java.util.concurrent.Future;
      * Waits and gets the result.
      *
      * @return
-     * @throws ClientException
-     * @throws ServiceException
+     * @throws OSSClientException
+     * @throws OSSServiceException
      */
-     T getResult() throws ClientException, ServiceException {
+     T getResult() throws OSSClientException, OSSServiceException {
         try {
             T result = future.get();
             return result;
         } catch (InterruptedException e) {
-            throw new ClientException(" InterruptedException and message : " + e.getMessage(), e);
+            throw new OSSClientException(" InterruptedException and message : " + e.getMessage(), e);
         } catch (ExecutionException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof ClientException) {
-                throw (ClientException) cause;
-            } else if (cause instanceof ServiceException) {
-                throw (ServiceException) cause;
+            if (cause instanceof OSSClientException) {
+                throw (OSSClientException) cause;
+            } else if (cause instanceof OSSServiceException) {
+                throw (OSSServiceException) cause;
             } else {
                 cause.printStackTrace();
-                throw new ClientException("Unexpected exception!" + cause.getMessage());
+                throw new OSSClientException("Unexpected exception!" + cause.getMessage());
             }
         }
     }

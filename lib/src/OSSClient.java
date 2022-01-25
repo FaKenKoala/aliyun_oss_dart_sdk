@@ -122,476 +122,476 @@ import java.io.IOException;
         mOss = new OSSImpl(context, credentialProvider, conf);
     }
 
-    @Override
+    @override
      OSSAsyncTask<ListBucketsResult> asyncListBuckets(
             ListBucketsRequest request, OSSCompletedCallback<ListBucketsRequest, ListBucketsResult> completedCallback) {
         return mOss.asyncListBuckets(request, completedCallback);
     }
 
-    @Override
+    @override
      ListBucketsResult listBuckets(ListBucketsRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
         return mOss.listBuckets(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<CreateBucketResult> asyncCreateBucket(
             CreateBucketRequest request, OSSCompletedCallback<CreateBucketRequest, CreateBucketResult> completedCallback) {
 
         return mOss.asyncCreateBucket(request, completedCallback);
     }
 
-    @Override
+    @override
      CreateBucketResult createBucket(CreateBucketRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.createBucket(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<DeleteBucketResult> asyncDeleteBucket(
             DeleteBucketRequest request, OSSCompletedCallback<DeleteBucketRequest, DeleteBucketResult> completedCallback) {
 
         return mOss.asyncDeleteBucket(request, completedCallback);
     }
 
-    @Override
+    @override
      DeleteBucketResult deleteBucket(DeleteBucketRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.deleteBucket(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<GetBucketInfoResult> asyncGetBucketInfo(GetBucketInfoRequest request, OSSCompletedCallback<GetBucketInfoRequest, GetBucketInfoResult> completedCallback) {
         return mOss.asyncGetBucketInfo(request, completedCallback);
     }
 
-    @Override
-     GetBucketInfoResult getBucketInfo(GetBucketInfoRequest request) throws ClientException, ServiceException {
+    @override
+     GetBucketInfoResult getBucketInfo(GetBucketInfoRequest request) throws OSSClientException, OSSServiceException {
         return mOss.getBucketInfo(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<GetBucketACLResult> asyncGetBucketACL(
             GetBucketACLRequest request, OSSCompletedCallback<GetBucketACLRequest, GetBucketACLResult> completedCallback) {
 
         return mOss.asyncGetBucketACL(request, completedCallback);
     }
 
-    @Override
+    @override
      GetBucketACLResult getBucketACL(GetBucketACLRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.getBucketACL(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<PutBucketRefererResult> asyncPutBucketReferer(PutBucketRefererRequest request, OSSCompletedCallback<PutBucketRefererRequest, PutBucketRefererResult> completedCallback) {
         return mOss.asyncPutBucketReferer(request, completedCallback);
     }
 
-    @Override
-     PutBucketRefererResult putBucketReferer(PutBucketRefererRequest request) throws ClientException, ServiceException {
+    @override
+     PutBucketRefererResult putBucketReferer(PutBucketRefererRequest request) throws OSSClientException, OSSServiceException {
         return mOss.putBucketReferer(request);
     }
 
-    @Override
-     GetBucketRefererResult getBucketReferer(GetBucketRefererRequest request) throws ClientException, ServiceException {
+    @override
+     GetBucketRefererResult getBucketReferer(GetBucketRefererRequest request) throws OSSClientException, OSSServiceException {
         return mOss.getBucketReferer(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<GetBucketRefererResult> asyncGetBucketReferer(GetBucketRefererRequest request, OSSCompletedCallback<GetBucketRefererRequest, GetBucketRefererResult> completedCallback) {
         return mOss.asyncGetBucketReferer(request, completedCallback);
     }
 
-    @Override
-     DeleteBucketLoggingResult deleteBucketLogging(DeleteBucketLoggingRequest request) throws ClientException, ServiceException {
+    @override
+     DeleteBucketLoggingResult deleteBucketLogging(DeleteBucketLoggingRequest request) throws OSSClientException, OSSServiceException {
         return mOss.deleteBucketLogging(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<DeleteBucketLoggingResult> asyncDeleteBucketLogging(DeleteBucketLoggingRequest request, OSSCompletedCallback<DeleteBucketLoggingRequest, DeleteBucketLoggingResult> completedCallback) {
         return mOss.asyncDeleteBucketLogging(request, completedCallback);
     }
 
-    @Override
-     PutBucketLoggingResult putBucketLogging(PutBucketLoggingRequest request) throws ClientException, ServiceException {
+    @override
+     PutBucketLoggingResult putBucketLogging(PutBucketLoggingRequest request) throws OSSClientException, OSSServiceException {
         return mOss.putBucketLogging(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<PutBucketLoggingResult> asyncPutBucketLogging(PutBucketLoggingRequest request, OSSCompletedCallback<PutBucketLoggingRequest, PutBucketLoggingResult> completedCallback) {
         return mOss.asyncPutBucketLogging(request, completedCallback);
     }
 
-    @Override
-     GetBucketLoggingResult getBucketLogging(GetBucketLoggingRequest request) throws ClientException, ServiceException {
+    @override
+     GetBucketLoggingResult getBucketLogging(GetBucketLoggingRequest request) throws OSSClientException, OSSServiceException {
         return mOss.getBucketLogging(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<GetBucketLoggingResult> asyncGetBucketLogging(GetBucketLoggingRequest request, OSSCompletedCallback<GetBucketLoggingRequest, GetBucketLoggingResult> completedCallback) {
         return mOss.asyncGetBucketLogging(request, completedCallback);
     }
 
-    @Override
-     PutBucketLifecycleResult putBucketLifecycle(PutBucketLifecycleRequest request) throws ClientException, ServiceException {
+    @override
+     PutBucketLifecycleResult putBucketLifecycle(PutBucketLifecycleRequest request) throws OSSClientException, OSSServiceException {
         return mOss.putBucketLifecycle(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<PutBucketLifecycleResult> asyncPutBucketLifecycle(PutBucketLifecycleRequest request, OSSCompletedCallback<PutBucketLifecycleRequest, PutBucketLifecycleResult> completedCallback) {
         return mOss.asyncPutBucketLifecycle(request, completedCallback);
     }
 
-    @Override
-     GetBucketLifecycleResult getBucketLifecycle(GetBucketLifecycleRequest request) throws ClientException, ServiceException {
+    @override
+     GetBucketLifecycleResult getBucketLifecycle(GetBucketLifecycleRequest request) throws OSSClientException, OSSServiceException {
         return mOss.getBucketLifecycle(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<GetBucketLifecycleResult> asyncGetBucketLifecycle(GetBucketLifecycleRequest request, OSSCompletedCallback<GetBucketLifecycleRequest, GetBucketLifecycleResult> completedCallback) {
         return mOss.asyncGetBucketLifecycle(request, completedCallback);
     }
 
-    @Override
-     DeleteBucketLifecycleResult deleteBucketLifecycle(DeleteBucketLifecycleRequest request) throws ClientException, ServiceException {
+    @override
+     DeleteBucketLifecycleResult deleteBucketLifecycle(DeleteBucketLifecycleRequest request) throws OSSClientException, OSSServiceException {
         return mOss.deleteBucketLifecycle(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<DeleteBucketLifecycleResult> asyncDeleteBucketLifecycle(DeleteBucketLifecycleRequest request, OSSCompletedCallback<DeleteBucketLifecycleRequest, DeleteBucketLifecycleResult> completedCallback) {
         return mOss.asyncDeleteBucketLifecycle(request, completedCallback);
     }
 
-    @Override
+    @override
      OSSAsyncTask<PutObjectResult> asyncPutObject(
             PutObjectRequest request, OSSCompletedCallback<PutObjectRequest, PutObjectResult> completedCallback) {
 
         return mOss.asyncPutObject(request, completedCallback);
     }
 
-    @Override
+    @override
      PutObjectResult putObject(PutObjectRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.putObject(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<GetObjectResult> asyncGetObject(
             GetObjectRequest request, OSSCompletedCallback<GetObjectRequest, GetObjectResult> completedCallback) {
 
         return mOss.asyncGetObject(request, completedCallback);
     }
 
-    @Override
+    @override
      GetObjectResult getObject(GetObjectRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.getObject(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<GetObjectACLResult> asyncGetObjectACL(
             GetObjectACLRequest request, OSSCompletedCallback<GetObjectACLRequest, GetObjectACLResult> completedCallback) {
         return mOss.asyncGetObjectACL(request, completedCallback);
     }
 
-    @Override
+    @override
      GetObjectACLResult getObjectACL(GetObjectACLRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
         return mOss.getObjectACL(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<DeleteObjectResult> asyncDeleteObject(
             DeleteObjectRequest request, OSSCompletedCallback<DeleteObjectRequest, DeleteObjectResult> completedCallback) {
 
         return mOss.asyncDeleteObject(request, completedCallback);
     }
 
-    @Override
+    @override
      DeleteObjectResult deleteObject(DeleteObjectRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.deleteObject(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<DeleteMultipleObjectResult> asyncDeleteMultipleObject(
             DeleteMultipleObjectRequest request, OSSCompletedCallback<DeleteMultipleObjectRequest, DeleteMultipleObjectResult> completedCallback) {
 
         return mOss.asyncDeleteMultipleObject(request, completedCallback);
     }
 
-    @Override
+    @override
      DeleteMultipleObjectResult deleteMultipleObject(DeleteMultipleObjectRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
         return mOss.deleteMultipleObject(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<AppendObjectResult> asyncAppendObject(
             AppendObjectRequest request, OSSCompletedCallback<AppendObjectRequest, AppendObjectResult> completedCallback) {
 
         return mOss.asyncAppendObject(request, completedCallback);
     }
 
-    @Override
+    @override
      AppendObjectResult appendObject(AppendObjectRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.appendObject(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<HeadObjectResult> asyncHeadObject(HeadObjectRequest request, OSSCompletedCallback<HeadObjectRequest, HeadObjectResult> completedCallback) {
 
         return mOss.asyncHeadObject(request, completedCallback);
     }
 
-    @Override
+    @override
      HeadObjectResult headObject(HeadObjectRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.headObject(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<CopyObjectResult> asyncCopyObject(CopyObjectRequest request, OSSCompletedCallback<CopyObjectRequest, CopyObjectResult> completedCallback) {
 
         return mOss.asyncCopyObject(request, completedCallback);
     }
 
-    @Override
+    @override
      CopyObjectResult copyObject(CopyObjectRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.copyObject(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<ListObjectsResult> asyncListObjects(
             ListObjectsRequest request, OSSCompletedCallback<ListObjectsRequest, ListObjectsResult> completedCallback) {
 
         return mOss.asyncListObjects(request, completedCallback);
     }
 
-    @Override
+    @override
      ListObjectsResult listObjects(ListObjectsRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.listObjects(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<InitiateMultipartUploadResult> asyncInitMultipartUpload(InitiateMultipartUploadRequest request, OSSCompletedCallback<InitiateMultipartUploadRequest, InitiateMultipartUploadResult> completedCallback) {
 
         return mOss.asyncInitMultipartUpload(request, completedCallback);
     }
 
-    @Override
+    @override
      InitiateMultipartUploadResult initMultipartUpload(InitiateMultipartUploadRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.initMultipartUpload(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<UploadPartResult> asyncUploadPart(UploadPartRequest request, OSSCompletedCallback<UploadPartRequest, UploadPartResult> completedCallback) {
 
         return mOss.asyncUploadPart(request, completedCallback);
     }
 
-    @Override
+    @override
      UploadPartResult uploadPart(UploadPartRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.uploadPart(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<CompleteMultipartUploadResult> asyncCompleteMultipartUpload(CompleteMultipartUploadRequest request, OSSCompletedCallback<CompleteMultipartUploadRequest, CompleteMultipartUploadResult> completedCallback) {
 
         return mOss.asyncCompleteMultipartUpload(request, completedCallback);
     }
 
-    @Override
+    @override
      CompleteMultipartUploadResult completeMultipartUpload(CompleteMultipartUploadRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.completeMultipartUpload(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<AbortMultipartUploadResult> asyncAbortMultipartUpload(AbortMultipartUploadRequest request, OSSCompletedCallback<AbortMultipartUploadRequest, AbortMultipartUploadResult> completedCallback) {
 
         return mOss.asyncAbortMultipartUpload(request, completedCallback);
     }
 
-    @Override
+    @override
      AbortMultipartUploadResult abortMultipartUpload(AbortMultipartUploadRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.abortMultipartUpload(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<ListPartsResult> asyncListParts(ListPartsRequest request, OSSCompletedCallback<ListPartsRequest, ListPartsResult> completedCallback) {
 
         return mOss.asyncListParts(request, completedCallback);
     }
 
-    @Override
+    @override
      ListPartsResult listParts(ListPartsRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.listParts(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<ListMultipartUploadsResult> asyncListMultipartUploads(ListMultipartUploadsRequest request, OSSCompletedCallback<ListMultipartUploadsRequest, ListMultipartUploadsResult> completedCallback) {
         return mOss.asyncListMultipartUploads(request, completedCallback);
     }
 
-    @Override
-     ListMultipartUploadsResult listMultipartUploads(ListMultipartUploadsRequest request) throws ClientException, ServiceException {
+    @override
+     ListMultipartUploadsResult listMultipartUploads(ListMultipartUploadsRequest request) throws OSSClientException, OSSServiceException {
         return mOss.listMultipartUploads(request);
     }
 
-    @Override
+    @override
      void updateCredentialProvider(OSSCredentialProvider credentialProvider) {
         mOss.updateCredentialProvider(credentialProvider);
     }
 
-    @Override
+    @override
      OSSAsyncTask<CompleteMultipartUploadResult> asyncMultipartUpload(
             MultipartUploadRequest request, OSSCompletedCallback<MultipartUploadRequest, CompleteMultipartUploadResult> completedCallback) {
 
         return mOss.asyncMultipartUpload(request, completedCallback);
     }
 
-    @Override
+    @override
      CompleteMultipartUploadResult multipartUpload(MultipartUploadRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.multipartUpload(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<ResumableUploadResult> asyncResumableUpload(
             ResumableUploadRequest request, OSSCompletedCallback<ResumableUploadRequest, ResumableUploadResult> completedCallback) {
 
         return mOss.asyncResumableUpload(request, completedCallback);
     }
 
-    @Override
+    @override
      ResumableUploadResult resumableUpload(ResumableUploadRequest request)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
         return mOss.resumableUpload(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<ResumableUploadResult> asyncSequenceUpload(ResumableUploadRequest request, OSSCompletedCallback<ResumableUploadRequest, ResumableUploadResult> completedCallback) {
         return mOss.asyncSequenceUpload(request, completedCallback);
     }
 
-    @Override
-     ResumableUploadResult sequenceUpload(ResumableUploadRequest request) throws ClientException, ServiceException {
+    @override
+     ResumableUploadResult sequenceUpload(ResumableUploadRequest request) throws OSSClientException, OSSServiceException {
         return mOss.sequenceUpload(request);
     }
 
-    @Override
-     String presignConstrainedObjectURL(GeneratePresignedUrlRequest request) throws ClientException {
+    @override
+     String presignConstrainedObjectURL(GeneratePresignedUrlRequest request) throws OSSClientException {
         return mOss.presignConstrainedObjectURL(request);
     }
 
-    @Override
+    @override
      String presignConstrainedObjectURL(String bucketName, String objectKey, int expiredTimeInSeconds)
-            throws ClientException {
+            throws OSSClientException {
 
         return mOss.presignConstrainedObjectURL(bucketName, objectKey, expiredTimeInSeconds);
     }
 
-    @Override
+    @override
      String presignObjectURL(String bucketName, String objectKey) {
 
         return mOss.presignObjectURL(bucketName, objectKey);
     }
 
-    @Override
+    @override
      bool doesObjectExist(String bucketName, String objectKey)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         return mOss.doesObjectExist(bucketName, objectKey);
     }
 
-    @Override
+    @override
      void abortResumableUpload(ResumableUploadRequest request) throws IOException {
 
         mOss.abortResumableUpload(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<TriggerCallbackResult> asyncTriggerCallback(TriggerCallbackRequest request, OSSCompletedCallback<TriggerCallbackRequest, TriggerCallbackResult> completedCallback) {
         return mOss.asyncTriggerCallback(request, completedCallback);
     }
 
-    @Override
-     TriggerCallbackResult triggerCallback(TriggerCallbackRequest request) throws ClientException, ServiceException {
+    @override
+     TriggerCallbackResult triggerCallback(TriggerCallbackRequest request) throws OSSClientException, OSSServiceException {
         return mOss.triggerCallback(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<ImagePersistResult> asyncImagePersist(ImagePersistRequest request, OSSCompletedCallback<ImagePersistRequest, ImagePersistResult> completedCallback) {
         return mOss.asyncImagePersist(request, completedCallback);
     }
 
-    @Override
-     ImagePersistResult imagePersist(ImagePersistRequest request) throws ClientException, ServiceException {
+    @override
+     ImagePersistResult imagePersist(ImagePersistRequest request) throws OSSClientException, OSSServiceException {
         return mOss.imagePersist(request);
     }
 
-    @Override
-     PutSymlinkResult putSymlink(PutSymlinkRequest request) throws ClientException, ServiceException {
+    @override
+     PutSymlinkResult putSymlink(PutSymlinkRequest request) throws OSSClientException, OSSServiceException {
         return mOss.putSymlink(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<PutSymlinkResult> asyncPutSymlink(PutSymlinkRequest request, OSSCompletedCallback<PutSymlinkRequest, PutSymlinkResult> completedCallback) {
         return mOss.asyncPutSymlink(request, completedCallback);
     }
 
-    @Override
-     GetSymlinkResult getSymlink(GetSymlinkRequest request) throws ClientException, ServiceException {
+    @override
+     GetSymlinkResult getSymlink(GetSymlinkRequest request) throws OSSClientException, OSSServiceException {
         return mOss.getSymlink(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<GetSymlinkResult> asyncGetSymlink(GetSymlinkRequest request, OSSCompletedCallback<GetSymlinkRequest, GetSymlinkResult> completedCallback) {
         return mOss.asyncGetSymlink(request, completedCallback);
     }
 
-    @Override
-     RestoreObjectResult restoreObject(RestoreObjectRequest request) throws ClientException, ServiceException {
+    @override
+     RestoreObjectResult restoreObject(RestoreObjectRequest request) throws OSSClientException, OSSServiceException {
         return mOss.restoreObject(request);
     }
 
-    @Override
+    @override
      OSSAsyncTask<RestoreObjectResult> asyncRestoreObject(RestoreObjectRequest request, OSSCompletedCallback<RestoreObjectRequest, RestoreObjectResult> completedCallback) {
         return mOss.asyncRestoreObject(request, completedCallback);
     }
 
-    @Override
+    @override
      OSSAsyncTask<ResumableDownloadResult> asyncResumableDownload(ResumableDownloadRequest request, OSSCompletedCallback<ResumableDownloadRequest, ResumableDownloadResult> completedCallback) {
         return mOss.asyncResumableDownload(request, completedCallback);
     }
 
-    @Override
-     ResumableDownloadResult syncResumableDownload(ResumableDownloadRequest request) throws ClientException, ServiceException {
+    @override
+     ResumableDownloadResult syncResumableDownload(ResumableDownloadRequest request) throws OSSClientException, OSSServiceException {
         return mOss.syncResumableDownload(request);
     }
 }

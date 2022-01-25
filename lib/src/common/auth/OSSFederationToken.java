@@ -49,7 +49,7 @@ import java.util.TimeZone;
         setExpirationInGMTFormat(expirationInGMTFormat);
     }
 
-    @Override
+    @override
      String toString() {
         return "OSSFederationToken [tempAk=" + tempAk + ", tempSk=" + tempSk + ", securityToken="
                 + securityToken + ", expiration=" + expiration + "]";

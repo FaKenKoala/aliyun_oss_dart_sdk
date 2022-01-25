@@ -31,7 +31,7 @@ package com.alibaba.sdk.android.oss.model;
         return currentAcl;
     }
 
-    @Override
+    @override
      String toString() {
         return this.ACLString;
     }

@@ -5,8 +5,8 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.alibaba.sdk.android.oss.ClientConfiguration;
-import com.alibaba.sdk.android.oss.ClientException;
-import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.OSSClientException;
+import com.alibaba.sdk.android.oss.OSSServiceException;
 import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
 import com.alibaba.sdk.android.oss.common.HttpMethod;
 import com.alibaba.sdk.android.oss.common.OSSConstants;
@@ -56,7 +56,7 @@ import okhttp3.OkHttpClient;
      static final int MAX_PART_NUMBER = 10000;
      static ExecutorService executorService =
             Executors.newFixedThreadPool(OSSConstants.DEFAULT_BASE_THREAD_POOL_SIZE, new ThreadFactory() {
-                @Override
+                @override
                  Thread newThread(Runnable r) {
                     return new Thread(r, "oss-android-api-thread");
                 }
@@ -81,7 +81,7 @@ import okhttp3.OkHttpClient;
                 .retryOnConnectionFailure(false)
                 .cache(null)
                 .hostnameVerifier(new HostnameVerifier() {
-                    @Override
+                    @override
                      bool verify(String hostname, SSLSession session) {
                         return HttpsURLConnection.getDefaultHostnameVerifier().verify(endpoint.getHost(), session);
                     }
@@ -122,7 +122,7 @@ import okhttp3.OkHttpClient;
                 .retryOnConnectionFailure(false)
                 .cache(null)
                 .hostnameVerifier(new HostnameVerifier() {
-                    @Override
+                    @override
                      bool verify(String hostname, SSLSession session) {
                         return HttpsURLConnection.getDefaultHostnameVerifier().verify(service.getHost(), session);
                     }
@@ -147,7 +147,7 @@ import okhttp3.OkHttpClient;
     }
 
      PutObjectResult syncPutObject(
-            PutObjectRequest request) throws ClientException, ServiceException {
+            PutObjectRequest request) throws OSSClientException, OSSServiceException {
         PutObjectResult result = putObject(request, null).getResult();
         checkCRC64(request, result);
         return result;
@@ -185,13 +185,13 @@ import okhttp3.OkHttpClient;
         ExecutionContext<PutObjectRequest, PutObjectResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
-                @Override
+                @override
                  void onSuccess(PutObjectRequest request, PutObjectResult result) {
                     checkCRC64(request, result, completedCallback);
                 }
 
-                @Override
-                 void onFailure(PutObjectRequest request, ClientException clientException, ServiceException serviceException) {
+                @override
+                 void onFailure(PutObjectRequest request, OSSClientException clientException, OSSServiceException serviceException) {
                     completedCallback.onFailure(request, clientException, serviceException);
                 }
             });
@@ -494,7 +494,7 @@ import okhttp3.OkHttpClient;
     }
 
      AppendObjectResult syncAppendObject(
-            AppendObjectRequest request) throws ClientException, ServiceException {
+            AppendObjectRequest request) throws OSSClientException, OSSServiceException {
         AppendObjectResult result = appendObject(request, null).getResult();
         bool checkCRC = request.getCRC64() == OSSRequest.CRC64Config.YES ? true : false;
         if (request.getInitCRC64() != null && checkCRC) {
@@ -534,7 +534,7 @@ import okhttp3.OkHttpClient;
         ExecutionContext<AppendObjectRequest, AppendObjectResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(new OSSCompletedCallback<AppendObjectRequest, AppendObjectResult>() {
-                @Override
+                @override
                  void onSuccess(AppendObjectRequest request, AppendObjectResult result) {
                     bool checkCRC = request.getCRC64() == OSSRequest.CRC64Config.YES ? true : false;
                     if (request.getInitCRC64() != null && checkCRC) {
@@ -544,8 +544,8 @@ import okhttp3.OkHttpClient;
                     checkCRC64(request, result, completedCallback);
                 }
 
-                @Override
-                 void onFailure(AppendObjectRequest request, ClientException clientException, ServiceException serviceException) {
+                @override
+                 void onFailure(AppendObjectRequest request, OSSClientException clientException, OSSServiceException serviceException) {
                     completedCallback.onFailure(request, clientException, serviceException);
                 }
             });
@@ -805,7 +805,7 @@ import okhttp3.OkHttpClient;
     }
 
      UploadPartResult syncUploadPart(
-            UploadPartRequest request) throws ClientException, ServiceException {
+            UploadPartRequest request) throws OSSClientException, OSSServiceException {
         UploadPartResult result = uploadPart(request, null).getResult();
         checkCRC64(request, result);
         return result;
@@ -833,13 +833,13 @@ import okhttp3.OkHttpClient;
         ExecutionContext<UploadPartRequest, UploadPartResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(new OSSCompletedCallback<UploadPartRequest, UploadPartResult>() {
-                @Override
+                @override
                  void onSuccess(UploadPartRequest request, UploadPartResult result) {
                     checkCRC64(request, result, completedCallback);
                 }
 
-                @Override
-                 void onFailure(UploadPartRequest request, ClientException clientException, ServiceException serviceException) {
+                @override
+                 void onFailure(UploadPartRequest request, OSSClientException clientException, OSSServiceException serviceException) {
                     completedCallback.onFailure(request, clientException, serviceException);
                 }
             });
@@ -853,7 +853,7 @@ import okhttp3.OkHttpClient;
     }
 
      CompleteMultipartUploadResult syncCompleteMultipartUpload(
-            CompleteMultipartUploadRequest request) throws ClientException, ServiceException {
+            CompleteMultipartUploadRequest request) throws OSSClientException, OSSServiceException {
         CompleteMultipartUploadResult result = completeMultipartUpload(request, null).getResult();
         if (result.getServerCRC() != null) {
             int crc64 = calcObjectCRCFromParts(request.getPartETags());
@@ -890,7 +890,7 @@ import okhttp3.OkHttpClient;
         ExecutionContext<CompleteMultipartUploadRequest, CompleteMultipartUploadResult> executionContext = new ExecutionContext(getInnerClient(), request, applicationContext);
         if (completedCallback != null) {
             executionContext.setCompletedCallback(new OSSCompletedCallback<CompleteMultipartUploadRequest, CompleteMultipartUploadResult>() {
-                @Override
+                @override
                  void onSuccess(CompleteMultipartUploadRequest request, CompleteMultipartUploadResult result) {
                     if (result.getServerCRC() != null) {
                         int crc64 = calcObjectCRCFromParts(request.getPartETags());
@@ -899,8 +899,8 @@ import okhttp3.OkHttpClient;
                     checkCRC64(request, result, completedCallback);
                 }
 
-                @Override
-                 void onFailure(CompleteMultipartUploadRequest request, ClientException clientException, ServiceException serviceException) {
+                @override
+                 void onFailure(CompleteMultipartUploadRequest request, OSSClientException clientException, OSSServiceException serviceException) {
                     completedCallback.onFailure(request, clientException, serviceException);
                 }
             });
@@ -1079,12 +1079,12 @@ import okhttp3.OkHttpClient;
     }
 
      <Request extends OSSRequest, Result extends OSSResult> void checkCRC64(Request request
-            , Result result) throws ClientException {
+            , Result result) throws OSSClientException {
         if (request.getCRC64() == OSSRequest.CRC64Config.YES ? true : false) {
             try {
                 OSSUtils.checkChecksum(result.getClientCRC(), result.getServerCRC(), result.getRequestId());
             } catch (InconsistentException e) {
-                throw new ClientException(e.getMessage(), e);
+                throw new OSSClientException(e.getMessage(), e);
             }
         }
     }
@@ -1096,7 +1096,7 @@ import okhttp3.OkHttpClient;
             if (completedCallback != null) {
                 completedCallback.onSuccess(request, result);
             }
-        } catch (ClientException e) {
+        } catch (OSSClientException e) {
             if (completedCallback != null) {
                 completedCallback.onFailure(request, e, null);
             }
@@ -1149,7 +1149,7 @@ import okhttp3.OkHttpClient;
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     TriggerCallbackResult asyncTriggerCallback(TriggerCallbackRequest request) throws ClientException, ServiceException {
+     TriggerCallbackResult asyncTriggerCallback(TriggerCallbackRequest request) throws OSSClientException, OSSServiceException {
         return triggerCallback(request, null).getResult();
     }
 
@@ -1177,7 +1177,7 @@ import okhttp3.OkHttpClient;
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     PutSymlinkResult syncPutSymlink(PutSymlinkRequest request) throws ClientException, ServiceException {
+     PutSymlinkResult syncPutSymlink(PutSymlinkRequest request) throws OSSClientException, OSSServiceException {
         return putSymlink(request, null).getResult();
     }
 
@@ -1211,7 +1211,7 @@ import okhttp3.OkHttpClient;
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     GetSymlinkResult syncGetSymlink(GetSymlinkRequest request) throws ClientException, ServiceException {
+     GetSymlinkResult syncGetSymlink(GetSymlinkRequest request) throws OSSClientException, OSSServiceException {
         return getSymlink(request, null).getResult();
     }
 
@@ -1236,7 +1236,7 @@ import okhttp3.OkHttpClient;
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     RestoreObjectResult syncRestoreObject(RestoreObjectRequest request) throws ClientException, ServiceException {
+     RestoreObjectResult syncRestoreObject(RestoreObjectRequest request) throws OSSClientException, OSSServiceException {
         return restoreObject(request, null).getResult();
     }
 

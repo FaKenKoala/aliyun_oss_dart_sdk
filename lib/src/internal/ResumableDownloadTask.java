@@ -2,8 +2,8 @@ package com.alibaba.sdk.android.oss.internal;
 
 import android.util.Log;
 
-import com.alibaba.sdk.android.oss.ClientException;
-import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.OSSClientException;
+import com.alibaba.sdk.android.oss.OSSServiceException;
 import com.alibaba.sdk.android.oss.TaskCancelException;
 import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
 import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
@@ -58,7 +58,7 @@ import java.util.zip.CheckedInputStream;
      ThreadPoolExecutor mPoolExecutor =
             new ThreadPoolExecutor(MAX_CORE_POOL_SIZE, MAX_IMUM_POOL_SIZE, KEEP_ALIVE_TIME,
                     TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(MAX_QUEUE_SIZE), new ThreadFactory() {
-                @Override
+                @override
                  Thread newThread(Runnable runnable) {
                     return new Thread(runnable, "oss-android-multipart-thread");
                 }
@@ -88,7 +88,7 @@ import java.util.zip.CheckedInputStream;
     }
 
 
-    @Override
+    @override
      Result call() throws Exception {
         try {
             checkInitData();
@@ -97,17 +97,17 @@ import java.util.zip.CheckedInputStream;
                 mCompletedCallback.onSuccess(mRequest, result);
             }
             return (Result) result;
-        } catch (ServiceException e) {
+        } catch (OSSServiceException e) {
             if (mCompletedCallback != null) {
                 mCompletedCallback.onFailure(mRequest, null, e);
             }
             throw e;
         } catch (Exception e) {
-            ClientException temp;
-            if (e instanceof ClientException) {
-                temp = (ClientException) e;
+            OSSClientException temp;
+            if (e instanceof OSSClientException) {
+                temp = (OSSClientException) e;
             } else {
-                temp = new ClientException(e.toString(), e);
+                temp = new OSSClientException(e.toString(), e);
             }
             if (mCompletedCallback != null) {
                 mCompletedCallback.onFailure(mRequest, temp, null);
@@ -116,10 +116,10 @@ import java.util.zip.CheckedInputStream;
         }
     }
 
-     void checkInitData() throws ClientException, ServiceException, IOException {
+     void checkInitData() throws OSSClientException, OSSServiceException, IOException {
 
         if (mRequest.getRange() != null && !mRequest.getRange().checkIsValid()) {
-            throw new ClientException("Range is invalid");
+            throw new OSSClientException("Range is invalid");
         };
         String recordFileName = BinaryUtil.calculateMd5Str((mRequest.getBucketName() + mRequest.getObjectKey()
                 + String.valueOf(mRequest.getPartSize()) + (mRequest.getCRC64() == OSSRequest.CRC64Config.YES ? "-crc64" : "")).getBytes());
@@ -156,7 +156,7 @@ import java.util.zip.CheckedInputStream;
         return flag;
     }
 
-     void initCheckPoint() throws ClientException, ServiceException, IOException {
+     void initCheckPoint() throws OSSClientException, OSSServiceException, IOException {
         FileStat fileStat = FileStat.getFileStat(mOperation, mRequest.getBucketName(), mRequest.getObjectKey());
         Range range = correctRange(mRequest.getRange(), fileStat.fileLength);
         int downloadSize = range.getEnd() - range.getBegin();
@@ -168,7 +168,7 @@ import java.util.zip.CheckedInputStream;
         mCheckPoint.parts = splitFile(range, mCheckPoint.fileStat.fileLength, mRequest.getPartSize());
     }
 
-     ResumableDownloadResult doMultipartDownload() throws ClientException, ServiceException, IOException, InterruptedException {
+     ResumableDownloadResult doMultipartDownload() throws OSSClientException, OSSServiceException, IOException, InterruptedException {
         checkCancel();
         ResumableDownloadResult resumableDownloadResult = new ResumableDownloadResult();
 
@@ -179,7 +179,7 @@ import java.util.zip.CheckedInputStream;
             checkException();
             if (mPoolExecutor != null && !part.isCompleted) {
                 mPoolExecutor.execute(new Runnable() {
-                    @Override
+                    @override
                      void run() {
                         downloadPart(result, part);
                         Log.i("partResults", "start: " + part.start + ", end: " + part.end);
@@ -206,7 +206,7 @@ import java.util.zip.CheckedInputStream;
         }
         checkException();
         Collections.sort(result.partResults, new Comparator<DownloadPartResult>() {
-            @Override
+            @override
              int compare(DownloadPartResult downloadPartResult, DownloadPartResult t1) {
                 return downloadPartResult.partNumber - t1.partNumber;
             }
@@ -462,18 +462,18 @@ import java.util.zip.CheckedInputStream;
         }
     }
 
-     void checkException() throws IOException, ServiceException, ClientException {
+     void checkException() throws IOException, OSSServiceException, OSSClientException {
         if (mDownloadException != null) {
             releasePool();
             if (mDownloadException instanceof IOException) {
                 throw (IOException) mDownloadException;
-            } else if (mDownloadException instanceof ServiceException) {
-                throw (ServiceException) mDownloadException;
-            } else if (mDownloadException instanceof ClientException) {
-                throw (ClientException) mDownloadException;
+            } else if (mDownloadException instanceof OSSServiceException) {
+                throw (OSSServiceException) mDownloadException;
+            } else if (mDownloadException instanceof OSSClientException) {
+                throw (OSSClientException) mDownloadException;
             } else {
-                ClientException clientException =
-                        new ClientException(mDownloadException.getMessage(), mDownloadException);
+                OSSClientException clientException =
+                        new OSSClientException(mDownloadException.getMessage(), mDownloadException);
                 throw clientException;
             }
         }
@@ -486,10 +486,10 @@ import java.util.zip.CheckedInputStream;
         return true;
     }
 
-     void checkCancel() throws ClientException {
+     void checkCancel() throws OSSClientException {
         if (mContext.getCancellationHandler().isCancelled()) {
             TaskCancelException e = new TaskCancelException("Resumable download cancel");
-            throw new ClientException(e.getMessage(), e, true);
+            throw new OSSClientException(e.getMessage(), e, true);
         }
     }
 
@@ -504,7 +504,7 @@ import java.util.zip.CheckedInputStream;
          int fileStart; // start index of file
          int crc; // part crc.
 
-        @Override
+        @override
          int hashCode() {
             final int prime = 31;
             int result = 1;
@@ -584,7 +584,7 @@ import java.util.zip.CheckedInputStream;
         /**
          * Check if the object matches the checkpoint information.
          */
-         synchronized bool isValid(InternalRequestOperation operation) throws ClientException, ServiceException {
+         synchronized bool isValid(InternalRequestOperation operation) throws OSSClientException, OSSServiceException {
             // Compare magic and md5 of checkpoint
             if (this.md5 != hashCode()) {
                 return false;
@@ -607,7 +607,7 @@ import java.util.zip.CheckedInputStream;
             return true;
         }
 
-        @Override
+        @override
          int hashCode() {
             final int prime = 31;
             int result = 1;
@@ -642,7 +642,7 @@ import java.util.zip.CheckedInputStream;
          int serverCRC;
          String requestId;
 
-         static FileStat getFileStat(InternalRequestOperation operation, String bucketName, String objectKey) throws ClientException, ServiceException {
+         static FileStat getFileStat(InternalRequestOperation operation, String bucketName, String objectKey) throws OSSClientException, OSSServiceException {
             HeadObjectRequest request = new HeadObjectRequest(bucketName, objectKey);
             HeadObjectResult result = operation.headObject(request, null).getResult();
 
@@ -656,7 +656,7 @@ import java.util.zip.CheckedInputStream;
             return fileStat;
         }
 
-        @Override
+        @override
          int hashCode() {
             final int prime = 31;
             int result = 1;

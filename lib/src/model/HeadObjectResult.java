@@ -16,7 +16,7 @@ package com.alibaba.sdk.android.oss.model;
         this.metadata = metadata;
     }
 
-    @Override
+    @override
      String toString() {
         String desc = String.format("HeadObjectResult<%s>:\n metadata:%s", super.toString(), metadata.toString());
         return desc;

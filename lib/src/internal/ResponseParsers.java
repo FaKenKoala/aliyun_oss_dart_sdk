@@ -3,8 +3,8 @@ package com.alibaba.sdk.android.oss.internal;
 import android.text.TextUtils;
 import android.util.Xml;
 
-import com.alibaba.sdk.android.oss.ClientException;
-import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.OSSClientException;
+import com.alibaba.sdk.android.oss.OSSServiceException;
 import com.alibaba.sdk.android.oss.common.OSSHeaders;
 import com.alibaba.sdk.android.oss.common.OSSLog;
 import com.alibaba.sdk.android.oss.common.utils.CRC64;
@@ -843,13 +843,13 @@ import java.util.Map;
                     }
                 }
             } catch (IOException e) {
-                return new ClientException(e.getMessage(), e);
+                return new OSSClientException(e.getMessage(), e);
             } catch (XmlPullParserException e) {
-                return new ClientException(e.getMessage(), e);
+                return new OSSClientException(e.getMessage(), e);
             }
         }
 
-        ServiceException serviceException = new ServiceException(statusCode, message, code, requestId, hostId, errorMessage);
+        OSSServiceException serviceException = new OSSServiceException(statusCode, message, code, requestId, hostId, errorMessage);
         if (!TextUtils.isEmpty(partEtag)) {
             serviceException.setPartEtag(partEtag);
         }
@@ -864,7 +864,7 @@ import java.util.Map;
 
      static final class PutObjectResponseParser extends AbstractResponseParser<PutObjectResult> {
 
-        @Override
+        @override
          PutObjectResult parseData(ResponseMessage response, PutObjectResult result)
                 throws IOException {
             result.setETag(trimQuotes(response.getHeaders().get(OSSHeaders.ETAG)));
@@ -878,7 +878,7 @@ import java.util.Map;
 
      static final class AppendObjectResponseParser extends AbstractResponseParser<AppendObjectResult> {
 
-        @Override
+        @override
          AppendObjectResult parseData(ResponseMessage response, AppendObjectResult result) throws IOException {
             String nextPosition = response.getHeaders().get(OSSHeaders.OSS_NEXT_APPEND_POSITION);
             if (nextPosition != null) {
@@ -891,7 +891,7 @@ import java.util.Map;
 
      static final class HeadObjectResponseParser extends AbstractResponseParser<HeadObjectResult> {
 
-        @Override
+        @override
          HeadObjectResult parseData(ResponseMessage response, HeadObjectResult result) throws Exception {
             result.setMetadata(parseObjectMetadata(result.getResponseHeader()));
             return result;
@@ -900,7 +900,7 @@ import java.util.Map;
 
      static final class GetObjectResponseParser extends AbstractResponseParser<GetObjectResult> {
 
-        @Override
+        @override
          GetObjectResult parseData(ResponseMessage response, GetObjectResult result) throws Exception {
             result.setMetadata(parseObjectMetadata(result.getResponseHeader()));
             result.setContentLength(response.getContentLength());
@@ -914,7 +914,7 @@ import java.util.Map;
             return result;
         }
 
-        @Override
+        @override
          bool needCloseResponse() {
             // keep body stream open for reading content
             return false;
@@ -923,7 +923,7 @@ import java.util.Map;
 
      static final class GetObjectACLResponseParser extends AbstractResponseParser<GetObjectACLResult> {
 
-        @Override
+        @override
         GetObjectACLResult parseData(ResponseMessage response, GetObjectACLResult result) throws Exception {
             result = parseGetObjectACLResponse(response.getContent(), result);
             return result;
@@ -932,7 +932,7 @@ import java.util.Map;
 
      static final class CopyObjectResponseParser extends AbstractResponseParser<CopyObjectResult> {
 
-        @Override
+        @override
          CopyObjectResult parseData(ResponseMessage response, CopyObjectResult result) throws Exception {
             result = parseCopyObjectResponseXML(response.getContent(), result);
             return result;
@@ -941,7 +941,7 @@ import java.util.Map;
 
      static final class CreateBucketResponseParser extends AbstractResponseParser<CreateBucketResult> {
 
-        @Override
+        @override
          CreateBucketResult parseData(ResponseMessage response, CreateBucketResult result) throws Exception {
             if (result.getResponseHeader().containsKey("Location")) {
                 result.bucketLocation = result.getResponseHeader().get("Location");
@@ -952,7 +952,7 @@ import java.util.Map;
 
      static final class DeleteBucketResponseParser extends AbstractResponseParser<DeleteBucketResult> {
 
-        @Override
+        @override
          DeleteBucketResult parseData(ResponseMessage response, DeleteBucketResult result) throws Exception {
             return result;
         }
@@ -960,7 +960,7 @@ import java.util.Map;
 
      static final class GetBucketInfoResponseParser extends AbstractResponseParser<GetBucketInfoResult> {
 
-        @Override
+        @override
          GetBucketInfoResult parseData(ResponseMessage response, GetBucketInfoResult result) throws Exception {
             result = parseGetBucketInfoResponse(response.getContent(), result);
             return result;
@@ -969,7 +969,7 @@ import java.util.Map;
 
      static final class GetBucketACLResponseParser extends AbstractResponseParser<GetBucketACLResult> {
 
-        @Override
+        @override
          GetBucketACLResult parseData(ResponseMessage response, GetBucketACLResult result) throws Exception {
             result = parseGetBucketACLResponse(response.getContent(), result);
             return result;
@@ -978,7 +978,7 @@ import java.util.Map;
 
      static final class PutBucketRefererResponseParser extends AbstractResponseParser<PutBucketRefererResult> {
 
-        @Override
+        @override
          PutBucketRefererResult parseData(ResponseMessage response, PutBucketRefererResult result) throws Exception {
             return result;
         }
@@ -986,7 +986,7 @@ import java.util.Map;
 
      static final class GetBucketRefererResponseParser extends AbstractResponseParser<GetBucketRefererResult> {
 
-        @Override
+        @override
          GetBucketRefererResult parseData(ResponseMessage response, GetBucketRefererResult result) throws Exception {
             result = parseGetBucketRefererResponse(response.getContent(), result);
             return result;
@@ -995,7 +995,7 @@ import java.util.Map;
 
      static final class PutBucketLoggingResponseParser extends AbstractResponseParser<PutBucketLoggingResult> {
 
-        @Override
+        @override
          PutBucketLoggingResult parseData(ResponseMessage response, PutBucketLoggingResult result) throws Exception {
             return result;
         }
@@ -1003,7 +1003,7 @@ import java.util.Map;
 
      static final class GetBucketLoggingResponseParser extends AbstractResponseParser<GetBucketLoggingResult> {
 
-        @Override
+        @override
          GetBucketLoggingResult parseData(ResponseMessage response, GetBucketLoggingResult result) throws Exception {
             result = parseGetBucketLoggingResponse(response.getContent(), result);
             return result;
@@ -1012,7 +1012,7 @@ import java.util.Map;
 
      static final class DeleteBucketLoggingResponseParser extends AbstractResponseParser<DeleteBucketLoggingResult> {
 
-        @Override
+        @override
          DeleteBucketLoggingResult parseData(ResponseMessage response, DeleteBucketLoggingResult result) throws Exception {
             return result;
         }
@@ -1020,7 +1020,7 @@ import java.util.Map;
 
      static final class PutBucketLifecycleResponseParser extends AbstractResponseParser<PutBucketLifecycleResult> {
 
-        @Override
+        @override
          PutBucketLifecycleResult parseData(ResponseMessage response, PutBucketLifecycleResult result) throws Exception {
             return result;
         }
@@ -1028,7 +1028,7 @@ import java.util.Map;
 
      static final class GetBucketLifecycleResponseParser extends AbstractResponseParser<GetBucketLifecycleResult> {
 
-        @Override
+        @override
          GetBucketLifecycleResult parseData(ResponseMessage response, GetBucketLifecycleResult result) throws Exception {
             result = parseGetBucketLifecycleResponse(response.getContent(), result);
             return result;
@@ -1037,7 +1037,7 @@ import java.util.Map;
 
      static final class DeleteBucketLifecycleResponseParser extends AbstractResponseParser<DeleteBucketLifecycleResult> {
 
-        @Override
+        @override
          DeleteBucketLifecycleResult parseData(ResponseMessage response, DeleteBucketLifecycleResult result) throws Exception {
             return result;
         }
@@ -1045,7 +1045,7 @@ import java.util.Map;
 
      static final class DeleteObjectResponseParser extends AbstractResponseParser<DeleteObjectResult> {
 
-        @Override
+        @override
          DeleteObjectResult parseData(ResponseMessage response, DeleteObjectResult result) throws Exception {
             return result;
         }
@@ -1053,7 +1053,7 @@ import java.util.Map;
 
      static final class DeleteMultipleObjectResponseParser extends AbstractResponseParser<DeleteMultipleObjectResult> {
 
-        @Override
+        @override
         DeleteMultipleObjectResult parseData(ResponseMessage response, DeleteMultipleObjectResult result) throws Exception {
             result = parseDeleteMultipleObjectResponse(response.getContent(), result);
             return result;
@@ -1062,7 +1062,7 @@ import java.util.Map;
 
      static final class ListObjectsResponseParser extends AbstractResponseParser<ListObjectsResult> {
 
-        @Override
+        @override
          ListObjectsResult parseData(ResponseMessage response, ListObjectsResult result) throws Exception {
             result = parseObjectListResponse(response.getContent(), result);
             return result;
@@ -1071,7 +1071,7 @@ import java.util.Map;
 
      static final class ListBucketResponseParser extends AbstractResponseParser<ListBucketsResult> {
 
-        @Override
+        @override
         ListBucketsResult parseData(ResponseMessage response, ListBucketsResult result) throws Exception {
             result = parseBucketListResponse(response.getContent(), result);
             return result;
@@ -1080,7 +1080,7 @@ import java.util.Map;
 
      static final class InitMultipartResponseParser extends AbstractResponseParser<InitiateMultipartUploadResult> {
 
-        @Override
+        @override
          InitiateMultipartUploadResult parseData(ResponseMessage response, InitiateMultipartUploadResult result) throws Exception {
             return parseInitMultipartResponseXML(response.getContent(), result);
         }
@@ -1088,7 +1088,7 @@ import java.util.Map;
 
      static final class UploadPartResponseParser extends AbstractResponseParser<UploadPartResult> {
 
-        @Override
+        @override
          UploadPartResult parseData(ResponseMessage response, UploadPartResult result) throws Exception {
             result.setETag(trimQuotes(response.getHeaders().get(OSSHeaders.ETAG)));
             return result;
@@ -1097,7 +1097,7 @@ import java.util.Map;
 
      static final class AbortMultipartUploadResponseParser extends AbstractResponseParser<AbortMultipartUploadResult> {
 
-        @Override
+        @override
          AbortMultipartUploadResult parseData(ResponseMessage response, AbortMultipartUploadResult result) throws Exception {
             return result;
         }
@@ -1105,7 +1105,7 @@ import java.util.Map;
 
      static final class CompleteMultipartUploadResponseParser extends AbstractResponseParser<CompleteMultipartUploadResult> {
 
-        @Override
+        @override
          CompleteMultipartUploadResult parseData(ResponseMessage response, CompleteMultipartUploadResult result) throws Exception {
             if (response.getHeaders().get(OSSHeaders.CONTENT_TYPE).equals("application/xml")) {
                 result = parseCompleteMultipartUploadResponseXML(response.getContent(), result);
@@ -1121,7 +1121,7 @@ import java.util.Map;
 
      static final class ListPartsResponseParser extends AbstractResponseParser<ListPartsResult> {
 
-        @Override
+        @override
          ListPartsResult parseData(ResponseMessage response, ListPartsResult result) throws Exception {
             result = parseListPartsResponseXML(response.getContent(), result);
             return result;
@@ -1130,7 +1130,7 @@ import java.util.Map;
 
      static final class ListMultipartUploadsResponseParser extends AbstractResponseParser<ListMultipartUploadsResult> {
 
-        @Override
+        @override
          ListMultipartUploadsResult parseData(ResponseMessage response, ListMultipartUploadsResult result) throws Exception {
             return result.parseData(response);
         }
@@ -1138,7 +1138,7 @@ import java.util.Map;
 
      static final class TriggerCallbackResponseParser extends AbstractResponseParser<TriggerCallbackResult> {
 
-        @Override
+        @override
          TriggerCallbackResult parseData(ResponseMessage response, TriggerCallbackResult result) throws Exception {
             String body = response.getResponse().body().string();
             if (!TextUtils.isEmpty(body)) {
@@ -1150,7 +1150,7 @@ import java.util.Map;
 
      static final class ImagePersistResponseParser extends AbstractResponseParser<ImagePersistResult> {
 
-        @Override
+        @override
          ImagePersistResult parseData(ResponseMessage response, ImagePersistResult result) throws Exception {
             return result;
         }
@@ -1158,7 +1158,7 @@ import java.util.Map;
 
      static final class PutSymlinkResponseParser extends AbstractResponseParser<PutSymlinkResult> {
 
-        @Override
+        @override
         PutSymlinkResult parseData(ResponseMessage response, PutSymlinkResult result) throws Exception {
             return result;
         }
@@ -1166,7 +1166,7 @@ import java.util.Map;
 
      static final class GetSymlinkResponseParser extends AbstractResponseParser<GetSymlinkResult> {
 
-        @Override
+        @override
         GetSymlinkResult parseData(ResponseMessage response, GetSymlinkResult result) throws Exception {
             result.setTargetObjectName(response.getHeaders().get(OSSHeaders.OSS_HEADER_SYMLINK_TARGET));
             return result;
@@ -1175,7 +1175,7 @@ import java.util.Map;
 
      static final class RestoreObjectResponseParser extends AbstractResponseParser<RestoreObjectResult> {
 
-        @Override
+        @override
         RestoreObjectResult parseData(ResponseMessage response, RestoreObjectResult result) throws Exception {
             return result;
         }

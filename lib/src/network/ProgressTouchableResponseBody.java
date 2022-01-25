@@ -31,17 +31,17 @@ import okio.Source;
         this.request = (T) context.getRequest();
     }
 
-    @Override
+    @override
      MediaType contentType() {
         return mResponseBody.contentType();
     }
 
-    @Override
+    @override
      int contentLength() {
         return mResponseBody.contentLength();
     }
 
-    @Override
+    @override
      BufferedSource source() {
         if (mBufferedSource == null) {
             mBufferedSource = Okio.buffer(source(mResponseBody.source()));
@@ -53,7 +53,7 @@ import okio.Source;
         return new ForwardingSource(source) {
              int totalBytesRead = 0L;
 
-            @Override
+            @override
              int read(Buffer sink, int byteCount) throws IOException {
                 int bytesRead = super.read(sink, byteCount);
                 totalBytesRead += bytesRead != -1 ? bytesRead : 0;

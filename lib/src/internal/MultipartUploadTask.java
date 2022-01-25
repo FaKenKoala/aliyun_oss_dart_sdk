@@ -1,7 +1,7 @@
 package com.alibaba.sdk.android.oss.internal;
 
-import com.alibaba.sdk.android.oss.ClientException;
-import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.OSSClientException;
+import com.alibaba.sdk.android.oss.OSSServiceException;
 import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
 import com.alibaba.sdk.android.oss.model.AbortMultipartUploadRequest;
 import com.alibaba.sdk.android.oss.model.CompleteMultipartUploadResult;
@@ -26,8 +26,8 @@ import java.util.concurrent.Callable;
         super(operation, request, completedCallback, context);
     }
 
-    @Override
-     void initMultipartUploadId() throws ClientException, ServiceException {
+    @override
+     void initMultipartUploadId() throws OSSClientException, OSSServiceException {
         InitiateMultipartUploadRequest init = new InitiateMultipartUploadRequest(
                 mRequest.getBucketName(), mRequest.getObjectKey(), mRequest.getMetadata());
 
@@ -37,8 +37,8 @@ import java.util.concurrent.Callable;
         mRequest.setUploadId(mUploadId);
     }
 
-    @Override
-     CompleteMultipartUploadResult doMultipartUpload() throws IOException, ServiceException, ClientException, InterruptedException {
+    @override
+     CompleteMultipartUploadResult doMultipartUpload() throws IOException, OSSServiceException, OSSClientException, InterruptedException {
         checkCancel();
         int readByte = mPartAttr[0];
         final int partNumber = mPartAttr[1];
@@ -54,7 +54,7 @@ import java.util.concurrent.Callable;
                 final int readIndex = i;
                 currentLength += byteCount;
                 mPoolExecutor.execute(new Runnable() {
-                    @Override
+                    @override
                      void run() {
                         uploadPart(readIndex, byteCount, partNumber);
                     }
@@ -78,7 +78,7 @@ import java.util.concurrent.Callable;
         return completeResult;
     }
 
-    @Override
+    @override
      void abortThisUpload() {
         if (mUploadId != null) {
             AbortMultipartUploadRequest abort = new AbortMultipartUploadRequest(
@@ -87,7 +87,7 @@ import java.util.concurrent.Callable;
         }
     }
 
-    @Override
+    @override
      void processException(Exception e) {
         synchronized (mLock) {
             mPartExceptionCount++;
@@ -98,7 +98,7 @@ import java.util.concurrent.Callable;
         }
     }
 
-    @Override
+    @override
      void preUploadPart(int readIndex, int byteCount, int partNumber) throws Exception {
         checkException();
     }

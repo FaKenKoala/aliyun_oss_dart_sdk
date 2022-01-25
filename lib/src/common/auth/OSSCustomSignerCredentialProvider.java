@@ -21,7 +21,7 @@ package com.alibaba.sdk.android.oss.common.auth;
      */
      abstract String signContent(String content);
 
-    @Override
+    @override
      OSSFederationToken getFederationToken() {
         return null;
     }

@@ -57,7 +57,7 @@ import java.io.InputStream;
         this.contentLength = contentLength;
     }
 
-    @Override
+    @override
      int getClientCRC() {
         if (objectContent != null && (objectContent instanceof CheckCRC64DownloadInputStream)) {
             return ((CheckCRC64DownloadInputStream) objectContent).getClientCRC64();

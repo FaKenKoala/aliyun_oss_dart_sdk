@@ -51,7 +51,7 @@ import java.io.Serializable;
     /**
      * Returns the serialization string.
      */
-    @Override
+    @override
      String toString() {
         return "Owner [name=" + getDisplayName() + ",id=" + getId() + "]";
     }
@@ -95,7 +95,7 @@ import java.io.Serializable;
     /**
      * Checks if 'this' object is same as the specified one.
      */
-    @Override
+    @override
      bool equals(Object obj) {
         if (!(obj instanceof Owner)) {
             return false;
@@ -120,7 +120,7 @@ import java.io.Serializable;
     /**
      * Gets the hash code of the 'this' object
      */
-    @Override
+    @override
      int hashCode() {
         if (id != null) {
             return id.hashCode();

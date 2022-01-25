@@ -3,8 +3,8 @@ package com.alibaba.sdk.android.oss.internal;
 import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 
-import com.alibaba.sdk.android.oss.ClientException;
-import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.OSSClientException;
+import com.alibaba.sdk.android.oss.OSSServiceException;
 import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
 import com.alibaba.sdk.android.oss.common.OSSLog;
 import com.alibaba.sdk.android.oss.common.utils.BinaryUtil;
@@ -58,8 +58,8 @@ import java.util.concurrent.Callable;
         mSp = OSSSharedPreferences.instance(mContext.getApplicationContext());
     }
 
-    @Override
-     void initMultipartUploadId() throws IOException, ClientException, ServiceException {
+    @override
+     void initMultipartUploadId() throws IOException, OSSClientException, OSSServiceException {
 
         Map<Integer, int> recordCrc64 = null;
 
@@ -150,20 +150,20 @@ import java.util.concurrent.Callable;
                             bool isTotal = part.getPartNumber() == partTotalNumber;
 
                             if (isTotal && part.getSize() != mLastPartSize){
-                                throw new ClientException("current part size " + part.getSize() + " setting is inconsistent with PartSize : " + partSize + " or lastPartSize : " + mLastPartSize);
+                                throw new OSSClientException("current part size " + part.getSize() + " setting is inconsistent with PartSize : " + partSize + " or lastPartSize : " + mLastPartSize);
                             }
 
                             if (!isTotal && part.getSize() != partSize){
-                                throw new ClientException("current part size " + part.getSize() + " setting is inconsistent with PartSize : " + partSize + " or lastPartSize : " + mLastPartSize);
+                                throw new OSSClientException("current part size " + part.getSize() + " setting is inconsistent with PartSize : " + partSize + " or lastPartSize : " + mLastPartSize);
                             }
 
 //                            if (part.getPartNumber() == partTotalNumber){
 //                                if (part.getSize() != mLastPartSize){
-//                                    throw new ClientException("current part size " + partSize + " setting is inconsistent with PartSize : " + mPartAttr[0] + " or lastPartSize : " + mLastPartSize);
+//                                    throw new OSSClientException("current part size " + partSize + " setting is inconsistent with PartSize : " + mPartAttr[0] + " or lastPartSize : " + mLastPartSize);
 //                                }
 //                            }else{
 //                                if (part.getSize() != partSize){
-//                                    throw new ClientException("current part size " + partSize + " setting is inconsistent with PartSize : " + mPartAttr[0] + " or lastPartSize : " + mLastPartSize);
+//                                    throw new OSSClientException("current part size " + partSize + " setting is inconsistent with PartSize : " + mPartAttr[0] + " or lastPartSize : " + mLastPartSize);
 //                                }
 //                            }
 
@@ -171,14 +171,14 @@ import java.util.concurrent.Callable;
                             mUploadedLength += part.getSize();
                             mAlreadyUploadIndex.add(part.getPartNumber());
                         }
-                    } catch (ServiceException e) {
+                    } catch (OSSServiceException e) {
                         isTruncated = false;
                         if (e.getStatusCode() == 404) {
                             mUploadId = null;
                         } else {
                             throw e;
                         }
-                    } catch (ClientException e) {
+                    } catch (OSSClientException e) {
                         isTruncated = false;
                         throw e;
                     }
@@ -188,7 +188,7 @@ import java.util.concurrent.Callable;
             }
 
             if (!mRecordFile.exists() && !mRecordFile.createNewFile()) {
-                throw new ClientException("Can't create file at path: " + mRecordFile.getAbsolutePath()
+                throw new OSSClientException("Can't create file at path: " + mRecordFile.getAbsolutePath()
                         + "\nPlease make sure the directory exist!");
             }
         }
@@ -211,8 +211,8 @@ import java.util.concurrent.Callable;
         mRequest.setUploadId(mUploadId);
     }
 
-    @Override
-     ResumableUploadResult doMultipartUpload() throws IOException, ClientException, ServiceException, InterruptedException {
+    @override
+     ResumableUploadResult doMultipartUpload() throws IOException, OSSClientException, OSSServiceException, InterruptedException {
 
         int tempUploadedLength = mUploadedLength;
         checkCancel();
@@ -223,13 +223,13 @@ import java.util.concurrent.Callable;
 
         if (mPartETags.size() > 0 && mAlreadyUploadIndex.size() > 0) { //revert progress
             if (mUploadedLength > mFileLength) {
-                throw new ClientException("The uploading file is inconsistent with before");
+                throw new OSSClientException("The uploading file is inconsistent with before");
             }
 
 //            int firstPartSize = mPartETags.get(0).getPartSize();
 //            OSSLog.logDebug("[initUploadId] - firstPartSize : " + firstPartSize);
 //            if (firstPartSize > 0 && firstPartSize != readByte && firstPartSize < mFileLength) {
-//                throw new ClientException("current part size " + readByte + " setting is inconsistent with before " + firstPartSize);
+//                throw new OSSClientException("current part size " + readByte + " setting is inconsistent with before " + firstPartSize);
 //            }
 
             int revertUploadedLength = mUploadedLength;
@@ -262,7 +262,7 @@ import java.util.concurrent.Callable;
                 final int readIndex = i;
                 tempUploadedLength += byteCount;
                 mPoolExecutor.execute(new Runnable() {
-                    @Override
+                    @override
                      void run() {
                         uploadPart(readIndex, byteCount, partNumber);
                     }
@@ -294,8 +294,8 @@ import java.util.concurrent.Callable;
         return result;
     }
 
-    @Override
-     void checkException() throws IOException, ServiceException, ClientException {
+    @override
+     void checkException() throws IOException, OSSServiceException, OSSClientException {
         if (mContext.getCancellationHandler().isCancelled()) {
             if (mRequest.deleteUploadOnCancelling()) {
                 abortThisUpload();
@@ -330,7 +330,7 @@ import java.util.concurrent.Callable;
         super.checkException();
     }
 
-    @Override
+    @override
      void abortThisUpload() {
         if (mUploadId != null) {
             AbortMultipartUploadRequest abort = new AbortMultipartUploadRequest(
@@ -339,7 +339,7 @@ import java.util.concurrent.Callable;
         }
     }
 
-    @Override
+    @override
      void processException(Exception e) {
         synchronized (mLock) {
             mPartExceptionCount++;
@@ -357,7 +357,7 @@ import java.util.concurrent.Callable;
         }
     }
 
-    @Override
+    @override
      void uploadPartFinish(PartETag partETag) throws Exception {
         if (mContext.getCancellationHandler().isCancelled()) {
             if (!mSp.contains(mUploadId)) {

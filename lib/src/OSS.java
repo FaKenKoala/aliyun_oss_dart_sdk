@@ -20,7 +20,7 @@ abstract class OSS {
         * @return
         */
        ListBucketsResult listBuckets(ListBucketsRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously upload file
@@ -40,11 +40,11 @@ abstract class OSS {
         *
         * @param request the PutObjectRequest instance
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        PutObjectResult putObject(PutObjectRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously download file
@@ -66,11 +66,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        GetObjectResult getObject(GetObjectRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously delete file
@@ -90,11 +90,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        DeleteObjectResult deleteObject(DeleteObjectRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously delete multiple objects
@@ -112,11 +112,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        DeleteMultipleObjectResult deleteMultipleObject(DeleteMultipleObjectRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously append the file
@@ -140,11 +140,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        AppendObjectResult appendObject(AppendObjectRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously get the file's metadata.
@@ -164,11 +164,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        HeadObjectResult headObject(HeadObjectRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously copy a file
@@ -202,18 +202,18 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        CopyObjectResult copyObject(CopyObjectRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        OSSAsyncTask<GetObjectACLResult> asyncGetObjectACL(
                      GetObjectACLRequest request,
                      OSSCompletedCallback<GetObjectACLRequest, GetObjectACLResult> completedCallback);
 
        GetObjectACLResult getObjectACL(GetObjectACLRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously create bucket
@@ -231,11 +231,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        CreateBucketResult createBucket(CreateBucketRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously delete bucket
@@ -253,11 +253,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        DeleteBucketResult deleteBucket(DeleteBucketRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously get bucket info
@@ -284,12 +284,12 @@ abstract class OSS {
         *                bucket
         *                name.
         * @return A {@link GetBucketInfoResult} instance.
-        * @throws ClientException
+        * @throws OSSClientException
         *                          OSS Client side exception.
-        * @throws ServiceException
+        * @throws OSSServiceException
         *                          OSS Server side exception.
         */
-       GetBucketInfoResult getBucketInfo(GetBucketInfoRequest request) throws ClientException, ServiceException;
+       GetBucketInfoResult getBucketInfo(GetBucketInfoRequest request) throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously get bucket ACL
@@ -307,22 +307,22 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        GetBucketACLResult getBucketACL(GetBucketACLRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Synchronously get bucket referer
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        GetBucketRefererResult getBucketReferer(GetBucketRefererRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously put bucket referer
@@ -340,22 +340,22 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        PutBucketRefererResult putBucketReferer(PutBucketRefererRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Synchronously delete bucket logging
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        DeleteBucketLoggingResult deleteBucketLogging(DeleteBucketLoggingRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously delete bucket logging
@@ -373,11 +373,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        PutBucketLoggingResult putBucketLogging(PutBucketLoggingRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously delete bucket logging
@@ -395,11 +395,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        GetBucketLoggingResult getBucketLogging(GetBucketLoggingRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously get bucket logging
@@ -428,11 +428,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        PutBucketLifecycleResult putBucketLifecycle(PutBucketLifecycleRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously put bucket lifecycle
@@ -450,11 +450,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        GetBucketLifecycleResult getBucketLifecycle(GetBucketLifecycleRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously get bucket lifecycle
@@ -472,11 +472,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        DeleteBucketLifecycleResult deleteBucketLifecycle(DeleteBucketLifecycleRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously delete bucket lifecycle
@@ -509,11 +509,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        ListObjectsResult listObjects(ListObjectsRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously initialize a multipart upload
@@ -543,11 +543,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        InitiateMultipartUploadResult initMultipartUpload(InitiateMultipartUploadRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously upload the part data
@@ -585,11 +585,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        UploadPartResult uploadPart(UploadPartRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously complete the multipart upload.
@@ -621,11 +621,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        CompleteMultipartUploadResult completeMultipartUpload(CompleteMultipartUploadRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously cancel the multipart upload.
@@ -651,11 +651,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        AbortMultipartUploadResult abortMultipartUpload(AbortMultipartUploadRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously list parts uploaded
@@ -675,19 +675,19 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        ListPartsResult listParts(ListPartsRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously list multipart uploads
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        OSSAsyncTask<ListMultipartUploadsResult> asyncListMultipartUploads(
                      ListMultipartUploadsRequest request,
@@ -698,11 +698,11 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        ListMultipartUploadsResult listMultipartUploads(ListMultipartUploadsRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /******************** extension functions **********************/
 
@@ -716,8 +716,8 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        OSSAsyncTask<CompleteMultipartUploadResult> asyncMultipartUpload(
                      MultipartUploadRequest request,
@@ -728,19 +728,19 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        CompleteMultipartUploadResult multipartUpload(MultipartUploadRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously do a resumable upload
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        OSSAsyncTask<ResumableUploadResult> asyncResumableUpload(
                      ResumableUploadRequest request,
@@ -751,18 +751,18 @@ abstract class OSS {
         *
         * @param request
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        ResumableUploadResult resumableUpload(ResumableUploadRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        OSSAsyncTask<ResumableUploadResult> asyncSequenceUpload(
                      ResumableUploadRequest request,
                      OSSCompletedCallback<ResumableUploadRequest, ResumableUploadResult> completedCallback);
 
        ResumableUploadResult sequenceUpload(ResumableUploadRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * Generates the signed url for 3rd parties accessing object
@@ -770,10 +770,10 @@ abstract class OSS {
         * @param request Generates the signed by custom config @see
         *                {GeneratePresignedUrlRequest}
         * @return
-        * @throws ClientException
+        * @throws OSSClientException
         */
        String presignConstrainedObjectURL(GeneratePresignedUrlRequest request)
-                     throws ClientException;
+                     throws OSSClientException;
 
        /**
         * Generates the signed url for 3rd parties accessing object
@@ -782,10 +782,10 @@ abstract class OSS {
         * @param objectKey            Object key
         * @param expiredTimeInSeconds URL's expiration time in seconds
         * @return
-        * @throws ClientException
+        * @throws OSSClientException
         */
        String presignConstrainedObjectURL(String bucketName, String objectKey, int expiredTimeInSeconds)
-                     throws ClientException;
+                     throws OSSClientException;
 
        /**
         * Generates the signed url for the available object
@@ -802,11 +802,11 @@ abstract class OSS {
         * @param bucketName
         * @param objectKey
         * @return
-        * @throws ClientException
-        * @throws ServiceException
+        * @throws OSSClientException
+        * @throws OSSServiceException
         */
        bool doesObjectExist(String bucketName, String objectKey)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 
        /**
         * If the multipart upload is not aborted in a resumable upload,
@@ -820,12 +820,12 @@ abstract class OSS {
        OSSAsyncTask<TriggerCallbackResult> asyncTriggerCallback(TriggerCallbackRequest request,
                      OSSCompletedCallback<TriggerCallbackRequest, TriggerCallbackResult> completedCallback);
 
-       TriggerCallbackResult triggerCallback(TriggerCallbackRequest request) throws ClientException, ServiceException;
+       TriggerCallbackResult triggerCallback(TriggerCallbackRequest request) throws OSSClientException, OSSServiceException;
 
        OSSAsyncTask<ImagePersistResult> asyncImagePersist(ImagePersistRequest request,
                      OSSCompletedCallback<ImagePersistRequest, ImagePersistResult> completedCallback);
 
-       ImagePersistResult imagePersist(ImagePersistRequest request) throws ClientException, ServiceException;
+       ImagePersistResult imagePersist(ImagePersistRequest request) throws OSSClientException, OSSServiceException;
 
        /**
         * Synchronously creates a symbol link to a target file under the bucket---this
@@ -835,13 +835,13 @@ abstract class OSS {
         * @param request
         *                A {@link PutSymlinkRequest} instance that specifies the
         *                bucket name, symlink name.
-        * @throws ClientException
+        * @throws OSSClientException
         *                          OSS Client side exception.
-        * @throws ServiceException
+        * @throws OSSServiceException
         *                          OSS Server side exception.
         * @return An instance of PutSymlinkResult
         */
-       PutSymlinkResult putSymlink(PutSymlinkRequest request) throws ClientException, ServiceException;
+       PutSymlinkResult putSymlink(PutSymlinkRequest request) throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously creates a symbol link to a target file under the bucket---this
@@ -870,13 +870,13 @@ abstract class OSS {
         *                name and symlink name.
         * @return The symlink information, including the target file name and its
         *         metadata.
-        * @throws ClientException
+        * @throws OSSClientException
         *                          OSS Client side exception.
-        * @throws ServiceException
+        * @throws OSSServiceException
         *                          OSS Server side exception.
         * @return A {@link GetSymlinkResult} instance.
         */
-       GetSymlinkResult getSymlink(GetSymlinkRequest request) throws ClientException, ServiceException;
+       GetSymlinkResult getSymlink(GetSymlinkRequest request) throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously gets the symlink information for the given symlink name.
@@ -906,7 +906,7 @@ abstract class OSS {
         *                name and object key.
         * @return A {@link RestoreObjectResult} instance.
         */
-       RestoreObjectResult restoreObject(RestoreObjectRequest request) throws ClientException, ServiceException;
+       RestoreObjectResult restoreObject(RestoreObjectRequest request) throws OSSClientException, OSSServiceException;
 
        /**
         * Asynchronously restores the object of archive storage. The function is not
@@ -953,5 +953,5 @@ abstract class OSS {
         *                name and object key.
         */
        ResumableDownloadResult syncResumableDownload(ResumableDownloadRequest request)
-                     throws ClientException, ServiceException;
+                     throws OSSClientException, OSSServiceException;
 }

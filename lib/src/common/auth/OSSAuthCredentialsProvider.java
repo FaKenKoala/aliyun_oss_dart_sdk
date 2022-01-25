@@ -1,6 +1,6 @@
 package com.alibaba.sdk.android.oss.common.auth;
 
-import com.alibaba.sdk.android.oss.ClientException;
+import com.alibaba.sdk.android.oss.OSSClientException;
 import com.alibaba.sdk.android.oss.common.OSSConstants;
 import com.alibaba.sdk.android.oss.common.utils.IOUtils;
 
@@ -42,8 +42,8 @@ import java.net.URL;
         this.mDecoder = decoder;
     }
 
-    @Override
-     OSSFederationToken getFederationToken() throws ClientException {
+    @override
+     OSSFederationToken getFederationToken() throws OSSClientException {
         OSSFederationToken authToken;
         String authData;
         try {
@@ -66,11 +66,11 @@ import java.net.URL;
             } else {
                 String errorCode = jsonObj.getString("ErrorCode");
                 String errorMessage = jsonObj.getString("ErrorMessage");
-                throw new ClientException("ErrorCode: " + errorCode + "| ErrorMessage: " + errorMessage);
+                throw new OSSClientException("ErrorCode: " + errorCode + "| ErrorMessage: " + errorMessage);
             }
             return authToken;
         } catch (Exception e) {
-            throw new ClientException(e);
+            throw new OSSClientException(e);
         }
     }
 

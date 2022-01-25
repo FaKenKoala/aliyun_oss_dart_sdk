@@ -1,6 +1,6 @@
 package com.alibaba.sdk.android.oss.common.auth;
 
-import com.alibaba.sdk.android.oss.ClientException;
+import com.alibaba.sdk.android.oss.OSSClientException;
 
 /**
  * Created by zhouzhuo on 11/4/15.
@@ -12,5 +12,5 @@ import com.alibaba.sdk.android.oss.ClientException;
      *
      * @return
      */
-    OSSFederationToken getFederationToken() throws ClientException;
+    OSSFederationToken getFederationToken() throws OSSClientException;
 }

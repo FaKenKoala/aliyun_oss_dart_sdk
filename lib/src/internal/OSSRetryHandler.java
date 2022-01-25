@@ -1,7 +1,7 @@
 package com.alibaba.sdk.android.oss.internal;
 
-import com.alibaba.sdk.android.oss.ClientException;
-import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.OSSClientException;
+import com.alibaba.sdk.android.oss.OSSServiceException;
 import com.alibaba.sdk.android.oss.common.OSSLog;
 
 import java.io.InterruptedIOException;
@@ -27,8 +27,8 @@ import java.net.SocketTimeoutException;
             return OSSRetryType.OSSRetryTypeShouldNotRetry;
         }
 
-        if (e instanceof ClientException) {
-            if (((ClientException) e).isCanceledException()) {
+        if (e instanceof OSSClientException) {
+            if (((OSSClientException) e).isCanceledException()) {
                 return OSSRetryType.OSSRetryTypeShouldNotRetry;
             }
 
@@ -43,8 +43,8 @@ import java.net.SocketTimeoutException;
             OSSLog.logDebug("shouldRetry - " + e.toString());
             e.getCause().printStackTrace();
             return OSSRetryType.OSSRetryTypeShouldRetry;
-        } else if (e instanceof ServiceException) {
-            ServiceException serviceException = (ServiceException) e;
+        } else if (e instanceof OSSServiceException) {
+            OSSServiceException serviceException = (OSSServiceException) e;
             if (serviceException.getErrorCode() != null && serviceException.getErrorCode().equalsIgnoreCase("RequestTimeTooSkewed")) {
                 return OSSRetryType.OSSRetryTypeShouldFixedTimeSkewedAndRetry;
             } else if (serviceException.getStatusCode() >= 500) {

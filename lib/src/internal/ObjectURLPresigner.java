@@ -3,7 +3,7 @@ package com.alibaba.sdk.android.oss.internal;
 import android.text.TextUtils;
 
 import com.alibaba.sdk.android.oss.ClientConfiguration;
-import com.alibaba.sdk.android.oss.ClientException;
+import com.alibaba.sdk.android.oss.OSSClientException;
 import com.alibaba.sdk.android.oss.common.HttpMethod;
 import com.alibaba.sdk.android.oss.common.OSSConstants;
 import com.alibaba.sdk.android.oss.common.OSSLog;
@@ -39,7 +39,7 @@ import java.util.Map;
         this.conf = conf;
     }
 
-     String presignConstrainedURL(GeneratePresignedUrlRequest request) throws ClientException {
+     String presignConstrainedURL(GeneratePresignedUrlRequest request) throws OSSClientException {
 
         String bucketName = request.getBucketName();
         String objectKey = request.getKey();
@@ -77,7 +77,7 @@ import java.util.Map;
             token = ((OSSFederationCredentialProvider) credentialProvider).getValidFederationToken();
             requestMessage.getParameters().put(RequestParameters.SECURITY_TOKEN, token.getSecurityToken());
             if (token == null) {
-                throw new ClientException("Can not get a federation token!");
+                throw new OSSClientException("Can not get a federation token!");
             }
         } else if (credentialProvider instanceof OSSStsTokenCredentialProvider) {
             token = ((OSSStsTokenCredentialProvider) credentialProvider).getFederationToken();
@@ -97,7 +97,7 @@ import java.util.Map;
         } else if (credentialProvider instanceof OSSCustomSignerCredentialProvider) {
             signature = ((OSSCustomSignerCredentialProvider) credentialProvider).signContent(contentToSign);
         } else {
-            throw new ClientException("Unknown credentialProvider!");
+            throw new OSSClientException("Unknown credentialProvider!");
         }
 
         String accessKey = signature.split(":")[0].substring(4);
@@ -119,7 +119,7 @@ import java.util.Map;
     }
 
      String presignConstrainedURL(String bucketName, String objectKey, int expiredTimeInSeconds)
-            throws ClientException {
+            throws OSSClientException {
         GeneratePresignedUrlRequest presignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, objectKey);
         presignedUrlRequest.setExpiration(expiredTimeInSeconds);
         return presignConstrainedURL(presignedUrlRequest);

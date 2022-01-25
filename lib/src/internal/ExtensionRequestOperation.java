@@ -3,8 +3,8 @@ package com.alibaba.sdk.android.oss.internal;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 
-import com.alibaba.sdk.android.oss.ClientException;
-import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.OSSClientException;
+import com.alibaba.sdk.android.oss.OSSServiceException;
 import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
 import com.alibaba.sdk.android.oss.common.OSSConstants;
 import com.alibaba.sdk.android.oss.common.OSSLog;
@@ -36,7 +36,7 @@ import java.util.concurrent.ThreadFactory;
 
      static ExecutorService executorService =
             Executors.newFixedThreadPool(OSSConstants.DEFAULT_BASE_THREAD_POOL_SIZE, new ThreadFactory() {
-                @Override
+                @override
                  Thread newThread(Runnable r) {
                     return new Thread(r, "oss-android-extensionapi-thread");
                 }
@@ -48,13 +48,13 @@ import java.util.concurrent.ThreadFactory;
     }
 
      bool doesObjectExist(String bucketName, String objectKey)
-            throws ClientException, ServiceException {
+            throws OSSClientException, OSSServiceException {
 
         try {
             HeadObjectRequest head = new HeadObjectRequest(bucketName, objectKey);
             apiOperation.headObject(head, null).getResult();
             return true;
-        } catch (ServiceException e) {
+        } catch (OSSServiceException e) {
             if (e.getStatusCode() == 404) {
                 return false;
             } else {

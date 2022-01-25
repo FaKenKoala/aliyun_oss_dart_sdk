@@ -33,17 +33,17 @@ import okio.Source;
         this.request = (T) context.getRequest();
     }
 
-    @Override
+    @override
      MediaType contentType() {
         return MediaType.parse(this.contentType);
     }
 
-    @Override
+    @override
      int contentLength() throws IOException {
         return this.contentLength;
     }
 
-    @Override
+    @override
      void writeTo(BufferedSink sink) throws IOException {
         Source source = Okio.source(this.inputStream);
         int total = 0;

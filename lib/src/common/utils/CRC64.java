@@ -133,12 +133,12 @@ import java.util.zip.Checksum;
         return this.value;
     }
 
-    @Override
+    @override
      void reset() {
         this.value = 0;
     }
 
-    @Override
+    @override
      void update(int val) {
         byte[] b = new byte[1];
         b[0] = (byte) (val & 0xff);
@@ -152,7 +152,7 @@ import java.util.zip.Checksum;
         update(b, 0, len);
     }
 
-    @Override
+    @override
      void update(byte[] b, int off, int len) {
 
         this.value = ~this.value;

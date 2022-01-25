@@ -11,7 +11,7 @@ package com.alibaba.sdk.android.oss.model;
         this.bucket = bucket;
     }
 
-    @Override
+    @override
      String toString() {
         return String.format("GetBucketInfoResult<%s>:\n bucket:%s", super.toString(), bucket.toString());
     }

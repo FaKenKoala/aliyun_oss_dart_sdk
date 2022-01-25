@@ -69,7 +69,7 @@ package com.alibaba.sdk.android.oss.model;
         return Unknown;
     }
 
-    @Override
+    @override
      String toString() {
         return permissionString;
     }

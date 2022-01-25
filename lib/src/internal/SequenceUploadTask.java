@@ -3,8 +3,8 @@ package com.alibaba.sdk.android.oss.internal;
 import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 
-import com.alibaba.sdk.android.oss.ClientException;
-import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.OSSClientException;
+import com.alibaba.sdk.android.oss.OSSServiceException;
 import com.alibaba.sdk.android.oss.TaskCancelException;
 import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
 import com.alibaba.sdk.android.oss.common.OSSLog;
@@ -67,8 +67,8 @@ import java.util.zip.CheckedInputStream;
         mSp = OSSSharedPreferences.instance(mContext.getApplicationContext());
     }
 
-    @Override
-     void initMultipartUploadId() throws IOException, ClientException, ServiceException {
+    @override
+     void initMultipartUploadId() throws IOException, OSSClientException, OSSServiceException {
 
         Map<Integer, int> recordCrc64 = null;
 
@@ -155,14 +155,14 @@ import java.util.zip.CheckedInputStream;
                                 mFirstPartSize = part.getSize();
                             }
                         }
-                    } catch (ServiceException e) {
+                    } catch (OSSServiceException e) {
                         isTruncated = false;
                         if (e.getStatusCode() == 404) {
                             mUploadId = null;
                         } else {
                             throw e;
                         }
-                    } catch (ClientException e) {
+                    } catch (OSSClientException e) {
                         isTruncated = false;
                         throw e;
                     }
@@ -172,7 +172,7 @@ import java.util.zip.CheckedInputStream;
             }
 
             if (!mRecordFile.exists() && !mRecordFile.createNewFile()) {
-                throw new ClientException("Can't create file at path: " + mRecordFile.getAbsolutePath()
+                throw new OSSClientException("Can't create file at path: " + mRecordFile.getAbsolutePath()
                         + "\nPlease make sure the directory exist!");
             }
         }
@@ -195,8 +195,8 @@ import java.util.zip.CheckedInputStream;
         mRequest.setUploadId(mUploadId);
     }
 
-    @Override
-     ResumableUploadResult doMultipartUpload() throws IOException, ClientException, ServiceException, InterruptedException {
+    @override
+     ResumableUploadResult doMultipartUpload() throws IOException, OSSClientException, OSSServiceException, InterruptedException {
 
         int tempUploadedLength = mUploadedLength;
 
@@ -210,11 +210,11 @@ import java.util.zip.CheckedInputStream;
 
         if (mPartETags.size() > 0 && mAlreadyUploadIndex.size() > 0) { //revert progress
             if (mUploadedLength > mFileLength) {
-                throw new ClientException("The uploading file is inconsistent with before");
+                throw new OSSClientException("The uploading file is inconsistent with before");
             }
 
             if (mFirstPartSize != readByte) {
-                throw new ClientException("The part size setting is inconsistent with before");
+                throw new OSSClientException("The part size setting is inconsistent with before");
             }
 
             int revertUploadedLength = mUploadedLength;
@@ -318,11 +318,11 @@ import java.util.zip.CheckedInputStream;
             if (mContext.getCancellationHandler().isCancelled()) {
                 //cancel immediately for sequence upload
                 TaskCancelException e = new TaskCancelException("sequence upload task cancel");
-                throw new ClientException(e.getMessage(), e, true);
+                throw new OSSClientException(e.getMessage(), e, true);
             } else {
                 onProgressCallback(mRequest, mUploadedLength, mFileLength);
             }
-        } catch (ServiceException e) {
+        } catch (OSSServiceException e) {
             // it is not necessary to throw 409 PartAlreadyExist exception out
             if (e.getStatusCode() != 409) {
                 processException(e);
@@ -357,8 +357,8 @@ import java.util.zip.CheckedInputStream;
     }
 
 
-    @Override
-     void checkException() throws IOException, ServiceException, ClientException {
+    @override
+     void checkException() throws IOException, OSSServiceException, OSSClientException {
         if (mContext.getCancellationHandler().isCancelled()) {
             if (mRequest.deleteUploadOnCancelling()) {
                 abortThisUpload();
@@ -393,7 +393,7 @@ import java.util.zip.CheckedInputStream;
         super.checkException();
     }
 
-    @Override
+    @override
      void abortThisUpload() {
         if (mUploadId != null) {
             AbortMultipartUploadRequest abort = new AbortMultipartUploadRequest(
@@ -402,7 +402,7 @@ import java.util.zip.CheckedInputStream;
         }
     }
 
-    @Override
+    @override
      void processException(Exception e) {
 //        mPartExceptionCount++;
         if (mUploadException == null || !e.getMessage().equals(mUploadException.getMessage())) {
@@ -416,7 +416,7 @@ import java.util.zip.CheckedInputStream;
         }
     }
 
-    @Override
+    @override
      void uploadPartFinish(PartETag partETag) throws Exception {
         if (mContext.getCancellationHandler().isCancelled()) {
             if (!mSp.contains(mUploadId)) {

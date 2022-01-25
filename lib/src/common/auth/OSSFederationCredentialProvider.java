@@ -1,6 +1,6 @@
 package com.alibaba.sdk.android.oss.common.auth;
 
-import com.alibaba.sdk.android.oss.ClientException;
+import com.alibaba.sdk.android.oss.OSSClientException;
 import com.alibaba.sdk.android.oss.common.OSSLog;
 import com.alibaba.sdk.android.oss.common.utils.DateUtil;
 
@@ -16,9 +16,9 @@ import com.alibaba.sdk.android.oss.common.utils.DateUtil;
      *
      * @return The valid STS Token
      */
-     abstract OSSFederationToken getFederationToken() throws ClientException;
+     abstract OSSFederationToken getFederationToken() throws OSSClientException;
 
-     synchronized OSSFederationToken getValidFederationToken() throws ClientException {
+     synchronized OSSFederationToken getValidFederationToken() throws OSSClientException {
         // Checks if the STS token is expired. To avoid returning staled data, here we pre-fetch the token 5 minutes a head of the real expiration.
         // The minimal expiration time is 15 minutes
         if (cachedToken == null

@@ -38,7 +38,7 @@ package com.alibaba.sdk.android.oss.common.auth;
         this.accessKeySecret = accessKeySecret;
     }
 
-    @Override
+    @override
      OSSFederationToken getFederationToken() {
         return null;
     }

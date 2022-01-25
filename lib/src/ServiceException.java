@@ -15,24 +15,24 @@ import com.alibaba.sdk.android.oss.common.OSSLog;
  * </p>
  * <p>
  * <p>
- * {@link ClientException} means there're errors occurred when sending request to OSS or parsing the response from OSS.
+ * {@link OSSClientException} means there're errors occurred when sending request to OSS or parsing the response from OSS.
  * For example when the network is unavailable, this exception will be thrown.
  * </p>
  * <p>
  * <p>
- * {@link ServiceException} means there're errors occurred in OSS service side. For example, the Access Id
- * does not exist for authentication, then {@link ServiceException} or its subclass is thrown.
- * The ServiceException has the error code for the caller to have some specific handling.
+ * {@link OSSServiceException} means there're errors occurred in OSS service side. For example, the Access Id
+ * does not exist for authentication, then {@link OSSServiceException} or its subclass is thrown.
+ * The OSSServiceException has the error code for the caller to have some specific handling.
  * </p>
  * <p>
  * <p>
- * Generally speaking, the caller only needs to handle {@link ServiceException} as it means the request
+ * Generally speaking, the caller only needs to handle {@link OSSServiceException} as it means the request
  * has reached OSS, but there're some errors occurred. This error in most of cases are expected due to
  * wrong parameters int the request or some wrong settings in user's account. The error code is very helpful
  * for troubleshooting.
  * </p>
  */
- class ServiceException extends Exception {
+ class OSSServiceException extends Exception {
 
      static final String PARSE_RESPONSE_FAIL = "SDKParseResponseFail";
 
@@ -98,7 +98,7 @@ import com.alibaba.sdk.android.oss.common.OSSLog;
      * @param requestId  Request ID
      * @param hostId     Host ID
      */
-     ServiceException(int statusCode, String message,
+     OSSServiceException(int statusCode, String message,
                             String errorCode, String requestId, String hostId, String rawMessage) {
 
         super(message);
@@ -148,7 +148,7 @@ import com.alibaba.sdk.android.oss.common.OSSLog;
         return hostId;
     }
 
-    @Override
+    @override
      String toString() {
         return "[StatusCode]: " + statusCode + ", "
                 + "[Code]: " + getErrorCode() + ", "

@@ -7,7 +7,7 @@ import java.util.HashMap;
  */
 
  class CaseInsensitiveHashMap<k,v> extends HashMap<k,v> {
-    @Override
+    @override
     //只能做到小写和驼峰兼容。
      v get(Object key) {
         //兼容http2.0

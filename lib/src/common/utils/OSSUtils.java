@@ -836,7 +836,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
             this.directiveAsString = directiveAsString;
         }
 
-        @Override
+        @override
          String toString() {
             return this.directiveAsString;
         }

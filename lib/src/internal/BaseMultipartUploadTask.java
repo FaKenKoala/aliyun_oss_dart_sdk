@@ -4,8 +4,8 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 
-import com.alibaba.sdk.android.oss.ClientException;
-import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.OSSClientException;
+import com.alibaba.sdk.android.oss.OSSServiceException;
 import com.alibaba.sdk.android.oss.TaskCancelException;
 import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
 import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit;
      ThreadPoolExecutor mPoolExecutor =
             new ThreadPoolExecutor(MAX_CORE_POOL_SIZE, MAX_IMUM_POOL_SIZE, KEEP_ALIVE_TIME,
                     TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(MAX_QUEUE_SIZE), new ThreadFactory() {
-                @Override
+                @override
                  Thread newThread(Runnable runnable) {
                     return new Thread(runnable, "oss-android-multipart-thread");
                 }
@@ -102,31 +102,31 @@ import java.util.concurrent.TimeUnit;
      * init multipart upload id
      *
      * @throws IOException
-     * @throws ClientException
-     * @throws ServiceException
+     * @throws OSSClientException
+     * @throws OSSServiceException
      */
-     abstract void initMultipartUploadId() throws IOException, ClientException, ServiceException;
+     abstract void initMultipartUploadId() throws IOException, OSSClientException, OSSServiceException;
 
     /**
      * do multipart upload task
      *
      * @return
      * @throws IOException
-     * @throws ServiceException
-     * @throws ClientException
+     * @throws OSSServiceException
+     * @throws OSSClientException
      * @throws InterruptedException
      */
-     abstract Result doMultipartUpload() throws IOException, ServiceException, ClientException, InterruptedException;
+     abstract Result doMultipartUpload() throws IOException, OSSServiceException, OSSClientException, InterruptedException;
 
     /**
      * check is or not cancel
      *
-     * @throws ClientException
+     * @throws OSSClientException
      */
-     void checkCancel() throws ClientException {
+     void checkCancel() throws OSSClientException {
         if (mContext.getCancellationHandler().isCancelled()) {
             TaskCancelException e = new TaskCancelException("multipart cancel");
-            throw new ClientException(e.getMessage(), e, true);
+            throw new OSSClientException(e.getMessage(), e, true);
         }
     }
 
@@ -138,7 +138,7 @@ import java.util.concurrent.TimeUnit;
      void uploadPartFinish(PartETag partETag) throws Exception {
     }
 
-    @Override
+    @override
      Result call() throws Exception {
         try {
             checkInitData();
@@ -149,17 +149,17 @@ import java.util.concurrent.TimeUnit;
                 mCompletedCallback.onSuccess(mRequest, result);
             }
             return result;
-        } catch (ServiceException e) {
+        } catch (OSSServiceException e) {
             if (mCompletedCallback != null) {
                 mCompletedCallback.onFailure(mRequest, null, e);
             }
             throw e;
         } catch (Exception e) {
-            ClientException temp;
-            if (e instanceof ClientException) {
-                temp = (ClientException) e;
+            OSSClientException temp;
+            if (e instanceof OSSClientException) {
+                temp = (OSSClientException) e;
             } else {
-                temp = new ClientException(e.toString(), e);
+                temp = new OSSClientException(e.toString(), e);
             }
             if (mCompletedCallback != null) {
                 mCompletedCallback.onFailure(mRequest, temp, null);
@@ -168,7 +168,7 @@ import java.util.concurrent.TimeUnit;
         }
     }
 
-     void checkInitData() throws ClientException {
+     void checkInitData() throws OSSClientException {
         if (mRequest.getUploadFilePath() != null) {
             mUploadFilePath = mRequest.getUploadFilePath();
             mUploadedLength = 0;
@@ -182,7 +182,7 @@ import java.util.concurrent.TimeUnit;
                 mUploadFileDescriptor = mContext.getApplicationContext().getContentResolver().openFileDescriptor(mUploadUri, "r");
                 mFileLength = mUploadFileDescriptor.getStatSize();
             } catch (IOException e) {
-                throw new ClientException(e.getMessage(), e, true);
+                throw new OSSClientException(e.getMessage(), e, true);
             } finally {
                 try {
                     if (mUploadFileDescriptor != null) {
@@ -194,7 +194,7 @@ import java.util.concurrent.TimeUnit;
             }
         }
         if (mFileLength == 0) {
-            throw new ClientException("file length must not be 0");
+            throw new OSSClientException("file length must not be 0");
         }
 
         checkPartSize(mPartAttr);
@@ -207,7 +207,7 @@ import java.util.concurrent.TimeUnit;
 
 
         if (partNumber > 1 && partSize < 102400) {
-            throw new ClientException("Part size must be greater than or equal to 100KB!");
+            throw new OSSClientException("Part size must be greater than or equal to 100KB!");
         }
     }
 
@@ -266,7 +266,7 @@ import java.util.concurrent.TimeUnit;
                     if (mPartETags.size() == (mRunPartTaskCount - mPartExceptionCount)) {
                         TaskCancelException e = new TaskCancelException("multipart cancel");
 
-                        throw new ClientException(e.getMessage(), e, true);
+                        throw new OSSClientException(e.getMessage(), e, true);
                     }
                 } else {
                     if (mPartETags.size() == (partNumber - mPartExceptionCount)) {
@@ -299,15 +299,15 @@ import java.util.concurrent.TimeUnit;
      * complete multipart upload
      *
      * @return
-     * @throws ClientException
-     * @throws ServiceException
+     * @throws OSSClientException
+     * @throws OSSServiceException
      */
-     CompleteMultipartUploadResult completeMultipartUploadResult() throws ClientException, ServiceException {
+     CompleteMultipartUploadResult completeMultipartUploadResult() throws OSSClientException, OSSServiceException {
         //complete sort
         CompleteMultipartUploadResult completeResult = null;
         if (mPartETags.size() > 0) {
             Collections.sort(mPartETags, new Comparator<PartETag>() {
-                @Override
+                @override
                  int compare(PartETag lhs, PartETag rhs) {
                     if (lhs.getPartNumber() < rhs.getPartNumber()) {
                         return -1;
@@ -351,18 +351,18 @@ import java.util.concurrent.TimeUnit;
         }
     }
 
-     void checkException() throws IOException, ServiceException, ClientException {
+     void checkException() throws IOException, OSSServiceException, OSSClientException {
         if (mUploadException != null) {
             releasePool();
             if (mUploadException instanceof IOException) {
                 throw (IOException) mUploadException;
-            } else if (mUploadException instanceof ServiceException) {
-                throw (ServiceException) mUploadException;
-            } else if (mUploadException instanceof ClientException) {
-                throw (ClientException) mUploadException;
+            } else if (mUploadException instanceof OSSServiceException) {
+                throw (OSSServiceException) mUploadException;
+            } else if (mUploadException instanceof OSSClientException) {
+                throw (OSSClientException) mUploadException;
             } else {
-                ClientException clientException =
-                        new ClientException(mUploadException.getMessage(), mUploadException);
+                OSSClientException clientException =
+                        new OSSClientException(mUploadException.getMessage(), mUploadException);
                 throw clientException;
             }
         }

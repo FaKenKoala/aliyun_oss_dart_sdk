@@ -54,7 +54,7 @@ package com.alibaba.sdk.android.oss.model;
         return true;
     }
 
-    @Override
+    @override
      String toString() {
         return "bytes=" + (begin == -1 ? "" : String.valueOf(begin)) + "-" + (end == -1 ? "" : String.valueOf(end));
     }

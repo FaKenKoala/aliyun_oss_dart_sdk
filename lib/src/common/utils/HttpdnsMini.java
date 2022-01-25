@@ -69,7 +69,7 @@ import java.util.concurrent.Executors;
          int ttl;
          int queryTime;
 
-        @Override
+        @override
          String toString() {
             return "[hostName=" + getHostName() + ", ip=" + ip + ", ttl=" + getTtl() + ", queryTime="
                     + queryTime + "]";
@@ -125,7 +125,7 @@ import java.util.concurrent.Executors;
             this.hostName = hostToQuery;
         }
 
-        @Override
+        @override
          String call() {
             String chooseServerAddress = SERVER_IP;
             String resolveUrl = "https://" + chooseServerAddress + "/" + ACCOUNT_ID + "/d?host=" + hostName;

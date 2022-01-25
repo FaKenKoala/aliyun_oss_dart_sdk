@@ -2,8 +2,8 @@ package com.alibaba.sdk.android.oss.network;
 
 import android.os.ParcelFileDescriptor;
 
-import com.alibaba.sdk.android.oss.ClientException;
-import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.OSSClientException;
+import com.alibaba.sdk.android.oss.OSSServiceException;
 import com.alibaba.sdk.android.oss.common.OSSHeaders;
 import com.alibaba.sdk.android.oss.common.OSSLog;
 import com.alibaba.sdk.android.oss.common.utils.CRC64;
@@ -66,7 +66,7 @@ import okhttp3.Response;
         this.retryHandler = new OSSRetryHandler(maxRetry);
     }
 
-    @Override
+    @override
      T call() throws Exception {
 
         Request request = null;
@@ -127,7 +127,7 @@ import okhttp3.Response;
                         inputStream = new FileInputStream(file);
                         length = file.length();
                         if (length <= 0) {
-                            throw new ClientException("the length of file is 0!");
+                            throw new OSSClientException("the length of file is 0!");
                         }
                     } else if (message.getUploadUri() != null) {
                         inputStream = context.getApplicationContext().getContentResolver().openInputStream(message.getUploadUri());
@@ -211,7 +211,7 @@ import okhttp3.Response;
             if (OSSLog.isEnableLog()) {
                 e.printStackTrace();
             }
-            exception = new ClientException(e.getMessage(), e);
+            exception = new OSSClientException(e.getMessage(), e);
         }
 
         if (exception == null && (responseMessage.getStatusCode() == 203 || responseMessage.getStatusCode() >= 300)) {
@@ -225,14 +225,14 @@ import okhttp3.Response;
                 }
                 return result;
             } catch (IOException e) {
-                exception = new ClientException(e.getMessage(), e);
+                exception = new OSSClientException(e.getMessage(), e);
             }
         }
 
         // reconstruct exception caused by manually cancelling
         if ((call != null && call.isCanceled())
                 || context.getCancellationHandler().isCancelled()) {
-            exception = new ClientException("Task is cancelled!", exception.getCause(), true);
+            exception = new OSSClientException("Task is cancelled!", exception.getCause(), true);
         }
 
         OSSRetryType retryType = retryHandler.shouldRetry(exception, currentRetryCount);
@@ -272,13 +272,13 @@ import okhttp3.Response;
             }
             return call();
         } else {
-            if (exception instanceof ClientException) {
+            if (exception instanceof OSSClientException) {
                 if (context.getCompletedCallback() != null) {
-                    context.getCompletedCallback().onFailure(context.getRequest(), (ClientException) exception, null);
+                    context.getCompletedCallback().onFailure(context.getRequest(), (OSSClientException) exception, null);
                 }
             } else {
                 if (context.getCompletedCallback() != null) {
-                    context.getCompletedCallback().onFailure(context.getRequest(), null, (ServiceException) exception);
+                    context.getCompletedCallback().onFailure(context.getRequest(), null, (OSSServiceException) exception);
                 }
             }
             throw exception;

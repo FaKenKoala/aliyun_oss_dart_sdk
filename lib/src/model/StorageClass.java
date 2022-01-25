@@ -60,7 +60,7 @@ package com.alibaba.sdk.android.oss.model;
         throw new IllegalArgumentException("Unable to parse " + storageClassString);
     }
 
-    @Override
+    @override
      String toString() {
         return this.storageClassString;
     }
