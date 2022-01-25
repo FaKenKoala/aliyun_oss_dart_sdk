@@ -26,25 +26,25 @@ class ProgressPublisher {
   static void publishRequestContentLength(
       final ProgressListener? listener, final int bytes) {
     publishByteCountEvent(
-        listener, ProgressEventType.requestContentLengthEvent, bytes);
+        listener, ProgressEventType.REQUEST_CONTENT_LENGTH_EVENT, bytes);
   }
 
   static void publishRequestBytesTransferred(
       final ProgressListener? listener, final int bytes) {
     publishByteCountEvent(
-        listener, ProgressEventType.requestByteTransferEvent, bytes);
+        listener, ProgressEventType.REQUEST_BYTE_TRANSFER_EVENT, bytes);
   }
 
   static void publishResponseContentLength(
       final ProgressListener? listener, final int bytes) {
     publishByteCountEvent(
-        listener, ProgressEventType.responseContentLengthEvent, bytes);
+        listener, ProgressEventType.RESPONSE_CONTENT_LENGTH_EVENT, bytes);
   }
 
   static void publishResponseBytesTransferred(
       final ProgressListener? listener, final int bytes) {
     publishByteCountEvent(
-        listener, ProgressEventType.responseByteTransferEvent, bytes);
+        listener, ProgressEventType.RESPONSE_BYTE_TRANSFER_EVENT, bytes);
   }
 
   static void publishByteCountEvent(final ProgressListener? listener,

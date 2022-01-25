@@ -13,7 +13,7 @@ import 'response_parser.dart';
     // Because JAXBContext.newInstance() is a very slow method,
     // it can improve performance a lot to cache the instances of JAXBContext
     // for used context paths or class types.
-     static HashMap<Object, JAXBContext> cachedContexts = new HashMap<Object, JAXBContext>();
+     static HashMap<Object, JAXBContext> cachedContexts = HashMap<Object, JAXBContext>();
 
     static {
         saxParserFactory.setNamespaceAware(true);
@@ -23,7 +23,7 @@ import 'response_parser.dart';
             saxParserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             saxParserFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
             saxParserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        } catch (Exception e) {
+        } catch ( e) {
         }
     }
 
@@ -51,13 +51,13 @@ import 'response_parser.dart';
             // if XMLReader is specified in the SAXSource instance.
             return um.unmarshal(getSAXSource(responseContent));
         } catch (JAXBException e) {
-            throw new ResponseParseException(
+            throw ResponseParseException(
                     COMMON_RESOURCE_MANAGER.getFormattedString("FailedToParseResponse", e.getMessage()), e);
         } catch (SAXException e) {
-            throw new ResponseParseException(
+            throw ResponseParseException(
                     COMMON_RESOURCE_MANAGER.getFormattedString("FailedToParseResponse", e.getMessage()), e);
         } catch (ParserConfigurationException e) {
-            throw new ResponseParseException(
+            throw ResponseParseException(
                     COMMON_RESOURCE_MANAGER.getFormattedString("FailedToParseResponse", e.getMessage()), e);
         }
     }
@@ -71,6 +71,6 @@ import 'response_parser.dart';
 
      static SAXSource getSAXSource(InputStream content) throws SAXException, ParserConfigurationException {
         SAXParser saxParser = saxParserFactory.newSAXParser();
-        return new SAXSource(saxParser.getXMLReader(), new InputSource(content));
+        return SAXSource(saxParser.getXMLReader(), InputSource(content));
     }
 }

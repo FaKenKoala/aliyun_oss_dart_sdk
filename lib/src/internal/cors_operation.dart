@@ -44,10 +44,8 @@ class CORSOperation extends OSSOperation {
 
   /// Return the CORS configuration of the specified bucket.
   CORSConfiguration getBucketCORS(GenericRequest genericRequest) {
-    assertParameterNotNull(genericRequest, "genericRequest");
 
     String bucketName = genericRequest.bucketName;
-    assertParameterNotNull(bucketName, "bucketName");
     ensureBucketNameValid(bucketName);
 
     Map<String, String> parameters = <String, String>{};

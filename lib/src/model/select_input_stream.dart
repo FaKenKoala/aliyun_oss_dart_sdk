@@ -1,5 +1,8 @@
 
- import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
+ import 'dart:math';
+
+import 'package:aliyun_oss_dart_sdk/src/event/progress_event_type.dart';
+import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
 import 'package:aliyun_oss_dart_sdk/src/event/progress_listener.dart';
 
 class SelectInputStream extends FilterInputStream {
@@ -21,8 +24,8 @@ class SelectInputStream extends FilterInputStream {
      static final int SELECT_VERSION = 1;
      static final int DEFAULT_NOTIFICATION_THRESHOLD = 50 * 1024 * 1024;//notify every scanned 50MB
 
-     int currentFrameOffset;
-     int currentFramePayloadLength;
+     int currentFrameOffset = 0;
+     int currentFramePayloadLength = 0;
      List<int> currentFrameTypeBytes;
      List<int> currentFramePayloadLengthBytes;
      List<int> currentFrameHeaderChecksumBytes;
@@ -38,30 +41,25 @@ class SelectInputStream extends FilterInputStream {
     /// need read the 4 bytes before we advance to next frame.
      bool firstReadFrame;
 
-     SelectInputStream(InputStream in, ProgressListener selectProgressListener, bool payloadCrcEnabled) {
-        super(in);
-        currentFrameOffset = 0;
-        currentFramePayloadLength = 0;
-        currentFrameTypeBytes = byte[4];
-        currentFramePayloadLengthBytes = byte[4];
-        currentFrameHeaderChecksumBytes = byte[4];
+     SelectInputStream(InputStream inputStream, this.selectProgressListener, this.payloadCrcEnabled) :super(inputStream){
+        currentFrameTypeBytes = List.filled(4, 0);
+        currentFramePayloadLengthBytes = List.filled(4, 0);
+        currentFrameHeaderChecksumBytes = List.filled(4, 0);
         scannedDataBytes = byte[8];
-        currentFramePayloadChecksumBytes = byte[4];
+        currentFramePayloadChecksumBytes = List.filled(4, 0);
         finished = false;
         firstReadFrame = true;
-        this.selectProgressListener = selectProgressListener;
-        this.nextNotificationScannedSize = DEFAULT_NOTIFICATION_THRESHOLD;
-        this.payloadCrcEnabled = payloadCrcEnabled;
-        if (this.payloadCrcEnabled) {
-            this.crc32 = CRC32();
-            this.crc32.reset();
+        nextNotificationScannedSize = DEFAULT_NOTIFICATION_THRESHOLD;
+        if (payloadCrcEnabled) {
+            crc32 = CRC32();
+            crc32.reset();
         }
     }
 
-     void internalRead(List<int> buf, int off, int len) throws IOException {
+     void internalRead(List<int> buf, int off, int len) {
         int bytesRead = 0;
         while (bytesRead < len) {
-            int bytes = in.read(buf, off + bytesRead, len - bytesRead);
+            int bytes = inputStream.read(buf, off + bytesRead, len - bytesRead);
             if (bytes < 0) {
                 throw SelectObjectException(SelectObjectException.INVALID_INPUT_STREAM, "Invalid input stream end found, need another " + (len - bytesRead) + " bytes", requestId);
             }
@@ -113,7 +111,7 @@ class SelectInputStream extends FilterInputStream {
                     currentFramePayloadLength = ByteBuffer.wrap(currentFramePayloadLengthBytes).getInt() - 8;
                     List<int> totalScannedDataSizeBytes = byte[8];
                     internalRead(totalScannedDataSizeBytes, 0, 8);
-                    List<int> statusBytes = byte[4];
+                    List<int> statusBytes = List.filled(4, 0);
                     internalRead(statusBytes, 0, 4);
                     if (payloadCrcEnabled) {
                         crc32.update(totalScannedDataSizeBytes);
@@ -161,9 +159,10 @@ class SelectInputStream extends FilterInputStream {
     }
 
     @override
-     int read() throws IOException {
+     int read([List<int>? list, int? off, int? len]) {
         readFrame();
-        int byteRead = in.read();
+        if (list == null) {
+int byteRead = inputStream.read();
         if (byteRead >= 0) {
             currentFrameOffset++;
             if (payloadCrcEnabled) {
@@ -171,23 +170,17 @@ class SelectInputStream extends FilterInputStream {
             }
         }
         return byteRead;
-    }
+        }
 
-    @override
-     int read(byte b[]) throws IOException {
-        return read(b, 0, b.length);
-    }
-
-    @override
-     int read(List<int> buf, int off, int len) throws IOException {
-        readFrame();
-        int bytesToRead = (int)Math.min(len, currentFramePayloadLength - currentFrameOffset);
+        int offset = off ?? 0;
+        int length = len ?? list.length;
+        int bytesToRead = min(length, currentFramePayloadLength - currentFrameOffset);
         if (bytesToRead != 0) {
-            int bytes = in.read(buf, off, bytesToRead);
+            int bytes = inputStream.read(list, offset, bytesToRead);
             if (bytes > 0) {
                 currentFrameOffset += bytes;
                 if (payloadCrcEnabled) {
-                    crc32.update(buf, off, bytes);
+                    crc32.update(list, offset, bytes);
                 }
             }
             return bytes;
@@ -196,11 +189,8 @@ class SelectInputStream extends FilterInputStream {
     }
 
     @override
-     int available() throws IOException {
-        throw IOException("Select object input stream does not support available() operation");
+     int available() {
+        throw Exception("Select object input stream does not support available() operation");
     }
 
-     void setRequestId(String requestId) {
-        this.requestId = requestId;
-    }
 }

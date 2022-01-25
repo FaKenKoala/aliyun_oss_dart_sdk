@@ -1,3 +1,3 @@
-abstract class Marshaller {
-  T marshall<T, R>(R input);
+abstract class Marshaller<T, R> {
+  T marshall(R input);
 }

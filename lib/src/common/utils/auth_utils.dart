@@ -2,6 +2,7 @@
 
 import 'package:aliyun_oss_dart_sdk/src/common/utils/io_utils.dart';
 import 'package:aliyun_oss_dart_sdk/src/internal/oss_upload_operation.dart';
+import 'package:encrypt/encrypt.dart';
 
 class AuthUtils {
 
@@ -104,12 +105,12 @@ class AuthUtils {
     /// @return  key description, include  key id etc.
     /// @throws ClientException
      static Key uploadKey(String regionId, String accessKeyId, String accessKeySecret,
-            String Key) {
+            String key) {
         DefaultProfile profile = DefaultProfile.getProfile(regionId, accessKeyId, accessKeySecret);
         DefaultAcsClient client = DefaultAcsClient(profile);
 
         UploadKeyRequest uploadKeyRequest = UploadKeyRequest();
-        uploadKeyRequest.setKeySpec(Key);
+        uploadKeyRequest.setKeySpec(key);
 
         UploadKeyResponse uploadKeyResponse = client.getAcsResponse(uploadKeyRequest);
         com.aliyuncs.ram.model.v20150501.UploadKeyResponse.Key pubKey = uploadKeyResponse

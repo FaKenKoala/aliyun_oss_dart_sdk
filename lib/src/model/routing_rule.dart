@@ -118,7 +118,7 @@ class MirrorMultiAlternate {
   void setPrior(int prior) {
     if (prior < 1 || prior > 10000) {
       throw ClientException("The specified prior is not valid",
-          OSSErrorCode.invalidArgument, null);
+          OSSErrorCode.INVALID_ARGUMENT, null);
     }
     _prior = prior;
   }
