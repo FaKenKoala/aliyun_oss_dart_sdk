@@ -27,3 +27,8 @@ abstract class HttpMessage {
 class InputStream {
   close() {}
 }
+
+class ByteArrayInputStream extends InputStream {
+  List<int> data;
+  ByteArrayInputStream(this.data);
+}

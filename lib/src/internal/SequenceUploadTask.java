@@ -35,7 +35,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
+import java.io.OSSIOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -219,7 +219,7 @@ import java.util.zip.CheckedInputStream;
 
             int revertUploadedLength = mUploadedLength;
 
-            if (!TextUtils.isEmpty(mSp.getStringValue(mUploadId))) {
+            if (mSp.getStringValue(mUploadId)).notNullOrEmpty {
                 revertUploadedLength = int.valueOf(mSp.getStringValue(mUploadId));
             }
 
@@ -340,7 +340,7 @@ import java.util.zip.CheckedInputStream;
                 mPartETags.add(partETag);
                 mUploadedLength += byteCount;
             }
-        } catch (Exception e) {
+        } catch ( e) {
             processException(e);
         } finally {
             try {
@@ -350,7 +350,7 @@ import java.util.zip.CheckedInputStream;
                     inputStream.close();
                 if (bufferedInputStream != null)
                     bufferedInputStream.close();
-            } catch (IOException e) {
+            } catch (OSSIOException e) {
                 OSSLog.logThrowable2Local(e);
             }
         }
@@ -380,7 +380,7 @@ import java.util.zip.CheckedInputStream;
                         }
                         oot = ObjectOutputStream(new FileOutputStream(mCRC64RecordFile));
                         oot.writeObject(maps);
-                    } catch (IOException e) {
+                    } catch (OSSIOException e) {
                         OSSLog.logThrowable2Local(e);
                     } finally {
                         if (oot != null) {

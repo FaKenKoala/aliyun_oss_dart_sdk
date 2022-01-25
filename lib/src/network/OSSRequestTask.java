@@ -23,9 +23,9 @@ import com.alibaba.sdk.android.oss.model.OSSResult;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.OSSIOException;
 import java.io.InputStream;
-import java.io.InterruptedIOException;
+import java.io.InterruptedOSSIOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +89,7 @@ import okhttp3.Response;
             OSSUtils.signRequest(message);
 
             if (context.getCancellationHandler().isCancelled()) {
-                throw InterruptedIOException("This task is cancelled!");
+                throw InterruptedOSSIOException("This task is cancelled!");
             }
 
             Request.Builder requestBuilder = Request.Builder();
@@ -206,7 +206,7 @@ import okhttp3.Response;
             // create response message
             responseMessage = buildResponseMessage(message, response);
 
-        } catch (Exception e) {
+        } catch ( e) {
             OSSLog.logError("Encounter local execpiton: " + e.toString());
             if (OSSLog.isEnableLog()) {
                 e.printStackTrace();
@@ -224,7 +224,7 @@ import okhttp3.Response;
                     context.getCompletedCallback().onSuccess(context.getRequest(), result);
                 }
                 return result;
-            } catch (IOException e) {
+            } catch (OSSIOException e) {
                 exception = OSSClientException(e.getMessage(), e);
             }
         }
@@ -260,7 +260,7 @@ import okhttp3.Response;
                     int serverTime = DateUtil.parseRfc822Date(responseDateString).getTime();
                     DateUtil.setCurrentServerTime(serverTime);
                     message.getHeaders()[OSSHeaders.DATE] = responseDateString;
-                } catch (Exception ignore) {
+                } catch ( ignore) {
                     // Fail to parse the time, ignore it
                     OSSLog.logError("[error] - synchronize time, reponseDate:" + responseDateString);
                 }

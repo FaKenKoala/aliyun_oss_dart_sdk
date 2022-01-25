@@ -3,7 +3,7 @@ package com.alibaba.sdk.android.oss.network;
 import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
 import com.alibaba.sdk.android.oss.model.OSSRequest;
 
-import java.io.IOException;
+import java.io.OSSIOException;
 
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;

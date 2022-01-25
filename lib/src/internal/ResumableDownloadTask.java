@@ -28,7 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.OSSIOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -102,7 +102,7 @@ import java.util.zip.CheckedInputStream;
                 mCompletedCallback.onFailure(mRequest, null, e);
             }
             throw e;
-        } catch (Exception e) {
+        } catch ( e) {
             OSSClientException temp;
             if (e instanceof OSSClientException) {
                 temp = (OSSClientException) e;
@@ -130,7 +130,7 @@ import java.util.zip.CheckedInputStream;
         if (mRequest.getEnableCheckPoint()) {
             try {
                 mCheckPoint.load(checkpointPath);
-            } catch (Exception e) {
+            } catch ( e) {
                 removeFile(checkpointPath);
                 removeFile(mRequest.getTempFilePath());
             }
@@ -200,7 +200,7 @@ import java.util.zip.CheckedInputStream;
         }
         // Wait for all tasks to be completed
         if (checkWaitCondition(mCheckPoint.parts.size())) {
-            synchronized (mLock) {
+             (mLock) {
                 mLock.wait();
             }
         }
@@ -336,7 +336,7 @@ import java.util.zip.CheckedInputStream;
                 output.write(buffer, 0, (int) readLength);
             }
 
-            synchronized (mLock) {
+             (mLock) {
 
                 DownloadPartResult partResult = DownloadPartResult();
                 partResult.partNumber = part.partNumber;
@@ -375,7 +375,7 @@ import java.util.zip.CheckedInputStream;
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch ( e) {
             processException(e);
         } finally {
             try {
@@ -385,7 +385,7 @@ import java.util.zip.CheckedInputStream;
                 if (content != null) {
                     content.close();
                 }
-            } catch (IOException e) {
+            } catch (OSSIOException e) {
                 OSSLog.logThrowable2Local(e);
             }
         }
@@ -417,7 +417,7 @@ import java.util.zip.CheckedInputStream;
                 ost = FileOutputStream(toFile);
                 copyFile(ist, ost);
                 if (!fromFile.delete()) {
-                    throw IOException("Failed to delete original file '" + fromFile + "'");
+                    throw OSSIOException("Failed to delete original file '" + fromFile + "'");
                 }
             } catch (FileNotFoundException e) {
                 throw e;
@@ -446,7 +446,7 @@ import java.util.zip.CheckedInputStream;
     }
 
      void processException(Exception e) {
-        synchronized (mLock) {
+         (mLock) {
             mPartExceptionCount++;
             if (mDownloadException == null) {
                 mDownloadException = e;
@@ -465,8 +465,8 @@ import java.util.zip.CheckedInputStream;
      void checkException()  {
         if (mDownloadException != null) {
             releasePool();
-            if (mDownloadException instanceof IOException) {
-                throw (IOException) mDownloadException;
+            if (mDownloadException instanceof OSSIOException) {
+                throw (OSSIOException) mDownloadException;
             } else if (mDownloadException instanceof OSSServiceException) {
                 throw (OSSServiceException) mDownloadException;
             } else if (mDownloadException instanceof OSSClientException) {
@@ -532,7 +532,7 @@ import java.util.zip.CheckedInputStream;
         /**
          * Loads the checkpoint data from the checkpoint file.
          */
-         synchronized void load(String cpFile)  {
+          void load(String cpFile)  {
             FileInputStream fileIn = null;
             ObjectInputStream in = null;
             try {
@@ -553,7 +553,7 @@ import java.util.zip.CheckedInputStream;
         /**
          * Writes the checkpoint data to the checkpoint file.
          */
-         synchronized void dump(String cpFile)  {
+          void dump(String cpFile)  {
             this.md5 = hashCode();
             FileOutputStream fileOut = null;
             ObjectOutputStream outStream = null;
@@ -574,9 +574,9 @@ import java.util.zip.CheckedInputStream;
         /**
          * Updates the part's download status.
          *
-         * @throws IOException
+         * @throws OSSIOException
          */
-         synchronized void update(int index, bool completed)  {
+          void update(int index, bool completed)  {
             parts.get(index).isCompleted = completed;
             downloadLength += parts.get(index).length;
         }
@@ -584,7 +584,7 @@ import java.util.zip.CheckedInputStream;
         /**
          * Check if the object matches the checkpoint information.
          */
-         synchronized bool isValid(InternalRequestOperation operation)  {
+          bool isValid(InternalRequestOperation operation)  {
             // Compare magic and md5 of checkpoint
             if (this.md5 != hashCode()) {
                 return false;

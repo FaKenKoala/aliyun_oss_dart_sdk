@@ -29,7 +29,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
+import java.io.OSSIOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -234,7 +234,7 @@ import java.util.concurrent.Callable;
 
             int revertUploadedLength = mUploadedLength;
 
-            if (!TextUtils.isEmpty(mSp.getStringValue(mUploadId))) {
+            if (mSp.getStringValue(mUploadId)).notNullOrEmpty {
                 revertUploadedLength = int.valueOf(mSp.getStringValue(mUploadId));
             }
 
@@ -271,7 +271,7 @@ import java.util.concurrent.Callable;
         }
 
         if (checkWaitCondition(partNumber)) {
-            synchronized (mLock) {
+             (mLock) {
                 mLock.wait();
             }
         }
@@ -317,7 +317,7 @@ import java.util.concurrent.Callable;
                         }
                         oot = ObjectOutputStream(new FileOutputStream(mCRC64RecordFile));
                         oot.writeObject(maps);
-                    } catch (IOException e) {
+                    } catch (OSSIOException e) {
                         OSSLog.logThrowable2Local(e);
                     } finally {
                         if (oot != null) {
@@ -341,7 +341,7 @@ import java.util.concurrent.Callable;
 
     @override
      void processException(Exception e) {
-        synchronized (mLock) {
+         (mLock) {
             mPartExceptionCount++;
             mUploadException = e;
             OSSLog.logThrowable2Local(e);

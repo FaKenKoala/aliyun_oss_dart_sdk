@@ -26,7 +26,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.OSSIOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -101,22 +101,22 @@ import java.util.concurrent.TimeUnit;
     /**
      * init multipart upload id
      *
-     * @throws IOException
+     * @throws OSSIOException
      * @throws OSSClientException
      * @throws OSSServiceException
      */
-     abstract void initMultipartUploadId() throws IOException, OSSClientException, OSSServiceException;
+     abstract void initMultipartUploadId() throws OSSIOException, OSSClientException, OSSServiceException;
 
     /**
      * do multipart upload task
      *
      * @return
-     * @throws IOException
+     * @throws OSSIOException
      * @throws OSSServiceException
      * @throws OSSClientException
      * @throws InterruptedException
      */
-     abstract Result doMultipartUpload() throws IOException, OSSServiceException, OSSClientException, InterruptedException;
+     abstract Result doMultipartUpload() throws OSSIOException, OSSServiceException, OSSClientException, InterruptedException;
 
     /**
      * check is or not cancel
@@ -154,7 +154,7 @@ import java.util.concurrent.TimeUnit;
                 mCompletedCallback.onFailure(mRequest, null, e);
             }
             throw e;
-        } catch (Exception e) {
+        } catch ( e) {
             OSSClientException temp;
             if (e instanceof OSSClientException) {
                 temp = (OSSClientException) e;
@@ -181,14 +181,14 @@ import java.util.concurrent.TimeUnit;
             try {
                 mUploadFileDescriptor = mContext.getApplicationContext().getContentResolver().openFileDescriptor(mUploadUri, "r");
                 mFileLength = mUploadFileDescriptor.getStatSize();
-            } catch (IOException e) {
+            } catch (OSSIOException e) {
                 throw OSSClientException(e.getMessage(), e, true);
             } finally {
                 try {
                     if (mUploadFileDescriptor != null) {
                         mUploadFileDescriptor.close();
                     }
-                } catch (IOException e) {
+                } catch (OSSIOException e) {
                     OSSLog.logThrowable2Local(e);
                 }
             }
@@ -223,7 +223,7 @@ import java.util.concurrent.TimeUnit;
                 return;
             }
 
-            synchronized (mLock) {
+             (mLock) {
                 mRunPartTaskCount++;
             }
 
@@ -250,7 +250,7 @@ import java.util.concurrent.TimeUnit;
             uploadPart.setCRC64(mRequest.getCRC64());
             UploadPartResult uploadPartResult = mApiOperation.syncUploadPart(uploadPart);
             //check isComplete
-            synchronized (mLock) {
+             (mLock) {
                 PartETag partETag = PartETag(uploadPart.getPartNumber(), uploadPartResult.getETag());
                 partETag.setPartSize(byteCount);
                 if (mCheckCRC64) {
@@ -277,7 +277,7 @@ import java.util.concurrent.TimeUnit;
 
             }
 
-        } catch (Exception e) {
+        } catch ( e) {
             processException(e);
         } finally {
             try {
@@ -287,7 +287,7 @@ import java.util.concurrent.TimeUnit;
                     bufferedInputStream.close();
                 if (inputStream != null)
                     inputStream.close();
-            } catch (IOException e) {
+            } catch (OSSIOException e) {
                 OSSLog.logThrowable2Local(e);
             }
         }
@@ -354,8 +354,8 @@ import java.util.concurrent.TimeUnit;
      void checkException()  {
         if (mUploadException != null) {
             releasePool();
-            if (mUploadException instanceof IOException) {
-                throw (IOException) mUploadException;
+            if (mUploadException instanceof OSSIOException) {
+                throw (OSSIOException) mUploadException;
             } else if (mUploadException instanceof OSSServiceException) {
                 throw (OSSServiceException) mUploadException;
             } else if (mUploadException instanceof OSSClientException) {

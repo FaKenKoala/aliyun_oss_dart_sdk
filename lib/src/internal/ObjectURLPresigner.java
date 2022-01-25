@@ -143,11 +143,11 @@ import java.util.Map;
         bool isPathStyle = false;
 
         String host = originHost;
-        if(!TextUtils.isEmpty(portString)){
+        if(portString).notNullOrEmpty{
             host += (":" + portString);
         }
 
-        if (!TextUtils.isEmpty(bucketName)) {
+        if (bucketName).notNullOrEmpty {
             if (OSSUtils.isOssOriginHost(originHost)) {
                 // official endpoint
                 host = bucketName + "." + originHost;
@@ -163,7 +163,7 @@ import java.util.Map;
                         // ip address
                         isPathStyle = true;
                     }
-                } catch (Exception e) {
+                } catch ( e) {
                     e.printStackTrace();
                 }
             }

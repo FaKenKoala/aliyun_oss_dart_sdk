@@ -7,9 +7,9 @@ import okhttp3.Call;
  */
  class CancellationHandler {
 
-     volatile bool isCancelled;
+      bool isCancelled;
 
-     volatile Call call;
+      Call call;
 
      void cancel() {
         if (call != null) {

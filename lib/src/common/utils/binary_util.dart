@@ -2,6 +2,8 @@
 
 import 'dart:html';
 
+import 'package:aliyun_oss_dart_sdk/src/internal/http_message.dart';
+
 class BinaryUtil {
      static String toBase64String(List<int> binaryData) {
         return base64.encode(binaryData).trim();
@@ -82,7 +84,7 @@ class BinaryUtil {
     /// @param filePath The filepath of the file
     /// @return The sha1 value
      static String fileToSHA1(String filePath) {
-        InputStream inputStream = null;
+        InputStream? inputStream = null;
         try {
             inputStream = FileInputStream(filePath); // Create an FileInputStream instance according to the filepath
             List<int> buffer = byte[1024]; // The buffer to read the file
@@ -96,20 +98,20 @@ class BinaryUtil {
             }
             List<int> sha1Bytes = digest.digest(); // Complete the hash computing
             return convertHashToString(sha1Bytes); // Call the function to convert to hex digits
-        } catch (Exception e) {
+        } catch ( e) {
             return null;
         } finally {
             if (inputStream != null) {
                 try {
                     inputStream.close(); // Close the InputStream
-                } catch (Exception e) {
+                } catch ( e) {
                 }
             }
         }
     }
 
-     static String fileToSHA1(FileDescriptor fileDescriptor) {
-        InputStream inputStream = null;
+     static String? fileToSHA1(FileDescriptor fileDescriptor) {
+        InputStream? inputStream;
         try {
             inputStream = FileInputStream(fileDescriptor); // Create an FileInputStream instance according to the filepath
             List<int> buffer = byte[1024]; // The buffer to read the file
@@ -123,13 +125,13 @@ class BinaryUtil {
             }
             List<int> sha1Bytes = digest.digest(); // Complete the hash computing
             return convertHashToString(sha1Bytes); // Call the function to convert to hex digits
-        } catch (Exception e) {
+        } catch ( e) {
             return null;
         } finally {
             if (inputStream != null) {
                 try {
                     inputStream.close(); // Close the InputStream
-                } catch (Exception e) {
+                } catch ( e) {
                 }
             }
         }
@@ -142,7 +144,7 @@ class BinaryUtil {
      static String convertHashToString(List<int> hashBytes) {
         String returnVal = "";
         for (int i = 0; i < hashBytes.length; i++) {
-            returnVal += Integer.toString((hashBytes[i] & 0xff) + 0x100, 16).substring(1);
+            returnVal += ((hashBytes[i] & 0xff) + 0x100).toRadixString(16).substring(1);
         }
         return returnVal.toLowerCase();
     }

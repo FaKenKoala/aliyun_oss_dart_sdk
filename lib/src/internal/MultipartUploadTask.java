@@ -10,7 +10,7 @@ import com.alibaba.sdk.android.oss.model.InitiateMultipartUploadResult;
 import com.alibaba.sdk.android.oss.model.MultipartUploadRequest;
 import com.alibaba.sdk.android.oss.network.ExecutionContext;
 
-import java.io.IOException;
+import java.io.OSSIOException;
 import java.util.concurrent.Callable;
 
 /**
@@ -63,7 +63,7 @@ import java.util.concurrent.Callable;
         }
 
         if (checkWaitCondition(partNumber)) {
-            synchronized (mLock) {
+             (mLock) {
                 mLock.wait();
             }
         }
@@ -89,7 +89,7 @@ import java.util.concurrent.Callable;
 
     @override
      void processException(Exception e) {
-        synchronized (mLock) {
+         (mLock) {
             mPartExceptionCount++;
             if (mUploadException == null) {
                 mUploadException = e;

@@ -813,9 +813,9 @@ abstract class OSS {
         * this API needs to be called to abort the underlying multipart upload.
         *
         * @param request
-        * @throws IOException
+        * @throws OSSIOException
         */
-       void abortResumableUpload(ResumableUploadRequest request) throws IOException;
+       void abortResumableUpload(ResumableUploadRequest request) throws OSSIOException;
 
        OSSAsyncTask<TriggerCallbackResult> asyncTriggerCallback(TriggerCallbackRequest request,
                      OSSCompletedCallback<TriggerCallbackRequest, TriggerCallbackResult> completedCallback);

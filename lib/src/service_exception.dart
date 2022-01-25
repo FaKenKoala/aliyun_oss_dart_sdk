@@ -14,7 +14,7 @@ class OSSServiceException implements Exception {
   final dynamic message;
 
   /// OSS error code, check out：http://help.aliyun.com/document_detail/oss/api-reference/error-response.html
-  final String errorCode;
+  final String? errorCode;
 
   /// OSS request Id
   final String requestId;

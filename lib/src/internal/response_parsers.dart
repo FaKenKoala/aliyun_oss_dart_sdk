@@ -1,73 +1,6 @@
-package com.alibaba.sdk.android.oss.internal;
-
-import android.text.TextUtils;
-import android.util.Xml;
-
-import com.alibaba.sdk.android.oss.OSSClientException;
-import com.alibaba.sdk.android.oss.OSSServiceException;
-import com.alibaba.sdk.android.oss.common.OSSHeaders;
-import com.alibaba.sdk.android.oss.common.OSSLog;
-import com.alibaba.sdk.android.oss.common.utils.CRC64;
-import com.alibaba.sdk.android.oss.common.utils.DateUtil;
-import com.alibaba.sdk.android.oss.common.utils.OSSUtils;
-import com.alibaba.sdk.android.oss.model.AbortMultipartUploadResult;
-import com.alibaba.sdk.android.oss.model.AppendObjectResult;
-import com.alibaba.sdk.android.oss.model.BucketLifecycleRule;
-import com.alibaba.sdk.android.oss.model.CompleteMultipartUploadResult;
-import com.alibaba.sdk.android.oss.model.CopyObjectResult;
-import com.alibaba.sdk.android.oss.model.CreateBucketResult;
-import com.alibaba.sdk.android.oss.model.DeleteBucketLifecycleResult;
-import com.alibaba.sdk.android.oss.model.DeleteBucketLoggingResult;
-import com.alibaba.sdk.android.oss.model.DeleteBucketResult;
-import com.alibaba.sdk.android.oss.model.DeleteMultipleObjectResult;
-import com.alibaba.sdk.android.oss.model.DeleteObjectResult;
-import com.alibaba.sdk.android.oss.model.GetBucketACLResult;
-import com.alibaba.sdk.android.oss.model.GetBucketInfoResult;
-import com.alibaba.sdk.android.oss.model.GetBucketLifecycleResult;
-import com.alibaba.sdk.android.oss.model.GetBucketLoggingResult;
-import com.alibaba.sdk.android.oss.model.GetObjectACLResult;
-import com.alibaba.sdk.android.oss.model.GetObjectResult;
-import com.alibaba.sdk.android.oss.model.GetSymlinkResult;
-import com.alibaba.sdk.android.oss.model.HeadObjectResult;
-import com.alibaba.sdk.android.oss.model.ImagePersistResult;
-import com.alibaba.sdk.android.oss.model.InitiateMultipartUploadResult;
-import com.alibaba.sdk.android.oss.model.ListBucketsResult;
-import com.alibaba.sdk.android.oss.model.ListMultipartUploadsResult;
-import com.alibaba.sdk.android.oss.model.ListObjectsResult;
-import com.alibaba.sdk.android.oss.model.ListPartsResult;
-import com.alibaba.sdk.android.oss.model.OSSBucketSummary;
-import com.alibaba.sdk.android.oss.model.OSSObjectSummary;
-import com.alibaba.sdk.android.oss.model.ObjectMetadata;
-import com.alibaba.sdk.android.oss.model.Owner;
-import com.alibaba.sdk.android.oss.model.PartSummary;
-import com.alibaba.sdk.android.oss.model.PutBucketLifecycleResult;
-import com.alibaba.sdk.android.oss.model.PutBucketLoggingResult;
-import com.alibaba.sdk.android.oss.model.PutObjectResult;
-import com.alibaba.sdk.android.oss.model.PutSymlinkResult;
-import com.alibaba.sdk.android.oss.model.RestoreObjectResult;
-import com.alibaba.sdk.android.oss.model.TriggerCallbackResult;
-import com.alibaba.sdk.android.oss.model.UploadPartResult;
-import com.alibaba.sdk.android.oss.model.GetBucketRefererResult;
-import com.alibaba.sdk.android.oss.model.PutBucketRefererResult;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-/**
- * Created by zhouzhuo on 11/23/15.
- */
  class ResponseParsers {
 
-     static CopyObjectResult parseCopyObjectResponseXML(InputStream in, CopyObjectResult result)
+     static CopyObjectResult parseCopyObjectResponseXML(InputStream inStream, CopyObjectResult result)
              {
 
         XmlPullParser parser = Xml.newPullParser();
@@ -93,7 +26,7 @@ import java.util.Map;
         return result;
     }
 
-     static ListPartsResult parseListPartsResponseXML(InputStream in, ListPartsResult result)
+     static ListPartsResult parseListPartsResponseXML(InputStream inStream, ListPartsResult result)
              {
 
         List<PartSummary> partEtagList = [];
@@ -170,7 +103,7 @@ import java.util.Map;
         return result;
     }
 
-     static CompleteMultipartUploadResult parseCompleteMultipartUploadResponseXML(InputStream in, CompleteMultipartUploadResult result)
+     static CompleteMultipartUploadResult parseCompleteMultipartUploadResponseXML(InputStream inStream, CompleteMultipartUploadResult result)
              {
         XmlPullParser parser = Xml.newPullParser();
         parser.setI[in] = "utf-8";
@@ -200,7 +133,7 @@ import java.util.Map;
         return result;
     }
 
-     static InitiateMultipartUploadResult parseInitMultipartResponseXML(InputStream in, InitiateMultipartUploadResult result)
+     static InitiateMultipartUploadResult parseInitMultipartResponseXML(InputStream inStream, InitiateMultipartUploadResult result)
              {
         XmlPullParser parser = Xml.newPullParser();
         parser.setI[in] = "utf-8";
@@ -227,14 +160,12 @@ import java.util.Map;
         return result;
     }
 
-    /**
-     * Parse the response of GetObjectACL
-     *
-     * @param in
-     * @param result
-     * @return
-     */
-     static GetObjectACLResult parseGetObjectACLResponse(InputStream in, GetObjectACLResult result)
+    /// Parse the response of GetObjectACL
+    ///
+    /// @param in
+    /// @param result
+    /// @return
+     static GetObjectACLResult parseGetObjectACLResponse(InputStream inStream, GetObjectACLResult result)
              {
         XmlPullParser parser = Xml.newPullParser();
         parser.setI[in] = "utf-8";
@@ -261,14 +192,12 @@ import java.util.Map;
         return result;
     }
 
-    /**
-     * Parse the response of GetBucketInfo
-     *
-     * @param in
-     * @return
-     * @throws Exception
-     */
-     static GetBucketInfoResult parseGetBucketInfoResponse(InputStream in, GetBucketInfoResult result)
+    /// Parse the response of GetBucketInfo
+    ///
+    /// @param in
+    /// @return
+    /// @throws Exception
+     static GetBucketInfoResult parseGetBucketInfoResponse(InputStream inStream, GetBucketInfoResult result)
              {
         XmlPullParser parser = Xml.newPullParser();
         parser.setI[in] = "utf-8";
@@ -351,14 +280,8 @@ import java.util.Map;
         return result;
     }
 
-    /**
-     * Parse the response of GetBucketACL
-     *
-     * @param in
-     * @return
-     * @throws Exception
-     */
-     static GetBucketACLResult parseGetBucketACLResponse(InputStream in, GetBucketACLResult result)
+    /// Parse the response of GetBucketACL
+     static GetBucketACLResult parseGetBucketACLResponse(InputStream inStream, GetBucketACLResult result)
              {
         XmlPullParser parser = Xml.newPullParser();
         parser.setI[in] = "utf-8";
@@ -385,7 +308,7 @@ import java.util.Map;
         return result;
     }
 
-     static GetBucketRefererResult parseGetBucketRefererResponse(InputStream in, GetBucketRefererResult result)  {
+     static GetBucketRefererResult parseGetBucketRefererResponse(InputStream inStream, GetBucketRefererResult result)  {
         XmlPullParser parser = Xml.newPullParser();
         parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
@@ -407,7 +330,7 @@ import java.util.Map;
         return result;
     }
 
-     static GetBucketLoggingResult parseGetBucketLoggingResponse(InputStream in, GetBucketLoggingResult result)  {
+     static GetBucketLoggingResult parseGetBucketLoggingResponse(InputStream inStream, GetBucketLoggingResult result)  {
         XmlPullParser parser = Xml.newPullParser();
         parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
@@ -434,7 +357,7 @@ import java.util.Map;
         return result;
     }
 
-     static GetBucketLifecycleResult parseGetBucketLifecycleResponse(InputStream in, GetBucketLifecycleResult result)  {
+     static GetBucketLifecycleResult parseGetBucketLifecycleResponse(InputStream inStream, GetBucketLifecycleResult result)  {
         XmlPullParser parser = Xml.newPullParser();
         parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
@@ -541,7 +464,7 @@ import java.util.Map;
         return result;
     }
 
-     static DeleteMultipleObjectResult parseDeleteMultipleObjectResponse(InputStream in, DeleteMultipleObjectResult result)
+     static DeleteMultipleObjectResult parseDeleteMultipleObjectResponse(InputStream inStream, DeleteMultipleObjectResult result)
              {
         XmlPullParser parser = Xml.newPullParser();
         parser.setI[in] = "utf-8";
@@ -564,15 +487,8 @@ import java.util.Map;
         return result;
     }
 
-    /**
-     * Parse the response of listBucketInService
-     *
-     * @param in
-     * @param result
-     * @return
-     * @throws IOException
-     */
-     static ListBucketsResult parseBucketListResponse(InputStream in, ListBucketsResult result)
+    /// Parse the response of listBucketInService
+     static ListBucketsResult parseBucketListResponse(InputStream inStream, ListBucketsResult result)
              {
         result.clearBucketList();
         XmlPullParser parser = Xml.newPullParser();
@@ -651,14 +567,8 @@ import java.util.Map;
         return result;
     }
 
-    /**
-     * Parse the response of listObjectInBucket
-     *
-     * @param in
-     * @return
-     * @throws Exception
-     */
-     static ListObjectsResult parseObjectListResponse(InputStream in, ListObjectsResult result)
+    /// Parse the response of listObjectInBucket
+     static ListObjectsResult parseObjectListResponse(InputStream inStream, ListObjectsResult result)
              {
         result.clearCommonPrefixes();
         result.clearObjectSummaries();
@@ -765,9 +675,7 @@ import java.util.Map;
         return s;
     }
 
-    /**
-     * Unmarshall object metadata from response headers.
-     */
+    /// Unmarshall object metadata from response headers.
      static ObjectMetadata parseObjectMetadata(Map<String, String> headers)
              {
 
@@ -783,7 +691,7 @@ import java.util.Map;
                     try {
                         objectMetadata.setHeader(key, DateUtil.parseRfc822Date(headers.get(key)));
                     } catch (ParseException pe) {
-                        throw IOException(pe.getMessage(), pe);
+                        throw OSSIOException(pe.getMessage(), pe);
                     }
                 } else if (key.equalsIgnoreCase(OSSHeaders.CONTENT_LENGTH)) {
                     int value = int.valueOf(headers.get(key));
@@ -796,8 +704,8 @@ import java.util.Map;
             }
 
             return objectMetadata;
-        } catch (Exception e) {
-            throw IOException(e.getMessage(), e);
+        } catch ( e) {
+            throw OSSIOException(e.getMessage(), e);
         }
     }
 
@@ -842,7 +750,7 @@ import java.util.Map;
                         eventType = parser.next();
                     }
                 }
-            } catch (IOException e) {
+            } catch (OSSIOException e) {
                 return OSSClientException(e.getMessage(), e);
             } catch (XmlPullParserException e) {
                 return OSSClientException(e.getMessage(), e);
@@ -850,11 +758,11 @@ import java.util.Map;
         }
 
         OSSServiceException serviceException = OSSServiceException(statusCode, message, code, requestId, hostId, errorMessage);
-        if (!TextUtils.isEmpty(partEtag)) {
+        if (partEtag).notNullOrEmpty {
             serviceException.setPartEtag(partEtag);
         }
 
-        if (!TextUtils.isEmpty(partNumber)) {
+        if (partNumber).notNullOrEmpty {
             serviceException.setPartNumber(partNumber);
         }
 
@@ -869,7 +777,7 @@ import java.util.Map;
                  {
             result.setETag(trimQuotes(response.getHeaders().get(OSSHeaders.ETAG)));
             String body = response.getResponse().body().string();
-            if (!TextUtils.isEmpty(body)) {
+            if (body).notNullOrEmpty {
                 result.setServerCallbackReturnBody(body);
             }
             return result;
@@ -1111,7 +1019,7 @@ import java.util.Map;
                 result = parseCompleteMultipartUploadResponseXML(response.getContent(), result);
             } else {
                 String body = response.getResponse().body().string();
-                if (!TextUtils.isEmpty(body)) {
+                if (body).notNullOrEmpty {
                     result.setServerCallbackReturnBody(body);
                 }
             }
@@ -1141,7 +1049,7 @@ import java.util.Map;
         @override
          TriggerCallbackResult parseData(ResponseMessage response, TriggerCallbackResult result)  {
             String body = response.getResponse().body().string();
-            if (!TextUtils.isEmpty(body)) {
+            if (body).notNullOrEmpty {
                 result.setServerCallbackReturnBody(body);
             }
             return result;

@@ -1,16 +1,13 @@
-package com.alibaba.sdk.android.oss.internal;
+ import 'dart:math';
 
-import com.alibaba.sdk.android.oss.OSSClientException;
-import com.alibaba.sdk.android.oss.OSSServiceException;
-import com.alibaba.sdk.android.oss.common.OSSLog;
+import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
+import 'package:aliyun_oss_dart_sdk/src/service_exception.dart';
 
-import java.io.InterruptedIOException;
-import java.net.SocketTimeoutException;
+import 'oss_retry_type.dart';
 
-/**
- * Created by zhouzhuo on 11/6/15.
- */
- class OSSRetryHandler {
+class OSSRetryHandler {
 
      int maxRetryCount = 2;
 
@@ -22,32 +19,31 @@ import java.net.SocketTimeoutException;
         this.maxRetryCount = maxRetryCount;
     }
 
+/// TODO:与异常类型有关，需要重点重写
      OSSRetryType shouldRetry(Exception e, int currentRetryCount) {
         if (currentRetryCount >= maxRetryCount) {
             return OSSRetryType.OSSRetryTypeShouldNotRetry;
         }
 
-        if (e instanceof OSSClientException) {
-            if (((OSSClientException) e).isCanceledException()) {
+        if (e is OSSClientException) {
+            if (e.isCanceledException()) {
                 return OSSRetryType.OSSRetryTypeShouldNotRetry;
             }
 
             Exception localException = (Exception) e.getCause();
-            if (localException instanceof InterruptedIOException
-                    && !(localException instanceof SocketTimeoutException)) {
+            if (localException is InterruptedOSSIOException
+                    && (localException is! SocketTimeoutException)) {
                 OSSLog.logError("[shouldRetry] - is interrupted!");
                 return OSSRetryType.OSSRetryTypeShouldNotRetry;
-            } else if (localException instanceof ArgumentError) {
+            } else if (localException is ArgumentError) {
                 return OSSRetryType.OSSRetryTypeShouldNotRetry;
             }
             OSSLog.logDebug("shouldRetry - " + e.toString());
-            e.getCause().printStackTrace();
             return OSSRetryType.OSSRetryTypeShouldRetry;
-        } else if (e instanceof OSSServiceException) {
-            OSSServiceException serviceException = (OSSServiceException) e;
-            if (serviceException.getErrorCode() != null && serviceException.getErrorCode().equalsIgnoreCase("RequestTimeTooSkewed")) {
+        } else if (e is OSSServiceException) {
+            if (e.errorCode.equalsIgnoreCase("RequestTimeTooSkewed")) {
                 return OSSRetryType.OSSRetryTypeShouldFixedTimeSkewedAndRetry;
-            } else if (serviceException.getStatusCode() >= 500) {
+            } else if (e.statusCode >= 500) {
                 return OSSRetryType.OSSRetryTypeShouldRetry;
             } else {
                 return OSSRetryType.OSSRetryTypeShouldNotRetry;
@@ -59,8 +55,8 @@ import java.net.SocketTimeoutException;
 
      int timeInterval(int currentRetryCount, OSSRetryType retryType) {
         switch (retryType) {
-            case OSSRetryTypeShouldRetry:
-                return (int)Math.pow(2, currentRetryCount) * 200;
+            case OSSRetryType.OSSRetryTypeShouldRetry:
+                return (pow(2, currentRetryCount) * 200).toInt();
             default:
                 return 0;
         }

@@ -5,7 +5,7 @@ import com.alibaba.sdk.android.oss.common.OSSLog;
 import com.alibaba.sdk.android.oss.common.utils.CaseInsensitiveHashMap;
 import com.alibaba.sdk.android.oss.model.OSSResult;
 
-import java.io.IOException;
+import java.io.OSSIOException;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -26,7 +26,7 @@ import okhttp3.Response;
      static void safeCloseResponse(ResponseMessage response) {
         try {
             response.close();
-        } catch (Exception e) {
+        } catch ( e) {
         }
     }
 
@@ -58,8 +58,8 @@ import okhttp3.Response;
                 result = parseData(response, result);
             }
             return result;
-        } catch (Exception e) {
-            IOException ioException = IOException(e.getMessage(), e);
+        } catch ( e) {
+            OSSIOException ioException = OSSIOException(e.getMessage(), e);
             e.printStackTrace();
             OSSLog.logThrowable2Local(e);
             throw ioException;

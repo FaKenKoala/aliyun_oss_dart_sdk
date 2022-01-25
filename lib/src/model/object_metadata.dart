@@ -1,132 +1,57 @@
-package com.alibaba.sdk.android.oss.model;
+ import 'dart:collection';
 
-import com.alibaba.sdk.android.oss.common.OSSConstants;
-import com.alibaba.sdk.android.oss.common.OSSHeaders;
-import com.alibaba.sdk.android.oss.common.utils.CaseInsensitiveHashMap;
-import com.alibaba.sdk.android.oss.common.utils.DateUtil;
+import 'package:aliyun_oss_dart_sdk/src/common/oss_headers.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/http_headers.dart';
 
-import java.text.ParseException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * OSS object metadata class definition.
- * It includes user's custom metadata as well as standard HTTP headers (such as Content-Length, ETag, etc)
- */
- class ObjectMetadata {
+class ObjectMetadata {
 
      static final String AES_256_SERVER_SIDE_ENCRYPTION = "AES256";
     // User's custom metadata dictionary. All keys  will be prefixed with x-oss-meta-in the HTTP headers.
     // The keys in this dictionary should include the prefix 'x-oss-meta-'.
-     Map<String, String> userMetadata = CaseInsensitiveHashMap<String, String>();
+     Map<String, String> userMetadata = LinkedHashMap<String, String>(equals: (p0, p1) => p0.equalsIgnoreCase(p1));
     // Standard metadata
-     Map<String, Object> metadata = CaseInsensitiveHashMap<String, Object>();
+     Map<String, Object> metadata = LinkedHashMap<String, Object>(equals: (p0, p1) => p0.equalsIgnoreCase(p1),);
 
-    /**
-     * <p>
-     * Gets the user's custom metadata.
-     * </p>
-     * <p>
-     * The keys in this userMetadata should include the prefix 'x-oss-meta-'.
-     * For example, if customMeta is {uuid:value}, the key should be set to 'x-oss-meta-uuid'
-     * Meanwhile the metadata's key is case insensitive and all metadata keys returned from OSS is
-     * in lowercase.
-     * </p>
-     *
-     * @return User's custom metadata.
-     */
      Map<String, String> getUserMetadata() {
         return userMetadata;
     }
 
-    /**
-     * Sets user's custom metadata.
-     *
-     * @param userMetadata User's custom metadata
-     */
-     void setUserMetadata(Map<String, String> userMetadata) {
+     void setUserMetadata(Map<String, String>? userMetadata) {
         this.userMetadata.clear();
-        if (userMetadata != null && !userMetadata.isEmpty()) {
-            this.userMetadata.putAll(userMetadata);
+        if (userMetadata != null && userMetadata.isNotEmpty) {
+            this.userMetadata.addAll(userMetadata);
         }
     }
 
-    /**
-     * Sets header (SDK internal usage only).
-     *
-     * @param key   Request Key.
-     * @param value Request Value.
-     */
      void setHeader(String key, Object value) {
         metadata[key] = value;
     }
 
-    /**
-     * Adds a custom metadata.
-     *
-     * @param key   metadata key
-     *              This key should include the prefix "x-oss-meta-"
-     * @param value metadata value
-     */
      void addUserMetadata(String key, String value) {
-        this.userMetadata[key] = value;
+        userMetadata[key] = value;
     }
 
-    /**
-     * Gets the Last-Modified value, which is the time of the object's last update.
-     *
-     * @return The object's last modified time.
-     */
-     Date getLastModified() {
-        return (Date) metadata.get(OSSHeaders.LAST_MODIFIED);
+     DateTime? getLastModified() {
+        return metadata[HttpHeaders.lastModified] as DateTime?;
     }
 
-    /**
-     * Sets the Last-Modified value, which is the time of the object's last update(SDK internal only).
-     *
-     * @param lastModified The object's last modified time.
-     */
-     void setLastModified(Date lastModified) {
-        metadata[OSSHeaders.LAST_MODIFIED] = lastModified;
+     void setLastModified(DateTime lastModified) {
+        metadata[HttpHeaders.lastModified] = lastModified;
     }
 
-    /**
-     * Gets Expires header value in Rfc822 format (EEE, dd MMM yyyy HH:mm:ss 'GMT'")
-     * If the 'expires' header was not assigned with value, returns null.
-     *
-     * @return Expires header value in Rfc822 format.
-     * @throws ParseException unable to parse the Expires value into Rfc822 format
-     */
-     Date getExpirationTime()  {
-        return DateUtil.parseRfc822Date((String) metadata.get(OSSHeaders.EXPIRES));
+     DateTime getExpirationTime()  {
+        return DateTimeUtil.parseRfc822DateTime((String) metadata.get(OSSHeaders.EXPIRES));
     }
 
-    /**
-     * Sets Expires header value
-     *
-     * @param expirationTime Expires time
-     */
-     void setExpirationTime(Date expirationTime) {
-        metadata[OSSHeaders.EXPIRES] = DateUtil.formatRfc822Date(expirationTime);
+     void setExpirationTime(DateTime expirationTime) {
+        metadata[OSSHeaders.EXPIRES] = DateTimeUtil.formatRfc822DateTime(expirationTime);
     }
 
-    /**
-     * Gets the raw expires header value without parsing it.
-     * If the 'expires' header was not assigned with value, returns null.
-     *
-     * @return The raw expires header value
-     */
      String getRawExpiresValue() {
         return (String) metadata.get(OSSHeaders.EXPIRES);
     }
 
-    /**
-     * Gets Content-Length header value which means the object content's size.
-     *
-     * @return The value of Content-Length header.
-     */
      int getContentLength() {
         int contentLength = (int) metadata.get(OSSHeaders.CONTENT_LENGTH);
 
@@ -134,13 +59,6 @@ import java.util.Map;
         return contentLength.intValue();
     }
 
-    /**
-     * Sets Content-Length header value which means the object content's size.
-     * The Content-Length header must be specified correctly when uploading an object.
-     *
-     * @param contentLength Object content length
-     * @throws ArgumentError Object content length is more than 5GB or less than 0.
-     */
      void setContentLength(int contentLength) {
         if (contentLength > OSSConstants.DEFAULT_FILE_SIZE_LIMIT) {
             throw ArgumentError("The content length could not be more than 5GB.");
@@ -287,20 +205,20 @@ import java.util.Map;
         String s;
         String expirationTimeStr = "";
         try {
-            Date expirationTime = getExpirationTime();
+            DateTime expirationTime = getExpirationTime();
             expirationTimeStr = expirationTime.toString();
-        } catch (Exception e) {
+        } catch ( e) {
         }
-        s = OSSHeaders.LAST_MODIFIED + ":" + getLastModified() + "\n"
-                + OSSHeaders.EXPIRES + ":" + expirationTimeStr + "\n"
+        s = HttpHeaders.lastModified + ":" + getLastModified() + "\n"
+                + HttpHeaders.expires + ":" + expirationTimeStr + "\n"
                 + "rawExpires" + ":" + getRawExpiresValue() + "\n"
-                + OSSHeaders.CONTENT_MD5 + ":" + getContentMD5() + "\n"
-                + OSSHeaders.OSS_OBJECT_TYPE + ":" + getObjectType() + "\n"
-                + OSSHeaders.OSS_SERVER_SIDE_ENCRYPTION + ":" + getServerSideEncryption() + "\n"
-                + OSSHeaders.CONTENT_DISPOSITION + ":" + getContentDisposition() + "\n"
-                + OSSHeaders.CONTENT_ENCODING + ":" + getContentEncoding() + "\n"
-                + OSSHeaders.CACHE_CONTROL + ":" + getCacheControl() + "\n"
-                + OSSHeaders.ETAG + ":" + getETag() + "\n";
+                + HttpHeaders.contentMd5 + ":" + getContentMD5() + "\n"
+                + OSSHeaders.ossObjectType + ":" + getObjectType() + "\n"
+                + OSSHeaders.ossServerSideEncryption + ":" + getServerSideEncryption() + "\n"
+                + HttpHeaders.contentDisposition + ":" + getContentDisposition() + "\n"
+                + HttpHeaders.contentEncoding + ":" + getContentEncoding() + "\n"
+                + HttpHeaders.cacheControl + ":" + getCacheControl() + "\n"
+                + HttpHeaders.etag + ":" + getETag() + "\n";
 
         return s;
     }

@@ -9,7 +9,7 @@ package com.alibaba.sdk.android.oss.common.utils;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.OSSIOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -94,7 +94,7 @@ import java.io.Writer;
         if (inputStream != null) {
             try {
                 inputStream.close();
-            } catch (IOException e) {
+            } catch (OSSIOException e) {
             }
         }
     }
@@ -103,7 +103,7 @@ import java.io.Writer;
         if (outputStream != null) {
             try {
                 outputStream.close();
-            } catch (IOException e) {
+            } catch (OSSIOException e) {
             }
         }
     }

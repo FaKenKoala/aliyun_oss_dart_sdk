@@ -61,7 +61,7 @@ import okhttp3.OkHttpClient;
                     return Thread(r, "oss-android-api-thread");
                 }
             });
-     volatile URI endpoint;
+      URI endpoint;
      URI service;
      OkHttpClient innerClient;
      Context applicationContext;
@@ -109,7 +109,7 @@ import okhttp3.OkHttpClient;
         try {
             service = URI("http://oss.aliyuncs.com");
             endpoint = URI("http://127.0.0.1"); //构造假的endpoint
-        } catch (Exception e) {
+        } catch ( e) {
             throw ArgumentError("Endpoint must be a string like 'http://oss-cn-****.aliyuncs.com'," +
                     "or your cname like 'http://image.cnamedomain.com'!");
         }
@@ -1021,7 +1021,7 @@ import okhttp3.OkHttpClient;
             }
 
             String confProxyHost = conf.getProxyHost();
-            if (!TextUtils.isEmpty(confProxyHost)) {
+            if (confProxyHost).notNullOrEmpty {
                 proxyHost = confProxyHost;
             }
 

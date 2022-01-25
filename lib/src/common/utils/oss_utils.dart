@@ -1,4 +1,16 @@
- import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
+ import 'dart:convert';
+
+import 'package:aliyun_oss_dart_sdk/src/common/auth/hmac_sha1_signature.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/auth/oss_credential_provider.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/auth/oss_federation_credential_provider.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/auth/oss_federation_token.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/oss_constants.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/request_message.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
+
+import 'http_util.dart';
 
 class OSSUtils {
 
@@ -226,9 +238,8 @@ class OSSUtils {
     ///
     /// @param str
     /// @return
-     static bool isEmptyString(String str) {
-        return TextUtils.isEmpty(str);
-
+     static bool isEmptyString(String? str) {
+        return str?.isEmpty??true;
     }
 
      static String buildCanonicalString(RequestMessage request) {
@@ -282,40 +293,38 @@ class OSSUtils {
         return canonicalString.toString();
     }
 
-     static String buildCanonicalizedResource(String bucketName, String objectKey, Map<String, String> parameters) {
+     static String buildCanonicalizedResource(String? bucketName, String? objectKey, Map<String, String>? parameters) {
         String resourcePath;
         if (bucketName == null && objectKey == null) {
             resourcePath = "/";
         } else if (objectKey == null) {
-            resourcePath = "/" + bucketName + "/";
+            resourcePath = "/$bucketName/";
         } else {
-            resourcePath = "/" + bucketName + "/" + objectKey;
+            resourcePath = "/$bucketName/$objectKey";
         }
 
-        return buildCanonicalizedResource(resourcePath, parameters);
+        return buildCanonicalizedResourceWithPath(resourcePath, parameters);
     }
 
-     static String buildCanonicalizedResource(String resourcePath, Map<String, String> parameters) {
+     static String buildCanonicalizedResourceWithPath(String resourcePath, Map<String, String>? parameters) {
 
         StringBuffer builder = StringBuffer();
         builder.write(resourcePath);
 
         if (parameters != null) {
-            String[] parameterNames = parameters.keySet().toArray(
-                    String[parameters.size()]);
-            Arrays.sort(parameterNames);
+            List<String> parameterNames = parameters.keys.toList()..sort();
 
-            char separater = '?';
-            for (String paramName : parameterNames) {
+            String separater = '?';
+            for (String paramName in parameterNames) {
                 if (!signedParameters.contains(paramName)) {
                     continue;
                 }
 
                 builder.write(separater);
                 builder.write(paramName);
-                String paramValue = parameters.get(paramName);
-                if (!isEmptyString(paramValue)) {
-                    builder.write("=").write(paramValue);
+                String? paramValue = parameters[paramName];
+                if (paramValue.notNullOrEmpty) {
+                    builder..write("=")..write(paramValue);
                 }
 
                 separater = '&';
@@ -326,30 +335,27 @@ class OSSUtils {
     }
 
     /// Encode request parameters to URL segment.
-     static String paramToQueryString(Map<String, String> params, String charset) {
+     static String? paramToQueryString(Map<String, String>? params) {
 
-        if (params == null || params.isEmpty()) {
+        if (params == null || params.isEmpty) {
             return null;
         }
 
         StringBuffer paramString = StringBuffer();
         bool first = true;
-        for (Map.Entry<String, String> p : params.entrySet()) {
-            String key = p.getKey();
-            String value = p.getValue();
-
-            if (!first) {
+        params.forEach((key, value) { 
+if (!first) {
                 paramString.write("&");
             }
 
             // Urlencode each request parameter
-            paramString.write(HttpUtil.urlEncode(key, charset));
-            if (!isEmptyString(value)) {
-                paramString.write("=").write(HttpUtil.urlEncode(value, charset));
+            paramString.write(HttpUtil.urlEncode(key));
+            if (value.notNullOrEmpty) {
+                paramString..write("=")..write(HttpUtil.urlEncode(value));
             }
 
             first = false;
-        }
+        });
 
         return paramString.toString();
     }
@@ -370,21 +376,20 @@ class OSSUtils {
         String signature;
 
         try {
-            signature = HmacSHA1Signature().computeSignature(screctKey, content);
+            signature = HmacSHA1Signature().computeSignature(screctKey, content)!;
             signature = signature.trim();
-        } catch (Exception e) {
-            throw IllegalStateException("Compute signature failed!", e);
+        } catch ( e) {
+            throw Exception("Compute signature failed! $e");
         }
 
         return "OSS " + accessKey + ":" + signature;
     }
 
-    ///
      static bool isOssOriginHost(String host){
-        if (TextUtils.isEmpty(host)){
+        if (host.nullOrEmpty){
             return false;
         }
-        for (String suffix : OSSConstants.OSSORIGNHOST) {
+        for (String suffix in OSSConstants.ossOrignHost) {
             if (host.toLowerCase().endsWith(suffix)) {
                 return true;
             }
@@ -394,7 +399,7 @@ class OSSUtils {
 
     /// 判断一个域名是否是cname
      static bool isCname(String host) {
-        for (String suffix : OSSConstants.DEFAULTCNAMEEXCLUDELIST) {
+        for (String suffix in OSSConstants.defaultCnameExcludeList) {
             if (host.toLowerCase().endsWith(suffix)) {
                 return false;
             }
@@ -404,7 +409,7 @@ class OSSUtils {
 
     /// 判断一个域名是否在自定义Cname排除列表之中
      static bool isInCustomCnameExcludeList(String endpoint, List<String> customCnameExludeList) {
-        for (String host : customCnameExludeList) {
+        for (String host in customCnameExludeList) {
             if (endpoint.endsWith(host.toLowerCase())) {
                 return true;
             }
@@ -422,15 +427,15 @@ class OSSUtils {
     ///
     /// @param bucketName
     /// @return
-     static bool validateBucketName(String bucketName) {
+     static bool validateBucketName(String? bucketName) {
         if (bucketName == null) {
             return false;
         }
-        final String BUCKETNAMEREGX = "^[a-z0-9][a-z0-9\\-]{1,61}[a-z0-9]$";
-        return bucketName.matches(BUCKETNAMEREGX);
+        final String BUCKETNAMEREGX = "^[a-z0-9][a-z0-9\\-]{1,61}[a-z0-9]\$";
+        return RegExp(BUCKETNAMEREGX).hasMatch(bucketName);
     }
 
-     static void ensureBucketNameValid(String bucketName) {
+     static void ensureBucketNameValid(String? bucketName) {
         if (!validateBucketName(bucketName)) {
             throw ArgumentError("The bucket name is invalid. \n" +
                     "A bucket name must: \n" +
@@ -444,25 +449,25 @@ class OSSUtils {
     ///
     /// @param objectKey
     /// @return
-     static bool validateObjectKey(String objectKey) {
+     static bool validateObjectKey(String? objectKey) {
         if (objectKey == null) {
             return false;
         }
-        if (objectKey.length() <= 0 || objectKey.length() > 1023) {
+        if (objectKey.isEmpty || objectKey.length > 1023) {
             return false;
         }
-        List<int> keyBytes;
-        try {
-            keyBytes = objectKey.getBytes(OSSConstants.defaultCharsetName);
-        } catch (UnsupportedEncodingException e) {
-            return false;
-        }
-        char[] keyChars = objectKey.toCharArray();
-        char beginKeyChar = keyChars[0];
+        // List<int> keyBytes;
+        // try {
+        //     keyBytes = utf8.encode(objectKey);
+        // } catch ( e) {
+        //     return false;
+        // }
+        String beginKeyChar = objectKey.substring(0, 1);
         if (beginKeyChar == '/' || beginKeyChar == '\\') {
             return false;
         }
-        for (char keyChar : keyChars) {
+        for (int i = 0; i < objectKey.length; i++) {
+          int keyChar = objectKey.codeUnitAt(i);
             if (keyChar != 0x09 && keyChar < 0x20) {
                 return false;
             }
@@ -470,7 +475,7 @@ class OSSUtils {
         return true;
     }
 
-     static void ensureObjectKeyValid(String objectKey) {
+     static void ensureObjectKeyValid(String? objectKey) {
         if (!validateObjectKey(objectKey)) {
             throw ArgumentError("The object key is invalid. \n" +
                     "An object name should be: \n" +
@@ -481,24 +486,24 @@ class OSSUtils {
     }
 
      static bool doesRequestNeedObjectKey(OSSRequest request) {
-        if (request instanceof ListObjectsRequest
-                || request instanceof ListBucketsRequest
-                || request instanceof CreateBucketRequest
-                || request instanceof DeleteBucketRequest
-                || request instanceof GetBucketInfoRequest
-                || request instanceof GetBucketACLRequest
-                || request instanceof DeleteMultipleObjectRequest
-                || request instanceof ListMultipartUploadsRequest
-                || request instanceof GetBucketRefererRequest
-                || request instanceof PutBucketRefererRequest
-                || request instanceof PutBucketLoggingRequest
-                || request instanceof GetBucketLoggingRequest
-                || request instanceof PutBucketLoggingRequest
-                || request instanceof GetBucketLoggingRequest
-                || request instanceof DeleteBucketLoggingRequest
-                || request instanceof PutBucketLifecycleRequest
-                || request instanceof GetBucketLifecycleRequest
-                || request instanceof DeleteBucketLifecycleRequest) {
+        if (request is ListObjectsRequest
+                || request is ListBucketsRequest
+                || request is CreateBucketRequest
+                || request is DeleteBucketRequest
+                || request is GetBucketInfoRequest
+                || request is GetBucketACLRequest
+                || request is DeleteMultipleObjectRequest
+                || request is ListMultipartUploadsRequest
+                || request is GetBucketRefererRequest
+                || request is PutBucketRefererRequest
+                || request is PutBucketLoggingRequest
+                || request is GetBucketLoggingRequest
+                || request is PutBucketLoggingRequest
+                || request is GetBucketLoggingRequest
+                || request is DeleteBucketLoggingRequest
+                || request is PutBucketLifecycleRequest
+                || request is GetBucketLifecycleRequest
+                || request is DeleteBucketLifecycleRequest) {
             return false;
         } else {
             return true;
@@ -506,7 +511,7 @@ class OSSUtils {
     }
 
      static bool doesBucketNameValid(OSSRequest request) {
-        if (request instanceof ListBucketsRequest) {
+        if (request is ListBucketsRequest) {
             return false;
         } else {
             return true;
@@ -515,18 +520,18 @@ class OSSUtils {
 
      static void ensureRequestValid(OSSRequest request, RequestMessage message) {
         if (doesBucketNameValid(request)) {
-            ensureBucketNameValid(message.getBucketName());
+            ensureBucketNameValid(message.bucketName);
         }
         if (doesRequestNeedObjectKey(request)) {
-            ensureObjectKeyValid(message.getObjectKey());
+            ensureObjectKeyValid(message.objectKey);
         }
 
-        if (request instanceof CopyObjectRequest) {
-            ensureObjectKeyValid(((CopyObjectRequest) request).getDestinationKey());
+        if (request is CopyObjectRequest) {
+            ensureObjectKeyValid((request.getDestinationKey());
         }
     }
 
-     static String determineContentType(String initValue, String srcPath, String toObjectKey) {
+     static String determineContentType(String? initValue, String? srcPath, String? toObjectKey) {
         if (initValue != null) {
             return initValue;
         }
@@ -534,7 +539,7 @@ class OSSUtils {
         MimeTypeMap typeMap = MimeTypeMap.getSingleton();
         if (srcPath != null) {
             String extension = srcPath.substring(srcPath.lastIndexOf('.') + 1);
-            String contentType = typeMap.getMimeTypeFromExtension(extension);
+            String? contentType = typeMap.getMimeTypeFromExtension(extension);
             if (contentType != null) {
                 return contentType;
             }
@@ -542,7 +547,7 @@ class OSSUtils {
 
         if (toObjectKey != null) {
             String extension = toObjectKey.substring(toObjectKey.lastIndexOf('.') + 1);
-            String contentType = typeMap.getMimeTypeFromExtension(extension);
+            String? contentType = typeMap.getMimeTypeFromExtension(extension);
             if (contentType != null) {
                 return contentType;
             }
@@ -551,28 +556,28 @@ class OSSUtils {
         return "application/octet-stream";
     }
 
-     static void signRequest(RequestMessage message)  {
+     static void signRequest(RequestMessage message)  async{
         OSSLog.logDebug("signRequest start");
         if (!message.isAuthorizationRequired()) {
             return;
         } else {
-            if (message.getCredentialProvider() == null) {
+            if (message.credentialProvider == null) {
                 throw IllegalStateException("当前CredentialProvider为空！！！"
                         + "\n1. 请检查您是否在初始化OSSService时设置CredentialProvider;"
                         + "\n2. 如果您bucket为公共权限，请确认获取到Bucket后已经调用Bucket中接口声明ACL;");
             }
         }
 
-        OSSCredentialProvider credentialProvider = message.getCredentialProvider();
-        OSSFederationToken federationToken = null;
-        if (credentialProvider instanceof OSSFederationCredentialProvider) {
-            federationToken = ((OSSFederationCredentialProvider) credentialProvider).getValidFederationToken();
+        OSSCredentialProvider credentialProvider = message.credentialProvider!;
+        OSSFederationToken? federationToken;
+        if (credentialProvider is OSSFederationCredentialProvider) {
+            federationToken =  await credentialProvider.getValidFederationToken();
             if (federationToken == null) {
                 OSSLog.logError("Can't get a federation token");
-                throw IOException("Can't get a federation token");
+                throw OSSIOException("Can't get a federation token");
             }
             message.getHeaders()[OSSHeaders.OSSSECURITYTOKEN] = federationToken.getSecurityToken();
-        } else if (credentialProvider instanceof OSSStsTokenCredentialProvider) {
+        } else if (credentialProvider is OSSStsTokenCredentialProvider) {
             federationToken = credentialProvider.getFederationToken();
             message.getHeaders()[OSSHeaders.OSSSECURITYTOKEN] = federationToken.getSecurityToken();
         }
@@ -580,13 +585,13 @@ class OSSUtils {
         String contentToSign = OSSUtils.buildCanonicalString(message);
         String signature = "---initValue---";
         OSSLog.logDebug("get contentToSign");
-        if (credentialProvider instanceof OSSFederationCredentialProvider ||
-                credentialProvider instanceof OSSStsTokenCredentialProvider) {
+        if (credentialProvider is OSSFederationCredentialProvider ||
+                credentialProvider is OSSStsTokenCredentialProvider) {
             signature = OSSUtils.sign(federationToken.getTempAK(), federationToken.getTempSK(), contentToSign);
-        } else if (credentialProvider instanceof OSSPlainTextAKSKCredentialProvider) {
+        } else if (credentialProvider is OSSPlainTextAKSKCredentialProvider) {
             signature = OSSUtils.sign(((OSSPlainTextAKSKCredentialProvider) credentialProvider).getAccessKeyId(),
                     ((OSSPlainTextAKSKCredentialProvider) credentialProvider).getAccessKeySecret(), contentToSign);
-        } else if (credentialProvider instanceof OSSCustomSignerCredentialProvider) {
+        } else if (credentialProvider is OSSCustomSignerCredentialProvider) {
             signature = ((OSSCustomSignerCredentialProvider) credentialProvider).signContent(contentToSign);
         }
 
@@ -637,7 +642,7 @@ class OSSUtils {
     /// *
     /// @param host
     /// @return
-     static bool isValidateIP(String host)  {
+     static bool isValidateIP(String? host)  {
         if (host == null) {
             throw Exception("host is null");
         }
@@ -649,18 +654,10 @@ class OSSUtils {
                 Class<?> aClass = Class.forName("java.net.InetAddress");
                 Method isNumeric = aClass.getMethod("isNumeric", String.class);
                 bool isIp = (bool) isNumeric.invoke(null, host);
-                return isIp.boolValue();
-            } catch (ClassNotFoundException e) {
+                return isIp;
+            } catch ( e) {
                 return false;
-            } catch (NoSuchMethodException e) {
-                return false;
-            } catch (IllegalAccessException e) {
-                return false;
-            } catch (ArgumentError e) {
-                return false;
-            } catch (InvocationTargetException e) {
-                return false;
-            }
+            } 
         }
     }
 
@@ -694,7 +691,7 @@ class OSSUtils {
             builder.write(action);
         }
         builder.write("|sys/");
-        if (!TextUtils.isEmpty(toBucketName) && !TextUtils.isEmpty(toObjectKey)) {
+        if (OSSUtils.isEmptyString(str)toBucketName) && !TextUtils.isEmpty(toObjectKey).notNullOrEmpty {
             String bucketNameBase64 = base64.encodeToString(toBucketName.getBytes(), base64.NOWRAP);
             String objectkeyBase64 = base64.encodeToString(toObjectKey.getBytes(), base64.NOWRAP);
             builder.write("saveas,o");

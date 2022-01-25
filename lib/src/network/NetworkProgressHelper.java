@@ -1,7 +1,7 @@
 package com.alibaba.sdk.android.oss.network;
 
 
-import java.io.IOException;
+import java.io.OSSIOException;
 import java.io.InputStream;
 
 import okhttp3.Interceptor;

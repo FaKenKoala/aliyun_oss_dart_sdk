@@ -62,7 +62,7 @@ class OSSLog {
     }
   }
 
-  static void logThrowable2Local(Exception exception) {
+  static void logThrowable2Local(dynamic exception) {
     if (_enableLog) {
       // OSSLogToFileUtils.getInstance().write(exception);
     }

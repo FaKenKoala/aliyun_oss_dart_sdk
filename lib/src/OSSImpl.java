@@ -90,7 +90,7 @@ import com.alibaba.sdk.android.oss.model.TriggerCallbackResult;
 import com.alibaba.sdk.android.oss.model.UploadPartRequest;
 import com.alibaba.sdk.android.oss.model.UploadPartResult;
 
-import java.io.IOException;
+import java.io.OSSIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -133,7 +133,7 @@ class OSSImpl implements OSS {
         bool hostIsIP = false;
         try {
             hostIsIP = OSSUtils.isValidateIP(this.endpointURI.getHost());
-        } catch (Exception e) {
+        } catch ( e) {
             e.printStackTrace();
         }
 

@@ -17,7 +17,7 @@ import java.util.concurrent.Future;
 
      ExecutionContext context;
 
-     volatile bool canceled;
+      bool canceled;
 
      static OSSAsyncTask wrapRequestTask(Future future, ExecutionContext context) {
         OSSAsyncTask asynTask = OSSAsyncTask();
@@ -77,7 +77,7 @@ import java.util.concurrent.Future;
      void waitUntilFinished() {
         try {
             future.get();
-        } catch (Exception ignore) {
+        } catch ( ignore) {
         }
     }
 

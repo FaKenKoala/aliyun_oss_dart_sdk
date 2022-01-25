@@ -64,7 +64,7 @@
 
 //      static OSSLogToFileUtils getInstance() {
 //         if (instance == null) {
-//             synchronized (OSSLogToFileUtils.class) {
+//              (OSSLogToFileUtils.class) {
 //                 if (instance == null) {
 //                     instance = OSSLogToFileUtils();
 //                 }
@@ -117,7 +117,7 @@
 //                     availCount = sf.getAvailableBlocks();
 //                 }
 //                 sdCardSize = availCount * blockSize;
-//             } catch (Exception e) {
+//             } catch ( e) {
 //                 sdCardSize = 0;
 //             }
 //         }
@@ -138,7 +138,7 @@
 //                 availCount = sf.getAvailableBlocks();
 //             }
 //             systemSpaceSize = availCount * blockSize / 1024;
-//         } catch (Exception e) {
+//         } catch ( e) {
 //             systemSpaceSize = 0;
 //         }
 //         OSSLog.logDebug("内部存储空间:" + String.valueOf(systemSpaceSize) + "kb", false);
@@ -209,7 +209,7 @@
 //                 canStorage = readSystemSpace() > LOG_MAX_SIZE / 1024;
 //                 file = File(sContext.getFilesDir().getPath() + File.separator + LOG_DIR_NAME);
 //             }
-//         } catch (Exception e) {
+//         } catch ( e) {
 //             canStorage = false;
 //         }
 //         // 若目录不存在则创建目录
@@ -241,7 +241,7 @@
 
 //             try {
 //                 contentResolver.openFileDescriptor(uri, "w");
-//             } catch (Exception e) {
+//             } catch ( e) {
 //                 return null;
 //             }
 //         }
@@ -256,8 +256,8 @@
 //         Uri external = MediaStore.Files.getContentUri("external");
 //         String selection =MediaStore.Files.FileColumns.RELATIVE_PATH+" like ? AND "
 //                 + MediaStore.Files.FileColumns.DISPLAY_NAME + "=?";
-//         String[] args = String[]{"Documents/" + LOG_DIR_NAME + "%", "logs.csv"};
-//         String[] projection = String[]{MediaStore.Files.FileColumns._ID};
+//         List<String> args = List<String>{"Documents/" + LOG_DIR_NAME + "%", "logs.csv"};
+//         List<String> projection = List<String>{MediaStore.Files.FileColumns._ID};
 //         Cursor cursor = contentResolver.query(external, projection, selection, args, null);
 
 //         if (cursor != null && cursor.moveToFirst()) {
@@ -270,7 +270,7 @@
 //      void createNewFile(File logFile) {
 //         try {
 //             logFile.createNewFile();
-//         } catch (Exception e) {
+//         } catch ( e) {
 //             OSSLog.logError("Create log file failure !!! " + e.toString(), false);
 //         }
 //     }
@@ -284,7 +284,7 @@
 //         return msg;
 //     }
 
-//      synchronized void write(Object str) {
+//       void write(Object str) {
 //         if (OSSLog.isEnableLog()) {
 //             // 判断是否初始化或者初始化是否成功
 //             if (null == sContext || null == instance || null == sLogFile) {
@@ -330,7 +330,7 @@
 //                         pw.println();
 //                         pw.close();
 //                     }
-//                 } catch (IOException e) {
+//                 } catch (OSSIOException e) {
 //                     e.printStackTrace();
 //                 }
 //             }

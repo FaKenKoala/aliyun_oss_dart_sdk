@@ -85,7 +85,7 @@ import com.alibaba.sdk.android.oss.model.TriggerCallbackResult;
 import com.alibaba.sdk.android.oss.model.UploadPartRequest;
 import com.alibaba.sdk.android.oss.model.UploadPartResult;
 
-import java.io.IOException;
+import java.io.OSSIOException;
 
 /**
  * The entry point class of (Open Storage Service, OSS）, which is the implementation of abstract class
