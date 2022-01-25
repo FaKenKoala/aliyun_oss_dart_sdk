@@ -185,12 +185,12 @@ import java.util.Map;
      void createBucketRequestBodyMarshall(Map<String, String> configures) throws UnsupportedEncodingException {
         StringBuffer xmlBody = StringBuffer();
         if (configures != null) {
-            xmlBody.append("<CreateBucketConfiguration>");
+            xmlBody.write("<CreateBucketConfiguration>");
             for (Map.Entry<String, String> entry : configures.entrySet()) {
-                xmlBody.append("<" + entry.getKey() + ">" + entry.getValue() + "</" + entry.getKey() + ">");
+                xmlBody.write("<" + entry.getKey() + ">" + entry.getValue() + "</" + entry.getKey() + ">");
             }
-            xmlBody.append("</CreateBucketConfiguration>");
-            byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
+            xmlBody.write("</CreateBucketConfiguration>");
+            byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.defaultCharsetName);
             int length = binaryData.length;
             InputStream inStream = ByteArrayInputStream(binaryData);
             setContent(inStream);
@@ -200,18 +200,18 @@ import java.util.Map;
 
      void putBucketRefererRequestBodyMarshall(ArrayList<String> referers, bool allowEmpty) throws UnsupportedEncodingException {
         StringBuffer xmlBody = StringBuffer();
-        xmlBody.append("<RefererConfiguration>");
-        xmlBody.append("<AllowEmptyReferer>" + (allowEmpty ? "true" : "false") + "</AllowEmptyReferer>");
+        xmlBody.write("<RefererConfiguration>");
+        xmlBody.write("<AllowEmptyReferer>" + (allowEmpty ? "true" : "false") + "</AllowEmptyReferer>");
         if (referers != null && referers.size() > 0) {
-            xmlBody.append("<RefererList>");
+            xmlBody.write("<RefererList>");
             for (String referer : referers) {
-                xmlBody.append("<Referer>" + referer + "</Referer>");
+                xmlBody.write("<Referer>" + referer + "</Referer>");
             }
-            xmlBody.append("</RefererList>");
+            xmlBody.write("</RefererList>");
         }
-        xmlBody.append("</RefererConfiguration>");
+        xmlBody.write("</RefererConfiguration>");
 
-        byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
+        byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.defaultCharsetName);
         int length = binaryData.length;
         InputStream inStream = ByteArrayInputStream(binaryData);
         setContent(inStream);
@@ -220,18 +220,18 @@ import java.util.Map;
 
      void putBucketLoggingRequestBodyMarshall(String targetBucketName, String targetPrefix) throws UnsupportedEncodingException {
         StringBuffer xmlBody = StringBuffer();
-        xmlBody.append("<BucketLoggingStatus>");
+        xmlBody.write("<BucketLoggingStatus>");
         if (targetBucketName != null) {
-            xmlBody.append("<LoggingEnabled><TargetBucket>" + targetBucketName + "</TargetBucket>");
+            xmlBody.write("<LoggingEnabled><TargetBucket>" + targetBucketName + "</TargetBucket>");
             if (targetPrefix != null) {
-                xmlBody.append("<TargetPrefix>" + targetPrefix + "</TargetPrefix>");
+                xmlBody.write("<TargetPrefix>" + targetPrefix + "</TargetPrefix>");
             }
-            xmlBody.append("</LoggingEnabled>");
+            xmlBody.write("</LoggingEnabled>");
         }
 
-        xmlBody.append("</BucketLoggingStatus>");
+        xmlBody.write("</BucketLoggingStatus>");
 
-        byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
+        byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.defaultCharsetName);
         int length = binaryData.length;
         InputStream inStream = ByteArrayInputStream(binaryData);
         setContent(inStream);
@@ -240,44 +240,44 @@ import java.util.Map;
 
      void putBucketLifecycleRequestBodyMarshall(ArrayList<BucketLifecycleRule> lifecycleRules) throws UnsupportedEncodingException {
         StringBuffer xmlBody = StringBuffer();
-        xmlBody.append("<LifecycleConfiguration>");
+        xmlBody.write("<LifecycleConfiguration>");
         for (BucketLifecycleRule rule : lifecycleRules) {
-            xmlBody.append("<Rule>");
+            xmlBody.write("<Rule>");
             if (rule.getIdentifier() != null) {
-                xmlBody.append("<ID>" + rule.getIdentifier() + "</ID>");
+                xmlBody.write("<ID>" + rule.getIdentifier() + "</ID>");
             }
             if (rule.getPrefix() != null) {
-                xmlBody.append("<Prefix>" + rule.getPrefix() + "</Prefix>");
+                xmlBody.write("<Prefix>" + rule.getPrefix() + "</Prefix>");
             }
-            xmlBody.append("<Status>" + (rule.getStatus() ? "Enabled": "Disabled") + "</Status>");
+            xmlBody.write("<Status>" + (rule.getStatus() ? "Enabled": "Disabled") + "</Status>");
             if (rule.getDays() != null) {
-                xmlBody.append("<Days>" + rule.getDays() + "</Days>");
+                xmlBody.write("<Days>" + rule.getDays() + "</Days>");
             } else if (rule.getExpireDate() != null) {
-                xmlBody.append("<Date>" + rule.getExpireDate() + "</Date>");
+                xmlBody.write("<Date>" + rule.getExpireDate() + "</Date>");
             }
 
             if (rule.getMultipartDays() != null) {
-                xmlBody.append("<AbortMultipartUpload><Days>" + rule.getMultipartDays() + "</Days></AbortMultipartUpload>");
+                xmlBody.write("<AbortMultipartUpload><Days>" + rule.getMultipartDays() + "</Days></AbortMultipartUpload>");
             } else if (rule.getMultipartExpireDate() != null) {
-                xmlBody.append("<AbortMultipartUpload><Date>" + rule.getMultipartDays() + "</Date></AbortMultipartUpload>");
+                xmlBody.write("<AbortMultipartUpload><Date>" + rule.getMultipartDays() + "</Date></AbortMultipartUpload>");
             }
 
             if (rule.getIADays() != null) {
-                xmlBody.append("<Transition><Days>" + rule.getIADays() + "</Days><StorageClass>IA</StorageClass></Transition>");
+                xmlBody.write("<Transition><Days>" + rule.getIADays() + "</Days><StorageClass>IA</StorageClass></Transition>");
             } else if (rule.getIAExpireDate() != null) {
-                xmlBody.append("<Transition><Date>" + rule.getIAExpireDate() + "</Date><StorageClass>IA</StorageClass></Transition>");
+                xmlBody.write("<Transition><Date>" + rule.getIAExpireDate() + "</Date><StorageClass>IA</StorageClass></Transition>");
             } else if (rule.getArchiveDays() != null) {
-                xmlBody.append("<Transition><Days>" + rule.getArchiveDays() + "</Days><StorageClass>Archive</StorageClass></Transition>");
+                xmlBody.write("<Transition><Days>" + rule.getArchiveDays() + "</Days><StorageClass>Archive</StorageClass></Transition>");
             } else if (rule.getArchiveExpireDate() != null) {
-                xmlBody.append("<Transition><Date>" + rule.getArchiveExpireDate() + "</Date><StorageClass>Archive</StorageClass></Transition>");
+                xmlBody.write("<Transition><Date>" + rule.getArchiveExpireDate() + "</Date><StorageClass>Archive</StorageClass></Transition>");
             }
 
-            xmlBody.append("</Rule>");
+            xmlBody.write("</Rule>");
         }
 
-        xmlBody.append("</LifecycleConfiguration>");
+        xmlBody.write("</LifecycleConfiguration>");
 
-        byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
+        byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.defaultCharsetName);
         int length = binaryData.length;
         InputStream inStream = ByteArrayInputStream(binaryData);
         setContent(inStream);
@@ -286,19 +286,19 @@ import java.util.Map;
 
      byte[] deleteMultipleObjectRequestBodyMarshall(List<String> objectKeys, bool isQuiet) throws UnsupportedEncodingException {
         StringBuffer xmlBody = StringBuffer();
-        xmlBody.append("<Delete>");
+        xmlBody.write("<Delete>");
         if (isQuiet) {
-            xmlBody.append("<Quiet>true</Quiet>");
+            xmlBody.write("<Quiet>true</Quiet>");
         } else {
-            xmlBody.append("<Quiet>false</Quiet>");
+            xmlBody.write("<Quiet>false</Quiet>");
         }
         for (String key : objectKeys) {
-            xmlBody.append("<Object>");
-            xmlBody.append("<Key>").append(key).append("</Key>");
-            xmlBody.append("</Object>");
+            xmlBody.write("<Object>");
+            xmlBody.write("<Key>").write(key).write("</Key>");
+            xmlBody.write("</Object>");
         }
-        xmlBody.append("</Delete>");
-        byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
+        xmlBody.write("</Delete>");
+        byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.defaultCharsetName);
         int length = binaryData.length;
         InputStream inStream = ByteArrayInputStream(binaryData);
         setContent(inStream);
@@ -321,10 +321,10 @@ import java.util.Map;
             urlHost = originHost;
         }
 
-        getHeaders().put(OSSHeaders.HOST, originHost);
+        getHeaders()[OSSHeaders.HOST] = originHost;
 
         String baseURL = scheme + "://" + urlHost;
-        String queryString = OSSUtils.paramToQueryString(this.parameters, OSSConstants.DEFAULT_CHARSET_NAME);
+        String queryString = OSSUtils.paramToQueryString(this.parameters, OSSConstants.defaultCharsetName);
 
         if (OSSUtils.isEmptyString(queryString)) {
             return baseURL;
@@ -405,18 +405,18 @@ import java.util.Map;
         }
 
         if (!TextUtils.isEmpty(objectKey)) {
-            baseURL += "/" + HttpUtil.urlEncode(objectKey, OSSConstants.DEFAULT_CHARSET_NAME);
+            baseURL += "/" + HttpUtil.urlEncode(objectKey, OSSConstants.defaultCharsetName);
         }
 
-        String queryString = OSSUtils.paramToQueryString(this.parameters, OSSConstants.DEFAULT_CHARSET_NAME);
+        String queryString = OSSUtils.paramToQueryString(this.parameters, OSSConstants.defaultCharsetName);
 
         //输入请求信息日志
-        StringBuilder printReq = StringBuilder();
-        printReq.append("request---------------------\n");
-        printReq.append("request url=" + baseURL + "\n");
-        printReq.append("request params=" + queryString + "\n");
+        StringBuffer printReq = StringBuffer();
+        printReq.write("request---------------------\n");
+        printReq.write("request url=" + baseURL + "\n");
+        printReq.write("request params=" + queryString + "\n");
         for (String key : getHeaders().keySet()) {
-            printReq.append("requestHeader [" + key + "]: ").append(getHeaders().get(key) + "\n");
+            printReq.write("requestHeader [" + key + "]: ").write(getHeaders().get(key) + "\n");
         }
         OSSLog.logDebug(printReq.toString());
 

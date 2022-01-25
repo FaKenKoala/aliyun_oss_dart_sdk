@@ -75,7 +75,7 @@ import okhttp3.Response;
         CaseInsensitiveHashMap<String, String> result = CaseInsensitiveHashMap<String, String>();
         Headers headers = response.headers();
         for (int i = 0; i < headers.size(); i++) {
-            result.put(headers.name(i), headers.value(i));
+            result[headers.name(i)] = headers.value(i);
         }
         return result;
     }

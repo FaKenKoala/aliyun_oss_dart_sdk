@@ -136,9 +136,9 @@ import java.security.NoSuchAlgorithmException;
         if (md5bytes == null) {
             return "";
         }
-        StringBuilder sb = StringBuilder();
+        StringBuffer sb = StringBuffer();
         for (int i = 0; i < md5bytes.length; i++) {
-            sb.append(String.format("%02x", md5bytes[i]));
+            sb.write(String.format("%02x", md5bytes[i]));
         }
         return sb.toString();
     }

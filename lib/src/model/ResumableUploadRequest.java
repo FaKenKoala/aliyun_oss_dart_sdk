@@ -132,7 +132,7 @@ import java.io.File;
         if (!OSSUtils.isEmptyString(recordDirectory)) {
             File file = File(recordDirectory);
             if (!file.exists() || !file.isDirectory()) {
-                throw IllegalArgumentException("Record directory must exist, and it should be a directory!");
+                throw ArgumentError("Record directory must exist, and it should be a directory!");
             }
         }
         this.recordDirectory = recordDirectory;

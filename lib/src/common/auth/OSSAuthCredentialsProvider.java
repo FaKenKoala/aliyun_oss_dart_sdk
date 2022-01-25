@@ -51,7 +51,7 @@ import java.net.URL;
             HttpURLConnection conn = (HttpURLConnection) stsUrl.openConnection();
             conn.setConnectTimeout(10000);
             InputStream input = conn.getInputStream();
-            authData = IOUtils.readStreamAsString(input, OSSConstants.DEFAULT_CHARSET_NAME);
+            authData = IOUtils.readStreamAsString(input, OSSConstants.defaultCharsetName);
             if (mDecoder != null) {
                 authData = mDecoder.decode(authData);
             }

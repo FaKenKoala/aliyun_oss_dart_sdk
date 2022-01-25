@@ -65,13 +65,13 @@ import java.util.Map;
 /**
  * Created by zhouzhuo on 11/23/15.
  */
- final class ResponseParsers {
+ class ResponseParsers {
 
      static CopyObjectResult parseCopyObjectResponseXML(InputStream in, CopyObjectResult result)
             throws Exception {
 
         XmlPullParser parser = Xml.newPullParser();
-        parser.setInput(in, "utf-8");
+        parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {
             switch (eventType) {
@@ -99,7 +99,7 @@ import java.util.Map;
         List<PartSummary> partEtagList = [];
         PartSummary partSummary = null;
         XmlPullParser parser = Xml.newPullParser();
-        parser.setInput(in, "utf-8");
+        parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {
             switch (eventType) {
@@ -173,7 +173,7 @@ import java.util.Map;
      static CompleteMultipartUploadResult parseCompleteMultipartUploadResponseXML(InputStream in, CompleteMultipartUploadResult result)
             throws Exception {
         XmlPullParser parser = Xml.newPullParser();
-        parser.setInput(in, "utf-8");
+        parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {
             switch (eventType) {
@@ -203,7 +203,7 @@ import java.util.Map;
      static InitiateMultipartUploadResult parseInitMultipartResponseXML(InputStream in, InitiateMultipartUploadResult result)
             throws Exception {
         XmlPullParser parser = Xml.newPullParser();
-        parser.setInput(in, "utf-8");
+        parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {
             switch (eventType) {
@@ -237,7 +237,7 @@ import java.util.Map;
      static GetObjectACLResult parseGetObjectACLResponse(InputStream in, GetObjectACLResult result)
             throws Exception {
         XmlPullParser parser = Xml.newPullParser();
-        parser.setInput(in, "utf-8");
+        parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {
             switch (eventType) {
@@ -271,7 +271,7 @@ import java.util.Map;
      static GetBucketInfoResult parseGetBucketInfoResponse(InputStream in, GetBucketInfoResult result)
             throws Exception {
         XmlPullParser parser = Xml.newPullParser();
-        parser.setInput(in, "utf-8");
+        parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
         OSSBucketSummary bucket = null;
         Owner owner = null;
@@ -361,7 +361,7 @@ import java.util.Map;
      static GetBucketACLResult parseGetBucketACLResponse(InputStream in, GetBucketACLResult result)
             throws Exception {
         XmlPullParser parser = Xml.newPullParser();
-        parser.setInput(in, "utf-8");
+        parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {
             switch (eventType) {
@@ -387,7 +387,7 @@ import java.util.Map;
 
      static GetBucketRefererResult parseGetBucketRefererResponse(InputStream in, GetBucketRefererResult result) throws Exception {
         XmlPullParser parser = Xml.newPullParser();
-        parser.setInput(in, "utf-8");
+        parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {
             switch (eventType) {
@@ -409,7 +409,7 @@ import java.util.Map;
 
      static GetBucketLoggingResult parseGetBucketLoggingResponse(InputStream in, GetBucketLoggingResult result) throws Exception {
         XmlPullParser parser = Xml.newPullParser();
-        parser.setInput(in, "utf-8");
+        parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {
             switch (eventType) {
@@ -436,7 +436,7 @@ import java.util.Map;
 
      static GetBucketLifecycleResult parseGetBucketLifecycleResponse(InputStream in, GetBucketLifecycleResult result) throws Exception {
         XmlPullParser parser = Xml.newPullParser();
-        parser.setInput(in, "utf-8");
+        parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
         BucketLifecycleRule lifecycleRule = null;
         bool isExpirationConf = false;
@@ -544,7 +544,7 @@ import java.util.Map;
      static DeleteMultipleObjectResult parseDeleteMultipleObjectResponse(InputStream in, DeleteMultipleObjectResult result)
             throws Exception {
         XmlPullParser parser = Xml.newPullParser();
-        parser.setInput(in, "utf-8");
+        parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {
             switch (eventType) {
@@ -576,7 +576,7 @@ import java.util.Map;
             throws Exception {
         result.clearBucketList();
         XmlPullParser parser = Xml.newPullParser();
-        parser.setInput(in, "utf-8");
+        parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
         OSSBucketSummary bucket = null;
         while (eventType != XmlPullParser.END_DOCUMENT) {
@@ -663,7 +663,7 @@ import java.util.Map;
         result.clearCommonPrefixes();
         result.clearObjectSummaries();
         XmlPullParser parser = Xml.newPullParser();
-        parser.setInput(in, "utf-8");
+        parser.setI[in] = "utf-8";
         int eventType = parser.getEventType();
         OSSObjectSummary object = null;
         Owner owner = null;
@@ -817,7 +817,7 @@ import java.util.Map;
                 OSSLog.logDebug("errorMessage  ： " + " \n " +  errorMessage);
                 InputStream inputStream = ByteArrayInputStream(errorMessage.getBytes());
                 XmlPullParser parser = Xml.newPullParser();
-                parser.setInput(inputStream, "utf-8");
+                parser.setI[inputStream] = "utf-8";
                 int eventType = parser.getEventType();
                 while (eventType != XmlPullParser.END_DOCUMENT) {
                     switch (eventType) {
@@ -862,7 +862,7 @@ import java.util.Map;
         return serviceException;
     }
 
-     static final class PutObjectResponseParser extends AbstractResponseParser<PutObjectResult> {
+     static class PutObjectResponseParser extends AbstractResponseParser<PutObjectResult> {
 
         @override
          PutObjectResult parseData(ResponseMessage response, PutObjectResult result)
@@ -876,7 +876,7 @@ import java.util.Map;
         }
     }
 
-     static final class AppendObjectResponseParser extends AbstractResponseParser<AppendObjectResult> {
+     static class AppendObjectResponseParser extends AbstractResponseParser<AppendObjectResult> {
 
         @override
          AppendObjectResult parseData(ResponseMessage response, AppendObjectResult result) throws IOException {
@@ -889,7 +889,7 @@ import java.util.Map;
         }
     }
 
-     static final class HeadObjectResponseParser extends AbstractResponseParser<HeadObjectResult> {
+     static class HeadObjectResponseParser extends AbstractResponseParser<HeadObjectResult> {
 
         @override
          HeadObjectResult parseData(ResponseMessage response, HeadObjectResult result) throws Exception {
@@ -898,7 +898,7 @@ import java.util.Map;
         }
     }
 
-     static final class GetObjectResponseParser extends AbstractResponseParser<GetObjectResult> {
+     static class GetObjectResponseParser extends AbstractResponseParser<GetObjectResult> {
 
         @override
          GetObjectResult parseData(ResponseMessage response, GetObjectResult result) throws Exception {
@@ -921,7 +921,7 @@ import java.util.Map;
         }
     }
 
-     static final class GetObjectACLResponseParser extends AbstractResponseParser<GetObjectACLResult> {
+     static class GetObjectACLResponseParser extends AbstractResponseParser<GetObjectACLResult> {
 
         @override
         GetObjectACLResult parseData(ResponseMessage response, GetObjectACLResult result) throws Exception {
@@ -930,7 +930,7 @@ import java.util.Map;
         }
     }
 
-     static final class CopyObjectResponseParser extends AbstractResponseParser<CopyObjectResult> {
+     static class CopyObjectResponseParser extends AbstractResponseParser<CopyObjectResult> {
 
         @override
          CopyObjectResult parseData(ResponseMessage response, CopyObjectResult result) throws Exception {
@@ -939,7 +939,7 @@ import java.util.Map;
         }
     }
 
-     static final class CreateBucketResponseParser extends AbstractResponseParser<CreateBucketResult> {
+     static class CreateBucketResponseParser extends AbstractResponseParser<CreateBucketResult> {
 
         @override
          CreateBucketResult parseData(ResponseMessage response, CreateBucketResult result) throws Exception {
@@ -950,7 +950,7 @@ import java.util.Map;
         }
     }
 
-     static final class DeleteBucketResponseParser extends AbstractResponseParser<DeleteBucketResult> {
+     static class DeleteBucketResponseParser extends AbstractResponseParser<DeleteBucketResult> {
 
         @override
          DeleteBucketResult parseData(ResponseMessage response, DeleteBucketResult result) throws Exception {
@@ -958,7 +958,7 @@ import java.util.Map;
         }
     }
 
-     static final class GetBucketInfoResponseParser extends AbstractResponseParser<GetBucketInfoResult> {
+     static class GetBucketInfoResponseParser extends AbstractResponseParser<GetBucketInfoResult> {
 
         @override
          GetBucketInfoResult parseData(ResponseMessage response, GetBucketInfoResult result) throws Exception {
@@ -967,7 +967,7 @@ import java.util.Map;
         }
     }
 
-     static final class GetBucketACLResponseParser extends AbstractResponseParser<GetBucketACLResult> {
+     static class GetBucketACLResponseParser extends AbstractResponseParser<GetBucketACLResult> {
 
         @override
          GetBucketACLResult parseData(ResponseMessage response, GetBucketACLResult result) throws Exception {
@@ -976,7 +976,7 @@ import java.util.Map;
         }
     }
 
-     static final class PutBucketRefererResponseParser extends AbstractResponseParser<PutBucketRefererResult> {
+     static class PutBucketRefererResponseParser extends AbstractResponseParser<PutBucketRefererResult> {
 
         @override
          PutBucketRefererResult parseData(ResponseMessage response, PutBucketRefererResult result) throws Exception {
@@ -984,7 +984,7 @@ import java.util.Map;
         }
     }
 
-     static final class GetBucketRefererResponseParser extends AbstractResponseParser<GetBucketRefererResult> {
+     static class GetBucketRefererResponseParser extends AbstractResponseParser<GetBucketRefererResult> {
 
         @override
          GetBucketRefererResult parseData(ResponseMessage response, GetBucketRefererResult result) throws Exception {
@@ -993,7 +993,7 @@ import java.util.Map;
         }
     }
 
-     static final class PutBucketLoggingResponseParser extends AbstractResponseParser<PutBucketLoggingResult> {
+     static class PutBucketLoggingResponseParser extends AbstractResponseParser<PutBucketLoggingResult> {
 
         @override
          PutBucketLoggingResult parseData(ResponseMessage response, PutBucketLoggingResult result) throws Exception {
@@ -1001,7 +1001,7 @@ import java.util.Map;
         }
     }
 
-     static final class GetBucketLoggingResponseParser extends AbstractResponseParser<GetBucketLoggingResult> {
+     static class GetBucketLoggingResponseParser extends AbstractResponseParser<GetBucketLoggingResult> {
 
         @override
          GetBucketLoggingResult parseData(ResponseMessage response, GetBucketLoggingResult result) throws Exception {
@@ -1010,7 +1010,7 @@ import java.util.Map;
         }
     }
 
-     static final class DeleteBucketLoggingResponseParser extends AbstractResponseParser<DeleteBucketLoggingResult> {
+     static class DeleteBucketLoggingResponseParser extends AbstractResponseParser<DeleteBucketLoggingResult> {
 
         @override
          DeleteBucketLoggingResult parseData(ResponseMessage response, DeleteBucketLoggingResult result) throws Exception {
@@ -1018,7 +1018,7 @@ import java.util.Map;
         }
     }
 
-     static final class PutBucketLifecycleResponseParser extends AbstractResponseParser<PutBucketLifecycleResult> {
+     static class PutBucketLifecycleResponseParser extends AbstractResponseParser<PutBucketLifecycleResult> {
 
         @override
          PutBucketLifecycleResult parseData(ResponseMessage response, PutBucketLifecycleResult result) throws Exception {
@@ -1026,7 +1026,7 @@ import java.util.Map;
         }
     }
 
-     static final class GetBucketLifecycleResponseParser extends AbstractResponseParser<GetBucketLifecycleResult> {
+     static class GetBucketLifecycleResponseParser extends AbstractResponseParser<GetBucketLifecycleResult> {
 
         @override
          GetBucketLifecycleResult parseData(ResponseMessage response, GetBucketLifecycleResult result) throws Exception {
@@ -1035,7 +1035,7 @@ import java.util.Map;
         }
     }
 
-     static final class DeleteBucketLifecycleResponseParser extends AbstractResponseParser<DeleteBucketLifecycleResult> {
+     static class DeleteBucketLifecycleResponseParser extends AbstractResponseParser<DeleteBucketLifecycleResult> {
 
         @override
          DeleteBucketLifecycleResult parseData(ResponseMessage response, DeleteBucketLifecycleResult result) throws Exception {
@@ -1043,7 +1043,7 @@ import java.util.Map;
         }
     }
 
-     static final class DeleteObjectResponseParser extends AbstractResponseParser<DeleteObjectResult> {
+     static class DeleteObjectResponseParser extends AbstractResponseParser<DeleteObjectResult> {
 
         @override
          DeleteObjectResult parseData(ResponseMessage response, DeleteObjectResult result) throws Exception {
@@ -1051,7 +1051,7 @@ import java.util.Map;
         }
     }
 
-     static final class DeleteMultipleObjectResponseParser extends AbstractResponseParser<DeleteMultipleObjectResult> {
+     static class DeleteMultipleObjectResponseParser extends AbstractResponseParser<DeleteMultipleObjectResult> {
 
         @override
         DeleteMultipleObjectResult parseData(ResponseMessage response, DeleteMultipleObjectResult result) throws Exception {
@@ -1060,7 +1060,7 @@ import java.util.Map;
         }
     }
 
-     static final class ListObjectsResponseParser extends AbstractResponseParser<ListObjectsResult> {
+     static class ListObjectsResponseParser extends AbstractResponseParser<ListObjectsResult> {
 
         @override
          ListObjectsResult parseData(ResponseMessage response, ListObjectsResult result) throws Exception {
@@ -1069,7 +1069,7 @@ import java.util.Map;
         }
     }
 
-     static final class ListBucketResponseParser extends AbstractResponseParser<ListBucketsResult> {
+     static class ListBucketResponseParser extends AbstractResponseParser<ListBucketsResult> {
 
         @override
         ListBucketsResult parseData(ResponseMessage response, ListBucketsResult result) throws Exception {
@@ -1078,7 +1078,7 @@ import java.util.Map;
         }
     }
 
-     static final class InitMultipartResponseParser extends AbstractResponseParser<InitiateMultipartUploadResult> {
+     static class InitMultipartResponseParser extends AbstractResponseParser<InitiateMultipartUploadResult> {
 
         @override
          InitiateMultipartUploadResult parseData(ResponseMessage response, InitiateMultipartUploadResult result) throws Exception {
@@ -1086,7 +1086,7 @@ import java.util.Map;
         }
     }
 
-     static final class UploadPartResponseParser extends AbstractResponseParser<UploadPartResult> {
+     static class UploadPartResponseParser extends AbstractResponseParser<UploadPartResult> {
 
         @override
          UploadPartResult parseData(ResponseMessage response, UploadPartResult result) throws Exception {
@@ -1095,7 +1095,7 @@ import java.util.Map;
         }
     }
 
-     static final class AbortMultipartUploadResponseParser extends AbstractResponseParser<AbortMultipartUploadResult> {
+     static class AbortMultipartUploadResponseParser extends AbstractResponseParser<AbortMultipartUploadResult> {
 
         @override
          AbortMultipartUploadResult parseData(ResponseMessage response, AbortMultipartUploadResult result) throws Exception {
@@ -1103,7 +1103,7 @@ import java.util.Map;
         }
     }
 
-     static final class CompleteMultipartUploadResponseParser extends AbstractResponseParser<CompleteMultipartUploadResult> {
+     static class CompleteMultipartUploadResponseParser extends AbstractResponseParser<CompleteMultipartUploadResult> {
 
         @override
          CompleteMultipartUploadResult parseData(ResponseMessage response, CompleteMultipartUploadResult result) throws Exception {
@@ -1119,7 +1119,7 @@ import java.util.Map;
         }
     }
 
-     static final class ListPartsResponseParser extends AbstractResponseParser<ListPartsResult> {
+     static class ListPartsResponseParser extends AbstractResponseParser<ListPartsResult> {
 
         @override
          ListPartsResult parseData(ResponseMessage response, ListPartsResult result) throws Exception {
@@ -1128,7 +1128,7 @@ import java.util.Map;
         }
     }
 
-     static final class ListMultipartUploadsResponseParser extends AbstractResponseParser<ListMultipartUploadsResult> {
+     static class ListMultipartUploadsResponseParser extends AbstractResponseParser<ListMultipartUploadsResult> {
 
         @override
          ListMultipartUploadsResult parseData(ResponseMessage response, ListMultipartUploadsResult result) throws Exception {
@@ -1136,7 +1136,7 @@ import java.util.Map;
         }
     }
 
-     static final class TriggerCallbackResponseParser extends AbstractResponseParser<TriggerCallbackResult> {
+     static class TriggerCallbackResponseParser extends AbstractResponseParser<TriggerCallbackResult> {
 
         @override
          TriggerCallbackResult parseData(ResponseMessage response, TriggerCallbackResult result) throws Exception {
@@ -1148,7 +1148,7 @@ import java.util.Map;
         }
     }
 
-     static final class ImagePersistResponseParser extends AbstractResponseParser<ImagePersistResult> {
+     static class ImagePersistResponseParser extends AbstractResponseParser<ImagePersistResult> {
 
         @override
          ImagePersistResult parseData(ResponseMessage response, ImagePersistResult result) throws Exception {
@@ -1156,7 +1156,7 @@ import java.util.Map;
         }
     }
 
-     static final class PutSymlinkResponseParser extends AbstractResponseParser<PutSymlinkResult> {
+     static class PutSymlinkResponseParser extends AbstractResponseParser<PutSymlinkResult> {
 
         @override
         PutSymlinkResult parseData(ResponseMessage response, PutSymlinkResult result) throws Exception {
@@ -1164,7 +1164,7 @@ import java.util.Map;
         }
     }
 
-     static final class GetSymlinkResponseParser extends AbstractResponseParser<GetSymlinkResult> {
+     static class GetSymlinkResponseParser extends AbstractResponseParser<GetSymlinkResult> {
 
         @override
         GetSymlinkResult parseData(ResponseMessage response, GetSymlinkResult result) throws Exception {
@@ -1173,7 +1173,7 @@ import java.util.Map;
         }
     }
 
-     static final class RestoreObjectResponseParser extends AbstractResponseParser<RestoreObjectResult> {
+     static class RestoreObjectResponseParser extends AbstractResponseParser<RestoreObjectResult> {
 
         @override
         RestoreObjectResult parseData(ResponseMessage response, RestoreObjectResult result) throws Exception {

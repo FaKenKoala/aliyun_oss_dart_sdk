@@ -193,12 +193,12 @@ import okhttp3.Response;
             if (OSSLog.isEnableLog()) {
                 // response log
                 Map<String, List<String>> headerMap = response.headers().toMultimap();
-                StringBuilder printRsp = StringBuilder();
-                printRsp.append("response:---------------------\n");
-                printRsp.append("response code: " + response.code() + " for url: " + request.url() + "\n");
-//                printRsp.append("response body: " + response.body().string() + "\n");
+                StringBuffer printRsp = StringBuffer();
+                printRsp.write("response:---------------------\n");
+                printRsp.write("response code: " + response.code() + " for url: " + request.url() + "\n");
+//                printRsp.write("response body: " + response.body().string() + "\n");
                 for (String key : headerMap.keySet()) {
-                    printRsp.append("responseHeader [" + key + "]: ").append(headerMap.get(key).get(0) + "\n");
+                    printRsp.write("responseHeader [" + key + "]: ").write(headerMap.get(key).get(0) + "\n");
                 }
                 OSSLog.logDebug(printRsp.toString());
             }
@@ -259,7 +259,7 @@ import okhttp3.Response;
                     // update the server time after every response
                     int serverTime = DateUtil.parseRfc822Date(responseDateString).getTime();
                     DateUtil.setCurrentServerTime(serverTime);
-                    message.getHeaders().put(OSSHeaders.DATE, responseDateString);
+                    message.getHeaders()[OSSHeaders.DATE] = responseDateString;
                 } catch (Exception ignore) {
                     // Fail to parse the time, ignore it
                     OSSLog.logError("[error] - synchronize time, reponseDate:" + responseDateString);
@@ -292,7 +292,7 @@ import okhttp3.Response;
         Map<String, String> headers = HashMap<String, String>();
         Headers responseHeaders = response.headers();
         for (int i = 0; i < responseHeaders.size(); i++) {
-            headers.put(responseHeaders.name(i), responseHeaders.value(i));
+            headers[responseHeaders.name(i)] = responseHeaders.value(i);
         }
         responseMessage.setHeaders(headers);
         responseMessage.setStatusCode(response.code());

@@ -60,7 +60,7 @@ import java.util.Map;
      * @param value Request Value.
      */
      void setHeader(String key, Object value) {
-        metadata.put(key, value);
+        metadata[key] = value;
     }
 
     /**
@@ -71,7 +71,7 @@ import java.util.Map;
      * @param value metadata value
      */
      void addUserMetadata(String key, String value) {
-        this.userMetadata.put(key, value);
+        this.userMetadata[key] = value;
     }
 
     /**
@@ -89,7 +89,7 @@ import java.util.Map;
      * @param lastModified The object's last modified time.
      */
      void setLastModified(Date lastModified) {
-        metadata.put(OSSHeaders.LAST_MODIFIED, lastModified);
+        metadata[OSSHeaders.LAST_MODIFIED] = lastModified;
     }
 
     /**
@@ -109,7 +109,7 @@ import java.util.Map;
      * @param expirationTime Expires time
      */
      void setExpirationTime(Date expirationTime) {
-        metadata.put(OSSHeaders.EXPIRES, DateUtil.formatRfc822Date(expirationTime));
+        metadata[OSSHeaders.EXPIRES] = DateUtil.formatRfc822Date(expirationTime);
     }
 
     /**
@@ -139,14 +139,14 @@ import java.util.Map;
      * The Content-Length header must be specified correctly when uploading an object.
      *
      * @param contentLength Object content length
-     * @throws IllegalArgumentException Object content length is more than 5GB or less than 0.
+     * @throws ArgumentError Object content length is more than 5GB or less than 0.
      */
      void setContentLength(int contentLength) {
         if (contentLength > OSSConstants.DEFAULT_FILE_SIZE_LIMIT) {
-            throw IllegalArgumentException("The content length could not be more than 5GB.");
+            throw ArgumentError("The content length could not be more than 5GB.");
         }
 
-        metadata.put(OSSHeaders.CONTENT_LENGTH, contentLength);
+        metadata[OSSHeaders.CONTENT_LENGTH] = contentLength;
     }
 
     /**
@@ -164,7 +164,7 @@ import java.util.Map;
      * @param contentType The object Content-Type value in MIME types.
      */
      void setContentType(String contentType) {
-        metadata.put(OSSHeaders.CONTENT_TYPE, contentType);
+        metadata[OSSHeaders.CONTENT_TYPE] = contentType;
     }
 
      String getContentMD5() {
@@ -172,7 +172,7 @@ import java.util.Map;
     }
 
      void setContentMD5(String contentMD5) {
-        metadata.put(OSSHeaders.CONTENT_MD5, contentMD5);
+        metadata[OSSHeaders.CONTENT_MD5] = contentMD5;
     }
 
      String getSHA1() {
@@ -180,7 +180,7 @@ import java.util.Map;
     }
 
      void setSHA1(String value) {
-        metadata.put(OSSHeaders.OSS_HASH_SHA1, value);
+        metadata[OSSHeaders.OSS_HASH_SHA1] = value;
     }
 
     /**
@@ -198,7 +198,7 @@ import java.util.Map;
      * @param encoding The object content's encoding.
      */
      void setContentEncoding(String encoding) {
-        metadata.put(OSSHeaders.CONTENT_ENCODING, encoding);
+        metadata[OSSHeaders.CONTENT_ENCODING] = encoding;
     }
 
     /**
@@ -216,7 +216,7 @@ import java.util.Map;
      * @param cacheControl Cache-Control header value
      */
      void setCacheControl(String cacheControl) {
-        metadata.put(OSSHeaders.CACHE_CONTROL, cacheControl);
+        metadata[OSSHeaders.CACHE_CONTROL] = cacheControl;
     }
 
     /**
@@ -236,7 +236,7 @@ import java.util.Map;
      * @param disposition Content-Disposition header value
      */
      void setContentDisposition(String disposition) {
-        metadata.put(OSSHeaders.CONTENT_DISPOSITION, disposition);
+        metadata[OSSHeaders.CONTENT_DISPOSITION] = disposition;
     }
 
     /**
@@ -261,7 +261,7 @@ import java.util.Map;
      * Sets the server side encryption algorithm.
      */
      void setServerSideEncryption(String serverSideEncryption) {
-        metadata.put(OSSHeaders.OSS_SERVER_SIDE_ENCRYPTION, serverSideEncryption);
+        metadata[OSSHeaders.OSS_SERVER_SIDE_ENCRYPTION] = serverSideEncryption;
     }
 
     /**

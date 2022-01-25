@@ -123,11 +123,11 @@ class OSSImpl implements OSS {
             }
             this.endpointURI = URI(endpoint);
         } catch (URISyntaxException e) {
-            throw IllegalArgumentException("Endpoint must be a string like 'http://oss-cn-****.aliyuncs.com'," +
+            throw ArgumentError("Endpoint must be a string like 'http://oss-cn-****.aliyuncs.com'," +
                     "or your cname like 'http://image.cnamedomain.com'!");
         }
         if (credentialProvider == null) {
-            throw IllegalArgumentException("CredentialProvider can't be null.");
+            throw ArgumentError("CredentialProvider can't be null.");
         }
 
         bool hostIsIP = false;
@@ -138,7 +138,7 @@ class OSSImpl implements OSS {
         }
 
         if (this.endpointURI.getScheme().equals("https") && hostIsIP) {
-            throw IllegalArgumentException("endpoint should not be format with https://ip.");
+            throw ArgumentError("endpoint should not be format with https://ip.");
         }
 
         this.credentialProvider = credentialProvider;

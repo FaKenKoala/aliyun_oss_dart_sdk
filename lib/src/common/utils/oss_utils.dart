@@ -1,117 +1,21 @@
-package com.alibaba.sdk.android.oss.common.utils;
+ import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.InetAddresses;
-import android.net.NetworkInfo;
-import android.os.Build;
-import android.telephony.TelephonyManager;
-import android.text.TextUtils;
-import android.util.Base64;
-import android.webkit.MimeTypeMap;
+class OSSUtils {
 
-import com.alibaba.sdk.android.oss.common.OSSConstants;
-import com.alibaba.sdk.android.oss.common.OSSHeaders;
-import com.alibaba.sdk.android.oss.common.OSSLog;
-import com.alibaba.sdk.android.oss.common.auth.HmacSHA1Signature;
-import com.alibaba.sdk.android.oss.common.auth.OSSCredentialProvider;
-import com.alibaba.sdk.android.oss.common.auth.OSSCustomSignerCredentialProvider;
-import com.alibaba.sdk.android.oss.common.auth.OSSFederationCredentialProvider;
-import com.alibaba.sdk.android.oss.common.auth.OSSFederationToken;
-import com.alibaba.sdk.android.oss.common.auth.OSSPlainTextAKSKCredentialProvider;
-import com.alibaba.sdk.android.oss.common.auth.OSSStsTokenCredentialProvider;
-import com.alibaba.sdk.android.oss.exception.InconsistentException;
-import com.alibaba.sdk.android.oss.internal.RequestMessage;
-import com.alibaba.sdk.android.oss.model.CopyObjectRequest;
-import com.alibaba.sdk.android.oss.model.CreateBucketRequest;
-import com.alibaba.sdk.android.oss.model.DeleteBucketLifecycleRequest;
-import com.alibaba.sdk.android.oss.model.DeleteBucketLoggingRequest;
-import com.alibaba.sdk.android.oss.model.DeleteBucketRequest;
-import com.alibaba.sdk.android.oss.model.GetBucketInfoRequest;
-import com.alibaba.sdk.android.oss.model.DeleteMultipleObjectRequest;
-import com.alibaba.sdk.android.oss.model.GetBucketACLRequest;
-import com.alibaba.sdk.android.oss.model.GetBucketLifecycleRequest;
-import com.alibaba.sdk.android.oss.model.GetBucketLoggingRequest;
-import com.alibaba.sdk.android.oss.model.GetBucketRefererRequest;
-import com.alibaba.sdk.android.oss.model.ListBucketsRequest;
-import com.alibaba.sdk.android.oss.model.ListMultipartUploadsRequest;
-import com.alibaba.sdk.android.oss.model.ListObjectsRequest;
-import com.alibaba.sdk.android.oss.model.OSSRequest;
-import com.alibaba.sdk.android.oss.model.ObjectMetadata;
-import com.alibaba.sdk.android.oss.model.PartETag;
-import com.alibaba.sdk.android.oss.model.PutBucketLifecycleRequest;
-import com.alibaba.sdk.android.oss.model.PutBucketLoggingRequest;
-import com.alibaba.sdk.android.oss.model.PutBucketRefererRequest;
+     static final String _newLine = "\n";
 
-import org.json.JSONObject;
+     static final List<String> signedParameters = [
+            subresourceBucketinfo, subresourceAcl, subresourceUploads, subresourceLocation,
+            subresourceCors, subresourceLogging, subresourceWebsite,
+            subresourceReferer, subresourceLifecycle, subresourceDelete,
+            subresourceAppend, uploadId, partNumber, securityToken, position,
+            responseHeaderCacheControl, responseHeaderContentDisposition,
+            responseHeaderContentEncoding, responseHeaderContentLanguage,
+            responseHeaderContentType, responseHeaderExpires, xOssProcess,
+            subresourceSequential, xOssSymlink, xOssRestore,
+     ];
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import static com.alibaba.sdk.android.oss.common.RequestParameters.DELIMITER;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.ENCODING_TYPE;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.KEY_MARKER;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.MARKER;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.MAX_KEYS;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.MAX_UPLOADS;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.PART_NUMBER;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.POSITION;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.PREFIX;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.RESPONSE_HEADER_CACHE_CONTROL;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.RESPONSE_HEADER_CONTENT_DISPOSITION;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.RESPONSE_HEADER_CONTENT_ENCODING;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.RESPONSE_HEADER_CONTENT_LANGUAGE;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.RESPONSE_HEADER_CONTENT_TYPE;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.RESPONSE_HEADER_EXPIRES;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.SECURITY_TOKEN;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.SUBRESOURCE_BUCKETINFO;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.SUBRESOURCE_ACL;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.SUBRESOURCE_APPEND;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.SUBRESOURCE_CORS;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.SUBRESOURCE_DELETE;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.SUBRESOURCE_LIFECYCLE;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.SUBRESOURCE_LOCATION;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.SUBRESOURCE_LOGGING;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.SUBRESOURCE_REFERER;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.SUBRESOURCE_SEQUENTIAL;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.SUBRESOURCE_UPLOADS;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.SUBRESOURCE_WEBSITE;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.UPLOAD_ID;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.UPLOAD_ID_MARKER;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_PROCESS;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_RESTORE;
-import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK;
-
-/**
- * Created by zhouzhuo on 11/22/15.
- */
- class OSSUtils {
-
-     static final String NEW_LINE = "\n";
-
-     static final List<String> SIGNED_PARAMTERS = Arrays.asList(String[]{
-            SUBRESOURCE_BUCKETINFO, SUBRESOURCE_ACL, SUBRESOURCE_UPLOADS, SUBRESOURCE_LOCATION,
-            SUBRESOURCE_CORS, SUBRESOURCE_LOGGING, SUBRESOURCE_WEBSITE,
-            SUBRESOURCE_REFERER, SUBRESOURCE_LIFECYCLE, SUBRESOURCE_DELETE,
-            SUBRESOURCE_APPEND, UPLOAD_ID, PART_NUMBER, SECURITY_TOKEN, POSITION,
-            RESPONSE_HEADER_CACHE_CONTROL, RESPONSE_HEADER_CONTENT_DISPOSITION,
-            RESPONSE_HEADER_CONTENT_ENCODING, RESPONSE_HEADER_CONTENT_LANGUAGE,
-            RESPONSE_HEADER_CONTENT_TYPE, RESPONSE_HEADER_EXPIRES, X_OSS_PROCESS,
-            SUBRESOURCE_SEQUENTIAL, X_OSS_SYMLINK, X_OSS_RESTORE
-    });
-
-    /**
-     * Populate metadata to headers.
-     */
+    /// Populate metadata to headers.
      static void populateRequestMetadata(Map<String, String> headers, ObjectMetadata metadata) {
         if (metadata == null) {
             return;
@@ -120,7 +24,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
         Map<String, Object> rawMetadata = metadata.getRawMetadata();
         if (rawMetadata != null) {
             for (Map.Entry<String, Object> entry : rawMetadata.entrySet()) {
-                headers.put(entry.getKey(), entry.getValue().toString());
+                headers[entry.getKey()] = entry.getValue().toString();
             }
         }
 
@@ -131,7 +35,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
                 String value = entry.getValue();
                 if (key != null) key = key.trim();
                 if (value != null) value = value.trim();
-                headers.put(key, value);
+                headers[key] = value;
             }
         }
     }
@@ -139,15 +43,15 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
      static void populateListBucketRequestParameters(ListBucketsRequest listBucketsRequest,
                                                            Map<String, String> params) {
         if (listBucketsRequest.getPrefix() != null) {
-            params.put(PREFIX, listBucketsRequest.getPrefix());
+            params[PREFIX] = listBucketsRequest.getPrefix();
         }
 
         if (listBucketsRequest.getMarker() != null) {
-            params.put(MARKER, listBucketsRequest.getMarker());
+            params[MARKER] = listBucketsRequest.getMarker();
         }
 
         if (listBucketsRequest.getMaxKeys() != null) {
-            params.put(MAX_KEYS, Integer.toString(listBucketsRequest.getMaxKeys()));
+            params[MAXKEYS] = Integer.toString(listBucketsRequest.getMaxKeys());
         }
     }
 
@@ -155,23 +59,23 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
                                                             Map<String, String> params) {
 
         if (listObjectsRequest.getPrefix() != null) {
-            params.put(PREFIX, listObjectsRequest.getPrefix());
+            params[PREFIX] = listObjectsRequest.getPrefix();
         }
 
         if (listObjectsRequest.getMarker() != null) {
-            params.put(MARKER, listObjectsRequest.getMarker());
+            params[MARKER] = listObjectsRequest.getMarker();
         }
 
         if (listObjectsRequest.getDelimiter() != null) {
-            params.put(DELIMITER, listObjectsRequest.getDelimiter());
+            params[DELIMITER] = listObjectsRequest.getDelimiter();
         }
 
         if (listObjectsRequest.getMaxKeys() != null) {
-            params.put(MAX_KEYS, Integer.toString(listObjectsRequest.getMaxKeys()));
+            params[MAXKEYS] = Integer.toString(listObjectsRequest.getMaxKeys());
         }
 
         if (listObjectsRequest.getEncodingType() != null) {
-            params.put(ENCODING_TYPE, listObjectsRequest.getEncodingType());
+            params[ENCODINGTYPE] = listObjectsRequest.getEncodingType();
         }
     }
 
@@ -179,27 +83,27 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
                                                                      Map<String, String> params) {
 
         if (request.getDelimiter() != null) {
-            params.put(DELIMITER, request.getDelimiter());
+            params[DELIMITER] = request.getDelimiter();
         }
 
         if (request.getMaxUploads() != null) {
-            params.put(MAX_UPLOADS, Integer.toString(request.getMaxUploads()));
+            params[MAXUPLOADS] = Integer.toString(request.getMaxUploads());
         }
 
         if (request.getKeyMarker() != null) {
-            params.put(KEY_MARKER, request.getKeyMarker());
+            params[KEYMARKER] = request.getKeyMarker();
         }
 
         if (request.getPrefix() != null) {
-            params.put(PREFIX, request.getPrefix());
+            params[PREFIX] = request.getPrefix();
         }
 
         if (request.getUploadIdMarker() != null) {
-            params.put(UPLOAD_ID_MARKER, request.getUploadIdMarker());
+            params[UPLOADIDMARKER] = request.getUploadIdMarker();
         }
 
         if (request.getEncodingType() != null) {
-            params.put(ENCODING_TYPE, request.getEncodingType());
+            params[ENCODINGTYPE] = request.getEncodingType();
         }
     }
 
@@ -235,66 +139,66 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
      static void populateCopyObjectHeaders(CopyObjectRequest copyObjectRequest,
                                                  Map<String, String> headers) {
         String copySourceHeader = "/" + copyObjectRequest.getSourceBucketName() + "/"
-                + HttpUtil.urlEncode(copyObjectRequest.getSourceKey(), OSSConstants.DEFAULT_CHARSET_NAME);
-        headers.put(OSSHeaders.COPY_OBJECT_SOURCE, copySourceHeader);
+                + HttpUtil.urlEncode(copyObjectRequest.getSourceKey(), OSSConstants.defaultCharsetName);
+        headers[OSSHeaders.COPYOBJECTSOURCE] = copySourceHeader;
 
         addDateHeader(headers,
-                OSSHeaders.COPY_OBJECT_SOURCE_IF_MODIFIED_SINCE,
+                OSSHeaders.COPYOBJECTSOURCEIFMODIFIEDSINCE,
                 copyObjectRequest.getModifiedSinceConstraint());
         addDateHeader(headers,
-                OSSHeaders.COPY_OBJECT_SOURCE_IF_UNMODIFIED_SINCE,
+                OSSHeaders.COPYOBJECTSOURCEIFUNMODIFIEDSINCE,
                 copyObjectRequest.getUnmodifiedSinceConstraint());
 
         addStringListHeader(headers,
-                OSSHeaders.COPY_OBJECT_SOURCE_IF_MATCH,
+                OSSHeaders.COPYOBJECTSOURCEIFMATCH,
                 copyObjectRequest.getMatchingETagConstraints());
         addStringListHeader(headers,
-                OSSHeaders.COPY_OBJECT_SOURCE_IF_NONE_MATCH,
+                OSSHeaders.COPYOBJECTSOURCEIFNONEMATCH,
                 copyObjectRequest.getNonmatchingEtagConstraints());
 
         addHeader(headers,
-                OSSHeaders.OSS_SERVER_SIDE_ENCRYPTION,
+                OSSHeaders.OSSSERVERSIDEENCRYPTION,
                 copyObjectRequest.getServerSideEncryption());
 
         ObjectMetadata newObjectMetadata = copyObjectRequest.getNewObjectMetadata();
         if (newObjectMetadata != null) {
-            headers.put(OSSHeaders.COPY_OBJECT_METADATA_DIRECTIVE, MetadataDirective.REPLACE.toString());
+            headers[OSSHeaders.COPYOBJECTMETADATADIRECTIVE] = MetadataDirective.REPLACE.toString();
             populateRequestMetadata(headers, newObjectMetadata);
         }
 
         // The header of Content-Length should not be specified on copying an object.
-        removeHeader(headers, HttpHeaders.CONTENT_LENGTH);
+        removeHeader(headers, HttpHeaders.CONTENTLENGTH);
     }
 
      static String buildXMLFromPartEtagList(List<PartETag> partETagList) {
-        StringBuilder builder = StringBuilder();
-        builder.append("<CompleteMultipartUpload>\n");
+        StringBuffer builder = StringBuffer();
+        builder.write("<CompleteMultipartUpload>\n");
         for (PartETag partETag : partETagList) {
-            builder.append("<Part>\n");
-            builder.append("<PartNumber>" + partETag.getPartNumber() + "</PartNumber>\n");
-            builder.append("<ETag>" + partETag.getETag() + "</ETag>\n");
-            builder.append("</Part>\n");
+            builder.write("<Part>\n");
+            builder.write("<PartNumber>" + partETag.getPartNumber() + "</PartNumber>\n");
+            builder.write("<ETag>" + partETag.getETag() + "</ETag>\n");
+            builder.write("</Part>\n");
         }
-        builder.append("</CompleteMultipartUpload>\n");
+        builder.write("</CompleteMultipartUpload>\n");
         return builder.toString();
     }
 
      static void addHeader(Map<String, String> headers, String header, String value) {
         if (value != null) {
-            headers.put(header, value);
+            headers[header] = value;
         }
     }
 
      static void addDateHeader(Map<String, String> headers, String header, Date value) {
         if (value != null) {
-            headers.put(header, DateUtil.formatRfc822Date(value));
+            headers[header] = DateUtil.formatRfc822Date(value);
         }
     }
 
      static void addStringListHeader(Map<String, String> headers, String header,
                                            List<String> values) {
         if (values != null && !values.isEmpty()) {
-            headers.put(header, join(values));
+            headers[header] = join(values);
         }
     }
 
@@ -305,25 +209,23 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
     }
 
      static String join(List<String> strings) {
-        StringBuilder result = StringBuilder();
+        StringBuffer result = StringBuffer();
 
         bool first = true;
         for (String s : strings) {
-            if (!first) result.append(", ");
+            if (!first) result.write(", ");
 
-            result.append(s);
+            result.write(s);
             first = false;
         }
 
         return result.toString();
     }
 
-    /**
-     * 判断一个字符串是否为空
-     *
-     * @param str
-     * @return
-     */
+    /// 判断一个字符串是否为空
+    ///
+    /// @param str
+    /// @return
      static bool isEmptyString(String str) {
         return TextUtils.isEmpty(str);
 
@@ -331,8 +233,8 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
 
      static String buildCanonicalString(RequestMessage request) {
 
-        StringBuilder canonicalString = StringBuilder();
-        canonicalString.append(request.getMethod().toString() + NEW_LINE);
+        StringBuffer canonicalString = StringBuffer();
+        canonicalString.write(request.getMethod().toString() + _newLine);
 
         Map<String, String> headers = request.getHeaders();
         TreeMap<String, String> headersToSign = TreeMap<String, String>();
@@ -344,20 +246,20 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
                 }
 
                 String lowerKey = header.getKey().toLowerCase();
-                if (lowerKey.equals(HttpHeaders.CONTENT_TYPE.toLowerCase()) ||
-                        lowerKey.equals(HttpHeaders.CONTENT_MD5.toLowerCase()) ||
+                if (lowerKey.equals(HttpHeaders.CONTENTTYPE.toLowerCase()) ||
+                        lowerKey.equals(HttpHeaders.CONTENTMD5.toLowerCase()) ||
                         lowerKey.equals(HttpHeaders.DATE.toLowerCase()) ||
-                        lowerKey.startsWith(OSSHeaders.OSS_PREFIX)) {
-                    headersToSign.put(lowerKey, header.getValue().trim());
+                        lowerKey.startsWith(OSSHeaders.OSSPREFIX)) {
+                    headersToSign[lowerKey] = header.getValue().trim();
                 }
             }
         }
 
-        if (!headersToSign.containsKey(HttpHeaders.CONTENT_TYPE.toLowerCase())) {
-            headersToSign.put(HttpHeaders.CONTENT_TYPE.toLowerCase(), "");
+        if (!headersToSign.containsKey(HttpHeaders.CONTENTTYPE.toLowerCase())) {
+            headersToSign[HttpHeaders.CONTENTTYPE.toLowerCase()] = "";
         }
-        if (!headersToSign.containsKey(HttpHeaders.CONTENT_MD5.toLowerCase())) {
-            headersToSign.put(HttpHeaders.CONTENT_MD5.toLowerCase(), "");
+        if (!headersToSign.containsKey(HttpHeaders.CONTENTMD5.toLowerCase())) {
+            headersToSign[HttpHeaders.CONTENTMD5.toLowerCase()] = "";
         }
 
         // Append all headers to sign to canonical string
@@ -365,17 +267,17 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
             String key = entry.getKey();
             Object value = entry.getValue();
 
-            if (key.startsWith(OSSHeaders.OSS_PREFIX)) {
-                canonicalString.append(key).append(':').append(value);
+            if (key.startsWith(OSSHeaders.OSSPREFIX)) {
+                canonicalString.write(key).write(':').write(value);
             } else {
-                canonicalString.append(value);
+                canonicalString.write(value);
             }
 
-            canonicalString.append(NEW_LINE);
+            canonicalString.write(_newLine);
         }
 
         // Append canonical resource to canonical string
-        canonicalString.append(buildCanonicalizedResource(request.getBucketName(), request.getObjectKey(), request.getParameters()));
+        canonicalString.write(buildCanonicalizedResource(request.getBucketName(), request.getObjectKey(), request.getParameters()));
 
         return canonicalString.toString();
     }
@@ -395,8 +297,8 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
 
      static String buildCanonicalizedResource(String resourcePath, Map<String, String> parameters) {
 
-        StringBuilder builder = StringBuilder();
-        builder.append(resourcePath);
+        StringBuffer builder = StringBuffer();
+        builder.write(resourcePath);
 
         if (parameters != null) {
             String[] parameterNames = parameters.keySet().toArray(
@@ -405,15 +307,15 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
 
             char separater = '?';
             for (String paramName : parameterNames) {
-                if (!SIGNED_PARAMTERS.contains(paramName)) {
+                if (!signedParameters.contains(paramName)) {
                     continue;
                 }
 
-                builder.append(separater);
-                builder.append(paramName);
+                builder.write(separater);
+                builder.write(paramName);
                 String paramValue = parameters.get(paramName);
                 if (!isEmptyString(paramValue)) {
-                    builder.append("=").append(paramValue);
+                    builder.write("=").write(paramValue);
                 }
 
                 separater = '&';
@@ -423,29 +325,27 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
         return builder.toString();
     }
 
-    /**
-     * Encode request parameters to URL segment.
-     */
+    /// Encode request parameters to URL segment.
      static String paramToQueryString(Map<String, String> params, String charset) {
 
         if (params == null || params.isEmpty()) {
             return null;
         }
 
-        StringBuilder paramString = StringBuilder();
+        StringBuffer paramString = StringBuffer();
         bool first = true;
         for (Map.Entry<String, String> p : params.entrySet()) {
             String key = p.getKey();
             String value = p.getValue();
 
             if (!first) {
-                paramString.append("&");
+                paramString.write("&");
             }
 
             // Urlencode each request parameter
-            paramString.append(HttpUtil.urlEncode(key, charset));
+            paramString.write(HttpUtil.urlEncode(key, charset));
             if (!isEmptyString(value)) {
-                paramString.append("=").append(HttpUtil.urlEncode(value, charset));
+                paramString.write("=").write(HttpUtil.urlEncode(value, charset));
             }
 
             first = false;
@@ -456,17 +356,15 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
 
      static String populateMapToBase64JsonString(Map<String, String> map) {
         JSONObject jsonObj = JSONObject(map);
-        return Base64.encodeToString(jsonObj.toString().getBytes(), Base64.NO_WRAP);
+        return Base64.encodeToString(jsonObj.toString().getBytes(), Base64.NOWRAP);
     }
 
-    /**
-     * 根据ak/sk、content生成token
-     *
-     * @param accessKey
-     * @param screctKey
-     * @param content
-     * @return
-     */
+    /// 根据ak/sk、content生成token
+    ///
+    /// @param accessKey
+    /// @param screctKey
+    /// @param content
+    /// @return
      static String sign(String accessKey, String screctKey, String content) {
 
         String signature;
@@ -481,14 +379,12 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
         return "OSS " + accessKey + ":" + signature;
     }
 
-    /**
-     *
-     */
+    ///
      static bool isOssOriginHost(String host){
         if (TextUtils.isEmpty(host)){
             return false;
         }
-        for (String suffix : OSSConstants.OSS_ORIGN_HOST) {
+        for (String suffix : OSSConstants.OSSORIGNHOST) {
             if (host.toLowerCase().endsWith(suffix)) {
                 return true;
             }
@@ -496,11 +392,9 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
         return false;
     }
 
-    /**
-     * 判断一个域名是否是cname
-     */
+    /// 判断一个域名是否是cname
      static bool isCname(String host) {
-        for (String suffix : OSSConstants.DEFAULT_CNAME_EXCLUDE_LIST) {
+        for (String suffix : OSSConstants.DEFAULTCNAMEEXCLUDELIST) {
             if (host.toLowerCase().endsWith(suffix)) {
                 return false;
             }
@@ -508,9 +402,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
         return true;
     }
 
-    /**
-     * 判断一个域名是否在自定义Cname排除列表之中
-     */
+    /// 判断一个域名是否在自定义Cname排除列表之中
      static bool isInCustomCnameExcludeList(String endpoint, List<String> customCnameExludeList) {
         for (String host : customCnameExludeList) {
             if (endpoint.endsWith(host.toLowerCase())) {
@@ -522,27 +414,25 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
 
      static void assertTrue(bool condition, String message) {
         if (!condition) {
-            throw IllegalArgumentException(message);
+            throw ArgumentError(message);
         }
     }
 
-    /**
-     * 校验bucketName的合法性
-     *
-     * @param bucketName
-     * @return
-     */
+    /// 校验bucketName的合法性
+    ///
+    /// @param bucketName
+    /// @return
      static bool validateBucketName(String bucketName) {
         if (bucketName == null) {
             return false;
         }
-        final String BUCKETNAME_REGX = "^[a-z0-9][a-z0-9\\-]{1,61}[a-z0-9]$";
-        return bucketName.matches(BUCKETNAME_REGX);
+        final String BUCKETNAMEREGX = "^[a-z0-9][a-z0-9\\-]{1,61}[a-z0-9]$";
+        return bucketName.matches(BUCKETNAMEREGX);
     }
 
      static void ensureBucketNameValid(String bucketName) {
         if (!validateBucketName(bucketName)) {
-            throw IllegalArgumentException("The bucket name is invalid. \n" +
+            throw ArgumentError("The bucket name is invalid. \n" +
                     "A bucket name must: \n" +
                     "1) be comprised of lower-case characters, numbers or dash(-); \n" +
                     "2) start with lower case or numbers; \n" +
@@ -550,12 +440,10 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
         }
     }
 
-    /**
-     * 校验objectKey的合法性
-     *
-     * @param objectKey
-     * @return
-     */
+    /// 校验objectKey的合法性
+    ///
+    /// @param objectKey
+    /// @return
      static bool validateObjectKey(String objectKey) {
         if (objectKey == null) {
             return false;
@@ -565,7 +453,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
         }
         byte[] keyBytes;
         try {
-            keyBytes = objectKey.getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
+            keyBytes = objectKey.getBytes(OSSConstants.defaultCharsetName);
         } catch (UnsupportedEncodingException e) {
             return false;
         }
@@ -584,7 +472,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
 
      static void ensureObjectKeyValid(String objectKey) {
         if (!validateObjectKey(objectKey)) {
-            throw IllegalArgumentException("The object key is invalid. \n" +
+            throw ArgumentError("The object key is invalid. \n" +
                     "An object name should be: \n" +
                     "1) between 1 - 1023 bytes int when encoded as UTF-8 \n" +
                     "2) cannot contain LF or CR or unsupported chars in XML1.0, \n" +
@@ -683,10 +571,10 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
                 OSSLog.logError("Can't get a federation token");
                 throw IOException("Can't get a federation token");
             }
-            message.getHeaders().put(OSSHeaders.OSS_SECURITY_TOKEN, federationToken.getSecurityToken());
+            message.getHeaders()[OSSHeaders.OSSSECURITYTOKEN] = federationToken.getSecurityToken();
         } else if (credentialProvider instanceof OSSStsTokenCredentialProvider) {
             federationToken = credentialProvider.getFederationToken();
-            message.getHeaders().put(OSSHeaders.OSS_SECURITY_TOKEN, federationToken.getSecurityToken());
+            message.getHeaders()[OSSHeaders.OSSSECURITYTOKEN] = federationToken.getSecurityToken();
         }
 
         String contentToSign = OSSUtils.buildCanonicalString(message);
@@ -706,20 +594,18 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
         OSSLog.logDebug("signed content: " + contentToSign + "   \n ---------   signature: " + signature, false);
 
         OSSLog.logDebug("get signature");
-        message.getHeaders().put(OSSHeaders.AUTHORIZATION, signature);
+        message.getHeaders()[OSSHeaders.AUTHORIZATION] = signature;
     }
 
      static String buildBaseLogInfo(Context context) {
-        StringBuilder sb = StringBuilder();
-        sb.append("=====[device info]=====\n");
-        sb.append("[INFO]: android_version：" + Build.VERSION.RELEASE + "\n");
-        sb.append("[INFO]: mobile_model：" + Build.MODEL + "\n");
+        StringBuffer sb = StringBuffer();
+        sb.write("=====[device info]=====\n");
+        sb.write("[INFO]: androidVersion：" + Build.VERSION.RELEASE + "\n");
+        sb.write("[INFO]: mobileModel：" + Build.MODEL + "\n");
         return sb.toString();
     }
 
-    /**
-     * Checks if OSS and SDK's checksum is same. If not, throws InconsistentException.
-     */
+    /// Checks if OSS and SDK's checksum is same. If not, throws InconsistentException.
      static void checkChecksum(int clientChecksum, int serverChecksum, String requestId) throws InconsistentException {
         if (clientChecksum != null && serverChecksum != null &&
                 !clientChecksum.equals(serverChecksum)) {
@@ -748,16 +634,15 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
     }
     */
 
-    /***
-     * @param host
-     * @return
-     */
+    /// *
+    /// @param host
+    /// @return
      static bool isValidateIP(String host) throws Exception {
         if (host == null) {
             throw Exception("host is null");
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDKINT >= Build.VERSIONCODES.Q) {
             return InetAddresses.isNumericAddress(host);
         } else {
             try {
@@ -771,7 +656,7 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
                 return false;
             } catch (IllegalAccessException e) {
                 return false;
-            } catch (IllegalArgumentException e) {
+            } catch (ArgumentError e) {
                 return false;
             } catch (InvocationTargetException e) {
                 return false;
@@ -780,66 +665,58 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
     }
 
      static String buildTriggerCallbackBody(Map<String, String> callbackParams, Map<String, String> callbackVars) {
-        StringBuilder builder = StringBuilder();
-        builder.append("x-oss-process=trigger/callback,callback_");
+        StringBuffer builder = StringBuffer();
+        builder.write("x-oss-process=trigger/callback,callback");
 
         if (callbackParams != null && callbackParams.size() > 0) {
             JSONObject jsonObj = JSONObject(callbackParams);
-            String paramsJsonString = Base64.encodeToString(jsonObj.toString().getBytes(), Base64.NO_WRAP);
-            builder.append(paramsJsonString);
+            String paramsJsonString = Base64.encodeToString(jsonObj.toString().getBytes(), Base64.NOWRAP);
+            builder.write(paramsJsonString);
         }
-        builder.append("," + "callback-var_");
+        builder.write("," + "callback-var");
 
         if (callbackVars != null && callbackVars.size() > 0) {
             JSONObject jsonObj = JSONObject(callbackVars);
-            String varsJsonString = Base64.encodeToString(jsonObj.toString().getBytes(), Base64.NO_WRAP);
-            builder.append(varsJsonString);
+            String varsJsonString = Base64.encodeToString(jsonObj.toString().getBytes(), Base64.NOWRAP);
+            builder.write(varsJsonString);
         }
 
         return builder.toString();
     }
 
      static String buildImagePersistentBody(String toBucketName, String toObjectKey, String action) {
-        StringBuilder builder = StringBuilder();
-        builder.append("x-oss-process=");
+        StringBuffer builder = StringBuffer();
+        builder.write("x-oss-process=");
         if (action.startsWith("image/")) {
-            builder.append(action);
+            builder.write(action);
         } else {
-            builder.append("image/");
-            builder.append(action);
+            builder.write("image/");
+            builder.write(action);
         }
-        builder.append("|sys/");
+        builder.write("|sys/");
         if (!TextUtils.isEmpty(toBucketName) && !TextUtils.isEmpty(toObjectKey)) {
-            String bucketName_base64 = Base64.encodeToString(toBucketName.getBytes(), Base64.NO_WRAP);
-            String objectkey_base64 = Base64.encodeToString(toObjectKey.getBytes(), Base64.NO_WRAP);
-            builder.append("saveas,o_");
-            builder.append(objectkey_base64);
-            builder.append(",b_");
-            builder.append(bucketName_base64);
+            String bucketNameBase64 = Base64.encodeToString(toBucketName.getBytes(), Base64.NOWRAP);
+            String objectkeyBase64 = Base64.encodeToString(toObjectKey.getBytes(), Base64.NOWRAP);
+            builder.write("saveas,o");
+            builder.write(objectkeyBase64);
+            builder.write(",b");
+            builder.write(bucketNameBase64);
         }
         String body = builder.toString();
         OSSLog.logDebug("ImagePersistent body : " + body);
         return body;
     }
 
-     enum MetadataDirective {
-
-        /* Copy metadata from source object */
-        COPY("COPY"),
-
-        /* Replace metadata with newly metadata */
-        REPLACE("REPLACE");
-
-         final String directiveAsString;
-
-        MetadataDirective(String directiveAsString) {
-            this.directiveAsString = directiveAsString;
-        }
-
-        @override
-         String toString() {
-            return this.directiveAsString;
-        }
-    }
+    
 
 }
+
+ enum MetadataDirective {
+
+        /* Copy metadata from source object */
+        COPY,
+
+        /* Replace metadata with newly metadata */
+        REPLACE,
+
+    }

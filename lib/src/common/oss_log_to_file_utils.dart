@@ -232,10 +232,10 @@
 //         uri = queryLogUri();
 //         if (uri == null) {
 //             ContentValues values = ContentValues();
-//             values.put(MediaStore.Files.FileColumns.DISPLAY_NAME, "logs.csv");
-//             values.put(MediaStore.Files.FileColumns.MIME_TYPE, "file/csv");
-//             values.put(MediaStore.Files.FileColumns.TITLE, "logs.csv");
-//             values.put(MediaStore.Files.FileColumns.RELATIVE_PATH, "Documents/" + LOG_DIR_NAME);
+//             values[MediaStore.Files.FileColumns.DISPLAY_NAME] = "logs.csv";
+//             values[MediaStore.Files.FileColumns.MIME_TYPE] = "file/csv";
+//             values[MediaStore.Files.FileColumns.TITLE] = "logs.csv";
+//             values[MediaStore.Files.FileColumns.RELATIVE_PATH] = "Documents/" + LOG_DIR_NAME;
 
 //             uri = contentResolver.insert(MediaStore.Files.getContentUri("external"), values);
 

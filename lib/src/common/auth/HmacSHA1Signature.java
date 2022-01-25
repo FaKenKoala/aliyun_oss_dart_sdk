@@ -21,7 +21,7 @@ import javax.crypto.spec.SecretKeySpec;
  * Hmac-SHA1 signature
  */
  class HmacSHA1Signature {
-     static final String DEFAULT_ENCODING = "UTF-8"; // Default encoding
+     static final String defaultEncoding = "UTF-8"; // Default encoding
      static final String ALGORITHM = "HmacSHA1"; // Signature method.
      static final String VERSION = "1"; // Signature version.
      static final Object LOCK = Object();
@@ -45,12 +45,12 @@ import javax.crypto.spec.SecretKeySpec;
         try {
             OSSLog.logDebug("sign start");
             byte[] signData = sign(
-                    key.getBytes(DEFAULT_ENCODING),
-                    data.getBytes(DEFAULT_ENCODING));
+                    key.getBytes(defaultEncoding),
+                    data.getBytes(defaultEncoding));
             OSSLog.logDebug("base64 start");
             sign = BinaryUtil.toBase64String(signData);
         } catch (UnsupportedEncodingException ex) {
-            throw RuntimeException("Unsupported algorithm: " + DEFAULT_ENCODING);
+            throw RuntimeException("Unsupported algorithm: " + defaultEncoding);
         }
         return sign;
     }

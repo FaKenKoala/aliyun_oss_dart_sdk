@@ -37,7 +37,7 @@ import java.net.SocketTimeoutException;
                     && !(localException instanceof SocketTimeoutException)) {
                 OSSLog.logError("[shouldRetry] - is interrupted!");
                 return OSSRetryType.OSSRetryTypeShouldNotRetry;
-            } else if (localException instanceof IllegalArgumentException) {
+            } else if (localException instanceof ArgumentError) {
                 return OSSRetryType.OSSRetryTypeShouldNotRetry;
             }
             OSSLog.logDebug("shouldRetry - " + e.toString());

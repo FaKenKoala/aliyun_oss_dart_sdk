@@ -33,7 +33,7 @@ import java.util.Map.Entry;
             return encoded.replace("+", "%20").replace("*", "%2A")
                     .replace("%7E", "~").replace("%2F", "/");
         } catch (Exception e) {
-            throw IllegalArgumentException("failed to encode url!", e);
+            throw ArgumentError("failed to encode url!", e);
         }
     }
 
@@ -46,20 +46,20 @@ import java.util.Map.Entry;
             return null;
         }
 
-        StringBuilder paramString = StringBuilder();
+        StringBuffer paramString = StringBuffer();
         bool first = true;
         for (Entry<String, String> p : params.entrySet()) {
             String key = p.getKey();
             String value = p.getValue();
 
             if (!first) {
-                paramString.append("&");
+                paramString.write("&");
             }
 
             // Urlencode each request parameter
-            paramString.append(urlEncode(key, charset));
+            paramString.write(urlEncode(key, charset));
             if (value != null) {
-                paramString.append("=").append(urlEncode(value, charset));
+                paramString.write("=").write(urlEncode(value, charset));
             }
 
             first = false;

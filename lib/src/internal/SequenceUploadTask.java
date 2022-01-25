@@ -369,7 +369,7 @@ import java.util.zip.CheckedInputStream;
                 if (mPartETags != null && mPartETags.size() > 0 && mCheckCRC64 && mRequest.getRecordDirectory() != null) {
                     Map<Integer, int> maps = HashMap<Integer, int>();
                     for (PartETag eTag : mPartETags) {
-                        maps.put(eTag.getPartNumber(), eTag.getCRC64());
+                        maps[eTag.getPartNumber()] = eTag.getCRC64();
                     }
                     ObjectOutputStream oot = null;
                     try {

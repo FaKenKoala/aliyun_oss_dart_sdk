@@ -52,36 +52,36 @@ import java.util.Map;
         requestMessage.setBucketName(bucketName);
         requestMessage.setObjectKey(objectKey);
 
-        requestMessage.getHeaders().put(HttpHeaders.DATE, expires);
+        requestMessage.getHeaders()[HttpHeaders.DATE] = expires;
 
         if (request.getContentType() != null && !request.getContentType().trim().equals("")) {
-            requestMessage.getHeaders().put(HttpHeaders.CONTENT_TYPE, request.getContentType());
+            requestMessage.getHeaders()[HttpHeaders.CONTENT_TYPE] = request.getContentType();
         }
         if (request.getContentMD5() != null && !request.getContentMD5().trim().equals("")) {
-            requestMessage.getHeaders().put(HttpHeaders.CONTENT_MD5, request.getContentMD5());
+            requestMessage.getHeaders()[HttpHeaders.CONTENT_MD5] = request.getContentMD5();
         }
 
         if (request.getQueryParameter() != null && request.getQueryParameter().size() > 0) {
             for (Map.Entry<String, String> entry : request.getQueryParameter().entrySet()) {
-                requestMessage.getParameters().put(entry.getKey(), entry.getValue());
+                requestMessage.getParameters()[entry.getKey()] = entry.getValue();
             }
         }
         //process img
         if (request.getProcess() != null && !request.getProcess().trim().equals("")) {
-            requestMessage.getParameters().put(RequestParameters.X_OSS_PROCESS, request.getProcess());
+            requestMessage.getParameters()[RequestParameters.X_OSS_PROCESS] = request.getProcess();
         }
 
         OSSFederationToken token = null;
 
         if (credentialProvider instanceof OSSFederationCredentialProvider) {
             token = ((OSSFederationCredentialProvider) credentialProvider).getValidFederationToken();
-            requestMessage.getParameters().put(RequestParameters.SECURITY_TOKEN, token.getSecurityToken());
+            requestMessage.getParameters()[RequestParameters.SECURITY_TOKEN] = token.getSecurityToken();
             if (token == null) {
                 throw OSSClientException("Can not get a federation token!");
             }
         } else if (credentialProvider instanceof OSSStsTokenCredentialProvider) {
             token = ((OSSStsTokenCredentialProvider) credentialProvider).getFederationToken();
-            requestMessage.getParameters().put(RequestParameters.SECURITY_TOKEN, token.getSecurityToken());
+            requestMessage.getParameters()[RequestParameters.SECURITY_TOKEN] = token.getSecurityToken();
         }
 
         String contentToSign = OSSUtils.buildCanonicalString(requestMessage);
@@ -106,13 +106,13 @@ import java.util.Map;
         String host = buildCanonicalHost(endpoint, bucketName, conf);
 
         Map<String, String> params = LinkedHashMap<String, String>();
-        params.put(HttpHeaders.EXPIRES, expires);
-        params.put(RequestParameters.OSS_ACCESS_KEY_ID, accessKey);
-        params.put(RequestParameters.SIGNATURE, signature);
+        params[HttpHeaders.EXPIRES] = expires;
+        params[RequestParameters.OSS_ACCESS_KEY_ID] = accessKey;
+        params[RequestParameters.SIGNATURE] = signature;
         params.putAll(requestMessage.getParameters());
         String queryString = HttpUtil.paramToQueryString(params, "utf-8");
 
-        String url = endpoint.getScheme() + "://" + host + "/" + HttpUtil.urlEncode(objectKey, OSSConstants.DEFAULT_CHARSET_NAME)
+        String url = endpoint.getScheme() + "://" + host + "/" + HttpUtil.urlEncode(objectKey, OSSConstants.defaultCharsetName)
                 + "?" + queryString;
 
         return url;
@@ -127,7 +127,7 @@ import java.util.Map;
 
      String presignURL(String bucketName, String objectKey) {
         String host = buildCanonicalHost(endpoint, bucketName, conf);
-        return endpoint.getScheme() + "://" + host + "/" + HttpUtil.urlEncode(objectKey, OSSConstants.DEFAULT_CHARSET_NAME);
+        return endpoint.getScheme() + "://" + host + "/" + HttpUtil.urlEncode(objectKey, OSSConstants.defaultCharsetName);
     }
 
      String buildCanonicalHost(URI endpoint, String bucketName, ClientConfiguration config) {

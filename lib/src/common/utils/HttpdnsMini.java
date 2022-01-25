@@ -140,10 +140,10 @@ import java.util.concurrent.Executors;
                 } else {
                     in = conn.getInputStream();
                     BufferedReader streamReader = BufferedReader(new InputStreamReader(in, "UTF-8"));
-                    StringBuilder sb = StringBuilder();
+                    StringBuffer sb = StringBuffer();
                     String line;
                     while ((line = streamReader.readLine()) != null) {
-                        sb.append(line);
+                        sb.write(line);
                     }
                     JSONObject json = JSONObject(sb.toString());
                     String host = json.getString("host");
@@ -164,7 +164,7 @@ import java.util.concurrent.Executors;
                         hostObject.setQueryTime(System.currentTimeMillis() / 1000);
                         OSSLog.logDebug("[httpdnsmini] - resolve result:" + hostObject.toString());
                         if (hostManager.size() < MAX_HOLD_HOST_NUM) {
-                            hostManager.put(hostName, hostObject);
+                            hostManager[hostName] = hostObject;
                         }
                         return ip;
                     }

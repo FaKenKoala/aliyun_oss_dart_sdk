@@ -57,7 +57,7 @@ package com.alibaba.sdk.android.oss.model;
             }
         }
 
-        throw IllegalArgumentException("Unable to parse " + storageClassString);
+        throw ArgumentError("Unable to parse " + storageClassString);
     }
 
     @override

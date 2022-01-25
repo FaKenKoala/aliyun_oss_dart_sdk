@@ -138,7 +138,7 @@ import java.util.Map;
      */
      void setMethod(HttpMethod method) {
         if (method != HttpMethod.GET && method != HttpMethod.PUT)
-            throw IllegalArgumentException("Only GET or PUT is supported!");
+            throw ArgumentError("Only GET or PUT is supported!");
 
         this.method = method;
     }
@@ -219,7 +219,7 @@ import java.util.Map;
      * @param value
      */
      void addQueryParameter(String key, String value) {
-        this.queryParam.put(key, value);
+        this.queryParam[key] = value;
     }
 
     /**

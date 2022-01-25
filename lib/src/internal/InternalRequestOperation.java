@@ -110,7 +110,7 @@ import okhttp3.OkHttpClient;
             service = URI("http://oss.aliyuncs.com");
             endpoint = URI("http://127.0.0.1"); //构造假的endpoint
         } catch (Exception e) {
-            throw IllegalArgumentException("Endpoint must be a string like 'http://oss-cn-****.aliyuncs.com'," +
+            throw ArgumentError("Endpoint must be a string like 'http://oss-cn-****.aliyuncs.com'," +
                     "or your cname like 'http://image.cnamedomain.com'!");
         }
         this.applicationContext = context;
@@ -172,10 +172,10 @@ import okhttp3.OkHttpClient;
             requestMessage.setUploadUri(request.getUploadUri());
         }
         if (request.getCallbackParam() != null) {
-            requestMessage.getHeaders().put("x-oss-callback", OSSUtils.populateMapToBase64JsonString(request.getCallbackParam()));
+            requestMessage.getHeaders()["x-oss-callback"] = OSSUtils.populateMapToBase64JsonString(request.getCallbackParam());
         }
         if (request.getCallbackVars() != null) {
-            requestMessage.getHeaders().put("x-oss-callback-var", OSSUtils.populateMapToBase64JsonString(request.getCallbackVars()));
+            requestMessage.getHeaders()["x-oss-callback-var"] = OSSUtils.populateMapToBase64JsonString(request.getCallbackVars());
         }
         OSSLog.logDebug(" populateRequestMetadata ");
         OSSUtils.populateRequestMetadata(requestMessage.getHeaders(), request.getMetadata());
@@ -217,14 +217,14 @@ import okhttp3.OkHttpClient;
         requestMessage.setMethod(HttpMethod.PUT);
         requestMessage.setBucketName(request.getBucketName());
         if (request.getBucketACL() != null) {
-            requestMessage.getHeaders().put(OSSHeaders.OSS_CANNED_ACL, request.getBucketACL().toString());
+            requestMessage.getHeaders()[OSSHeaders.OSS_CANNED_ACL] = request.getBucketACL().toString();
         }
         try {
             Map<String, String> configures = HashMap<String, String>();
             if (request.getLocationConstraint() != null) {
-                configures.put(CreateBucketRequest.TAB_LOCATIONCONSTRAINT, request.getLocationConstraint());
+                configures[CreateBucketRequest.TAB_LOCATIONCONSTRAINT] = request.getLocationConstraint();
             }
-            configures.put(CreateBucketRequest.TAB_STORAGECLASS, request.getBucketStorageClass().toString());
+            configures[CreateBucketRequest.TAB_STORAGECLASS] = request.getBucketStorageClass().toString();
             requestMessage.createBucketRequestBodyMarshall(configures);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -263,7 +263,7 @@ import okhttp3.OkHttpClient;
             GetBucketInfoRequest request, OSSCompletedCallback<GetBucketInfoRequest, GetBucketInfoResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put("bucketInfo", "");
+        query["bucketInfo"] = "";
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
@@ -284,7 +284,7 @@ import okhttp3.OkHttpClient;
             GetBucketACLRequest request, OSSCompletedCallback<GetBucketACLRequest, GetBucketACLResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put("acl", "");
+        query["acl"] = "";
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
@@ -305,7 +305,7 @@ import okhttp3.OkHttpClient;
             PutBucketRefererRequest request, OSSCompletedCallback<PutBucketRefererRequest, PutBucketRefererResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put("referer", "");
+        query["referer"] = "";
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
@@ -334,7 +334,7 @@ import okhttp3.OkHttpClient;
             GetBucketRefererRequest request, OSSCompletedCallback<GetBucketRefererRequest, GetBucketRefererResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put("referer", "");
+        query["referer"] = "";
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
@@ -355,7 +355,7 @@ import okhttp3.OkHttpClient;
             PutBucketLoggingRequest request, OSSCompletedCallback<PutBucketLoggingRequest, PutBucketLoggingResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put("logging", "");
+        query["logging"] = "";
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
@@ -384,7 +384,7 @@ import okhttp3.OkHttpClient;
             GetBucketLoggingRequest request, OSSCompletedCallback<GetBucketLoggingRequest, GetBucketLoggingResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put("logging", "");
+        query["logging"] = "";
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
@@ -405,7 +405,7 @@ import okhttp3.OkHttpClient;
             DeleteBucketLoggingRequest request, OSSCompletedCallback<DeleteBucketLoggingRequest, DeleteBucketLoggingResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put("logging", "");
+        query["logging"] = "";
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
@@ -426,7 +426,7 @@ import okhttp3.OkHttpClient;
             PutBucketLifecycleRequest request, OSSCompletedCallback<PutBucketLifecycleRequest, PutBucketLifecycleResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put("lifecycle", "");
+        query["lifecycle"] = "";
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
@@ -455,7 +455,7 @@ import okhttp3.OkHttpClient;
             GetBucketLifecycleRequest request, OSSCompletedCallback<GetBucketLifecycleRequest, GetBucketLifecycleResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put("lifecycle", "");
+        query["lifecycle"] = "";
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
@@ -476,7 +476,7 @@ import okhttp3.OkHttpClient;
             DeleteBucketLifecycleRequest request, OSSCompletedCallback<DeleteBucketLifecycleRequest, DeleteBucketLifecycleResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put("lifecycle", "");
+        query["lifecycle"] = "";
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
@@ -524,8 +524,8 @@ import okhttp3.OkHttpClient;
         if (request.getUploadUri() != null) {
             requestMessage.setUploadUri(request.getUploadUri());
         }
-        requestMessage.getParameters().put(RequestParameters.SUBRESOURCE_APPEND, "");
-        requestMessage.getParameters().put(RequestParameters.POSITION, String.valueOf(request.getPosition()));
+        requestMessage.getParameters()[RequestParameters.SUBRESOURCE_APPEND] = "";
+        requestMessage.getParameters()[RequestParameters.POSITION] = String.valueOf(request.getPosition());
 
         OSSUtils.populateRequestMetadata(requestMessage.getHeaders(), request.getMetadata());
 
@@ -592,18 +592,18 @@ import okhttp3.OkHttpClient;
         requestMessage.setObjectKey(request.getObjectKey());
 
         if (request.getRange() != null) {
-            requestMessage.getHeaders().put(OSSHeaders.RANGE, request.getRange().toString());
+            requestMessage.getHeaders()[OSSHeaders.RANGE] = request.getRange().toString();
         }
 
         if (request.getxOssProcess() != null) {
-            requestMessage.getParameters().put(RequestParameters.X_OSS_PROCESS, request.getxOssProcess());
+            requestMessage.getParameters()[RequestParameters.X_OSS_PROCESS] = request.getxOssProcess();
         }
 
         canonicalizeRequestMessage(requestMessage, request);
 
         if (request.getRequestHeaders() != null) {
             for (Map.Entry<String, String> entry : request.getRequestHeaders().entrySet()) {
-                requestMessage.getHeaders().put(entry.getKey(), entry.getValue());
+                requestMessage.getHeaders()[entry.getKey()] = entry.getValue();
             }
         }
 
@@ -623,7 +623,7 @@ import okhttp3.OkHttpClient;
 
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put("acl", "");
+        query["acl"] = "";
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
@@ -697,7 +697,7 @@ import okhttp3.OkHttpClient;
             DeleteMultipleObjectRequest request, OSSCompletedCallback<DeleteMultipleObjectRequest, DeleteMultipleObjectResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put("delete", "");
+        query["delete"] = "";
 
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
@@ -707,8 +707,8 @@ import okhttp3.OkHttpClient;
         try {
             byte[] bodyBytes = requestMessage.deleteMultipleObjectRequestBodyMarshall(request.getObjectKeys(), request.getQuiet());
             if (bodyBytes != null && bodyBytes.length > 0) {
-                requestMessage.getHeaders().put(OSSHeaders.CONTENT_MD5, BinaryUtil.calculateBase64Md5(bodyBytes));
-                requestMessage.getHeaders().put(OSSHeaders.CONTENT_LENGTH, String.valueOf(bodyBytes.length));
+                requestMessage.getHeaders()[OSSHeaders.CONTENT_MD5] = BinaryUtil.calculateBase64Md5(bodyBytes);
+                requestMessage.getHeaders()[OSSHeaders.CONTENT_LENGTH] = String.valueOf(bodyBytes.length);
             }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -784,9 +784,9 @@ import okhttp3.OkHttpClient;
         requestMessage.setBucketName(request.getBucketName());
         requestMessage.setObjectKey(request.getObjectKey());
 
-        requestMessage.getParameters().put(RequestParameters.SUBRESOURCE_UPLOADS, "");
+        requestMessage.getParameters()[RequestParameters.SUBRESOURCE_UPLOADS] = "";
         if (request.isSequential) {
-            requestMessage.getParameters().put(RequestParameters.SUBRESOURCE_SEQUENTIAL, "");
+            requestMessage.getParameters()[RequestParameters.SUBRESOURCE_SEQUENTIAL] = "";
         }
 
         OSSUtils.populateRequestMetadata(requestMessage.getHeaders(), request.getMetadata());
@@ -821,11 +821,11 @@ import okhttp3.OkHttpClient;
         requestMessage.setBucketName(request.getBucketName());
         requestMessage.setObjectKey(request.getObjectKey());
 
-        requestMessage.getParameters().put(RequestParameters.UPLOAD_ID, request.getUploadId());
-        requestMessage.getParameters().put(RequestParameters.PART_NUMBER, String.valueOf(request.getPartNumber()));
+        requestMessage.getParameters()[RequestParameters.UPLOAD_ID] = request.getUploadId();
+        requestMessage.getParameters()[RequestParameters.PART_NUMBER] = String.valueOf(request.getPartNumber());
         requestMessage.setUploadData(request.getPartContent());
         if (request.getMd5Digest() != null) {
-            requestMessage.getHeaders().put(OSSHeaders.CONTENT_MD5, request.getMd5Digest());
+            requestMessage.getHeaders()[OSSHeaders.CONTENT_MD5] = request.getMd5Digest();
         }
 
         canonicalizeRequestMessage(requestMessage, request);
@@ -874,13 +874,13 @@ import okhttp3.OkHttpClient;
         requestMessage.setObjectKey(request.getObjectKey());
         requestMessage.setStringBody(OSSUtils.buildXMLFromPartEtagList(request.getPartETags()));
 
-        requestMessage.getParameters().put(RequestParameters.UPLOAD_ID, request.getUploadId());
+        requestMessage.getParameters()[RequestParameters.UPLOAD_ID] = request.getUploadId();
 
         if (request.getCallbackParam() != null) {
-            requestMessage.getHeaders().put("x-oss-callback", OSSUtils.populateMapToBase64JsonString(request.getCallbackParam()));
+            requestMessage.getHeaders()["x-oss-callback"] = OSSUtils.populateMapToBase64JsonString(request.getCallbackParam());
         }
         if (request.getCallbackVars() != null) {
-            requestMessage.getHeaders().put("x-oss-callback-var", OSSUtils.populateMapToBase64JsonString(request.getCallbackVars()));
+            requestMessage.getHeaders()["x-oss-callback-var"] = OSSUtils.populateMapToBase64JsonString(request.getCallbackVars());
         }
 
         OSSUtils.populateRequestMetadata(requestMessage.getHeaders(), request.getMetadata());
@@ -922,7 +922,7 @@ import okhttp3.OkHttpClient;
         requestMessage.setBucketName(request.getBucketName());
         requestMessage.setObjectKey(request.getObjectKey());
 
-        requestMessage.getParameters().put(RequestParameters.UPLOAD_ID, request.getUploadId());
+        requestMessage.getParameters()[RequestParameters.UPLOAD_ID] = request.getUploadId();
 
         canonicalizeRequestMessage(requestMessage, request);
 
@@ -947,22 +947,22 @@ import okhttp3.OkHttpClient;
         requestMessage.setBucketName(request.getBucketName());
         requestMessage.setObjectKey(request.getObjectKey());
 
-        requestMessage.getParameters().put(RequestParameters.UPLOAD_ID, request.getUploadId());
+        requestMessage.getParameters()[RequestParameters.UPLOAD_ID] = request.getUploadId();
 
         Integer maxParts = request.getMaxParts();
         if (maxParts != null) {
             if (!OSSUtils.checkParamRange(maxParts, 0, true, LIST_PART_MAX_RETURNS, true)) {
-                throw IllegalArgumentException("MaxPartsOutOfRange: " + LIST_PART_MAX_RETURNS);
+                throw ArgumentError("MaxPartsOutOfRange: " + LIST_PART_MAX_RETURNS);
             }
-            requestMessage.getParameters().put(RequestParameters.MAX_PARTS, maxParts.toString());
+            requestMessage.getParameters()[RequestParameters.MAX_PARTS] = maxParts.toString();
         }
 
         Integer partNumberMarker = request.getPartNumberMarker();
         if (partNumberMarker != null) {
             if (!OSSUtils.checkParamRange(partNumberMarker, 0, false, MAX_PART_NUMBER, true)) {
-                throw IllegalArgumentException("PartNumberMarkerOutOfRange: " + MAX_PART_NUMBER);
+                throw ArgumentError("PartNumberMarkerOutOfRange: " + MAX_PART_NUMBER);
             }
-            requestMessage.getParameters().put(RequestParameters.PART_NUMBER_MARKER, partNumberMarker.toString());
+            requestMessage.getParameters()[RequestParameters.PART_NUMBER_MARKER] = partNumberMarker.toString();
         }
 
         canonicalizeRequestMessage(requestMessage, request);
@@ -987,7 +987,7 @@ import okhttp3.OkHttpClient;
         requestMessage.setMethod(HttpMethod.GET);
         requestMessage.setBucketName(request.getBucketName());
 
-        requestMessage.getParameters().put(RequestParameters.SUBRESOURCE_UPLOADS, "");
+        requestMessage.getParameters()[RequestParameters.SUBRESOURCE_UPLOADS] = "";
 
         OSSUtils.populateListMultipartUploadsRequestParameters(request, requestMessage.getParameters());
 
@@ -1038,14 +1038,14 @@ import okhttp3.OkHttpClient;
         Map<String, String> header = message.getHeaders();
 
         if (header.get(OSSHeaders.DATE) == null) {
-            header.put(OSSHeaders.DATE, DateUtil.currentFixedSkewedTimeInRFC822Format());
+            header[OSSHeaders.DATE] = DateUtil.currentFixedSkewedTimeInRFC822Format();
         }
 
         if (message.getMethod() == HttpMethod.POST || message.getMethod() == HttpMethod.PUT) {
             if (OSSUtils.isEmptyString(header.get(OSSHeaders.CONTENT_TYPE))) {
                 String determineContentType = OSSUtils.determineContentType(null,
                         message.getUploadFilePath(), message.getObjectKey());
-                header.put(OSSHeaders.CONTENT_TYPE, determineContentType);
+                header[OSSHeaders.CONTENT_TYPE] = determineContentType;
             }
         }
 
@@ -1058,7 +1058,7 @@ import okhttp3.OkHttpClient;
         // set ip with header
         message.setIpWithHeader(conf.getIpWithHeader());
 
-        message.getHeaders().put(HttpHeaders.USER_AGENT, VersionInfoUtils.getUserAgent(conf.getCustomUserMark()));
+        message.getHeaders()[HttpHeaders.USER_AGENT] = VersionInfoUtils.getUserAgent(conf.getCustomUserMark());
 
         if (message.getHeaders().containsKey(OSSHeaders.RANGE) || message.getParameters().containsKey(RequestParameters.X_OSS_PROCESS)) {
             //if contain range or x-oss-process , then don't crc64
@@ -1125,7 +1125,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<TriggerCallbackResult> triggerCallback(TriggerCallbackRequest request, OSSCompletedCallback<TriggerCallbackRequest, TriggerCallbackResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put(RequestParameters.X_OSS_PROCESS, "");
+        query[RequestParameters.X_OSS_PROCESS] = "";
 
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.POST);
@@ -1137,7 +1137,7 @@ import okhttp3.OkHttpClient;
         requestMessage.setStringBody(bodyString);
 
         String md5String = BinaryUtil.calculateBase64Md5(bodyString.getBytes());
-        requestMessage.getHeaders().put(HttpHeaders.CONTENT_MD5, md5String);
+        requestMessage.getHeaders()[HttpHeaders.CONTENT_MD5] = md5String;
 
         canonicalizeRequestMessage(requestMessage, request);
         ExecutionContext<TriggerCallbackRequest, TriggerCallbackResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
@@ -1156,7 +1156,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<ImagePersistResult> imageActionPersist(ImagePersistRequest request, OSSCompletedCallback<ImagePersistRequest, ImagePersistResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put(RequestParameters.X_OSS_PROCESS, "");
+        query[RequestParameters.X_OSS_PROCESS] = "";
 
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.POST);
@@ -1186,7 +1186,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<PutSymlinkResult> putSymlink(PutSymlinkRequest request, OSSCompletedCallback<PutSymlinkRequest, PutSymlinkResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put(RequestParameters.X_OSS_SYMLINK, "");
+        query[RequestParameters.X_OSS_SYMLINK] = "";
 
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.PUT);
@@ -1195,8 +1195,8 @@ import okhttp3.OkHttpClient;
         requestMessage.setParameters(query);
 
         if (!OSSUtils.isEmptyString(request.getTargetObjectName())) {
-            String targetObjectName = HttpUtil.urlEncode(request.getTargetObjectName(), OSSConstants.DEFAULT_CHARSET_NAME);
-            requestMessage.getHeaders().put(OSSHeaders.OSS_HEADER_SYMLINK_TARGET, targetObjectName);
+            String targetObjectName = HttpUtil.urlEncode(request.getTargetObjectName(), OSSConstants.defaultCharsetName);
+            requestMessage.getHeaders()[OSSHeaders.OSS_HEADER_SYMLINK_TARGET] = targetObjectName;
         }
 
         OSSUtils.populateRequestMetadata(requestMessage.getHeaders(), request.getMetadata());
@@ -1218,7 +1218,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<GetSymlinkResult> getSymlink(GetSymlinkRequest request, OSSCompletedCallback<GetSymlinkRequest, GetSymlinkResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put(RequestParameters.X_OSS_SYMLINK, "");
+        query[RequestParameters.X_OSS_SYMLINK] = "";
 
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.GET);
@@ -1243,7 +1243,7 @@ import okhttp3.OkHttpClient;
      OSSAsyncTask<RestoreObjectResult> restoreObject(RestoreObjectRequest request, OSSCompletedCallback<RestoreObjectRequest, RestoreObjectResult> completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
-        query.put(RequestParameters.X_OSS_RESTORE, "");
+        query[RequestParameters.X_OSS_RESTORE] = "";
 
         requestMessage.setEndpoint(endpoint);
         requestMessage.setMethod(HttpMethod.POST);

@@ -146,7 +146,7 @@ import java.util.List;
         MultipartUpload upload = null;
         bool isCommonPrefixes = false;
         XmlPullParser parser = Xml.newPullParser();
-        parser.setInput(responseMessage.getContent(), "utf-8");
+        parser.setI[responseMessage.getContent()] = "utf-8";
         int eventType = parser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {
             switch (eventType) {
