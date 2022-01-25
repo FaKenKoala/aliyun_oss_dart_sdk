@@ -1,5 +1,6 @@
 import 'client_configuration.dart';
 import 'common/auth/credentials_provider.dart';
+import 'common/auth/custom_session_credentials_provider.dart';
 import 'common/comm/service_client.dart';
 import 'common/comm/sign_version.dart';
 import 'common/comm/timeout_service_client.dart';
@@ -370,7 +371,7 @@ import 'model/vpc_ip.dart';
 
     @override
      BucketList listBuckets(String prefix, String marker, int maxKeys)  {
-        return bucketOperation.listBuckets(ListBucketsRequest(prefix, marker, maxKeys));
+        return bucketOperation.listBucketsWithRequest(ListBucketsRequest(prefix, marker, maxKeys));
     }
 
     @override
@@ -386,61 +387,61 @@ import 'model/vpc_ip.dart';
 
     @override
      AccessControlList getBucketAcl(String bucketName)  {
-        return getBucketAcl(GenericRequest(bucketName: bucketName));
+        return getBucketAclWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     AccessControlList getBucketAcl(GenericRequest genericRequest)  {
+     AccessControlList getBucketAclWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketAcl(genericRequest);
     }
 
     @override
      BucketMetadata getBucketMetadata(String bucketName)  {
-        return getBucketMetadata(GenericRequest(bucketName: bucketName));
+        return getBucketMetadataWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     BucketMetadata getBucketMetadata(GenericRequest genericRequest)  {
+     BucketMetadata getBucketMetadataWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketMetadata(genericRequest);
     }
 
     @override
      VoidResult setBucketReferer(String bucketName, BucketReferer referer)  {
-        return setBucketReferer(SetBucketRefererRequest(bucketName, referer));
+        return setBucketRefererWithRequest(SetBucketRefererRequest(bucketName, referer));
     }
 
     @override
-     VoidResult setBucketReferer(SetBucketRefererRequest setBucketRefererRequest)  {
+     VoidResult setBucketRefererWithRequest(SetBucketRefererRequest setBucketRefererRequest)  {
         return bucketOperation.setBucketReferer(setBucketRefererRequest);
     }
 
     @override
      BucketReferer getBucketReferer(String bucketName)  {
-        return getBucketReferer(GenericRequest(bucketName: bucketName));
+        return getBucketRefererWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     BucketReferer getBucketReferer(GenericRequest genericRequest)  {
+     BucketReferer getBucketRefererWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketReferer(genericRequest);
     }
 
     @override
      String getBucketLocation(String bucketName)  {
-        return getBucketLocation(GenericRequest(bucketName: bucketName));
+        return getBucketLocationWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     String getBucketLocation(GenericRequest genericRequest)  {
+     String getBucketLocationWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketLocation(genericRequest);
     }
 
     @override
      bool doesBucketExist(String bucketName)  {
-        return doesBucketExist(GenericRequest(bucketName: bucketName));
+        return doesBucketExistWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     bool doesBucketExist(GenericRequest genericRequest)  {
+     bool doesBucketExistWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.doesBucketExists(genericRequest);
     }
 
@@ -452,45 +453,45 @@ import 'model/vpc_ip.dart';
 
     @override
      ObjectListing listObjects(String bucketName)  {
-        return listObjects(ListObjectsRequest(bucketName, null, null, null, null));
+        return listObjectsWithRequest(ListObjectsRequest(bucketName, null, null, null, null));
     }
 
     @override
      ObjectListing listObjects(String bucketName, String prefix)  {
-        return listObjects(ListObjectsRequest(bucketName, prefix, null, null, null));
+        return listObjectsWithRequest(ListObjectsRequest(bucketName, prefix, null, null, null));
     }
 
     @override
-     ObjectListing listObjects(ListObjectsRequest listObjectsRequest)  {
+     ObjectListing listObjectsWithRequest(ListObjectsRequest listObjectsRequest)  {
         return bucketOperation.listObjects(listObjectsRequest);
     }
 
     @override
-     ListObjectsV2Result listObjectsV2(ListObjectsV2Request listObjectsV2Request)  {
+     ListObjectsV2Result listObjectsV2WithRequest(ListObjectsV2Request listObjectsV2Request)  {
         return bucketOperation.listObjectsV2(listObjectsV2Request);
     }
 
     @override
      ListObjectsV2Result listObjectsV2(String bucketName)  {
-        return bucketOperation.listObjectsV2(ListObjectsV2Request(bucketName));
+        return bucketOperation.listObjectsV2WithRequest(ListObjectsV2Request(bucketName));
     }
 
     @override
      ListObjectsV2Result listObjectsV2(String bucketName, String prefix)  {
-        return bucketOperation.listObjectsV2(ListObjectsV2Request(bucketName, prefix));
+        return bucketOperation.listObjectsV2WithRequest(ListObjectsV2Request(bucketName, prefix));
     }
 
     @override
      ListObjectsV2Result listObjectsV2(String bucketName, String prefix, String continuationToken,
                                 String startAfter, String delimiter, Integer maxKeys,
                                 String encodingType, bool fetchOwner)  {
-        return bucketOperation.listObjectsV2(ListObjectsV2Request(bucketName, prefix, continuationToken, startAfter,
+        return bucketOperation.listObjectsV2WithRequest(ListObjectsV2Request(bucketName, prefix, continuationToken, startAfter,
                 delimiter, maxKeys, encodingType, fetchOwner));
     }
 
     @override
 	 VersionListing listVersions(String bucketName, String prefix)  {
-        return listVersions(ListVersionsRequest(bucketName, prefix, null, null, null, null));
+        return listVersionsWithRequest(ListVersionsRequest(bucketName, prefix, null, null, null, null));
 	}
 
     @override
@@ -507,7 +508,7 @@ import 'model/vpc_ip.dart';
     }
 
     @override
-     VersionListing listVersions(ListVersionsRequest listVersionsRequest)  {
+     VersionListing listVersionsWithRequest(ListVersionsRequest listVersionsRequest)  {
         return bucketOperation.listVersions(listVersionsRequest);
     }
 
@@ -520,13 +521,13 @@ import 'model/vpc_ip.dart';
     @override
      PutObjectResult putObject(String bucketName, String key, InputStream input, ObjectMetadata metadata)
              {
-        return putObject(PutObjectRequest(bucketName, key, input, metadata));
+        return putObjectWithRequest(PutObjectRequest(bucketName, key, input, metadata));
     }
 
     @override
      PutObjectResult putObject(String bucketName, String key, File file, ObjectMetadata metadata)
              {
-        return putObject(PutObjectRequest(bucketName, key, file, metadata));
+        return putObjectWithRequest(PutObjectRequest(bucketName, key, file, metadata));
     }
 
     @override
@@ -535,7 +536,7 @@ import 'model/vpc_ip.dart';
     }
 
     @override
-     PutObjectResult putObject(PutObjectRequest putObjectRequest)  {
+     PutObjectResult putObjectWithRequest(PutObjectRequest putObjectRequest)  {
         return objectOperation.putObject(putObjectRequest);
     }
 
@@ -565,7 +566,7 @@ import 'model/vpc_ip.dart';
             if (requestContent != null) {
                 try {
                     requestContent.close();
-                } catch (IOException e) {
+                } catch ( e) {
                 }
             }
         }
@@ -586,118 +587,118 @@ import 'model/vpc_ip.dart';
     @override
      CopyObjectResult copyObject(String sourceBucketName, String sourceKey, String destinationBucketName,
             String destinationKey)  {
-        return copyObject(CopyObjectRequest(sourceBucketName, sourceKey, destinationBucketName, destinationKey));
+        return copyObjectWithRequest(CopyObjectRequest(sourceBucketName, sourceKey, destinationBucketName, destinationKey));
     }
 
     @override
-     CopyObjectResult copyObject(CopyObjectRequest copyObjectRequest)  {
+     CopyObjectResult copyObjectWithRequest(CopyObjectRequest copyObjectRequest)  {
         return objectOperation.copyObject(copyObjectRequest);
     }
 
     @override
      OSSObject getObject(String bucketName, String key)  {
-        return getObject(GetObjectRequest(bucketName, key));
+        return getObjectWithRequest(GetObjectRequest(bucketName, key));
     }
 
     @override
-     ObjectMetadata getObject(GetObjectRequest getObjectRequest, File file)  {
+     ObjectMetadata getObjectWithRequestFile(GetObjectRequest getObjectRequest, File file)  {
         return objectOperation.getObject(getObjectRequest, file);
     }
 
     @override
-     OSSObject getObject(GetObjectRequest getObjectRequest)  {
+     OSSObject getObjectWithRequest(GetObjectRequest getObjectRequest)  {
         return objectOperation.getObject(getObjectRequest);
     }
 
     @override
-     OSSObject getObject(URL signedUrl, Map<String, String> requestHeaders)  {
+     OSSObject getObjectWithHeader(Uri signedUrl, Map<String, String> requestHeaders)  {
         GetObjectRequest getObjectRequest = GetObjectRequest(signedUrl, requestHeaders);
         return objectOperation.getObject(getObjectRequest);
     }
 
     @override
-     OSSObject selectObject(SelectObjectRequest selectObjectRequest)  {
+     OSSObject selectObjectWithRequest(SelectObjectRequest selectObjectRequest)  {
         return objectOperation.selectObject(selectObjectRequest);
     }
 
     @override
      SimplifiedObjectMeta getSimplifiedObjectMeta(String bucketName, String key)
              {
-        return getSimplifiedObjectMeta(GenericRequest(bucketName, key));
+        return getSimplifiedObjectMetaWithRequest(GenericRequest(bucketName, key));
     }
 
     @override
-     SimplifiedObjectMeta getSimplifiedObjectMeta(GenericRequest genericRequest)
+     SimplifiedObjectMeta getSimplifiedObjectMetaWithRequest(GenericRequest genericRequest)
              {
         return objectOperation.getSimplifiedObjectMeta(genericRequest);
     }
 
     @override
      ObjectMetadata getObjectMetadata(String bucketName, String key)  {
-        return getObjectMetadata(GenericRequest(bucketName, key));
+        return getObjectMetadataWithRequest(GenericRequest(bucketName, key));
     }
 
     @override
-     SelectObjectMetadata createSelectObjectMetadata(CreateSelectObjectMetadataRequest createSelectObjectMetadataRequest)  {
+     SelectObjectMetadata createSelectObjectMetadataWithRequest(CreateSelectObjectMetadataRequest createSelectObjectMetadataRequest)  {
         return objectOperation.createSelectObjectMetadata(createSelectObjectMetadataRequest);
     }
     
     @override
-     ObjectMetadata getObjectMetadata(GenericRequest genericRequest)  {
+     ObjectMetadata getObjectMetadataWithRequest(GenericRequest genericRequest)  {
         return objectOperation.getObjectMetadata(genericRequest);
     }
 
     @override
      ObjectMetadata headObject(String bucketName, String key)  {
-        return headObject(HeadObjectRequest(bucketName, key));
+        return headObjectWithRequest(HeadObjectRequest(bucketName, key));
     }
 
     @override
-     ObjectMetadata headObject(HeadObjectRequest headObjectRequest)  {
+     ObjectMetadata headObjectWithRequest(HeadObjectRequest headObjectRequest)  {
         return objectOperation.headObject(headObjectRequest);
     }
 
     @override
-     AppendObjectResult appendObject(AppendObjectRequest appendObjectRequest)
+     AppendObjectResult appendObjectWithRequest(AppendObjectRequest appendObjectRequest)
              {
         return objectOperation.appendObject(appendObjectRequest);
     }
 
     @override
      VoidResult deleteObject(String bucketName, String key)  {
-        return deleteObject(GenericRequest(bucketName, key));
+        return deleteObjectWithRequest(GenericRequest(bucketName, key));
     }
 
     @override
-     VoidResult deleteObject(GenericRequest genericRequest)  {
+     VoidResult deleteObjectWithRequest(GenericRequest genericRequest)  {
         return objectOperation.deleteObject(genericRequest);
     }
     
     @override
      VoidResult deleteVersion(String bucketName, String key, String versionId)  {
-        return deleteVersion(DeleteVersionRequest(bucketName, key, versionId));
+        return deleteVersionWithRequest(DeleteVersionRequest(bucketName, key, versionId));
     }
 
     @override
-     VoidResult deleteVersion(DeleteVersionRequest deleteVersionRequest)  {
+     VoidResult deleteVersionWithRequest(DeleteVersionRequest deleteVersionRequest)  {
         return objectOperation.deleteVersion(deleteVersionRequest);
     }
 
     @override
-     DeleteObjectsResult deleteObjects(DeleteObjectsRequest deleteObjectsRequest)
+     DeleteObjectsResult deleteObjectsWithRequest(DeleteObjectsRequest deleteObjectsRequest)
              {
         return objectOperation.deleteObjects(deleteObjectsRequest);
     }
     
     @override
-     DeleteVersionsResult deleteVersions(DeleteVersionsRequest deleteVersionsRequest)
+     DeleteVersionsResult deleteVersionsWithRequest(DeleteVersionsRequest deleteVersionsRequest)
          {
         return objectOperation.deleteVersions(deleteVersionsRequest);
     }
 
     @override
      bool doesObjectExist(String bucketName, String key)  {
-        return doesObjectExist(GenericRequest(bucketName, key));
+        return doesObjectExistWithRequest(GenericRequest(bucketName, key));
     }
 
     @override
@@ -705,23 +706,23 @@ import 'model/vpc_ip.dart';
         if (isOnlyInOSS) {
             return doesObjectExist(bucketName, key);
         } else {
-            return objectOperation.doesObjectExistWithRedirect(GenericRequest(bucketName, key));
+            return objectOperation.doesObjectExistWithRedirectWithRequest(GenericRequest(bucketName, key));
         }
     }
 
     @Deprecated
     @override
-     bool doesObjectExist(HeadObjectRequest headObjectRequest)  {
-        return doesObjectExist(GenericRequest(headObjectRequest.getBucketName(), headObjectRequest.getKey()));
+     bool doesObjectExistWithRequest(HeadObjectRequest headObjectRequest)  {
+        return doesObjectExistWithRequest(GenericRequest(headObjectRequest.getBucketName(), headObjectRequest.getKey()));
     }
 
     @override
-     bool doesObjectExist(GenericRequest genericRequest)  {
+     bool doesObjectExistWithRequest(GenericRequest genericRequest)  {
         return objectOperation.doesObjectExist(genericRequest);
     }
 
     @override
-     bool doesObjectExist(GenericRequest genericRequest, bool isOnlyInOSS)  {
+     bool doesObjectExistWithRequest(GenericRequest genericRequest, bool isOnlyInOSS)  {
     	if (isOnlyInOSS) {
     	    return objectOperation.doesObjectExist(genericRequest);	
     	} else {
@@ -732,42 +733,42 @@ import 'model/vpc_ip.dart';
     @override
      VoidResult setObjectAcl(String bucketName, String key, CannedAccessControlList cannedACL)
              {
-        return setObjectAcl(SetObjectAclRequest(bucketName, key, cannedACL));
+        return setObjectAclWithRequest(SetObjectAclRequest(bucketName, key, cannedACL));
     }
 
     @override
-     VoidResult setObjectAcl(SetObjectAclRequest setObjectAclRequest)  {
+     VoidResult setObjectAclWithRequest(SetObjectAclRequest setObjectAclRequest)  {
         return objectOperation.setObjectAcl(setObjectAclRequest);
     }
 
     @override
      ObjectAcl getObjectAcl(String bucketName, String key)  {
-        return getObjectAcl(GenericRequest(bucketName, key));
+        return getObjectAclWithRequest(GenericRequest(bucketName, key));
     }
 
     @override
-     ObjectAcl getObjectAcl(GenericRequest genericRequest)  {
+     ObjectAcl getObjectAclWithRequest(GenericRequest genericRequest)  {
         return objectOperation.getObjectAcl(genericRequest);
     }
 
     @override
      RestoreObjectResult restoreObject(String bucketName, String key)  {
-        return restoreObject(GenericRequest(bucketName, key));
+        return restoreObjectWithRequest(GenericRequest(bucketName, key));
     }
 
     @override
-     RestoreObjectResult restoreObject(GenericRequest genericRequest)  {
+     RestoreObjectResult restoreObjectWithRequest(GenericRequest genericRequest)  {
         return objectOperation.restoreObject(genericRequest);
     }
     
     @override
      RestoreObjectResult restoreObject(String bucketName, String key, RestoreConfiguration restoreConfiguration)
              {
-        return restoreObject(RestoreObjectRequest(bucketName, key, restoreConfiguration));
+        return restoreObjectWithRequest(RestoreObjectRequest(bucketName, key, restoreConfiguration));
     }
 
     @override
-     RestoreObjectResult restoreObject(RestoreObjectRequest restoreObjectRequest)
+     RestoreObjectResult restoreObjectWithRequest(RestoreObjectRequest restoreObjectRequest)
              {
         return objectOperation.restoreObject(restoreObjectRequest);
     }
@@ -775,36 +776,36 @@ import 'model/vpc_ip.dart';
     @override
      VoidResult setObjectTagging(String bucketName, String key, Map<String, String> tags)
          {
-        return setObjectTagging(SetObjectTaggingRequest(bucketName, key, tags));
+        return setObjectTaggingWithRequest(SetObjectTaggingRequest(bucketName, key, tags));
     }
 
     @override
      VoidResult setObjectTagging(String bucketName, String key, TagSet tagSet)  {
-        return setObjectTagging(SetObjectTaggingRequest(bucketName, key, tagSet));
+        return setObjectTaggingWithRequest(SetObjectTaggingRequest(bucketName, key, tagSet));
     }
 
     @override
-     VoidResult setObjectTagging(SetObjectTaggingRequest setObjectTaggingRequest)  {
+     VoidResult setObjectTaggingWithRequest(SetObjectTaggingRequest setObjectTaggingRequest)  {
         return objectOperation.setObjectTagging(setObjectTaggingRequest);
     }
 
     @override
      TagSet getObjectTagging(String bucketName, String key)  {
-        return getObjectTagging(GenericRequest(bucketName, key));
+        return getObjectTaggingWithRequest(GenericRequest(bucketName, key));
     }
 
     @override
-     TagSet getObjectTagging(GenericRequest genericRequest)  {
+     TagSet getObjectTaggingWithRequest(GenericRequest genericRequest)  {
         return objectOperation.getObjectTagging(genericRequest);
     }
 
     @override
      VoidResult deleteObjectTagging(String bucketName, String key)  {
-        return deleteObjectTagging(GenericRequest(bucketName, key));
+        return deleteObjectTaggingWithRequest(GenericRequest(bucketName, key));
     }
 
     @override
-     VoidResult deleteObjectTagging(GenericRequest genericRequest)  {
+     VoidResult deleteObjectTaggingWithRequest(GenericRequest genericRequest)  {
         return objectOperation.deleteObjectTagging(genericRequest);
     }
 
@@ -824,7 +825,7 @@ import 'model/vpc_ip.dart';
     }
 
     @override
-     URL generatePresignedUrl(GeneratePresignedUrlRequest request)  {
+     URL generatePresignedUrlWithRequest(GeneratePresignedUrlRequest request)  {
 
         assertParameterNotNull(request, "request");
 
@@ -852,221 +853,221 @@ import 'model/vpc_ip.dart';
     }
 
     @override
-     VoidResult abortMultipartUpload(AbortMultipartUploadRequest request)  {
+     VoidResult abortMultipartUploadWithRequest(AbortMultipartUploadRequest request)  {
         return multipartOperation.abortMultipartUpload(request);
     }
 
     @override
-     CompleteMultipartUploadResult completeMultipartUpload(CompleteMultipartUploadRequest request)
+     CompleteMultipartUploadResult completeMultipartUploadWithRequest(CompleteMultipartUploadRequest request)
              {
         return multipartOperation.completeMultipartUpload(request);
     }
 
     @override
-     InitiateMultipartUploadResult initiateMultipartUpload(InitiateMultipartUploadRequest request)
+     InitiateMultipartUploadResult initiateMultipartUploadWithRequest(InitiateMultipartUploadRequest request)
              {
         return multipartOperation.initiateMultipartUpload(request);
     }
 
     @override
-     MultipartUploadListing listMultipartUploads(ListMultipartUploadsRequest request)
+     MultipartUploadListing listMultipartUploadsWithRequest(ListMultipartUploadsRequest request)
              {
         return multipartOperation.listMultipartUploads(request);
     }
 
     @override
-     PartListing listParts(ListPartsRequest request)  {
+     PartListing listPartsWithRequest(ListPartsRequest request)  {
         return multipartOperation.listParts(request);
     }
 
     @override
-     UploadPartResult uploadPart(UploadPartRequest request)  {
+     UploadPartResult uploadPartWithRequest(UploadPartRequest request)  {
         return multipartOperation.uploadPart(request);
     }
 
     @override
-     UploadPartCopyResult uploadPartCopy(UploadPartCopyRequest request)  {
+     UploadPartCopyResult uploadPartCopyWithRequest(UploadPartCopyRequest request)  {
         return multipartOperation.uploadPartCopy(request);
     }
 
     @override
-     VoidResult setBucketCORS(SetBucketCORSRequest request)  {
+     VoidResult setBucketCORSWithRequest(SetBucketCORSRequest request)  {
         return corsOperation.setBucketCORS(request);
     }
 
     @override
      List<CORSRule> getBucketCORSRules(String bucketName)  {
-        return getBucketCORSRules(GenericRequest(bucketName: bucketName));
+        return getBucketCORSRulesWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     List<CORSRule> getBucketCORSRules(GenericRequest genericRequest)  {
+     List<CORSRule> getBucketCORSRulesWithRequest(GenericRequest genericRequest)  {
         return getBucketCORS(genericRequest).getCorsRules();
     }
 
     @override
-     CORSConfiguration getBucketCORS(GenericRequest genericRequest)  {
+     CORSConfiguration getBucketCORSWithRequest(GenericRequest genericRequest)  {
         return corsOperation.getBucketCORS(genericRequest);
     }
 
     @override
      VoidResult deleteBucketCORSRules(String bucketName)  {
-        return deleteBucketCORSRules(GenericRequest(bucketName: bucketName));
+        return deleteBucketCORSRulesWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     VoidResult deleteBucketCORSRules(GenericRequest genericRequest)  {
+     VoidResult deleteBucketCORSRulesWithRequest(GenericRequest genericRequest)  {
         return corsOperation.deleteBucketCORS(genericRequest);
     }
 
     @override
-     ResponseMessage optionsObject(OptionsRequest request)  {
+     ResponseMessage optionsObjectWithRequest(OptionsRequest request)  {
         return corsOperation.optionsObject(request);
     }
 
     @override
-     VoidResult setBucketLogging(SetBucketLoggingRequest request)  {
+     VoidResult setBucketLoggingWithRequest(SetBucketLoggingRequest request)  {
         return bucketOperation.setBucketLogging(request);
     }
 
     @override
      BucketLoggingResult getBucketLogging(String bucketName)  {
-        return getBucketLogging(GenericRequest(bucketName: bucketName));
+        return getBucketLoggingWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     BucketLoggingResult getBucketLogging(GenericRequest genericRequest)  {
+     BucketLoggingResult getBucketLoggingWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketLogging(genericRequest);
     }
 
     @override
      VoidResult deleteBucketLogging(String bucketName)  {
-        return deleteBucketLogging(GenericRequest(bucketName: bucketName));
+        return deleteBucketLoggingWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     VoidResult deleteBucketLogging(GenericRequest genericRequest)  {
+     VoidResult deleteBucketLoggingWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.deleteBucketLogging(genericRequest);
     }
 
     @override
-     VoidResult putBucketImage(PutBucketImageRequest request)  {
+     VoidResult putBucketImageWithRequest(PutBucketImageRequest request)  {
         return bucketOperation.putBucketImage(request);
     }
 
     @override
      GetBucketImageResult getBucketImage(String bucketName)  {
-        return bucketOperation.getBucketImage(bucketName, GenericRequest());
+        return bucketOperation.getBucketImageWithRequest(bucketName, GenericRequest());
     }
 
     @override
-     GetBucketImageResult getBucketImage(String bucketName, GenericRequest genericRequest)
+     GetBucketImageResult getBucketImageWithRequest(String bucketName, GenericRequest genericRequest)
              {
         return bucketOperation.getBucketImage(bucketName, genericRequest);
     }
 
     @override
      VoidResult deleteBucketImage(String bucketName)  {
-        return bucketOperation.deleteBucketImage(bucketName, GenericRequest());
+        return bucketOperation.deleteBucketImageWithRequest(bucketName, GenericRequest());
     }
 
     @override
-     VoidResult deleteBucketImage(String bucketName, GenericRequest genericRequest)
+     VoidResult deleteBucketImageWithRequest(String bucketName, GenericRequest genericRequest)
              {
         return bucketOperation.deleteBucketImage(bucketName, genericRequest);
     }
 
     @override
-     VoidResult putImageStyle(PutImageStyleRequest putImageStyleRequest)  {
+     VoidResult putImageStyleWithRequest(PutImageStyleRequest putImageStyleRequest)  {
         return bucketOperation.putImageStyle(putImageStyleRequest);
     }
 
     @override
      VoidResult deleteImageStyle(String bucketName, String styleName)  {
-        return bucketOperation.deleteImageStyle(bucketName, styleName, GenericRequest());
+        return bucketOperation.deleteImageStyleWithRequest(bucketName, styleName, GenericRequest());
     }
 
     @override
-     VoidResult deleteImageStyle(String bucketName, String styleName, GenericRequest genericRequest)
+     VoidResult deleteImageStyleWithRequest(String bucketName, String styleName, GenericRequest genericRequest)
              {
         return bucketOperation.deleteImageStyle(bucketName, styleName, genericRequest);
     }
 
     @override
      GetImageStyleResult getImageStyle(String bucketName, String styleName)  {
-        return bucketOperation.getImageStyle(bucketName, styleName, GenericRequest());
+        return bucketOperation.getImageStyleWithRequest(bucketName, styleName, GenericRequest());
     }
 
     @override
-     GetImageStyleResult getImageStyle(String bucketName, String styleName, GenericRequest genericRequest)
+     GetImageStyleResult getImageStyleWithRequest(String bucketName, String styleName, GenericRequest genericRequest)
              {
         return bucketOperation.getImageStyle(bucketName, styleName, genericRequest);
     }
 
     @override
      List<Style> listImageStyle(String bucketName)  {
-        return bucketOperation.listImageStyle(bucketName, GenericRequest());
+        return bucketOperation.listImageStyleWithRequest(bucketName, GenericRequest());
     }
 
     @override
-     List<Style> listImageStyle(String bucketName, GenericRequest genericRequest)
+     List<Style> listImageStyleWithRequest(String bucketName, GenericRequest genericRequest)
              {
         return bucketOperation.listImageStyle(bucketName, genericRequest);
     }
 
     @override
-     VoidResult setBucketProcess(SetBucketProcessRequest setBucketProcessRequest)  {
+     VoidResult setBucketProcessWithRequest(SetBucketProcessRequest setBucketProcessRequest)  {
         return bucketOperation.setBucketProcess(setBucketProcessRequest);
     }
 
     @override
      BucketProcess getBucketProcess(String bucketName)  {
-        return getBucketProcess(GenericRequest(bucketName: bucketName));
+        return getBucketProcessWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     BucketProcess getBucketProcess(GenericRequest genericRequest)  {
+     BucketProcess getBucketProcessWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketProcess(genericRequest);
     }
 
     @override
-     VoidResult setBucketWebsite(SetBucketWebsiteRequest setBucketWebSiteRequest)  {
+     VoidResult setBucketWebsiteWithRequest(SetBucketWebsiteRequest setBucketWebSiteRequest)  {
         return bucketOperation.setBucketWebsite(setBucketWebSiteRequest);
     }
 
     @override
      BucketWebsiteResult getBucketWebsite(String bucketName)  {
-        return getBucketWebsite(GenericRequest(bucketName: bucketName));
+        return getBucketWebsiteWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     BucketWebsiteResult getBucketWebsite(GenericRequest genericRequest)  {
+     BucketWebsiteResult getBucketWebsiteWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketWebsite(genericRequest);
     }
 
     @override
      VoidResult deleteBucketWebsite(String bucketName)  {
-        return deleteBucketWebsite(GenericRequest(bucketName: bucketName));
+        return deleteBucketWebsiteWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     VoidResult deleteBucketWebsite(GenericRequest genericRequest)  {
+     VoidResult deleteBucketWebsiteWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.deleteBucketWebsite(genericRequest);
     }
     
     @override
      BucketVersioningConfiguration getBucketVersioning(String bucketName)  {
-        return getBucketVersioning(GenericRequest(bucketName: bucketName));
+        return getBucketVersioningWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     BucketVersioningConfiguration getBucketVersioning(GenericRequest genericRequest)
+     BucketVersioningConfiguration getBucketVersioningWithRequest(GenericRequest genericRequest)
          {
         return bucketOperation.getBucketVersioning(genericRequest);
     }
 
     @override
-     VoidResult setBucketVersioning(SetBucketVersioningRequest setBucketVersioningRequest)
+     VoidResult setBucketVersioningWithRequest(SetBucketVersioningRequest setBucketVersioningRequest)
          {
         return bucketOperation.setBucketVersioning(setBucketVersioningRequest);
     }
@@ -1096,79 +1097,79 @@ import 'model/vpc_ip.dart';
     }
 
     @override
-     VoidResult setBucketLifecycle(SetBucketLifecycleRequest setBucketLifecycleRequest)
+     VoidResult setBucketLifecycleWithRequest(SetBucketLifecycleRequest setBucketLifecycleRequest)
              {
         return bucketOperation.setBucketLifecycle(setBucketLifecycleRequest);
     }
 
     @override
      List<LifecycleRule> getBucketLifecycle(String bucketName)  {
-        return getBucketLifecycle(GenericRequest(bucketName: bucketName));
+        return getBucketLifecycleWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     List<LifecycleRule> getBucketLifecycle(GenericRequest genericRequest)  {
+     List<LifecycleRule> getBucketLifecycleWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketLifecycle(genericRequest);
     }
 
     @override
      VoidResult deleteBucketLifecycle(String bucketName)  {
-        return deleteBucketLifecycle(GenericRequest(bucketName: bucketName));
+        return deleteBucketLifecycleWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     VoidResult deleteBucketLifecycle(GenericRequest genericRequest)  {
+     VoidResult deleteBucketLifecycleWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.deleteBucketLifecycle(genericRequest);
     }
 
     @override
      VoidResult setBucketTagging(String bucketName, Map<String, String> tags)  {
-        return setBucketTagging(SetBucketTaggingRequest(bucketName, tags));
+        return setBucketTaggingWithRequest(SetBucketTaggingRequest(bucketName, tags));
     }
 
     @override
      VoidResult setBucketTagging(String bucketName, TagSet tagSet)  {
-        return setBucketTagging(SetBucketTaggingRequest(bucketName, tagSet));
+        return setBucketTaggingWithRequest(SetBucketTaggingRequest(bucketName, tagSet));
     }
 
     @override
-     VoidResult setBucketTagging(SetBucketTaggingRequest setBucketTaggingRequest)  {
+     VoidResult setBucketTaggingWithRequest(SetBucketTaggingRequest setBucketTaggingRequest)  {
         return bucketOperation.setBucketTagging(setBucketTaggingRequest);
     }
 
     @override
      TagSet getBucketTagging(String bucketName)  {
-        return getBucketTagging(GenericRequest(bucketName: bucketName));
+        return getBucketTaggingWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     TagSet getBucketTagging(GenericRequest genericRequest)  {
+     TagSet getBucketTaggingWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketTagging(genericRequest);
     }
 
     @override
      VoidResult deleteBucketTagging(String bucketName)  {
-        return deleteBucketTagging(GenericRequest(bucketName: bucketName));
+        return deleteBucketTaggingWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     VoidResult deleteBucketTagging(GenericRequest genericRequest)  {
+     VoidResult deleteBucketTaggingWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.deleteBucketTagging(genericRequest);
     }
 
     @override
-     VoidResult addBucketReplication(AddBucketReplicationRequest addBucketReplicationRequest)
+     VoidResult addBucketReplicationWithRequest(AddBucketReplicationRequest addBucketReplicationRequest)
              {
         return bucketOperation.addBucketReplication(addBucketReplicationRequest);
     }
 
     @override
      List<ReplicationRule> getBucketReplication(String bucketName)  {
-        return getBucketReplication(GenericRequest(bucketName: bucketName));
+        return getBucketReplicationWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     List<ReplicationRule> getBucketReplication(GenericRequest genericRequest)
+     List<ReplicationRule> getBucketReplicationWithRequest(GenericRequest genericRequest)
              {
         return bucketOperation.getBucketReplication(genericRequest);
     }
@@ -1176,11 +1177,11 @@ import 'model/vpc_ip.dart';
     @override
      VoidResult deleteBucketReplication(String bucketName, String replicationRuleID)
              {
-        return deleteBucketReplication(DeleteBucketReplicationRequest(bucketName, replicationRuleID));
+        return deleteBucketReplicationWithRequest(DeleteBucketReplicationRequest(bucketName, replicationRuleID));
     }
 
     @override
-     VoidResult deleteBucketReplication(DeleteBucketReplicationRequest deleteBucketReplicationRequest)
+     VoidResult deleteBucketReplicationWithRequest(DeleteBucketReplicationRequest deleteBucketReplicationRequest)
              {
         return bucketOperation.deleteBucketReplication(deleteBucketReplicationRequest);
     }
@@ -1188,7 +1189,7 @@ import 'model/vpc_ip.dart';
     @override
      BucketReplicationProgress getBucketReplicationProgress(String bucketName, String replicationRuleID)
              {
-        return getBucketReplicationProgress(GetBucketReplicationProgressRequest(bucketName, replicationRuleID));
+        return getBucketReplicationProgressWithRequest(GetBucketReplicationProgressRequest(bucketName, replicationRuleID));
     }
 
     @override
@@ -1200,84 +1201,84 @@ import 'model/vpc_ip.dart';
 
     @override
      List<String> getBucketReplicationLocation(String bucketName)  {
-        return getBucketReplicationLocation(GenericRequest(bucketName: bucketName));
+        return getBucketReplicationLocationWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     List<String> getBucketReplicationLocation(GenericRequest genericRequest)
+     List<String> getBucketReplicationLocationWithRequest(GenericRequest genericRequest)
              {
         return bucketOperation.getBucketReplicationLocation(genericRequest);
     }
 
     @override
-     AddBucketCnameResult addBucketCname(AddBucketCnameRequest addBucketCnameRequest)  {
+     AddBucketCnameResult addBucketCnameWithRequest(AddBucketCnameRequest addBucketCnameRequest)  {
         return bucketOperation.addBucketCname(addBucketCnameRequest);
     }
 
     @override
      List<CnameConfiguration> getBucketCname(String bucketName)  {
-        return getBucketCname(GenericRequest(bucketName: bucketName));
+        return getBucketCnameWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     List<CnameConfiguration> getBucketCname(GenericRequest genericRequest)  {
+     List<CnameConfiguration> getBucketCnameWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketCname(genericRequest);
     }
 
     @override
      VoidResult deleteBucketCname(String bucketName, String domain)  {
-        return deleteBucketCname(DeleteBucketCnameRequest(bucketName, domain));
+        return deleteBucketCnameWithRequest(DeleteBucketCnameRequest(bucketName, domain));
     }
 
     @override
-     VoidResult deleteBucketCname(DeleteBucketCnameRequest deleteBucketCnameRequest)
+     VoidResult deleteBucketCnameWithRequest(DeleteBucketCnameRequest deleteBucketCnameRequest)
              {
         return bucketOperation.deleteBucketCname(deleteBucketCnameRequest);
     }
 
     @override
      BucketInfo getBucketInfo(String bucketName)  {
-        return getBucketInfo(GenericRequest(bucketName: bucketName));
+        return getBucketInfoWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     BucketInfo getBucketInfo(GenericRequest genericRequest)  {
+     BucketInfo getBucketInfoWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketInfo(genericRequest);
     }
 
     @override
      BucketStat getBucketStat(String bucketName)  {
-        return getBucketStat(GenericRequest(bucketName: bucketName));
+        return getBucketStatWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     BucketStat getBucketStat(GenericRequest genericRequest)  {
+     BucketStat getBucketStatWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketStat(genericRequest);
     }
 
     @override
      VoidResult setBucketStorageCapacity(String bucketName, UserQos userQos)  {
-        return setBucketStorageCapacity(SetBucketStorageCapacityRequest(bucketName).withUserQos(userQos));
+        return setBucketStorageCapacityWithRequest(SetBucketStorageCapacityRequest(bucketName).withUserQos(userQos));
     }
 
     @override
-     VoidResult setBucketStorageCapacity(SetBucketStorageCapacityRequest setBucketStorageCapacityRequest)
+     VoidResult setBucketStorageCapacityWithRequest(SetBucketStorageCapacityRequest setBucketStorageCapacityRequest)
              {
         return bucketOperation.setBucketStorageCapacity(setBucketStorageCapacityRequest);
     }
 
     @override
      UserQos getBucketStorageCapacity(String bucketName)  {
-        return getBucketStorageCapacity(GenericRequest(bucketName: bucketName));
+        return getBucketStorageCapacityWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     UserQos getBucketStorageCapacity(GenericRequest genericRequest)  {
+     UserQos getBucketStorageCapacityWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketStorageCapacity(genericRequest);
     }
 
     @override
-     VoidResult setBucketEncryption(SetBucketEncryptionRequest setBucketEncryptionRequest)
+     VoidResult setBucketEncryptionWithRequest(SetBucketEncryptionRequest setBucketEncryptionRequest)
          {
         return bucketOperation.setBucketEncryption(setBucketEncryptionRequest);
     }
@@ -1285,67 +1286,67 @@ import 'model/vpc_ip.dart';
     @override
      ServerSideEncryptionConfiguration getBucketEncryption(String bucketName)
          {
-        return getBucketEncryption(GenericRequest(bucketName: bucketName));
+        return getBucketEncryptionWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     ServerSideEncryptionConfiguration getBucketEncryption(GenericRequest genericRequest)
+     ServerSideEncryptionConfiguration getBucketEncryptionWithRequest(GenericRequest genericRequest)
          {
         return bucketOperation.getBucketEncryption(genericRequest);
     }
 
     @override
      VoidResult deleteBucketEncryption(String bucketName)  {
-        return deleteBucketEncryption(GenericRequest(bucketName: bucketName));
+        return deleteBucketEncryptionWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     VoidResult deleteBucketEncryption(GenericRequest genericRequest)  {
+     VoidResult deleteBucketEncryptionWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.deleteBucketEncryption(genericRequest);
     }
 
     @override
      VoidResult setBucketPolicy(String bucketName,  String policyText)  {
-        return setBucketPolicy(SetBucketPolicyRequest(bucketName, policyText));
+        return setBucketPolicyWithRequest(SetBucketPolicyRequest(bucketName, policyText));
     }
 
     @override
-     VoidResult setBucketPolicy(SetBucketPolicyRequest setBucketPolicyRequest)  {
+     VoidResult setBucketPolicyWithRequest(SetBucketPolicyRequest setBucketPolicyRequest)  {
         return bucketOperation.setBucketPolicy(setBucketPolicyRequest);
     }
 
     @override
-     GetBucketPolicyResult getBucketPolicy(GenericRequest genericRequest)  {
+     GetBucketPolicyResult getBucketPolicyWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketPolicy(genericRequest);
     }
 
     @override
      GetBucketPolicyResult getBucketPolicy(String bucketName)  {
-        return getBucketPolicy(GenericRequest(bucketName: bucketName));
+        return getBucketPolicyWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     VoidResult deleteBucketPolicy(GenericRequest genericRequest)  {
+     VoidResult deleteBucketPolicyWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.deleteBucketPolicy(genericRequest);
     }
 
     @override
      VoidResult deleteBucketPolicy(String bucketName)  {
-        return deleteBucketPolicy(GenericRequest(bucketName: bucketName));
+        return deleteBucketPolicyWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     UploadFileResult uploadFile(UploadFileRequest uploadFileRequest) throws Throwable {
+     UploadFileResult uploadFileWithRequest(UploadFileRequest uploadFileRequest) throws Throwable {
         return uploadOperation.uploadFile(uploadFileRequest);
     }
 
     @override
-     DownloadFileResult downloadFile(DownloadFileRequest downloadFileRequest) throws Throwable {
+     DownloadFileResult downloadFileWithRequest(DownloadFileRequest downloadFileRequest) throws Throwable {
         return downloadOperation.downloadFile(downloadFileRequest);
     }
 
     @override
-     CreateLiveChannelResult createLiveChannel(CreateLiveChannelRequest createLiveChannelRequest)
+     CreateLiveChannelResult createLiveChannelWithRequest(CreateLiveChannelRequest createLiveChannelRequest)
              {
         return liveChannelOperation.createLiveChannel(createLiveChannelRequest);
     }
@@ -1353,22 +1354,22 @@ import 'model/vpc_ip.dart';
     @override
      VoidResult setLiveChannelStatus(String bucketName, String liveChannel, LiveChannelStatus status)
              {
-        return setLiveChannelStatus(SetLiveChannelRequest(bucketName, liveChannel, status));
+        return setLiveChannelStatusWithRequest(SetLiveChannelRequest(bucketName, liveChannel, status));
     }
 
     @override
-     VoidResult setLiveChannelStatus(SetLiveChannelRequest setLiveChannelRequest)  {
+     VoidResult setLiveChannelStatusWithRequest(SetLiveChannelRequest setLiveChannelRequest)  {
         return liveChannelOperation.setLiveChannelStatus(setLiveChannelRequest);
     }
 
     @override
      LiveChannelInfo getLiveChannelInfo(String bucketName, String liveChannel)
              {
-        return getLiveChannelInfo(LiveChannelGenericRequest(bucketName, liveChannel));
+        return getLiveChannelInfoWithRequest(LiveChannelGenericRequest(bucketName, liveChannel));
     }
 
     @override
-     LiveChannelInfo getLiveChannelInfo(LiveChannelGenericRequest liveChannelGenericRequest)
+     LiveChannelInfo getLiveChannelInfoWithRequest(LiveChannelGenericRequest liveChannelGenericRequest)
              {
         return liveChannelOperation.getLiveChannelInfo(liveChannelGenericRequest);
     }
@@ -1376,22 +1377,22 @@ import 'model/vpc_ip.dart';
     @override
      LiveChannelStat getLiveChannelStat(String bucketName, String liveChannel)
              {
-        return getLiveChannelStat(LiveChannelGenericRequest(bucketName, liveChannel));
+        return getLiveChannelStatWithRequest(LiveChannelGenericRequest(bucketName, liveChannel));
     }
 
     @override
-     LiveChannelStat getLiveChannelStat(LiveChannelGenericRequest liveChannelGenericRequest)
+     LiveChannelStat getLiveChannelStatWithRequest(LiveChannelGenericRequest liveChannelGenericRequest)
              {
         return liveChannelOperation.getLiveChannelStat(liveChannelGenericRequest);
     }
 
     @override
      VoidResult deleteLiveChannel(String bucketName, String liveChannel)  {
-        return deleteLiveChannel(LiveChannelGenericRequest(bucketName, liveChannel));
+        return deleteLiveChannelWithRequest(LiveChannelGenericRequest(bucketName, liveChannel));
     }
 
     @override
-     VoidResult deleteLiveChannel(LiveChannelGenericRequest liveChannelGenericRequest)
+     VoidResult deleteLiveChannelWithRequest(LiveChannelGenericRequest liveChannelGenericRequest)
              {
         return liveChannelOperation.deleteLiveChannel(liveChannelGenericRequest);
     }
@@ -1402,7 +1403,7 @@ import 'model/vpc_ip.dart';
     }
 
     @override
-     LiveChannelListing listLiveChannels(ListLiveChannelsRequest listLiveChannelRequest)
+     LiveChannelListing listLiveChannelsWithRequest(ListLiveChannelsRequest listLiveChannelRequest)
              {
         return liveChannelOperation.listLiveChannels(listLiveChannelRequest);
     }
@@ -1410,11 +1411,11 @@ import 'model/vpc_ip.dart';
     @override
      List<LiveRecord> getLiveChannelHistory(String bucketName, String liveChannel)
              {
-        return getLiveChannelHistory(LiveChannelGenericRequest(bucketName, liveChannel));
+        return getLiveChannelHistoryWithRequest(LiveChannelGenericRequest(bucketName, liveChannel));
     }
 
     @override
-     List<LiveRecord> getLiveChannelHistory(LiveChannelGenericRequest liveChannelGenericRequest)
+     List<LiveRecord> getLiveChannelHistoryWithRequest(LiveChannelGenericRequest liveChannelGenericRequest)
              {
         return liveChannelOperation.getLiveChannelHistory(liveChannelGenericRequest);
     }
@@ -1427,7 +1428,7 @@ import 'model/vpc_ip.dart';
     }
 
     @override
-     VoidResult generateVodPlaylist(GenerateVodPlaylistRequest generateVodPlaylistRequest)
+     VoidResult generateVodPlaylistWithRequest(GenerateVodPlaylistRequest generateVodPlaylistRequest)
              {
         return liveChannelOperation.generateVodPlaylist(generateVodPlaylistRequest);
     }
@@ -1440,7 +1441,7 @@ import 'model/vpc_ip.dart';
     }
 
     @override
-     OSSObject getVodPlaylist(GetVodPlaylistRequest getVodPlaylistRequest)
+     OSSObject getVodPlaylistWithRequest(GetVodPlaylistRequest getVodPlaylistRequest)
              {
         return liveChannelOperation.getVodPlaylist(getVodPlaylistRequest);
     }
@@ -1448,87 +1449,87 @@ import 'model/vpc_ip.dart';
     @override
      String generateRtmpUri(String bucketName, String liveChannelName, String PlaylistName, long expires)
              {
-        return generateRtmpUri(GenerateRtmpUriRequest(bucketName, liveChannelName, PlaylistName, expires));
+        return generateRtmpUriWithRequest(GenerateRtmpUriRequest(bucketName, liveChannelName, PlaylistName, expires));
     }
 
     @override
-     String generateRtmpUri(GenerateRtmpUriRequest generateRtmpUriRequest)  {
+     String generateRtmpUriWithRequest(GenerateRtmpUriRequest generateRtmpUriRequest)  {
         return liveChannelOperation.generateRtmpUri(generateRtmpUriRequest);
     }
 
     @override
      VoidResult createSymlink(String bucketName, String symLink, String targetObject)
              {
-        return createSymlink(CreateSymlinkRequest(bucketName, symLink, targetObject));
+        return createSymlinkWithRequest(CreateSymlinkRequest(bucketName, symLink, targetObject));
     }
 
     @override
-     VoidResult createSymlink(CreateSymlinkRequest createSymlinkRequest)  {
+     VoidResult createSymlinkWithRequest(CreateSymlinkRequest createSymlinkRequest)  {
         return objectOperation.createSymlink(createSymlinkRequest);
     }
 
     @override
      OSSSymlink getSymlink(String bucketName, String symLink)  {
-        return getSymlink(GenericRequest(bucketName, symLink));
+        return getSymlinkWithRequest(GenericRequest(bucketName, symLink));
     }
 
     @override
-     OSSSymlink getSymlink(GenericRequest genericRequest)  {
+     OSSSymlink getSymlinkWithRequest(GenericRequest genericRequest)  {
         return objectOperation.getSymlink(genericRequest);
     }
 
     @override
-     GenericResult processObject(ProcessObjectRequest processObjectRequest)  {
+     GenericResult processObjectWithRequest(ProcessObjectRequest processObjectRequest)  {
         return objectOperation.processObject(processObjectRequest);
     }
 
     @override
      VoidResult setBucketRequestPayment(String bucketName, Payer payer)  {
-        return setBucketRequestPayment(SetBucketRequestPaymentRequest(bucketName, payer));
+        return setBucketRequestPaymentWithRequest(SetBucketRequestPaymentRequest(bucketName, payer));
     }
 
     @override
-     VoidResult setBucketRequestPayment(SetBucketRequestPaymentRequest setBucketRequestPaymentRequest)  {
+     VoidResult setBucketRequestPaymentWithRequest(SetBucketRequestPaymentRequest setBucketRequestPaymentRequest)  {
         return bucketOperation.setBucketRequestPayment(setBucketRequestPaymentRequest);
     }
 
     @override
      GetBucketRequestPaymentResult getBucketRequestPayment(String bucketName)  {
-        return getBucketRequestPayment(GenericRequest(bucketName: bucketName));
+        return getBucketRequestPaymentWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     GetBucketRequestPaymentResult getBucketRequestPayment(GenericRequest genericRequest)  {
+     GetBucketRequestPaymentResult getBucketRequestPaymentWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketRequestPayment(genericRequest);
     }
 
     @override
      VoidResult setBucketQosInfo(String bucketName, BucketQosInfo bucketQosInfo)  {
-        return setBucketQosInfo(SetBucketQosInfoRequest(bucketName, bucketQosInfo));
+        return setBucketQosInfoWithRequest(SetBucketQosInfoRequest(bucketName, bucketQosInfo));
     }
 
     @override
-     VoidResult setBucketQosInfo(SetBucketQosInfoRequest setBucketQosInfoRequest)  {
+     VoidResult setBucketQosInfoWithRequest(SetBucketQosInfoRequest setBucketQosInfoRequest)  {
         return bucketOperation.setBucketQosInfo(setBucketQosInfoRequest);
     }
 
     @override
      BucketQosInfo getBucketQosInfo(String bucketName)  {
-        return getBucketQosInfo(GenericRequest(bucketName: bucketName));
+        return getBucketQosInfoWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     BucketQosInfo getBucketQosInfo(GenericRequest genericRequest)  {
+     BucketQosInfo getBucketQosInfoWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketQosInfo(genericRequest);
     }
 
     @override
      VoidResult deleteBucketQosInfo(String bucketName)  {
-        return deleteBucketQosInfo(GenericRequest(bucketName: bucketName));
+        return deleteBucketQosInfoWithRequest(GenericRequest(bucketName: bucketName));
     }
  
     @override
-     VoidResult deleteBucketQosInfo(GenericRequest genericRequest)  {
+     VoidResult deleteBucketQosInfoWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.deleteBucketQosInfo(genericRequest);
     }
 
@@ -1540,11 +1541,11 @@ import 'model/vpc_ip.dart';
     @override
      SetAsyncFetchTaskResult setAsyncFetchTask(String bucketName,
         AsyncFetchTaskConfiguration asyncFetchTaskConfiguration)  {
-        return setAsyncFetchTask(SetAsyncFetchTaskRequest(bucketName,asyncFetchTaskConfiguration));
+        return setAsyncFetchTaskWithRequest(SetAsyncFetchTaskRequest(bucketName,asyncFetchTaskConfiguration));
     }
 
     @override
-     SetAsyncFetchTaskResult setAsyncFetchTask(SetAsyncFetchTaskRequest setAsyncFetchTaskRequest)
+     SetAsyncFetchTaskResult setAsyncFetchTaskWithRequest(SetAsyncFetchTaskRequest setAsyncFetchTaskRequest)
              {
         return bucketOperation.setAsyncFetchTask(setAsyncFetchTaskRequest);
     }
@@ -1552,17 +1553,17 @@ import 'model/vpc_ip.dart';
     @override
      GetAsyncFetchTaskResult getAsyncFetchTask(String bucketName, String taskId)
              {
-        return getAsyncFetchTask(GetAsyncFetchTaskRequest(bucketName, taskId));
+        return getAsyncFetchTaskWithRequest(GetAsyncFetchTaskRequest(bucketName, taskId));
     }
 
     @override
-     GetAsyncFetchTaskResult getAsyncFetchTask(GetAsyncFetchTaskRequest getAsyncFetchTaskRequest)
+     GetAsyncFetchTaskResult getAsyncFetchTaskWithRequest(GetAsyncFetchTaskRequest getAsyncFetchTaskRequest)
              {
         return bucketOperation.getAsyncFetchTask(getAsyncFetchTaskRequest);
     }
 
     @override
-     CreateVpcipResult createVpcip(CreateVpcipRequest createVpcipRequest)  {
+     CreateVpcipResult createVpcipWithRequest(CreateVpcipRequest createVpcipRequest)  {
         return bucketOperation.createVpcip(createVpcipRequest);
     }
 
@@ -1572,29 +1573,29 @@ import 'model/vpc_ip.dart';
     }
 
     @override
-     VoidResult deleteVpcip(DeleteVpcipRequest deleteVpcipRequest)  {
+     VoidResult deleteVpcipWithRequest(DeleteVpcipRequest deleteVpcipRequest)  {
         return bucketOperation.deleteVpcip(deleteVpcipRequest);
     }
 
     @override
-     VoidResult createBucketVpcip(CreateBucketVpcipRequest createBucketVpcipRequest)  {
+     VoidResult createBucketVpcipWithRequest(CreateBucketVpcipRequest createBucketVpcipRequest)  {
         return bucketOperation.createBucketVpcip(createBucketVpcipRequest);
     }
 
     @override
-     VoidResult deleteBucketVpcip(DeleteBucketVpcipRequest deleteBucketVpcipRequest)  {
+     VoidResult deleteBucketVpcipWithRequest(DeleteBucketVpcipRequest deleteBucketVpcipRequest)  {
         return bucketOperation.deleteBucketVpcip(deleteBucketVpcipRequest);
     }
 
     @override
-     List<VpcPolicy> getBucketVpcip(GenericRequest genericRequest)  {
+     List<VpcPolicy> getBucketVpcipWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketVpcip(genericRequest);
     }
 
     @override
      VoidResult setBucketInventoryConfiguration(String bucketName, InventoryConfiguration inventoryConfiguration)
              {
-        return setBucketInventoryConfiguration(SetBucketInventoryConfigurationRequest(bucketName, inventoryConfiguration));
+        return setBucketInventoryConfigurationWithRequest(SetBucketInventoryConfigurationRequest(bucketName, inventoryConfiguration));
     }
 
     @override
@@ -1606,7 +1607,7 @@ import 'model/vpc_ip.dart';
     @override
      GetBucketInventoryConfigurationResult getBucketInventoryConfiguration(String bucketName, String inventoryId)
              {
-        return getBucketInventoryConfiguration(GetBucketInventoryConfigurationRequest(bucketName, inventoryId));
+        return getBucketInventoryConfigurationWithRequest(GetBucketInventoryConfigurationRequest(bucketName, inventoryId));
     }
 
     @override
@@ -1618,13 +1619,13 @@ import 'model/vpc_ip.dart';
     @override
      ListBucketInventoryConfigurationsResult listBucketInventoryConfigurations(String bucketName)
             {
-        return listBucketInventoryConfigurations(ListBucketInventoryConfigurationsRequest(bucketName));
+        return listBucketInventoryConfigurationsWithRequest(ListBucketInventoryConfigurationsRequest(bucketName));
     }
 
     @override
      ListBucketInventoryConfigurationsResult listBucketInventoryConfigurations(
             String bucketName, String continuationToken)  {
-        return listBucketInventoryConfigurations(ListBucketInventoryConfigurationsRequest(
+        return listBucketInventoryConfigurationsWithRequest(ListBucketInventoryConfigurationsRequest(
                 bucketName, continuationToken));
     }
 
@@ -1636,7 +1637,7 @@ import 'model/vpc_ip.dart';
 
     @override
      VoidResult deleteBucketInventoryConfiguration(String bucketName, String inventoryId)  {
-        return deleteBucketInventoryConfiguration(DeleteBucketInventoryConfigurationRequest(bucketName, inventoryId));
+        return deleteBucketInventoryConfigurationWithRequest(DeleteBucketInventoryConfigurationRequest(bucketName, inventoryId));
     }
 
     @override
@@ -1647,62 +1648,62 @@ import 'model/vpc_ip.dart';
     }
 
     @override
-     InitiateBucketWormResult initiateBucketWorm(InitiateBucketWormRequest initiateBucketWormRequest)  {
+     InitiateBucketWormResult initiateBucketWormWithRequest(InitiateBucketWormRequest initiateBucketWormRequest)  {
         return bucketOperation.initiateBucketWorm(initiateBucketWormRequest);
     }
 
     @override
      InitiateBucketWormResult initiateBucketWorm(String bucketName, int retentionPeriodInDays)  {
-        return initiateBucketWorm(InitiateBucketWormRequest(bucketName, retentionPeriodInDays));
+        return initiateBucketWormWithRequest(InitiateBucketWormRequest(bucketName, retentionPeriodInDays));
     }
 
     @override
-     VoidResult abortBucketWorm(GenericRequest genericRequest)  {
+     VoidResult abortBucketWormWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.abortBucketWorm(genericRequest);
     }
 
     @override
      VoidResult abortBucketWorm(String bucketName)  {
-        return abortBucketWorm(GenericRequest(bucketName: bucketName));
+        return abortBucketWormWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
-     VoidResult completeBucketWorm(CompleteBucketWormRequest completeBucketWormRequest)  {
+     VoidResult completeBucketWormWithRequest(CompleteBucketWormRequest completeBucketWormRequest)  {
         return bucketOperation.completeBucketWorm(completeBucketWormRequest);
     }
 
     @override
      VoidResult completeBucketWorm(String bucketName, String wormId)  {
-        return completeBucketWorm(CompleteBucketWormRequest(bucketName, wormId));
+        return completeBucketWormWithRequest(CompleteBucketWormRequest(bucketName, wormId));
     }
 
     @override
-     VoidResult extendBucketWorm(ExtendBucketWormRequest extendBucketWormRequest)  {
+     VoidResult extendBucketWormWithRequest(ExtendBucketWormRequest extendBucketWormRequest)  {
         return bucketOperation.extendBucketWorm(extendBucketWormRequest);
     }
 
     @override
      VoidResult extendBucketWorm(String bucketName, String wormId, int retentionPeriodInDays)  {
-        return extendBucketWorm(ExtendBucketWormRequest(bucketName, wormId, retentionPeriodInDays));
+        return extendBucketWormWithRequest(ExtendBucketWormRequest(bucketName, wormId, retentionPeriodInDays));
     }
 
     @override
-     GetBucketWormResult getBucketWorm(GenericRequest genericRequest)  {
+     GetBucketWormResult getBucketWormWithRequest(GenericRequest genericRequest)  {
         return bucketOperation.getBucketWorm(genericRequest);
     }
 
     @override
      GetBucketWormResult getBucketWorm(String bucketName)  {
-        return getBucketWorm(GenericRequest(bucketName: bucketName));
+        return getBucketWormWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
      VoidResult createDirectory(String bucketName, String dirName)  {
-        return createDirectory(CreateDirectoryRequest(bucketName, dirName));
+        return createDirectoryWithRequest(CreateDirectoryRequest(bucketName, dirName));
     }
 
     @override
-     VoidResult createDirectory(CreateDirectoryRequest createDirectoryRequest)  {
+     VoidResult createDirectoryWithRequest(CreateDirectoryRequest createDirectoryRequest)  {
         return objectOperation.createDirectory(createDirectoryRequest);
     }
 
@@ -1714,41 +1715,41 @@ import 'model/vpc_ip.dart';
     @override
      DeleteDirectoryResult deleteDirectory(String bucketName, String dirName,
                         bool deleteRecursive, String nextDeleteToken)  {
-        return deleteDirectory(DeleteDirectoryRequest(bucketName, dirName, deleteRecursive, nextDeleteToken));
+        return deleteDirectoryWithRequest(DeleteDirectoryRequest(bucketName, dirName, deleteRecursive, nextDeleteToken));
     }
 
     @override
-     DeleteDirectoryResult deleteDirectory(DeleteDirectoryRequest deleteDirectoryRequest)  {
+     DeleteDirectoryResult deleteDirectoryWithRequest(DeleteDirectoryRequest deleteDirectoryRequest)  {
         return objectOperation.deleteDirectory(deleteDirectoryRequest);
     }
 
     @override
      VoidResult renameObject(String bucketName, String sourceObjectName, String destinationObject)  {
-        return renameObject(RenameObjectRequest(bucketName, sourceObjectName, destinationObject));
+        return renameObjectWithRequest(RenameObjectRequest(bucketName, sourceObjectName, destinationObject));
     }
 	
 	@override
-     VoidResult renameObject(RenameObjectRequest renameObjectRequest)  {
+     VoidResult renameObjectWithRequest(RenameObjectRequest renameObjectRequest)  {
         return objectOperation.renameObject(renameObjectRequest);
     }
 
 	@override
-	 VoidResult setBucketResourceGroup(SetBucketResourceGroupRequest setBucketResourceGroupRequest)  {
+	 VoidResult setBucketResourceGroupWithRequest(SetBucketResourceGroupRequest setBucketResourceGroupRequest)  {
 		return bucketOperation.setBucketResourceGroup(setBucketResourceGroupRequest);
 	}
 
 	@override
 	 GetBucketResourceGroupResult getBucketResourceGroup(String bucketName)  {
-		return bucketOperation.getBucketResourceGroup(GenericRequest(bucketName: bucketName));
+		return bucketOperation.getBucketResourceGroupWithRequest(GenericRequest(bucketName: bucketName));
 	}
 
     @override
-     VoidResult createUdf(CreateUdfRequest createUdfRequest)  {
+     VoidResult createUdfWithRequest(CreateUdfRequest createUdfRequest)  {
         throw ClientException("Not supported.");
     }
 
     @override
-     UdfInfo getUdfInfo(UdfGenericRequest genericRequest)  {
+     UdfInfo getUdfInfoWithRequest(UdfGenericRequest genericRequest)  {
         throw ClientException("Not supported.");
     }
 
@@ -1758,33 +1759,33 @@ import 'model/vpc_ip.dart';
     }
 
     @override
-     VoidResult deleteUdf(UdfGenericRequest genericRequest)  {
+     VoidResult deleteUdfWithRequest(UdfGenericRequest genericRequest)  {
         throw ClientException("Not supported.");
     }
 
     @override
-     VoidResult uploadUdfImage(UploadUdfImageRequest uploadUdfImageRequest)  {
+     VoidResult uploadUdfImageWithRequest(UploadUdfImageRequest uploadUdfImageRequest)  {
         throw ClientException("Not supported.");
     }
 
     @override
-     List<UdfImageInfo> getUdfImageInfo(UdfGenericRequest genericRequest)  {
+     List<UdfImageInfo> getUdfImageInfoWithRequest(UdfGenericRequest genericRequest)  {
         throw ClientException("Not supported.");
     }
 
     @override
-     VoidResult deleteUdfImage(UdfGenericRequest genericRequest)  {
+     VoidResult deleteUdfImageWithRequest(UdfGenericRequest genericRequest)  {
         throw ClientException("Not supported.");
     }
 
     @override
-     VoidResult createUdfApplication(CreateUdfApplicationRequest createUdfApplicationRequest)
+     VoidResult createUdfApplicationWithRequest(CreateUdfApplicationRequest createUdfApplicationRequest)
              {
         throw ClientException("Not supported.");
     }
 
     @override
-     UdfApplicationInfo getUdfApplicationInfo(UdfGenericRequest genericRequest)
+     UdfApplicationInfo getUdfApplicationInfoWithRequest(UdfGenericRequest genericRequest)
              {
         throw ClientException("Not supported.");
     }
@@ -1795,41 +1796,41 @@ import 'model/vpc_ip.dart';
     }
 
     @override
-     VoidResult deleteUdfApplication(UdfGenericRequest genericRequest)  {
+     VoidResult deleteUdfApplicationWithRequest(UdfGenericRequest genericRequest)  {
         throw ClientException("Not supported.");
     }
 
     @override
-     VoidResult upgradeUdfApplication(UpgradeUdfApplicationRequest upgradeUdfApplicationRequest)
+     VoidResult upgradeUdfApplicationWithRequest(UpgradeUdfApplicationRequest upgradeUdfApplicationRequest)
              {
         throw ClientException("Not supported.");
     }
 
     @override
-     VoidResult resizeUdfApplication(ResizeUdfApplicationRequest resizeUdfApplicationRequest)
+     VoidResult resizeUdfApplicationWithRequest(ResizeUdfApplicationRequest resizeUdfApplicationRequest)
              {
         throw ClientException("Not supported.");
     }
 
     @override
-     UdfApplicationLog getUdfApplicationLog(GetUdfApplicationLogRequest getUdfApplicationLogRequest)
+     UdfApplicationLog getUdfApplicationLogWithRequest(GetUdfApplicationLogRequest getUdfApplicationLogRequest)
              {
         throw ClientException("Not supported.");
     }
 
     @override
      VoidResult setBucketTransferAcceleration(String bucketName, bool enable)  {
-        return bucketOperation.setBucketTransferAcceleration(SetBucketTransferAccelerationRequest(bucketName, enable));
+        return bucketOperation.setBucketTransferAccelerationWithRequest(SetBucketTransferAccelerationRequest(bucketName, enable));
     }
 
     @override
      TransferAcceleration getBucketTransferAcceleration(String bucketName)  {
-        return bucketOperation.getBucketTransferAcceleration(GenericRequest(bucketName: bucketName));
+        return bucketOperation.getBucketTransferAccelerationWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
      VoidResult deleteBucketTransferAcceleration(String bucketName)  {
-        return bucketOperation.deleteBucketTransferAcceleration(GenericRequest(bucketName: bucketName));
+        return bucketOperation.deleteBucketTransferAccelerationWithRequest(GenericRequest(bucketName: bucketName));
     }
 
     @override
@@ -1845,7 +1846,7 @@ import 'model/vpc_ip.dart';
      String getConnectionPoolStats() {
         try {
             return serviceClient.getConnectionPoolStats();
-        } catch ( e) {
+        } catch (e) {
         }
         return "";
     }

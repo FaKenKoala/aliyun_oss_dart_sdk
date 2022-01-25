@@ -6,7 +6,9 @@ import 'client_configuration.dart';
 import 'common/auth/credentials_provider.dart';
 import 'crypto/crypto_configuration.dart';
 import 'crypto/crypto_module.dart';
+import 'crypto/crypto_module_dispatcher.dart';
 import 'crypto/encryption_materials.dart';
+import 'crypto/kms_encryption_materials.dart';
 import 'crypto/multipart_upload_crypto_context.dart';
 import 'crypto/oss_direct.dart';
 import 'event/progress_input_stream.dart';
@@ -37,245 +39,274 @@ import 'model/upload_part_result.dart';
 import 'oss_client.dart';
 
 /// OSSEncryptionClient is used to do client-side encryption.
- class OSSEncryptionClient extends OSSClient {
-     static final String USER_AGENT_SUFFIX = "/OSSEncryptionClient";
-     final EncryptionMaterials encryptionMaterials;
-     final CryptoConfiguration cryptoConfig;
-     final OSSDirect ossDirect = OSSDirectImpl();
+class OSSEncryptionClient extends OSSClient {
+  static final String USER_AGENT_SUFFIX = "/OSSEncryptionClient";
+  final EncryptionMaterials encryptionMaterials;
+  final CryptoConfiguration cryptoConfig;
+  OSSDirect _ossDirect;
 
-     OSSEncryptionClient(String endpoint, CredentialsProvider credsProvider, ClientConfiguration clientConfig,
-            EncryptionMaterials encryptionMaterials, CryptoConfiguration cryptoConfig)
-        :super(endpoint, credsProvider, clientConfig)
-            
-             {
-        assertParameterNotNull(credsProvider, "CredentialsProvider");
-        assertParameterNotNull(encryptionMaterials, "EncryptionMaterials");
-        if(encryptionMaterials is KmsEncryptionMaterials) {
-            ((KmsEncryptionMaterials)encryptionMaterials).setKmsCredentialsProvider(credsProvider);
+  OSSEncryptionClient(
+      String endpoint,
+      CredentialsProvider credsProvider,
+      ClientConfiguration clientConfig,
+      this.encryptionMaterials,
+      CryptoConfiguration? cryptoConfig)
+      : cryptoConfig = cryptoConfig ?? CryptoConfiguration.DEFAULT,
+        super(endpoint, credsProvider, clientConfig) {
+    if (encryptionMaterials is KmsEncryptionMaterials) {
+      encryptionMaterials.setKmsCredentialsProvider(credsProvider);
+    }
+    _ossDirect = OSSDirectImpl(this);
+  }
+
+  @override
+  PutObjectResult putObject(PutObjectRequest req) {
+    CryptoModule crypto =
+        CryptoModuleDispatcher(_ossDirect, encryptionMaterials, cryptoConfig);
+    return crypto.putObjectSecurely(req);
+  }
+
+  @override
+  OSSObject getObject(GetObjectRequest req) {
+    if (req.useUrlSignature) {
+      throw ClientException(
+          "Encryption client error, get object with url opreation is disabled in encryption client." +
+              "Please use normal oss client method {@OSSClient#getObject(GetObjectRequest req)}.");
+    }
+    CryptoModule crypto =
+        CryptoModuleDispatcher(_ossDirect, encryptionMaterials, cryptoConfig);
+    return crypto.getObjectSecurely(req);
+  }
+
+  @override
+  ObjectMetadata getObject(GetObjectRequest req, File file) {
+    CryptoModule crypto =
+        CryptoModuleDispatcher(_ossDirect, encryptionMaterials, cryptoConfig);
+    return crypto.getObjectSecurely(req, file);
+  }
+
+  @override
+  UploadFileResult uploadFile(UploadFileRequest uploadFileRequest) {
+    OSSUploadOperationEncrypted ossUploadOperationEncrypted =
+        OSSUploadOperationEncrypted(this, encryptionMaterials);
+    setUploadOperation(ossUploadOperationEncrypted);
+    return super.uploadFile(uploadFileRequest);
+  }
+
+  @override
+  DownloadFileResult downloadFile(DownloadFileRequest downloadFileRequest) {
+    GenericRequest genericRequest =
+        GenericRequest(downloadFileRequest.bucketName, downloadFileRequest.key);
+    String? versionId = downloadFileRequest.versionId;
+    if (versionId != null) {
+      genericRequest.versionId = versionId;
+    }
+    Payer? payer = downloadFileRequest.payer;
+    if (payer != null) {
+      genericRequest.payer = payer;
+    }
+    ObjectMetadata objectMetadata = getObjectMetadata(genericRequest);
+
+    int objectSize = objectMetadata.getContentLength();
+    if (objectSize <= downloadFileRequest.partSize) {
+      GetObjectRequest getObjectRequest =
+          convertToGetObjectRequest(downloadFileRequest);
+      objectMetadata =
+          getObject(getObjectRequest, File(downloadFileRequest.downloadFile));
+      DownloadFileResult downloadFileResult = DownloadFileResult();
+      downloadFileResult.objectMetadata = objectMetadata;
+      return downloadFileResult;
+    } else {
+      if (!hasEncryptionInfo(objectMetadata)) {
+        return super.downloadFile(downloadFileRequest);
+      } else {
+        int partSize = downloadFileRequest.partSize;
+        if (0 != (partSize % CryptoScheme.BLOCK_SIZE) || partSize <= 0) {
+          throw ArgumentError(
+              "download file part size is not 16 bytes alignment.");
         }
-        this.cryptoConfig = cryptoConfig == null ? CryptoConfiguration.DEFAULT : cryptoConfig;
-        this.encryptionMaterials = encryptionMaterials;
+        OSSDownloadOperationEncrypted ossDownloadOperationEncrypted =
+            OSSDownloadOperationEncrypted(this);
+        setDownloadOperation(ossDownloadOperationEncrypted);
+        return super.downloadFile(downloadFileRequest);
+      }
+    }
+  }
+
+  static GetObjectRequest convertToGetObjectRequest(
+      DownloadFileRequest downloadFileRequest) {
+    GetObjectRequest getObjectRequest = GetObjectRequest(
+        downloadFileRequest.bucketName, downloadFileRequest.key);
+    getObjectRequest.setMatchingETagConstraints(
+        downloadFileRequest.getMatchingETagConstraints());
+    getObjectRequest.setNonmatchingETagConstraints(
+        downloadFileRequest.getNonmatchingETagConstraints());
+    getObjectRequest.modifiedSinceConstraint =
+        downloadFileRequest.modifiedSinceConstraint;
+    getObjectRequest.unmodifiedSinceConstraint =
+        downloadFileRequest.unmodifiedSinceConstraint;
+    getObjectRequest.responseHeaders = downloadFileRequest.responseHeaders;
+
+    List<int>? range = downloadFileRequest.getRange();
+    if (range != null) {
+      getObjectRequest.setRange(range[0], range[1]);
     }
 
-    @override
-     PutObjectResult putObject(PutObjectRequest req) {
-        CryptoModule crypto = CryptoModuleDispatcher(ossDirect, encryptionMaterials, cryptoConfig);
-        return crypto.putObjectSecurely(req);
+    String? versionId = downloadFileRequest.versionId;
+    if (versionId != null) {
+      getObjectRequest.versionId = versionId;
     }
 
-    @override
-     OSSObject getObject(GetObjectRequest req) {
-        if(req.useUrlSignature) {
-            throw ClientException("Encryption client error, get object with url opreation is disabled in encryption client." + 
-                    "Please use normal oss client method {@OSSClient#getObject(GetObjectRequest req)}."); 
-        }
-        CryptoModule crypto = CryptoModuleDispatcher(ossDirect, encryptionMaterials, cryptoConfig);
-        return crypto.getObjectSecurely(req);
+    Payer? payer = downloadFileRequest.payer;
+    if (payer != null) {
+      getObjectRequest.payer = payer;
     }
 
-    @override
-     ObjectMetadata getObject(GetObjectRequest req, File file) {
-        CryptoModule crypto = CryptoModuleDispatcher(ossDirect, encryptionMaterials, cryptoConfig);
-        return crypto.getObjectSecurely(req, file);
+    int limit = downloadFileRequest.trafficLimit;
+    if (limit > 0) {
+      getObjectRequest.trafficLimit = limit;
     }
 
-    @override
-     UploadFileResult uploadFile(UploadFileRequest uploadFileRequest) {
-        OSSUploadOperationEncrypted ossUploadOperationEncrypted = OSSUploadOperationEncrypted(this, encryptionMaterials);
-        setUploadOperation(ossUploadOperationEncrypted);
-        return super.uploadFile(uploadFileRequest);
-    }
+    return getObjectRequest;
+  }
 
-    @override
-     DownloadFileResult downloadFile(DownloadFileRequest downloadFileRequest) {
-        GenericRequest genericRequest = GenericRequest(downloadFileRequest.bucketName, downloadFileRequest.key);
-        String? versionId = downloadFileRequest.versionId;
-        if (versionId != null) {
-            genericRequest.versionId = versionId;
-        }
-        Payer? payer = downloadFileRequest.payer;
-        if (payer != null) {
-            genericRequest.payer = payer;
-        }
-        ObjectMetadata objectMetadata = getObjectMetadata(genericRequest);
+  InitiateMultipartUploadResult initiateMultipartUpload(
+      InitiateMultipartUploadRequest request,
+      MultipartUploadCryptoContext context) {
+    CryptoModule crypto =
+        CryptoModuleDispatcher(_ossDirect, encryptionMaterials, cryptoConfig);
+    return crypto.initiateMultipartUploadSecurely(request, context);
+  }
 
-        int objectSize = objectMetadata.getContentLength();
-        if (objectSize <= downloadFileRequest.partSize) {
-            GetObjectRequest getObjectRequest = convertToGetObjectRequest(downloadFileRequest);
-            objectMetadata = getObject(getObjectRequest, File(downloadFileRequest.downloadFile));
-            DownloadFileResult downloadFileResult = DownloadFileResult();
-            downloadFileResult.objectMetadata = objectMetadata;
-            return downloadFileResult;
-        } else {
-            if (!hasEncryptionInfo(objectMetadata)) {
-                return super.downloadFile(downloadFileRequest);
-            } else {
-                int partSize = downloadFileRequest.partSize;
-                if (0 != (partSize % CryptoScheme.BLOCK_SIZE) || partSize <= 0) {
-                    throw ArgumentError("download file part size is not 16 bytes alignment.");
-                }
-                OSSDownloadOperationEncrypted ossDownloadOperationEncrypted = OSSDownloadOperationEncrypted(this);
-                setDownloadOperation(ossDownloadOperationEncrypted);
-                return super.downloadFile(downloadFileRequest);
-            }
-        }
-    }
+  UploadPartResult uploadPart(
+      UploadPartRequest request, MultipartUploadCryptoContext context) {
+    CryptoModule crypto =
+        CryptoModuleDispatcher(_ossDirect, encryptionMaterials, cryptoConfig);
+    return crypto.uploadPartSecurely(request, context);
+  }
 
-     static GetObjectRequest convertToGetObjectRequest(DownloadFileRequest downloadFileRequest) {
-        GetObjectRequest getObjectRequest = GetObjectRequest(downloadFileRequest.bucketName,
-                downloadFileRequest.key);
-        getObjectRequest.setMatchingETagConstraints(downloadFileRequest.getMatchingETagConstraints());
-        getObjectRequest.setNonmatchingETagConstraints(downloadFileRequest.getNonmatchingETagConstraints());
-        getObjectRequest.modifiedSinceConstraint = downloadFileRequest.modifiedSinceConstraint;
-        getObjectRequest.unmodifiedSinceConstraint = downloadFileRequest.unmodifiedSinceConstraint;
-        getObjectRequest.responseHeaders = downloadFileRequest.responseHeaders;
+  CompleteMultipartUploadResult completeMultipartUpload(
+      CompleteMultipartUploadRequest request,
+      MultipartUploadCryptoContext context) {
+    return super.completeMultipartUpload(request);
+  }
 
-        List<int>? range = downloadFileRequest.getRange();
-        if (range != null) {
-            getObjectRequest.setRange(range[0], range[1]);
-        }
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////// Disabled api in encryption client///////////////////////////
+  /// Note: This method is disabled in encryption client.
+  ///
+  /// @deprecated please use encryption client method
+  ///     {@link OSSEncryptionClient#initiateMultipartUpload(InitiateMultipartUploadRequest request, MultipartUploadCryptoContext context)}.
+  @override
+  @Deprecated
+  InitiateMultipartUploadResult initiateMultipartUpload(
+      InitiateMultipartUploadRequest request) {
+    throw ClientException(
+        "Encryption client error, you should provide a multipart upload context to the encryption client. " +
+            "Please use  encryption client method {@link OSSEncryptionClient#initiateMultipartUpload(InitiateMultipartUploadRequest request, " +
+            "MultipartUploadCryptoContext context)}.");
+  }
 
-        String? versionId = downloadFileRequest.versionId;
-        if (versionId != null) {
-            getObjectRequest.versionId = versionId;
-        }
+  /// Note: This method is disabled in encryption client.
+  ///
+  /// @deprecated please use encryption client method
+  ///     {@link OSSEncryptionClient#uploadPart(UploadPartRequest request, MultipartUploadCryptoContext context)}.
+  @override
+  @Deprecated
+  UploadPartResult uploadPart(UploadPartRequest request) {
+    throw ClientException(
+        "Encryption client error, you should provide a multipart upload context to the encryption client. " +
+            "Please use  encryption client method {@link OSSEncryptionClient#uploadPart(UploadPartRequest request, MultipartUploadCryptoContext context)}.");
+  }
 
-        Payer? payer = downloadFileRequest.payer;
-        if (payer != null) {
-            getObjectRequest.payer = payer;
-        }
-
-        int limit = downloadFileRequest.trafficLimit;
-        if (limit > 0) {
-            getObjectRequest.trafficLimit = limit;
-        }
-
-        return getObjectRequest;
-    }
-
-     InitiateMultipartUploadResult initiateMultipartUpload(InitiateMultipartUploadRequest request,
-                                                                 MultipartUploadCryptoContext context)
-                                                                 {
-        CryptoModule crypto = CryptoModuleDispatcher(ossDirect, encryptionMaterials, cryptoConfig);
-        return crypto.initiateMultipartUploadSecurely(request, context);
-    }
-
-     UploadPartResult uploadPart(UploadPartRequest request, MultipartUploadCryptoContext context) {
-        CryptoModule crypto = CryptoModuleDispatcher(ossDirect, encryptionMaterials, cryptoConfig);
-        return crypto.uploadPartSecurely(request, context);
-    }
-
-     CompleteMultipartUploadResult completeMultipartUpload(CompleteMultipartUploadRequest request, 
-                                                                 MultipartUploadCryptoContext context) 
-                                                                 {
-        return super.completeMultipartUpload(request);
-    }
-
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////// Disabled api in encryption client///////////////////////////
-    /// Note: This method is disabled in encryption client.
-    ///  
-    /// @deprecated please use encryption client method
-    ///     {@link OSSEncryptionClient#initiateMultipartUpload(InitiateMultipartUploadRequest request, MultipartUploadCryptoContext context)}.             
-    @override
-    @Deprecated 
-     InitiateMultipartUploadResult initiateMultipartUpload(InitiateMultipartUploadRequest request) {
-        throw ClientException("Encryption client error, you should provide a multipart upload context to the encryption client. " + 
-                 "Please use  encryption client method {@link OSSEncryptionClient#initiateMultipartUpload(InitiateMultipartUploadRequest request, " + 
-                 "MultipartUploadCryptoContext context)}.");
-    }
-
-    /// Note: This method is disabled in encryption client.
-    ///  
-    /// @deprecated please use encryption client method
-    ///     {@link OSSEncryptionClient#uploadPart(UploadPartRequest request, MultipartUploadCryptoContext context)}.             
-    @override 
-    @Deprecated
-     UploadPartResult uploadPart(UploadPartRequest request)  {
-        throw ClientException("Encryption client error, you should provide a multipart upload context to the encryption client. " + 
-                "Please use  encryption client method {@link OSSEncryptionClient#uploadPart(UploadPartRequest request, MultipartUploadCryptoContext context)}.");
-    }
-    
-    /// Note: This method is disabled in encryption client.
-    ///  
-    /// @deprecated please use normal oss client method
-    ///     {@link OSSClient#appendObject(AppendObjectRequest appendObjectRequest)}.             
-    @override
-    @Deprecated
-     AppendObjectResult appendObject(AppendObjectRequest appendObjectRequest)  {
-        throw ClientException("Encryption client error, this method is disabled in encryption client." + 
+  /// Note: This method is disabled in encryption client.
+  ///
+  /// @deprecated please use normal oss client method
+  ///     {@link OSSClient#appendObject(AppendObjectRequest appendObjectRequest)}.
+  @override
+  @Deprecated
+  AppendObjectResult appendObject(AppendObjectRequest appendObjectRequest) {
+    throw ClientException(
+        "Encryption client error, this method is disabled in encryption client." +
             "Please use normal oss client method {@link OSSClient#appendObject(AppendObjectRequest appendObjectRequest)} method");
-    } 
-    
-    /// Note: This method is disabled in encryption client.
-    ///  
-    /// @deprecated please use normal oss client method
-    ///     {@link OSSClient#uploadPartCopy(UploadPartCopyRequest request)}.             
-    @override
-    @Deprecated
-     UploadPartCopyResult uploadPartCopy(UploadPartCopyRequest request) {
-        throw ClientException("Encryption client error, this method is disabled in encryption client." + 
-                "Please use normal oss client method {@link OSSClient#uploadPartCopy(UploadPartCopyRequest request)}");
-    }
-    
-    /// Note: This method is disabled in encryption client.
-    ///  
-    /// @deprecated please use normal oss client method
-    ///     {@link OSSClient}#putObject(URL signedUrl, InputStream requestContent, int contentLength,
-    ///           Map<String, String> requestHeaders, bool useChunkEncoding).
-    @override
-    @Deprecated
-     PutObjectResult putObject(URL signedUrl, InputStream requestContent, int contentLength,
-            Map<String, String> requestHeaders, bool useChunkEncoding) {
-        throw ClientException("Encryption client error, this method is disabled in encryption client." + 
-                "Please use normal oss client method {@link OSSClient#putObject(URL signedUrl, InputStream requestContent, "
-                + "int contentLength, Map<String, String> requestHeaders, bool useChunkEncoding)");
-    }
+  }
 
+  /// Note: This method is disabled in encryption client.
+  ///
+  /// @deprecated please use normal oss client method
+  ///     {@link OSSClient#uploadPartCopy(UploadPartCopyRequest request)}.
+  @override
+  @Deprecated
+  UploadPartCopyResult uploadPartCopy(UploadPartCopyRequest request) {
+    throw ClientException(
+        "Encryption client error, this method is disabled in encryption client." +
+            "Please use normal oss client method {@link OSSClient#uploadPartCopy(UploadPartCopyRequest request)}");
+  }
 
-     
+  /// Note: This method is disabled in encryption client.
+  ///
+  /// @deprecated please use normal oss client method
+  ///     {@link OSSClient}#putObject(URL signedUrl, InputStream requestContent, int contentLength,
+  ///           Map<String, String> requestHeaders, bool useChunkEncoding).
+  @override
+  @Deprecated
+  PutObjectResult putObject(
+      URL signedUrl,
+      InputStream requestContent,
+      int contentLength,
+      Map<String, String> requestHeaders,
+      bool useChunkEncoding) {
+    throw ClientException(
+        "Encryption client error, this method is disabled in encryption client." +
+            "Please use normal oss client method {@link OSSClient#putObject(URL signedUrl, InputStream requestContent, " +
+            "int contentLength, Map<String, String> requestHeaders, bool useChunkEncoding)");
+  }
 
-     void assertParameterNotNull(Object parameterValue,
-            String errorMessage) {
-        if (parameterValue == null)
-            throw ArgumentError(errorMessage);
+  void assertParameterNotNull(Object? parameterValue, String errorMessage) {
+    if (parameterValue == null) {
+      throw ArgumentError(errorMessage);
     }
+  }
 }
 
- class OSSDirectImpl implements OSSDirect {
-        @override
-         ClientConfiguration getInnerClientConfiguration() {
-            return OSSEncryptionClient.getClientConfiguration();
-        }
+class OSSDirectImpl implements OSSDirect {
+  OSSDirectImpl(this._ossEncryptionClient);
 
-        @override
-         PutObjectResult putObject(PutObjectRequest putObjectRequest) {
-            return OSSEncryptionClient.putObject(putObjectRequest);
-        }
+  final OSSEncryptionClient _ossEncryptionClient;
+  @override
+  ClientConfiguration getInnerClientConfiguration() {
+    return _ossEncryptionClient.getClientConfiguration();
+  }
 
-        @override
-         OSSObject getObject(GetObjectRequest getObjectRequest) {
-            return OSSEncryptionClient.getObject(getObjectRequest);
-        }
+  @override
+  PutObjectResult putObject(PutObjectRequest putObjectRequest) {
+    return _ossEncryptionClient.putObject(putObjectRequest);
+  }
 
-        @override
-         void abortMultipartUpload(AbortMultipartUploadRequest request) {
-            OSSEncryptionClient.abortMultipartUpload(request);     
-        }
+  @override
+  OSSObject getObject(GetObjectRequest getObjectRequest) {
+    return _ossEncryptionClient.getObjectWithRequest(getObjectRequest);
+  }
 
-        @override
-         CompleteMultipartUploadResult completeMultipartUpload(CompleteMultipartUploadRequest request) {
-            return OSSEncryptionClient.completeMultipartUpload(request);
-        }
+  @override
+  void abortMultipartUpload(AbortMultipartUploadRequest request) {
+    _ossEncryptionClient.abortMultipartUpload(request);
+  }
 
-        @override
-         InitiateMultipartUploadResult initiateMultipartUpload(InitiateMultipartUploadRequest request) {
-            return OSSEncryptionClient.initiateMultipartUpload(request);
-        }
+  @override
+  CompleteMultipartUploadResult completeMultipartUpload(
+      CompleteMultipartUploadRequest request) {
+    return _ossEncryptionClient.completeMultipartUpload(request);
+  }
 
-        @override
-         UploadPartResult uploadPart(UploadPartRequest request) {
-            return OSSEncryptionClient.uploadPart(request);
-        }
-    }
+  @override
+  InitiateMultipartUploadResult initiateMultipartUpload(
+      InitiateMultipartUploadRequest request) {
+    return _ossEncryptionClient.initiateMultipartUpload(request);
+  }
+
+  @override
+  UploadPartResult uploadPart(UploadPartRequest request) {
+    return _ossEncryptionClient.uploadPart(request);
+  }
+}

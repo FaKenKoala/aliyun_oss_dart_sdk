@@ -5,6 +5,8 @@ import 'package:aliyun_oss_dart_sdk/src/event/progress_event_type.dart';
 import 'package:aliyun_oss_dart_sdk/src/event/progress_input_stream.dart';
 import 'package:aliyun_oss_dart_sdk/src/event/progress_listener.dart';
 
+import 'select_object_exception.dart';
+
 class SelectInputStream extends FilterInputStream {
     /// Format of data frame
     /// |--frame type(4 bytes)--|--payload length(4 bytes)--|--header checksum(4 bytes)--|
@@ -45,7 +47,7 @@ class SelectInputStream extends FilterInputStream {
         currentFrameTypeBytes = List.filled(4, 0);
         currentFramePayloadLengthBytes = List.filled(4, 0);
         currentFrameHeaderChecksumBytes = List.filled(4, 0);
-        scannedDataBytes = byte[8];
+        scannedDataBytes = List.filled(8, 0);
         currentFramePayloadChecksumBytes = List.filled(4, 0);
         finished = false;
         firstReadFrame = true;
@@ -67,7 +69,7 @@ class SelectInputStream extends FilterInputStream {
         }
     }
 
-     void validateCheckSum(List<int> checksumBytes, CRC32 crc32) throws IOException {
+     void validateCheckSum(List<int> checksumBytes, CRC32 crc32) {
         if (payloadCrcEnabled) {
             int currentChecksum = ByteBuffer.wrap(checksumBytes).getInt();
             if (crc32.getValue() != ((int)currentChecksum & 0xffffffffL)) {
@@ -77,7 +79,7 @@ class SelectInputStream extends FilterInputStream {
         }
     }
 
-     void readFrame() throws IOException {
+     void readFrame() {
         while (currentFrameOffset >= currentFramePayloadLength && !finished) {
             if (!firstReadFrame) {
                 internalRead(currentFramePayloadChecksumBytes, 0, 4);

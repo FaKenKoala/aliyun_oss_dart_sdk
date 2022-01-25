@@ -9,12 +9,12 @@ class LogUtils {
   // prevent from dumping a flood of logs when trying access to none-existent
   // resources.
   static List<String> errorCodeFilterList = [
-    OSSErrorCode.noSuchBucket,
-    OSSErrorCode.noSuchKey,
-    OSSErrorCode.noSuchUpload,
-    OSSErrorCode.noSuchCorsConfiguration,
-    OSSErrorCode.noSuchWebsiteConfiguration,
-    OSSErrorCode.noSuchLifecycle,
+    OSSErrorCode.NO_SUCH_BUCKET,
+    OSSErrorCode.NO_SUCH_KEY,
+    OSSErrorCode.NO_SUCH_UPLOAD,
+    OSSErrorCode.NO_SUCH_CORS_CONFIGURATION,
+    OSSErrorCode.NO_SUCH_WEBSITE_CONFIGURATION,
+    OSSErrorCode.NO_SUCH_LIFECYCLE,
   ];
 
   static Log getLog() {

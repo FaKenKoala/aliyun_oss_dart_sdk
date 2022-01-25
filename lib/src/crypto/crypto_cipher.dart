@@ -19,7 +19,7 @@ class CryptoCipher {
   /// Recreates a new instance of CipherLite from the current one.
   CryptoCipher recreate() {
     return scheme.createCryptoCipher(
-        secreteKey, cipher.getIV(), this.cipherMode, cipher.getProvider());
+        secreteKey, cipher.getIV(), cipherMode, cipher.getProvider());
   }
 
   List<int> doFinal() {
