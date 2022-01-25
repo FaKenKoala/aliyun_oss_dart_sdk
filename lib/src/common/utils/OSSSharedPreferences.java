@@ -7,17 +7,17 @@ import android.content.SharedPreferences;
  * Created by jingdan on 2017/12/6.
  */
 
-public class OSSSharedPreferences {
+ class OSSSharedPreferences {
 
-    private static OSSSharedPreferences sInstance;
-    private SharedPreferences mSp;
+     static OSSSharedPreferences sInstance;
+     SharedPreferences mSp;
 
-    private OSSSharedPreferences(Context context) {
-        mSp = context.getSharedPreferences("oss_android_sdk_sp", Context.MODE_PRIVATE);
+     OSSSharedPreferences(Context context) {
+        mSp = context.getSharedPreferences("oss_android_sdk_sp", Context.MODE_);
     }
 
 
-    public static OSSSharedPreferences instance(Context context) {
+     static OSSSharedPreferences instance(Context context) {
         if (sInstance == null) {
             synchronized (OSSSharedPreferences.class) {
                 if (sInstance == null) {
@@ -28,23 +28,23 @@ public class OSSSharedPreferences {
         return sInstance;
     }
 
-    public void setStringValue(String key, String value) {
+     void setStringValue(String key, String value) {
         SharedPreferences.Editor edit = mSp.edit();
         edit.putString(key, value);
         edit.commit();
     }
 
-    public String getStringValue(String key) {
+     String getStringValue(String key) {
         return mSp.getString(key, "");
     }
 
-    public void removeKey(String key) {
+     void removeKey(String key) {
         SharedPreferences.Editor edit = mSp.edit();
         edit.remove(key);
         edit.commit();
     }
 
-    public boolean contains(String key) {
+     bool contains(String key) {
         return mSp.contains(key);
     }
 }

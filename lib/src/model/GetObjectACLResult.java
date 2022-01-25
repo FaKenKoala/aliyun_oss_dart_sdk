@@ -4,19 +4,19 @@ package com.alibaba.sdk.android.oss.model;
  * Created by chenjie on 17/11/25.
  */
 
-public class GetObjectACLResult extends OSSResult {
+ class GetObjectACLResult extends OSSResult {
 
     // object owner
-    private Owner objectOwner;
+     Owner objectOwner;
 
     // object's ACL
-    private CannedAccessControlList objectACL;
+     CannedAccessControlList objectACL;
 
-    public GetObjectACLResult() {
+     GetObjectACLResult() {
         objectOwner = new Owner();
     }
 
-    public Owner getOwner() {
+     Owner getOwner() {
         return objectOwner;
     }
 
@@ -25,7 +25,7 @@ public class GetObjectACLResult extends OSSResult {
      *
      * @return
      */
-    public String getObjectOwner() {
+     String getObjectOwner() {
         return objectOwner.getDisplayName();
     }
 
@@ -34,7 +34,7 @@ public class GetObjectACLResult extends OSSResult {
      *
      * @param ownerName
      */
-    public void setObjectOwner(String ownerName) {
+     void setObjectOwner(String ownerName) {
         this.objectOwner.setDisplayName(ownerName);
     }
 
@@ -43,7 +43,7 @@ public class GetObjectACLResult extends OSSResult {
      *
      * @return
      */
-    public String getObjectOwnerID() {
+     String getObjectOwnerID() {
         return objectOwner.getId();
     }
 
@@ -52,7 +52,7 @@ public class GetObjectACLResult extends OSSResult {
      *
      * @param id
      */
-    public void setObjectOwnerID(String id) {
+     void setObjectOwnerID(String id) {
         this.objectOwner.setId(id);
     }
 
@@ -61,7 +61,7 @@ public class GetObjectACLResult extends OSSResult {
      *
      * @return
      */
-    public String getObjectACL() {
+     String getObjectACL() {
         String acl = null;
         if (objectACL != null) {
             acl = objectACL.toString();
@@ -74,7 +74,7 @@ public class GetObjectACLResult extends OSSResult {
      *
      * @param objectACL
      */
-    public void setObjectACL(String objectACL) {
+     void setObjectACL(String objectACL) {
         this.objectACL = CannedAccessControlList.parseACL(objectACL);
     }
 

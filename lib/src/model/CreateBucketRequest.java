@@ -3,21 +3,21 @@ package com.alibaba.sdk.android.oss.model;
 /**
  * Created by LK on 15/12/15.
  */
-public class CreateBucketRequest extends OSSRequest {
+ class CreateBucketRequest extends OSSRequest {
 
-    public static final String TAB_LOCATIONCONSTRAINT = "LocationConstraint";
-    public static final String TAB_STORAGECLASS = "StorageClass";
-    private String bucketName;
-    private CannedAccessControlList bucketACL;
-    private String locationConstraint;
-    private StorageClass bucketStorageClass = StorageClass.Standard;
+     static final String TAB_LOCATIONCONSTRAINT = "LocationConstraint";
+     static final String TAB_STORAGECLASS = "StorageClass";
+     String bucketName;
+     CannedAccessControlList bucketACL;
+     String locationConstraint;
+     StorageClass bucketStorageClass = StorageClass.Standard;
 
     /**
      * The constructor of CreateBucketRequest
      *
      * @param bucketName
      */
-    public CreateBucketRequest(String bucketName) {
+     CreateBucketRequest(String bucketName) {
         setBucketName(bucketName);
     }
 
@@ -26,7 +26,7 @@ public class CreateBucketRequest extends OSSRequest {
      *
      * @return
      */
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
@@ -36,7 +36,7 @@ public class CreateBucketRequest extends OSSRequest {
      *
      * @param bucketName
      */
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
@@ -46,7 +46,7 @@ public class CreateBucketRequest extends OSSRequest {
      * @return
      */
     @Deprecated
-    public String getLocationConstraint() {
+     String getLocationConstraint() {
         return locationConstraint;
     }
 
@@ -59,7 +59,7 @@ public class CreateBucketRequest extends OSSRequest {
      * @param locationConstraint
      */
     @Deprecated
-    public void setLocationConstraint(String locationConstraint) {
+     void setLocationConstraint(String locationConstraint) {
         this.locationConstraint = locationConstraint;
     }
 
@@ -68,17 +68,17 @@ public class CreateBucketRequest extends OSSRequest {
      *
      * @return
      */
-    public CannedAccessControlList getBucketACL() {
+     CannedAccessControlList getBucketACL() {
         return bucketACL;
     }
 
     /**
      * Sets bucket ACL
-     * For now there're three permissions of Bucket: private、public-read、public-read-write
+     * For now there're three permissions of Bucket: 、-read、-read-write
      *
      * @param bucketACL
      */
-    public void setBucketACL(CannedAccessControlList bucketACL) {
+     void setBucketACL(CannedAccessControlList bucketACL) {
         this.bucketACL = bucketACL;
     }
 
@@ -87,7 +87,7 @@ public class CreateBucketRequest extends OSSRequest {
      *
      * @return
      */
-    public StorageClass getBucketStorageClass() {
+     StorageClass getBucketStorageClass() {
         return bucketStorageClass;
     }
 
@@ -96,7 +96,7 @@ public class CreateBucketRequest extends OSSRequest {
      *
      * @param storageClass
      */
-    public void setBucketStorageClass(StorageClass storageClass) {
+     void setBucketStorageClass(StorageClass storageClass) {
         this.bucketStorageClass = storageClass;
     }
 }

@@ -7,21 +7,21 @@ import com.alibaba.sdk.android.oss.common.OSSConstants;
 
 import java.util.Map;
 
-public class MultipartUploadRequest<T extends MultipartUploadRequest> extends OSSRequest {
-    protected String bucketName;
-    protected String objectKey;
-    protected String uploadId;
+ class MultipartUploadRequest<T extends MultipartUploadRequest> extends OSSRequest {
+     String bucketName;
+     String objectKey;
+     String uploadId;
 
-    protected String uploadFilePath;
-    protected Uri uploadUri;
-    protected long partSize = 256 * 1024;
+     String uploadFilePath;
+     Uri uploadUri;
+     int partSize = 256 * 1024;
 
-    protected ObjectMetadata metadata;
+     ObjectMetadata metadata;
 
-    protected Map<String, String> callbackParam;
-    protected Map<String, String> callbackVars;
+     Map<String, String> callbackParam;
+     Map<String, String> callbackVars;
 
-    protected OSSProgressCallback<T> progressCallback;
+     OSSProgressCallback<T> progressCallback;
 
     /**
      * Constructor
@@ -30,7 +30,7 @@ public class MultipartUploadRequest<T extends MultipartUploadRequest> extends OS
      * @param objectKey      The target object's key
      * @param uploadFilePath The local path of the file to upload
      */
-    public MultipartUploadRequest(String bucketName, String objectKey, String uploadFilePath) {
+     MultipartUploadRequest(String bucketName, String objectKey, String uploadFilePath) {
         this(bucketName, objectKey, uploadFilePath, null);
     }
 
@@ -42,7 +42,7 @@ public class MultipartUploadRequest<T extends MultipartUploadRequest> extends OS
      * @param uploadFilePath The local path of the file to upload
      * @param metadata       The metadata of the target object
      */
-    public MultipartUploadRequest(String bucketName, String objectKey, String uploadFilePath, ObjectMetadata metadata) {
+     MultipartUploadRequest(String bucketName, String objectKey, String uploadFilePath, ObjectMetadata metadata) {
         setBucketName(bucketName);
         setObjectKey(objectKey);
         setUploadFilePath(uploadFilePath);
@@ -56,7 +56,7 @@ public class MultipartUploadRequest<T extends MultipartUploadRequest> extends OS
      * @param objectKey      The target object's key
      * @param uploadUri      The Uri of the file to upload
      */
-    public MultipartUploadRequest(String bucketName, String objectKey, Uri uploadUri) {
+     MultipartUploadRequest(String bucketName, String objectKey, Uri uploadUri) {
         this(bucketName, objectKey, uploadUri, null);
     }
 
@@ -68,14 +68,14 @@ public class MultipartUploadRequest<T extends MultipartUploadRequest> extends OS
      * @param uploadUri      The Uri of the file to upload
      * @param metadata       The metadata of the target object
      */
-    public MultipartUploadRequest(String bucketName, String objectKey, Uri uploadUri, ObjectMetadata metadata) {
+     MultipartUploadRequest(String bucketName, String objectKey, Uri uploadUri, ObjectMetadata metadata) {
         setBucketName(bucketName);
         setObjectKey(objectKey);
         setUploadUri(uploadUri);
         setMetadata(metadata);
     }
 
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
@@ -84,11 +84,11 @@ public class MultipartUploadRequest<T extends MultipartUploadRequest> extends OS
      *
      * @param bucketName
      */
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
-    public String getObjectKey() {
+     String getObjectKey() {
         return objectKey;
     }
 
@@ -97,11 +97,11 @@ public class MultipartUploadRequest<T extends MultipartUploadRequest> extends OS
      *
      * @param objectKey
      */
-    public void setObjectKey(String objectKey) {
+     void setObjectKey(String objectKey) {
         this.objectKey = objectKey;
     }
 
-    public String getUploadFilePath() {
+     String getUploadFilePath() {
         return uploadFilePath;
     }
 
@@ -110,20 +110,20 @@ public class MultipartUploadRequest<T extends MultipartUploadRequest> extends OS
      *
      * @param uploadFilePath the local path of the file to upload
      */
-    public void setUploadFilePath(String uploadFilePath) {
+     void setUploadFilePath(String uploadFilePath) {
         this.uploadFilePath = uploadFilePath;
     }
 
-    public ObjectMetadata getMetadata() {
+     ObjectMetadata getMetadata() {
         return metadata;
     }
 
 
-    public Uri getUploadUri() {
+     Uri getUploadUri() {
         return uploadUri;
     }
 
-    public void setUploadUri(Uri uploadUri) {
+     void setUploadUri(Uri uploadUri) {
         this.uploadUri = uploadUri;
     }
 
@@ -132,22 +132,22 @@ public class MultipartUploadRequest<T extends MultipartUploadRequest> extends OS
      *
      * @param metadata The metadata
      */
-    public void setMetadata(ObjectMetadata metadata) {
+     void setMetadata(ObjectMetadata metadata) {
         this.metadata = metadata;
     }
 
-    public OSSProgressCallback<T> getProgressCallback() {
+     OSSProgressCallback<T> getProgressCallback() {
         return progressCallback;
     }
 
     /**
      * Sets the upload progress callback
      */
-    public void setProgressCallback(OSSProgressCallback<T> progressCallback) {
+     void setProgressCallback(OSSProgressCallback<T> progressCallback) {
         this.progressCallback = progressCallback;
     }
 
-    public long getPartSize() {
+     int getPartSize() {
         return partSize;
     }
 
@@ -156,37 +156,37 @@ public class MultipartUploadRequest<T extends MultipartUploadRequest> extends OS
      *
      * @param partSize size in byte
      */
-    public void setPartSize(long partSize) {
+     void setPartSize(int partSize) {
         this.partSize = partSize;
     }
 
-    public Map<String, String> getCallbackParam() {
+     Map<String, String> getCallbackParam() {
         return callbackParam;
     }
 
     /**
      * Sets the server callback parameters
      */
-    public void setCallbackParam(Map<String, String> callbackParam) {
+     void setCallbackParam(Map<String, String> callbackParam) {
         this.callbackParam = callbackParam;
     }
 
-    public Map<String, String> getCallbackVars() {
+     Map<String, String> getCallbackVars() {
         return callbackVars;
     }
 
     /**
      * Sets the server callback variables
      */
-    public void setCallbackVars(Map<String, String> callbackVars) {
+     void setCallbackVars(Map<String, String> callbackVars) {
         this.callbackVars = callbackVars;
     }
 
-    public String getUploadId() {
+     String getUploadId() {
         return uploadId;
     }
 
-    public void setUploadId(String uploadId) {
+     void setUploadId(String uploadId) {
         this.uploadId = uploadId;
     }
 }

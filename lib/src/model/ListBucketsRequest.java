@@ -4,57 +4,57 @@ package com.alibaba.sdk.android.oss.model;
  * Created by chenjie on 17/12/6.
  */
 
-public class ListBucketsRequest extends OSSRequest {
+ class ListBucketsRequest extends OSSRequest {
 
-    private static final int MAX_RETURNED_KEYS_LIMIT = 1000;
+     static final int MAX_RETURNED_KEYS_LIMIT = 1000;
 
     // prefix filter
-    private String prefix;
+     String prefix;
 
     // maker filter--the returned bucket' keys must be greater than this value in lexicographic order.
-    private String marker;
+     String marker;
 
     // the max keys to return--by default it's 100
-    private Integer maxKeys;
+     Integer maxKeys;
 
-    public ListBucketsRequest() {
+     ListBucketsRequest() {
     }
 
-    public ListBucketsRequest(String prefix) {
+     ListBucketsRequest(String prefix) {
         this(prefix, null);
     }
 
-    public ListBucketsRequest(String prefix, String marker) {
+     ListBucketsRequest(String prefix, String marker) {
         this(prefix, marker, 100);
     }
 
-    public ListBucketsRequest(String prefix, String marker, Integer maxKeys) {
+     ListBucketsRequest(String prefix, String marker, Integer maxKeys) {
         this.prefix = prefix;
         this.marker = marker;
         this.maxKeys = maxKeys;
     }
 
-    public String getPrefix() {
+     String getPrefix() {
         return this.prefix;
     }
 
-    public void setPrefix(String prefix) {
+     void setPrefix(String prefix) {
         this.prefix = prefix;
     }
 
-    public String getMarker() {
+     String getMarker() {
         return this.marker;
     }
 
-    public void setMarker(String marker) {
+     void setMarker(String marker) {
         this.marker = marker;
     }
 
-    public Integer getMaxKeys() {
+     Integer getMaxKeys() {
         return this.maxKeys;
     }
 
-    public void setMaxKeys(Integer maxKeys) {
+     void setMaxKeys(Integer maxKeys) {
         this.maxKeys = maxKeys;
     }
 

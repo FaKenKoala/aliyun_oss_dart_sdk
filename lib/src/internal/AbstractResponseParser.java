@@ -20,10 +20,10 @@ import okhttp3.Response;
 /**
  * create by jingdan 15/08/17
  */
-public abstract class AbstractResponseParser<T extends OSSResult> implements ResponseParser {
+ abstract class AbstractResponseParser<T extends OSSResult> implements ResponseParser {
 
     //关闭okhttp响应链接
-    public static void safeCloseResponse(ResponseMessage response) {
+     static void safeCloseResponse(ResponseMessage response) {
         try {
             response.close();
         } catch (Exception e) {
@@ -40,12 +40,12 @@ public abstract class AbstractResponseParser<T extends OSSResult> implements Res
      */
     abstract T parseData(ResponseMessage response, T result) throws Exception;
 
-    public boolean needCloseResponse() {
+     bool needCloseResponse() {
         return true;
     }
 
     @Override
-    public T parse(ResponseMessage response) throws IOException {
+     T parse(ResponseMessage response) throws IOException {
         try {
             Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
             Class<?> classType = (Class<?>) type;
@@ -71,7 +71,7 @@ public abstract class AbstractResponseParser<T extends OSSResult> implements Res
     }
 
     //处理返回信息的信息头
-    private CaseInsensitiveHashMap<String, String> parseResponseHeader(Response response) {
+     CaseInsensitiveHashMap<String, String> parseResponseHeader(Response response) {
         CaseInsensitiveHashMap<String, String> result = new CaseInsensitiveHashMap<String, String>();
         Headers headers = response.headers();
         for (int i = 0; i < headers.size(); i++) {
@@ -80,7 +80,7 @@ public abstract class AbstractResponseParser<T extends OSSResult> implements Res
         return result;
     }
 
-    public <Result extends OSSResult> void setCRC(Result result,
+     <Result extends OSSResult> void setCRC(Result result,
                                                   ResponseMessage response) {
         InputStream inputStream = response.getRequest().getContent();
         if (inputStream != null && inputStream instanceof CheckedInputStream) {
@@ -91,7 +91,7 @@ public abstract class AbstractResponseParser<T extends OSSResult> implements Res
         String strSrvCrc = response.getHeaders().get(OSSHeaders.OSS_HASH_CRC64_ECMA);
         if (strSrvCrc != null) {
             BigInteger bi = new BigInteger(strSrvCrc);
-            result.setServerCRC(bi.longValue());
+            result.setServerCRC(bi.intValue());
         }
     }
 }

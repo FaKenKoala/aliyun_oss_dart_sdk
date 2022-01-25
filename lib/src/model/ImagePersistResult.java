@@ -22,7 +22,7 @@ package com.alibaba.sdk.android.oss.model;
 /**
  * The uploading part result class definition
  */
-public class ImagePersistResult extends OSSResult {
+ class ImagePersistResult extends OSSResult {
 
 
 }

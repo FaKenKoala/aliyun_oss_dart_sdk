@@ -5,24 +5,24 @@ import okhttp3.Call;
 /**
  * Created by zhouzhuo on 11/23/15.
  */
-public class CancellationHandler {
+ class CancellationHandler {
 
-    private volatile boolean isCancelled;
+     volatile bool isCancelled;
 
-    private volatile Call call;
+     volatile Call call;
 
-    public void cancel() {
+     void cancel() {
         if (call != null) {
             call.cancel();
         }
         isCancelled = true;
     }
 
-    public boolean isCancelled() {
+     bool isCancelled() {
         return isCancelled;
     }
 
-    public void setCall(Call call) {
+     void setCall(Call call) {
         this.call = call;
     }
 }

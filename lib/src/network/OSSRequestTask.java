@@ -44,21 +44,21 @@ import okhttp3.Response;
 /**
  * Created by zhouzhuo on 11/22/15.
  */
-public class OSSRequestTask<T extends OSSResult> implements Callable<T> {
+ class OSSRequestTask<T extends OSSResult> implements Callable<T> {
 
-    private ResponseParser<T> responseParser;
+     ResponseParser<T> responseParser;
 
-    private RequestMessage message;
+     RequestMessage message;
 
-    private ExecutionContext context;
+     ExecutionContext context;
 
-    private OkHttpClient client;
+     OkHttpClient client;
 
-    private OSSRetryHandler retryHandler;
+     OSSRetryHandler retryHandler;
 
-    private int currentRetryCount = 0;
+     int currentRetryCount = 0;
 
-    public OSSRequestTask(RequestMessage message, ResponseParser parser, ExecutionContext context, int maxRetry) {
+     OSSRequestTask(RequestMessage message, ResponseParser parser, ExecutionContext context, int maxRetry) {
         this.responseParser = parser;
         this.message = message;
         this.context = context;
@@ -67,7 +67,7 @@ public class OSSRequestTask<T extends OSSResult> implements Callable<T> {
     }
 
     @Override
-    public T call() throws Exception {
+     T call() throws Exception {
 
         Request request = null;
         ResponseMessage responseMessage = null;
@@ -118,7 +118,7 @@ public class OSSRequestTask<T extends OSSResult> implements Callable<T> {
                     OSSUtils.assertTrue(contentType != null, "Content type can't be null when upload!");
                     InputStream inputStream = null;
                     String stringBody = null;
-                    long length = 0;
+                    int length = 0;
                     if (message.getUploadData() != null) {
                         inputStream = new ByteArrayInputStream(message.getUploadData());
                         length = message.getUploadData().length;
@@ -257,7 +257,7 @@ public class OSSRequestTask<T extends OSSResult> implements Callable<T> {
                 String responseDateString = responseMessage.getHeaders().get(OSSHeaders.DATE);
                 try {
                     // update the server time after every response
-                    long serverTime = DateUtil.parseRfc822Date(responseDateString).getTime();
+                    int serverTime = DateUtil.parseRfc822Date(responseDateString).getTime();
                     DateUtil.setCurrentServerTime(serverTime);
                     message.getHeaders().put(OSSHeaders.DATE, responseDateString);
                 } catch (Exception ignore) {
@@ -285,7 +285,7 @@ public class OSSRequestTask<T extends OSSResult> implements Callable<T> {
         }
     }
 
-    private ResponseMessage buildResponseMessage(RequestMessage request, Response response) {
+     ResponseMessage buildResponseMessage(RequestMessage request, Response response) {
         ResponseMessage responseMessage = new ResponseMessage();
         responseMessage.setRequest(request);
         responseMessage.setResponse(response);

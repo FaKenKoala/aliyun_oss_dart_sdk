@@ -18,44 +18,44 @@ import okio.Source;
  * response progress
  */
 
-public class ProgressTouchableResponseBody<T extends OSSRequest> extends ResponseBody {
+ class ProgressTouchableResponseBody<T extends OSSRequest> extends ResponseBody {
 
-    private final ResponseBody mResponseBody;
-    private OSSProgressCallback mProgressListener;
-    private BufferedSource mBufferedSource;
-    private T request;
+     final ResponseBody mResponseBody;
+     OSSProgressCallback mProgressListener;
+     BufferedSource mBufferedSource;
+     T request;
 
-    public ProgressTouchableResponseBody(ResponseBody responseBody, ExecutionContext context) {
+     ProgressTouchableResponseBody(ResponseBody responseBody, ExecutionContext context) {
         this.mResponseBody = responseBody;
         this.mProgressListener = context.getProgressCallback();
         this.request = (T) context.getRequest();
     }
 
     @Override
-    public MediaType contentType() {
+     MediaType contentType() {
         return mResponseBody.contentType();
     }
 
     @Override
-    public long contentLength() {
+     int contentLength() {
         return mResponseBody.contentLength();
     }
 
     @Override
-    public BufferedSource source() {
+     BufferedSource source() {
         if (mBufferedSource == null) {
             mBufferedSource = Okio.buffer(source(mResponseBody.source()));
         }
         return mBufferedSource;
     }
 
-    private Source source(Source source) {
+     Source source(Source source) {
         return new ForwardingSource(source) {
-            private long totalBytesRead = 0L;
+             int totalBytesRead = 0L;
 
             @Override
-            public long read(Buffer sink, long byteCount) throws IOException {
-                long bytesRead = super.read(sink, byteCount);
+             int read(Buffer sink, int byteCount) throws IOException {
+                int bytesRead = super.read(sink, byteCount);
                 totalBytesRead += bytesRead != -1 ? bytesRead : 0;
                 //callback
                 if (mProgressListener != null && bytesRead != -1 && totalBytesRead != 0) {

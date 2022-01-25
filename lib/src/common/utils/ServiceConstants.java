@@ -7,9 +7,9 @@
 
 package com.alibaba.sdk.android.oss.common.utils;
 
-public interface ServiceConstants {
+ abstract class ServiceConstants {
 
-    public static final String DEFAULT_ENCODING = "utf-8";
+     static final String DEFAULT_ENCODING = "utf-8";
 
-    public static final String RESOURCE_NAME_COMMON = "common";
+     static final String RESOURCE_NAME_COMMON = "common";
 }

@@ -1,22 +1,22 @@
 package com.alibaba.sdk.android.oss.model;
 
-public class RestoreObjectRequest extends OSSRequest {
-    private String bucketName;
-    private String objectKey;
+ class RestoreObjectRequest extends OSSRequest {
+     String bucketName;
+     String objectKey;
 
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
-    public String getObjectKey() {
+     String getObjectKey() {
         return objectKey;
     }
 
-    public void setObjectKey(String objectKey) {
+     void setObjectKey(String objectKey) {
         this.objectKey = objectKey;
     }
 }

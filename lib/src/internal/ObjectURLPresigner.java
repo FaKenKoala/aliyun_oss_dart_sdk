@@ -27,19 +27,19 @@ import java.util.Map;
 /**
  * Created by zhouzhuo on 11/29/15.
  */
-public class ObjectURLPresigner {
+ class ObjectURLPresigner {
 
-    private URI endpoint;
-    private OSSCredentialProvider credentialProvider;
-    private ClientConfiguration conf;
+     URI endpoint;
+     OSSCredentialProvider credentialProvider;
+     ClientConfiguration conf;
 
-    public ObjectURLPresigner(URI endpoint, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
+     ObjectURLPresigner(URI endpoint, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
         this.endpoint = endpoint;
         this.credentialProvider = credentialProvider;
         this.conf = conf;
     }
 
-    public String presignConstrainedURL(GeneratePresignedUrlRequest request) throws ClientException {
+     String presignConstrainedURL(GeneratePresignedUrlRequest request) throws ClientException {
 
         String bucketName = request.getBucketName();
         String objectKey = request.getKey();
@@ -118,19 +118,19 @@ public class ObjectURLPresigner {
         return url;
     }
 
-    public String presignConstrainedURL(String bucketName, String objectKey, long expiredTimeInSeconds)
+     String presignConstrainedURL(String bucketName, String objectKey, int expiredTimeInSeconds)
             throws ClientException {
         GeneratePresignedUrlRequest presignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, objectKey);
         presignedUrlRequest.setExpiration(expiredTimeInSeconds);
         return presignConstrainedURL(presignedUrlRequest);
     }
 
-    public String presignPublicURL(String bucketName, String objectKey) {
+     String presignURL(String bucketName, String objectKey) {
         String host = buildCanonicalHost(endpoint, bucketName, conf);
         return endpoint.getScheme() + "://" + host + "/" + HttpUtil.urlEncode(objectKey, OSSConstants.DEFAULT_CHARSET_NAME);
     }
 
-    private String buildCanonicalHost(URI endpoint, String bucketName, ClientConfiguration config) {
+     String buildCanonicalHost(URI endpoint, String bucketName, ClientConfiguration config) {
         String originHost = endpoint.getHost();
         String portString = null;
         String path = endpoint.getPath();
@@ -140,7 +140,7 @@ public class ObjectURLPresigner {
             portString = String.valueOf(port);
         }
 
-        boolean isPathStyle = false;
+        bool isPathStyle = false;
 
         String host = originHost;
         if(!TextUtils.isEmpty(portString)){

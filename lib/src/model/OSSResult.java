@@ -5,29 +5,29 @@ import java.util.Map;
 /**
  * Created by zhouzhuo on 11/23/15.
  */
-public class OSSResult {
+ class OSSResult {
 
-    private int statusCode;
+     int statusCode;
 
-    private Map<String, String> responseHeader;
+     Map<String, String> responseHeader;
 
-    private String requestId;
+     String requestId;
 
     //client crc64
-    private Long clientCRC;
+     int clientCRC;
     //server crc64
-    private Long serverCRC;
+     int serverCRC;
 
     /**
      * The HTTP status code
      *
      * @return HTTP status code
      */
-    public int getStatusCode() {
+     int getStatusCode() {
         return statusCode;
     }
 
-    public void setStatusCode(int statusCode) {
+     void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
     }
 
@@ -36,11 +36,11 @@ public class OSSResult {
      *
      * @return ALl headers in the response
      */
-    public Map<String, String> getResponseHeader() {
+     Map<String, String> getResponseHeader() {
         return responseHeader;
     }
 
-    public void setResponseHeader(Map<String, String> responseHeader) {
+     void setResponseHeader(Map<String, String> responseHeader) {
         this.responseHeader = responseHeader;
     }
 
@@ -49,36 +49,36 @@ public class OSSResult {
      *
      * @return The globally unique request Id
      */
-    public String getRequestId() {
+     String getRequestId() {
         return requestId;
     }
 
-    public void setRequestId(String requestId) {
+     void setRequestId(String requestId) {
         this.requestId = requestId;
     }
 
-    public Long getClientCRC() {
+     int getClientCRC() {
         return clientCRC;
     }
 
-    public void setClientCRC(Long clientCRC) {
+     void setClientCRC(int clientCRC) {
         if (clientCRC != null && clientCRC != 0) {
             this.clientCRC = clientCRC;
         }
     }
 
-    public Long getServerCRC() {
+     int getServerCRC() {
         return serverCRC;
     }
 
-    public void setServerCRC(Long serverCRC) {
+     void setServerCRC(int serverCRC) {
         if (serverCRC != null && serverCRC != 0) {
             this.serverCRC = serverCRC;
         }
     }
 
     @Override
-    public String toString() {
+     String toString() {
         String desc = String.format("OSSResult<%s>: \nstatusCode:%d,\nresponseHeader:%s,\nrequestId:%s", super.toString(), statusCode, responseHeader.toString(), requestId);
         return desc;
     }

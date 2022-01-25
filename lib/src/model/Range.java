@@ -5,17 +5,17 @@ package com.alibaba.sdk.android.oss.model;
  * @author: zhouzhuo
  * 2014年11月3日
  */
-public class Range {
+ class Range {
 
-    public static final long INFINITE = -1;
+     static final int INFINITE = -1;
     /**
      * The start point of the download range
      */
-    private long begin;
+     int begin;
     /**
      * The end point of the download range
      */
-    private long end;
+     int end;
 
     /**
      * Constructor
@@ -23,28 +23,28 @@ public class Range {
      * @param begin The start index
      * @param end   The end index
      */
-    public Range(long begin, long end) {
+     Range(int begin, int end) {
         setBegin(begin);
         setEnd(end);
     }
 
-    public long getEnd() {
+     int getEnd() {
         return end;
     }
 
-    public void setEnd(long end) {
+     void setEnd(int end) {
         this.end = end;
     }
 
-    public long getBegin() {
+     int getBegin() {
         return begin;
     }
 
-    public void setBegin(long begin) {
+     void setBegin(int begin) {
         this.begin = begin;
     }
 
-    public boolean checkIsValid() {
+     bool checkIsValid() {
         if (begin < -1 || end < -1) {
             return false;
         }
@@ -55,7 +55,7 @@ public class Range {
     }
 
     @Override
-    public String toString() {
+     String toString() {
         return "bytes=" + (begin == -1 ? "" : String.valueOf(begin)) + "-" + (end == -1 ? "" : String.valueOf(end));
     }
 }

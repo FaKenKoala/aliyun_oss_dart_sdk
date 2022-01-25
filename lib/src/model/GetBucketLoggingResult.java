@@ -1,31 +1,31 @@
 package com.alibaba.sdk.android.oss.model;
 
-public class GetBucketLoggingResult extends OSSResult {
-    private String mTargetBucketName;
-    private String mTargetPrefix;
-    private boolean mLoggingEnabled = false;
+ class GetBucketLoggingResult extends OSSResult {
+     String mTargetBucketName;
+     String mTargetPrefix;
+     bool mLoggingEnabled = false;
 
-    public String getTargetBucketName() {
+     String getTargetBucketName() {
         return mTargetBucketName;
     }
 
-    public void setTargetBucketName(String targetBucketName) {
+     void setTargetBucketName(String targetBucketName) {
         this.mTargetBucketName = targetBucketName;
     }
 
-    public String getTargetPrefix() {
+     String getTargetPrefix() {
         return mTargetPrefix;
     }
 
-    public void setTargetPrefix(String targetPrefix) {
+     void setTargetPrefix(String targetPrefix) {
         this.mTargetPrefix = targetPrefix;
     }
 
-    public boolean loggingEnabled() {
+     bool loggingEnabled() {
         return mLoggingEnabled;
     }
 
-    public void setLoggingEnabled(boolean loggingEnabled) {
+     void setLoggingEnabled(bool loggingEnabled) {
         this.mLoggingEnabled = loggingEnabled;
     }
 }

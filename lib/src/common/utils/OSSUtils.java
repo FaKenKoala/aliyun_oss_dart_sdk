@@ -94,11 +94,11 @@ import static com.alibaba.sdk.android.oss.common.RequestParameters.X_OSS_SYMLINK
 /**
  * Created by zhouzhuo on 11/22/15.
  */
-public class OSSUtils {
+ class OSSUtils {
 
-    private static final String NEW_LINE = "\n";
+     static final String NEW_LINE = "\n";
 
-    private static final List<String> SIGNED_PARAMTERS = Arrays.asList(new String[]{
+     static final List<String> SIGNED_PARAMTERS = Arrays.asList(new String[]{
             SUBRESOURCE_BUCKETINFO, SUBRESOURCE_ACL, SUBRESOURCE_UPLOADS, SUBRESOURCE_LOCATION,
             SUBRESOURCE_CORS, SUBRESOURCE_LOGGING, SUBRESOURCE_WEBSITE,
             SUBRESOURCE_REFERER, SUBRESOURCE_LIFECYCLE, SUBRESOURCE_DELETE,
@@ -112,7 +112,7 @@ public class OSSUtils {
     /**
      * Populate metadata to headers.
      */
-    public static void populateRequestMetadata(Map<String, String> headers, ObjectMetadata metadata) {
+     static void populateRequestMetadata(Map<String, String> headers, ObjectMetadata metadata) {
         if (metadata == null) {
             return;
         }
@@ -136,7 +136,7 @@ public class OSSUtils {
         }
     }
 
-    public static void populateListBucketRequestParameters(ListBucketsRequest listBucketsRequest,
+     static void populateListBucketRequestParameters(ListBucketsRequest listBucketsRequest,
                                                            Map<String, String> params) {
         if (listBucketsRequest.getPrefix() != null) {
             params.put(PREFIX, listBucketsRequest.getPrefix());
@@ -151,7 +151,7 @@ public class OSSUtils {
         }
     }
 
-    public static void populateListObjectsRequestParameters(ListObjectsRequest listObjectsRequest,
+     static void populateListObjectsRequestParameters(ListObjectsRequest listObjectsRequest,
                                                             Map<String, String> params) {
 
         if (listObjectsRequest.getPrefix() != null) {
@@ -175,7 +175,7 @@ public class OSSUtils {
         }
     }
 
-    public static void populateListMultipartUploadsRequestParameters(ListMultipartUploadsRequest request,
+     static void populateListMultipartUploadsRequestParameters(ListMultipartUploadsRequest request,
                                                                      Map<String, String> params) {
 
         if (request.getDelimiter() != null) {
@@ -203,8 +203,8 @@ public class OSSUtils {
         }
     }
 
-    public static boolean checkParamRange(long param, long from, boolean leftInclusive,
-                                          long to, boolean rightInclusive) {
+     static bool checkParamRange(int param, int from, bool leftInclusive,
+                                          int to, bool rightInclusive) {
         if (leftInclusive && rightInclusive) {    // [from, to]
             if (from <= param && param <= to) {
                 return true;
@@ -232,7 +232,7 @@ public class OSSUtils {
         }
     }
 
-    public static void populateCopyObjectHeaders(CopyObjectRequest copyObjectRequest,
+     static void populateCopyObjectHeaders(CopyObjectRequest copyObjectRequest,
                                                  Map<String, String> headers) {
         String copySourceHeader = "/" + copyObjectRequest.getSourceBucketName() + "/"
                 + HttpUtil.urlEncode(copyObjectRequest.getSourceKey(), OSSConstants.DEFAULT_CHARSET_NAME);
@@ -266,7 +266,7 @@ public class OSSUtils {
         removeHeader(headers, HttpHeaders.CONTENT_LENGTH);
     }
 
-    public static String buildXMLFromPartEtagList(List<PartETag> partETagList) {
+     static String buildXMLFromPartEtagList(List<PartETag> partETagList) {
         StringBuilder builder = new StringBuilder();
         builder.append("<CompleteMultipartUpload>\n");
         for (PartETag partETag : partETagList) {
@@ -279,35 +279,35 @@ public class OSSUtils {
         return builder.toString();
     }
 
-    public static void addHeader(Map<String, String> headers, String header, String value) {
+     static void addHeader(Map<String, String> headers, String header, String value) {
         if (value != null) {
             headers.put(header, value);
         }
     }
 
-    public static void addDateHeader(Map<String, String> headers, String header, Date value) {
+     static void addDateHeader(Map<String, String> headers, String header, Date value) {
         if (value != null) {
             headers.put(header, DateUtil.formatRfc822Date(value));
         }
     }
 
-    public static void addStringListHeader(Map<String, String> headers, String header,
+     static void addStringListHeader(Map<String, String> headers, String header,
                                            List<String> values) {
         if (values != null && !values.isEmpty()) {
             headers.put(header, join(values));
         }
     }
 
-    public static void removeHeader(Map<String, String> headers, String header) {
+     static void removeHeader(Map<String, String> headers, String header) {
         if (header != null && headers.containsKey(header)) {
             headers.remove(header);
         }
     }
 
-    public static String join(List<String> strings) {
+     static String join(List<String> strings) {
         StringBuilder result = new StringBuilder();
 
-        boolean first = true;
+        bool first = true;
         for (String s : strings) {
             if (!first) result.append(", ");
 
@@ -324,12 +324,12 @@ public class OSSUtils {
      * @param str
      * @return
      */
-    public static boolean isEmptyString(String str) {
+     static bool isEmptyString(String str) {
         return TextUtils.isEmpty(str);
 
     }
 
-    public static String buildCanonicalString(RequestMessage request) {
+     static String buildCanonicalString(RequestMessage request) {
 
         StringBuilder canonicalString = new StringBuilder();
         canonicalString.append(request.getMethod().toString() + NEW_LINE);
@@ -380,7 +380,7 @@ public class OSSUtils {
         return canonicalString.toString();
     }
 
-    public static String buildCanonicalizedResource(String bucketName, String objectKey, Map<String, String> parameters) {
+     static String buildCanonicalizedResource(String bucketName, String objectKey, Map<String, String> parameters) {
         String resourcePath;
         if (bucketName == null && objectKey == null) {
             resourcePath = "/";
@@ -393,7 +393,7 @@ public class OSSUtils {
         return buildCanonicalizedResource(resourcePath, parameters);
     }
 
-    public static String buildCanonicalizedResource(String resourcePath, Map<String, String> parameters) {
+     static String buildCanonicalizedResource(String resourcePath, Map<String, String> parameters) {
 
         StringBuilder builder = new StringBuilder();
         builder.append(resourcePath);
@@ -426,14 +426,14 @@ public class OSSUtils {
     /**
      * Encode request parameters to URL segment.
      */
-    public static String paramToQueryString(Map<String, String> params, String charset) {
+     static String paramToQueryString(Map<String, String> params, String charset) {
 
         if (params == null || params.isEmpty()) {
             return null;
         }
 
         StringBuilder paramString = new StringBuilder();
-        boolean first = true;
+        bool first = true;
         for (Map.Entry<String, String> p : params.entrySet()) {
             String key = p.getKey();
             String value = p.getValue();
@@ -454,7 +454,7 @@ public class OSSUtils {
         return paramString.toString();
     }
 
-    public static String populateMapToBase64JsonString(Map<String, String> map) {
+     static String populateMapToBase64JsonString(Map<String, String> map) {
         JSONObject jsonObj = new JSONObject(map);
         return Base64.encodeToString(jsonObj.toString().getBytes(), Base64.NO_WRAP);
     }
@@ -467,7 +467,7 @@ public class OSSUtils {
      * @param content
      * @return
      */
-    public static String sign(String accessKey, String screctKey, String content) {
+     static String sign(String accessKey, String screctKey, String content) {
 
         String signature;
 
@@ -484,7 +484,7 @@ public class OSSUtils {
     /**
      *
      */
-    public static boolean isOssOriginHost(String host){
+     static bool isOssOriginHost(String host){
         if (TextUtils.isEmpty(host)){
             return false;
         }
@@ -499,7 +499,7 @@ public class OSSUtils {
     /**
      * 判断一个域名是否是cname
      */
-    public static boolean isCname(String host) {
+     static bool isCname(String host) {
         for (String suffix : OSSConstants.DEFAULT_CNAME_EXCLUDE_LIST) {
             if (host.toLowerCase().endsWith(suffix)) {
                 return false;
@@ -511,7 +511,7 @@ public class OSSUtils {
     /**
      * 判断一个域名是否在自定义Cname排除列表之中
      */
-    public static boolean isInCustomCnameExcludeList(String endpoint, List<String> customCnameExludeList) {
+     static bool isInCustomCnameExcludeList(String endpoint, List<String> customCnameExludeList) {
         for (String host : customCnameExludeList) {
             if (endpoint.endsWith(host.toLowerCase())) {
                 return true;
@@ -520,7 +520,7 @@ public class OSSUtils {
         return false;
     }
 
-    public static void assertTrue(boolean condition, String message) {
+     static void assertTrue(bool condition, String message) {
         if (!condition) {
             throw new IllegalArgumentException(message);
         }
@@ -532,7 +532,7 @@ public class OSSUtils {
      * @param bucketName
      * @return
      */
-    public static boolean validateBucketName(String bucketName) {
+     static bool validateBucketName(String bucketName) {
         if (bucketName == null) {
             return false;
         }
@@ -540,13 +540,13 @@ public class OSSUtils {
         return bucketName.matches(BUCKETNAME_REGX);
     }
 
-    public static void ensureBucketNameValid(String bucketName) {
+     static void ensureBucketNameValid(String bucketName) {
         if (!validateBucketName(bucketName)) {
             throw new IllegalArgumentException("The bucket name is invalid. \n" +
                     "A bucket name must: \n" +
                     "1) be comprised of lower-case characters, numbers or dash(-); \n" +
                     "2) start with lower case or numbers; \n" +
-                    "3) be between 3-63 characters long. ");
+                    "3) be between 3-63 characters int. ");
         }
     }
 
@@ -556,7 +556,7 @@ public class OSSUtils {
      * @param objectKey
      * @return
      */
-    public static boolean validateObjectKey(String objectKey) {
+     static bool validateObjectKey(String objectKey) {
         if (objectKey == null) {
             return false;
         }
@@ -582,17 +582,17 @@ public class OSSUtils {
         return true;
     }
 
-    public static void ensureObjectKeyValid(String objectKey) {
+     static void ensureObjectKeyValid(String objectKey) {
         if (!validateObjectKey(objectKey)) {
             throw new IllegalArgumentException("The object key is invalid. \n" +
                     "An object name should be: \n" +
-                    "1) between 1 - 1023 bytes long when encoded as UTF-8 \n" +
+                    "1) between 1 - 1023 bytes int when encoded as UTF-8 \n" +
                     "2) cannot contain LF or CR or unsupported chars in XML1.0, \n" +
                     "3) cannot begin with \"/\" or \"\\\".");
         }
     }
 
-    public static boolean doesRequestNeedObjectKey(OSSRequest request) {
+     static bool doesRequestNeedObjectKey(OSSRequest request) {
         if (request instanceof ListObjectsRequest
                 || request instanceof ListBucketsRequest
                 || request instanceof CreateBucketRequest
@@ -617,7 +617,7 @@ public class OSSUtils {
         }
     }
 
-    public static boolean doesBucketNameValid(OSSRequest request) {
+     static bool doesBucketNameValid(OSSRequest request) {
         if (request instanceof ListBucketsRequest) {
             return false;
         } else {
@@ -625,7 +625,7 @@ public class OSSUtils {
         }
     }
 
-    public static void ensureRequestValid(OSSRequest request, RequestMessage message) {
+     static void ensureRequestValid(OSSRequest request, RequestMessage message) {
         if (doesBucketNameValid(request)) {
             ensureBucketNameValid(message.getBucketName());
         }
@@ -638,7 +638,7 @@ public class OSSUtils {
         }
     }
 
-    public static String determineContentType(String initValue, String srcPath, String toObjectKey) {
+     static String determineContentType(String initValue, String srcPath, String toObjectKey) {
         if (initValue != null) {
             return initValue;
         }
@@ -663,7 +663,7 @@ public class OSSUtils {
         return "application/octet-stream";
     }
 
-    public static void signRequest(RequestMessage message) throws Exception {
+     static void signRequest(RequestMessage message) throws Exception {
         OSSLog.logDebug("signRequest start");
         if (!message.isAuthorizationRequired()) {
             return;
@@ -709,7 +709,7 @@ public class OSSUtils {
         message.getHeaders().put(OSSHeaders.AUTHORIZATION, signature);
     }
 
-    public static String buildBaseLogInfo(Context context) {
+     static String buildBaseLogInfo(Context context) {
         StringBuilder sb = new StringBuilder();
         sb.append("=====[device info]=====\n");
         sb.append("[INFO]: android_version：" + Build.VERSION.RELEASE + "\n");
@@ -720,7 +720,7 @@ public class OSSUtils {
     /**
      * Checks if OSS and SDK's checksum is same. If not, throws InconsistentException.
      */
-    public static void checkChecksum(Long clientChecksum, Long serverChecksum, String requestId) throws InconsistentException {
+     static void checkChecksum(int clientChecksum, int serverChecksum, String requestId) throws InconsistentException {
         if (clientChecksum != null && serverChecksum != null &&
                 !clientChecksum.equals(serverChecksum)) {
             throw new InconsistentException(clientChecksum, serverChecksum, requestId);
@@ -730,7 +730,7 @@ public class OSSUtils {
     /*
      * check is standard ip
 
-    public static boolean isValidateIP(String addr) {
+     static bool isValidateIP(String addr) {
         if (addr.length() < 7 || addr.length() > 15 || "".equals(addr)) {
             return false;
         }
@@ -742,7 +742,7 @@ public class OSSUtils {
 
         Matcher mat = pat.matcher(addr);
 
-        boolean ipAddress = mat.find();
+        bool ipAddress = mat.find();
 
         return ipAddress;
     }
@@ -752,7 +752,7 @@ public class OSSUtils {
      * @param host
      * @return
      */
-    public static boolean isValidateIP(String host) throws Exception {
+     static bool isValidateIP(String host) throws Exception {
         if (host == null) {
             throw new Exception("host is null");
         }
@@ -763,8 +763,8 @@ public class OSSUtils {
             try {
                 Class<?> aClass = Class.forName("java.net.InetAddress");
                 Method isNumeric = aClass.getMethod("isNumeric", String.class);
-                Boolean isIp = (Boolean) isNumeric.invoke(null, host);
-                return isIp.booleanValue();
+                bool isIp = (bool) isNumeric.invoke(null, host);
+                return isIp.boolValue();
             } catch (ClassNotFoundException e) {
                 return false;
             } catch (NoSuchMethodException e) {
@@ -779,7 +779,7 @@ public class OSSUtils {
         }
     }
 
-    public static String buildTriggerCallbackBody(Map<String, String> callbackParams, Map<String, String> callbackVars) {
+     static String buildTriggerCallbackBody(Map<String, String> callbackParams, Map<String, String> callbackVars) {
         StringBuilder builder = new StringBuilder();
         builder.append("x-oss-process=trigger/callback,callback_");
 
@@ -799,7 +799,7 @@ public class OSSUtils {
         return builder.toString();
     }
 
-    public static String buildImagePersistentBody(String toBucketName, String toObjectKey, String action) {
+     static String buildImagePersistentBody(String toBucketName, String toObjectKey, String action) {
         StringBuilder builder = new StringBuilder();
         builder.append("x-oss-process=");
         if (action.startsWith("image/")) {
@@ -822,7 +822,7 @@ public class OSSUtils {
         return body;
     }
 
-    private enum MetadataDirective {
+     enum MetadataDirective {
 
         /* Copy metadata from source object */
         COPY("COPY"),
@@ -830,14 +830,14 @@ public class OSSUtils {
         /* Replace metadata with newly metadata */
         REPLACE("REPLACE");
 
-        private final String directiveAsString;
+         final String directiveAsString;
 
         MetadataDirective(String directiveAsString) {
             this.directiveAsString = directiveAsString;
         }
 
         @Override
-        public String toString() {
+         String toString() {
             return this.directiveAsString;
         }
     }

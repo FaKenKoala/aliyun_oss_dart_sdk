@@ -14,34 +14,34 @@ import java.util.List;
 /**
  * Client configuration for access to Ali cloud services
  */
-public class ClientConfiguration {
+ class ClientConfiguration {
 
-    private static final int DEFAULT_MAX_RETRIES = 2;
-    private int maxConcurrentRequest = 5;
-    private int socketTimeout = 60 * 1000;
-    private int connectionTimeout = 60 * 1000;
-    private long max_log_size = 5 * 1024 * 1024;
-    private int maxErrorRetry = DEFAULT_MAX_RETRIES;
-    private List<String> customCnameExcludeList = new ArrayList<String>();
-    private String proxyHost;
-    private int proxyPort;
-    private String mUserAgentMark;
-    private boolean httpDnsEnable = true;
-    private boolean checkCRC64 = false;//crc64 default false
-    private String ipWithHeader;
-    private boolean pathStyleAccessEnable = false;
-    private boolean customPathPrefixEnable = false;
+     static final int DEFAULT_MAX_RETRIES = 2;
+     int maxConcurrentRequest = 5;
+     int socketTimeout = 60 * 1000;
+     int connectionTimeout = 60 * 1000;
+     int max_log_size = 5 * 1024 * 1024;
+     int maxErrorRetry = DEFAULT_MAX_RETRIES;
+     List<String> customCnameExcludeList = new ArrayList<String>();
+     String proxyHost;
+     int proxyPort;
+     String mUserAgentMark;
+     bool httpDnsEnable = true;
+     bool checkCRC64 = false;//crc64 default false
+     String ipWithHeader;
+     bool pathStyleAccessEnable = false;
+     bool customPathPrefixEnable = false;
 
     /**
      * Constructor
      */
-    public ClientConfiguration() {
+     ClientConfiguration() {
     }
 
     /**
      * Gets the default configuration instance
      */
-    public static ClientConfiguration getDefaultConf() {
+     static ClientConfiguration getDefaultConf() {
         return new ClientConfiguration();
     }
 
@@ -50,7 +50,7 @@ public class ClientConfiguration {
      *
      * @return
      */
-    public int getMaxConcurrentRequest() {
+     int getMaxConcurrentRequest() {
         return maxConcurrentRequest;
     }
 
@@ -59,7 +59,7 @@ public class ClientConfiguration {
      *
      * @param maxConcurrentRequest The max HTTP request count
      */
-    public void setMaxConcurrentRequest(int maxConcurrentRequest) {
+     void setMaxConcurrentRequest(int maxConcurrentRequest) {
         this.maxConcurrentRequest = maxConcurrentRequest;
     }
 
@@ -69,7 +69,7 @@ public class ClientConfiguration {
      *
      * @return the socket timeout in milliseconds
      */
-    public int getSocketTimeout() {
+     int getSocketTimeout() {
         return socketTimeout;
     }
 
@@ -79,7 +79,7 @@ public class ClientConfiguration {
      *
      * @param socketTimeout the socket timeout in milliseconds
      */
-    public void setSocketTimeout(int socketTimeout) {
+     void setSocketTimeout(int socketTimeout) {
         this.socketTimeout = socketTimeout;
     }
 
@@ -88,7 +88,7 @@ public class ClientConfiguration {
      *
      * @return The connection timeout in milliseconds
      */
-    public int getConnectionTimeout() {
+     int getConnectionTimeout() {
         return connectionTimeout;
     }
 
@@ -97,11 +97,11 @@ public class ClientConfiguration {
      *
      * @param connectionTimeout The connection timeout in milliseconds
      */
-    public void setConnectionTimeout(int connectionTimeout) {
+     void setConnectionTimeout(int connectionTimeout) {
         this.connectionTimeout = connectionTimeout;
     }
 
-    public long getMaxLogSize() {
+     int getMaxLogSize() {
         return max_log_size;
     }
 
@@ -110,7 +110,7 @@ public class ClientConfiguration {
      *
      * @param max_log_size
      */
-    public void setMaxLogSize(long max_log_size) {
+     void setMaxLogSize(int max_log_size) {
         this.max_log_size = max_log_size;
     }
 
@@ -119,7 +119,7 @@ public class ClientConfiguration {
      *
      * @return The max retry count after the recoverable failure.
      */
-    public int getMaxErrorRetry() {
+     int getMaxErrorRetry() {
         return maxErrorRetry;
     }
 
@@ -128,7 +128,7 @@ public class ClientConfiguration {
      *
      * @param maxErrorRetry The max retry count after the recoverable failure.
      */
-    public void setMaxErrorRetry(int maxErrorRetry) {
+     void setMaxErrorRetry(int maxErrorRetry) {
         this.maxErrorRetry = maxErrorRetry;
     }
 
@@ -137,7 +137,7 @@ public class ClientConfiguration {
      *
      * @return CNAME excluded list.
      */
-    public List<String> getCustomCnameExcludeList() {
+     List<String> getCustomCnameExcludeList() {
         return Collections.unmodifiableList(this.customCnameExcludeList);
     }
 
@@ -146,7 +146,7 @@ public class ClientConfiguration {
      *
      * @param customCnameExcludeList CNAME excluded list
      */
-    public void setCustomCnameExcludeList(List<String> customCnameExcludeList) {
+     void setCustomCnameExcludeList(List<String> customCnameExcludeList) {
         if (customCnameExcludeList == null || customCnameExcludeList.size() == 0) {
             throw new IllegalArgumentException("cname exclude list should not be null.");
         }
@@ -161,39 +161,39 @@ public class ClientConfiguration {
         }
     }
 
-    public String getProxyHost() {
+     String getProxyHost() {
         return proxyHost;
     }
 
-    public void setProxyHost(String proxyHost) {
+     void setProxyHost(String proxyHost) {
         this.proxyHost = proxyHost;
     }
 
-    public int getProxyPort() {
+     int getProxyPort() {
         return proxyPort;
     }
 
-    public void setProxyPort(int proxyPort) {
+     void setProxyPort(int proxyPort) {
         this.proxyPort = proxyPort;
     }
 
-    public String getCustomUserMark() {
+     String getCustomUserMark() {
         return mUserAgentMark;
     }
 
-    public void setUserAgentMark(String mark) {
+     void setUserAgentMark(String mark) {
         this.mUserAgentMark = mark;
     }
 
-    public boolean isHttpDnsEnable() {
+     bool isHttpDnsEnable() {
         return httpDnsEnable;
     }
 
-    public void setHttpDnsEnable(boolean httpdnsEnable) {
+     void setHttpDnsEnable(bool httpdnsEnable) {
         this.httpDnsEnable = httpdnsEnable;
     }
 
-    public boolean isCheckCRC64() {
+     bool isCheckCRC64() {
         return checkCRC64;
     }
 
@@ -202,15 +202,15 @@ public class ClientConfiguration {
      *
      * @param checkCRC64
      */
-    public void setCheckCRC64(boolean checkCRC64) {
+     void setCheckCRC64(bool checkCRC64) {
         this.checkCRC64 = checkCRC64;
     }
 
-    public String getIpWithHeader() {
+     String getIpWithHeader() {
         return ipWithHeader;
     }
 
-    public void setIpWithHeader(String ipWithHeader) {
+     void setIpWithHeader(String ipWithHeader) {
         this.ipWithHeader = ipWithHeader;
     }
 
@@ -221,7 +221,7 @@ public class ClientConfiguration {
      *
      * @return True if it's enabled; False if it's disabled.
      */
-    public boolean isPathStyleAccessEnable() {
+     bool isPathStyleAccessEnable() {
         return pathStyleAccessEnable;
     }
 
@@ -232,7 +232,7 @@ public class ClientConfiguration {
      * @param pathStyleAccessEnable
      *            True if it's enabled; False if it's disabled.
      */
-    public void setPathStyleAccessEnable(boolean pathStyleAccessEnable) {
+     void setPathStyleAccessEnable(bool pathStyleAccessEnable) {
         this.pathStyleAccessEnable = pathStyleAccessEnable;
     }
 
@@ -243,7 +243,7 @@ public class ClientConfiguration {
      *
      * @return True if it's enabled; False if it's disabled.
      */
-    public boolean isCustomPathPrefixEnable() {
+     bool isCustomPathPrefixEnable() {
         return customPathPrefixEnable;
     }
 
@@ -254,7 +254,7 @@ public class ClientConfiguration {
      * @param customPathPrefixEnable
      *            True if it's enabled; False if it's disabled.
      */
-    public void setCustomPathPrefixEnable(boolean customPathPrefixEnable) {
+     void setCustomPathPrefixEnable(bool customPathPrefixEnable) {
         this.customPathPrefixEnable = customPathPrefixEnable;
     }
 

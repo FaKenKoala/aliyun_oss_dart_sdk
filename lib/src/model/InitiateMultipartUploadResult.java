@@ -20,35 +20,35 @@
 package com.alibaba.sdk.android.oss.model;
 
 
-public class InitiateMultipartUploadResult extends OSSResult {
+ class InitiateMultipartUploadResult extends OSSResult {
 
-    private String bucketName;
+     String bucketName;
 
-    private String objectKey;
+     String objectKey;
 
-    private String uploadId;
+     String uploadId;
 
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
-    public String getObjectKey() {
+     String getObjectKey() {
         return objectKey;
     }
 
-    public void setObjectKey(String objectKey) {
+     void setObjectKey(String objectKey) {
         this.objectKey = objectKey;
     }
 
-    public String getUploadId() {
+     String getUploadId() {
         return uploadId;
     }
 
-    public void setUploadId(String uploadId) {
+     void setUploadId(String uploadId) {
         this.uploadId = uploadId;
     }
 

@@ -23,127 +23,127 @@ import android.net.Uri;
 
 import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
 
-public class AppendObjectRequest extends OSSRequest {
+ class AppendObjectRequest extends OSSRequest {
 
-    private String bucketName;
-    private String objectKey;
+     String bucketName;
+     String objectKey;
 
-    private String uploadFilePath;
+     String uploadFilePath;
 
-    private byte[] uploadData;
+     byte[] uploadData;
 
-    private Uri uploadUri;
+     Uri uploadUri;
 
-    private ObjectMetadata metadata;
+     ObjectMetadata metadata;
 
-    private OSSProgressCallback<AppendObjectRequest> progressCallback;
+     OSSProgressCallback<AppendObjectRequest> progressCallback;
 
-    private long position;
+     int position;
 
-    private Long initCRC64;
+     int initCRC64;
 
-    public AppendObjectRequest(String bucketName, String objectKey, String uploadFilePath) {
+     AppendObjectRequest(String bucketName, String objectKey, String uploadFilePath) {
         this(bucketName, objectKey, uploadFilePath, null);
     }
 
-    public AppendObjectRequest(String bucketName, String objectKey, String uploadFilePath, ObjectMetadata metadata) {
+     AppendObjectRequest(String bucketName, String objectKey, String uploadFilePath, ObjectMetadata metadata) {
         setBucketName(bucketName);
         setObjectKey(objectKey);
         setUploadFilePath(uploadFilePath);
         setMetadata(metadata);
     }
 
-    public AppendObjectRequest(String bucketName, String objectKey, byte[] uploadData) {
+     AppendObjectRequest(String bucketName, String objectKey, byte[] uploadData) {
         this(bucketName, objectKey, uploadData, null);
     }
 
-    public AppendObjectRequest(String bucketName, String objectKey, byte[] uploadData, ObjectMetadata metadata) {
+     AppendObjectRequest(String bucketName, String objectKey, byte[] uploadData, ObjectMetadata metadata) {
         setBucketName(bucketName);
         setObjectKey(objectKey);
         setUploadData(uploadData);
         setMetadata(metadata);
     }
 
-    public AppendObjectRequest(String bucketName, String objectKey, Uri uploadUri) {
+     AppendObjectRequest(String bucketName, String objectKey, Uri uploadUri) {
         this(bucketName, objectKey, uploadUri, null);
     }
 
-    public AppendObjectRequest(String bucketName, String objectKey, Uri uploadUri, ObjectMetadata metadata) {
+     AppendObjectRequest(String bucketName, String objectKey, Uri uploadUri, ObjectMetadata metadata) {
         setBucketName(bucketName);
         setObjectKey(objectKey);
         setUploadUri(uploadUri);
         setMetadata(metadata);
     }
 
-    public long getPosition() {
+     int getPosition() {
         return position;
     }
 
-    public void setPosition(long position) {
+     void setPosition(int position) {
         this.position = position;
     }
 
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
-    public String getObjectKey() {
+     String getObjectKey() {
         return objectKey;
     }
 
-    public void setObjectKey(String objectKey) {
+     void setObjectKey(String objectKey) {
         this.objectKey = objectKey;
     }
 
-    public String getUploadFilePath() {
+     String getUploadFilePath() {
         return uploadFilePath;
     }
 
-    public void setUploadFilePath(String uploadFilePath) {
+     void setUploadFilePath(String uploadFilePath) {
         this.uploadFilePath = uploadFilePath;
     }
 
-    public byte[] getUploadData() {
+     byte[] getUploadData() {
         return uploadData;
     }
 
-    public void setUploadData(byte[] uploadData) {
+     void setUploadData(byte[] uploadData) {
         this.uploadData = uploadData;
     }
 
-    public Uri getUploadUri() {
+     Uri getUploadUri() {
         return uploadUri;
     }
 
-    public void setUploadUri(Uri uploadUri) {
+     void setUploadUri(Uri uploadUri) {
         this.uploadUri = uploadUri;
     }
 
-    public ObjectMetadata getMetadata() {
+     ObjectMetadata getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(ObjectMetadata metadata) {
+     void setMetadata(ObjectMetadata metadata) {
         this.metadata = metadata;
     }
 
-    public OSSProgressCallback<AppendObjectRequest> getProgressCallback() {
+     OSSProgressCallback<AppendObjectRequest> getProgressCallback() {
         return progressCallback;
     }
 
-    public void setProgressCallback(OSSProgressCallback<AppendObjectRequest> progressCallback) {
+     void setProgressCallback(OSSProgressCallback<AppendObjectRequest> progressCallback) {
         this.progressCallback = progressCallback;
     }
 
-    public Long getInitCRC64() {
+     int getInitCRC64() {
         return initCRC64;
     }
 
-    public void setInitCRC64(Long initCRC64) {
+     void setInitCRC64(int initCRC64) {
         this.initCRC64 = initCRC64;
     }
 }

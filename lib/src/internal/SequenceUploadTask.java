@@ -51,16 +51,16 @@ import java.util.zip.CheckedInputStream;
  * Created by jingdan on 2017/10/30.
  */
 
-public class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadRequest,
+ class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadRequest,
         ResumableUploadResult> implements Callable<ResumableUploadResult> {
 
-    private File mRecordFile;
-    private List<Integer> mAlreadyUploadIndex = new ArrayList<Integer>();
-    private long mFirstPartSize;
-    private OSSSharedPreferences mSp;
-    private File mCRC64RecordFile;
+     File mRecordFile;
+     List<Integer> mAlreadyUploadIndex = new ArrayList<Integer>();
+     int mFirstPartSize;
+     OSSSharedPreferences mSp;
+     File mCRC64RecordFile;
 
-    public SequenceUploadTask(ResumableUploadRequest request,
+     SequenceUploadTask(ResumableUploadRequest request,
                               OSSCompletedCallback<ResumableUploadRequest, ResumableUploadResult> completedCallback,
                               ExecutionContext context, InternalRequestOperation apiOperation) {
         super(apiOperation, request, completedCallback, context);
@@ -68,9 +68,9 @@ public class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadR
     }
 
     @Override
-    protected void initMultipartUploadId() throws IOException, ClientException, ServiceException {
+     void initMultipartUploadId() throws IOException, ClientException, ServiceException {
 
-        Map<Integer, Long> recordCrc64 = null;
+        Map<Integer, int> recordCrc64 = null;
 
         if (!OSSUtils.isEmptyString(mRequest.getRecordDirectory())) {
             String fileMd5 = null;
@@ -107,7 +107,7 @@ public class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadR
                         ObjectInputStream ois = new ObjectInputStream(fs);
 
                         try {
-                            recordCrc64 = (Map<Integer, Long>) ois.readObject();
+                            recordCrc64 = (Map<Integer, int>) ois.readObject();
                             crc64Record.delete();
                         } catch (ClassNotFoundException e) {
                             OSSLog.logThrowable2Local(e);
@@ -119,7 +119,7 @@ public class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadR
                     }
                 }
 
-                boolean isTruncated = false;
+                bool isTruncated = false;
                 int nextPartNumberMarker = 0;
 
                 do {
@@ -196,9 +196,9 @@ public class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadR
     }
 
     @Override
-    protected ResumableUploadResult doMultipartUpload() throws IOException, ClientException, ServiceException, InterruptedException {
+     ResumableUploadResult doMultipartUpload() throws IOException, ClientException, ServiceException, InterruptedException {
 
-        long tempUploadedLength = mUploadedLength;
+        int tempUploadedLength = mUploadedLength;
 
         checkCancel();
 
@@ -217,10 +217,10 @@ public class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadR
                 throw new ClientException("The part size setting is inconsistent with before");
             }
 
-            long revertUploadedLength = mUploadedLength;
+            int revertUploadedLength = mUploadedLength;
 
             if (!TextUtils.isEmpty(mSp.getStringValue(mUploadId))) {
-                revertUploadedLength = Long.valueOf(mSp.getStringValue(mUploadId));
+                revertUploadedLength = int.valueOf(mSp.getStringValue(mUploadId));
             }
 
             if (mProgressCallback != null) {
@@ -267,7 +267,7 @@ public class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadR
         return result;
     }
 
-    public void uploadPart(int readIndex, int byteCount, int partNumber) {
+     void uploadPart(int readIndex, int byteCount, int partNumber) {
 
         RandomAccessFile raf = null;
         InputStream inputStream = null;
@@ -282,7 +282,7 @@ public class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadR
             mRunPartTaskCount++;
 
             preUploadPart(readIndex, byteCount, partNumber);
-            long skip = readIndex * mRequest.getPartSize();
+            int skip = readIndex * mRequest.getPartSize();
             byte[] partContent = new byte[byteCount];
 
             if (mUploadUri != null) {
@@ -358,7 +358,7 @@ public class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadR
 
 
     @Override
-    protected void checkException() throws IOException, ServiceException, ClientException {
+     void checkException() throws IOException, ServiceException, ClientException {
         if (mContext.getCancellationHandler().isCancelled()) {
             if (mRequest.deleteUploadOnCancelling()) {
                 abortThisUpload();
@@ -367,7 +367,7 @@ public class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadR
                 }
             } else {
                 if (mPartETags != null && mPartETags.size() > 0 && mCheckCRC64 && mRequest.getRecordDirectory() != null) {
-                    Map<Integer, Long> maps = new HashMap<Integer, Long>();
+                    Map<Integer, int> maps = new HashMap<Integer, int>();
                     for (PartETag eTag : mPartETags) {
                         maps.put(eTag.getPartNumber(), eTag.getCRC64());
                     }
@@ -394,7 +394,7 @@ public class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadR
     }
 
     @Override
-    protected void abortThisUpload() {
+     void abortThisUpload() {
         if (mUploadId != null) {
             AbortMultipartUploadRequest abort = new AbortMultipartUploadRequest(
                     mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId);
@@ -403,7 +403,7 @@ public class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadR
     }
 
     @Override
-    protected void processException(Exception e) {
+     void processException(Exception e) {
 //        mPartExceptionCount++;
         if (mUploadException == null || !e.getMessage().equals(mUploadException.getMessage())) {
             mUploadException = e;
@@ -417,7 +417,7 @@ public class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadR
     }
 
     @Override
-    protected void uploadPartFinish(PartETag partETag) throws Exception {
+     void uploadPartFinish(PartETag partETag) throws Exception {
         if (mContext.getCancellationHandler().isCancelled()) {
             if (!mSp.contains(mUploadId)) {
                 mSp.setStringValue(mUploadId, String.valueOf(mUploadedLength));

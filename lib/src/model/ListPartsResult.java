@@ -6,32 +6,32 @@ import java.util.List;
 /**
  * Created by zhouzhuo on 11/25/15.
  */
-public class ListPartsResult extends OSSResult {
+ class ListPartsResult extends OSSResult {
 
-    private String bucketName;
+     String bucketName;
 
-    private String key;
+     String key;
 
-    private String uploadId;
+     String uploadId;
 
-    private int maxParts = 0;
+     int maxParts = 0;
 
-    private int partNumberMarker = 0;
+     int partNumberMarker = 0;
 
-    private String storageClass;
+     String storageClass;
 
-    private boolean isTruncated = false;
+     bool isTruncated = false;
 
-    private int nextPartNumberMarker = 0;
+     int nextPartNumberMarker = 0;
 
-    private List<PartSummary> parts = new ArrayList<PartSummary>();
+     List<PartSummary> parts = new ArrayList<PartSummary>();
 
     /**
      * Gets bucket name
      *
      * @return bucket name
      */
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
@@ -40,7 +40,7 @@ public class ListPartsResult extends OSSResult {
      *
      * @param bucketName bucket name
      */
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
@@ -49,7 +49,7 @@ public class ListPartsResult extends OSSResult {
      *
      * @return Object key
      */
-    public String getKey() {
+     String getKey() {
         return key;
     }
 
@@ -58,7 +58,7 @@ public class ListPartsResult extends OSSResult {
      *
      * @param key Object key
      */
-    public void setKey(String key) {
+     void setKey(String key) {
         this.key = key;
     }
 
@@ -67,7 +67,7 @@ public class ListPartsResult extends OSSResult {
      *
      * @return The Multipart Upload ID
      */
-    public String getUploadId() {
+     String getUploadId() {
         return uploadId;
     }
 
@@ -76,15 +76,15 @@ public class ListPartsResult extends OSSResult {
      *
      * @param uploadId The Multipart Upload ID
      */
-    public void setUploadId(String uploadId) {
+     void setUploadId(String uploadId) {
         this.uploadId = uploadId;
     }
 
-    public String getStorageClass() {
+     String getStorageClass() {
         return storageClass;
     }
 
-    public void setStorageClass(String storageClass) {
+     void setStorageClass(String storageClass) {
         this.storageClass = storageClass;
     }
 
@@ -93,7 +93,7 @@ public class ListPartsResult extends OSSResult {
      *
      * @return Part number marker.
      */
-    public int getPartNumberMarker() {
+     int getPartNumberMarker() {
         return partNumberMarker;
     }
 
@@ -102,7 +102,7 @@ public class ListPartsResult extends OSSResult {
      *
      * @param partNumberMarker Part number marker.
      */
-    public void setPartNumberMarker(int partNumberMarker) {
+     void setPartNumberMarker(int partNumberMarker) {
         this.partNumberMarker = partNumberMarker;
     }
 
@@ -111,7 +111,7 @@ public class ListPartsResult extends OSSResult {
      *
      * @return the next part number marker
      */
-    public int getNextPartNumberMarker() {
+     int getNextPartNumberMarker() {
         return nextPartNumberMarker;
     }
 
@@ -120,7 +120,7 @@ public class ListPartsResult extends OSSResult {
      *
      * @param nextPartNumberMarker the next part number marker
      */
-    public void setNextPartNumberMarker(int nextPartNumberMarker) {
+     void setNextPartNumberMarker(int nextPartNumberMarker) {
         this.nextPartNumberMarker = nextPartNumberMarker;
     }
 
@@ -129,7 +129,7 @@ public class ListPartsResult extends OSSResult {
      *
      * @return Max Part count
      */
-    public int getMaxParts() {
+     int getMaxParts() {
         return maxParts;
     }
 
@@ -138,7 +138,7 @@ public class ListPartsResult extends OSSResult {
      *
      * @param maxParts Gets the max part count.
      */
-    public void setMaxParts(int maxParts) {
+     void setMaxParts(int maxParts) {
         this.maxParts = maxParts;
     }
 
@@ -147,7 +147,7 @@ public class ListPartsResult extends OSSResult {
      *
      * @return The flag of truncation.
      */
-    public boolean isTruncated() {
+     bool isTruncated() {
         return isTruncated;
     }
 
@@ -156,7 +156,7 @@ public class ListPartsResult extends OSSResult {
      *
      * @param isTruncated The flag of truncation.
      */
-    public void setTruncated(boolean isTruncated) {
+     void setTruncated(bool isTruncated) {
         this.isTruncated = isTruncated;
     }
 
@@ -165,7 +165,7 @@ public class ListPartsResult extends OSSResult {
      *
      * @return The list of PartSummary
      */
-    public List<PartSummary> getParts() {
+     List<PartSummary> getParts() {
         return parts;
     }
 
@@ -174,7 +174,7 @@ public class ListPartsResult extends OSSResult {
      *
      * @param parts the list of {@link PartSummary}
      */
-    public void setParts(List<PartSummary> parts) {
+     void setParts(List<PartSummary> parts) {
         this.parts.clear();
         if (parts != null && !parts.isEmpty()) {
             this.parts.addAll(parts);

@@ -7,33 +7,33 @@ import java.util.Map;
 /**
  * Created by zhouzhuo on 11/24/15.
  */
-public class CompleteMultipartUploadRequest extends OSSRequest {
+ class CompleteMultipartUploadRequest extends OSSRequest {
 
     /**
      * The name of the bucket containing the multipart upload to complete
      */
-    private String bucketName;
+     String bucketName;
 
     /**
      * The objectKey of the multipart upload to complete
      */
-    private String objectKey;
+     String objectKey;
 
     /**
      * The ID of the multipart upload to complete
      */
-    private String uploadId;
+     String uploadId;
 
     /**
      * The list of part numbers and ETags to use when completing the multipart upload
      */
-    private List<PartETag> partETags = new ArrayList<PartETag>();
+     List<PartETag> partETags = new ArrayList<PartETag>();
 
-    private Map<String, String> callbackParam;
+     Map<String, String> callbackParam;
 
-    private Map<String, String> callbackVars;
+     Map<String, String> callbackVars;
 
-    private ObjectMetadata metadata;
+     ObjectMetadata metadata;
 
     /**
      * Constructor of CompleteMultipartUploadRequest
@@ -43,7 +43,7 @@ public class CompleteMultipartUploadRequest extends OSSRequest {
      * @param uploadId   Mutlipart upload ID.
      * @param partETags  The list of PartETag instances
      */
-    public CompleteMultipartUploadRequest(String bucketName, String objectKey, String uploadId, List<PartETag> partETags) {
+     CompleteMultipartUploadRequest(String bucketName, String objectKey, String uploadId, List<PartETag> partETags) {
         setBucketName(bucketName);
         setObjectKey(objectKey);
         setUploadId(uploadId);
@@ -55,7 +55,7 @@ public class CompleteMultipartUploadRequest extends OSSRequest {
      *
      * @return bucket name
      */
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
@@ -64,7 +64,7 @@ public class CompleteMultipartUploadRequest extends OSSRequest {
      *
      * @param bucketName bucket name
      */
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
@@ -73,7 +73,7 @@ public class CompleteMultipartUploadRequest extends OSSRequest {
      *
      * @return Object objectKey。
      */
-    public String getObjectKey() {
+     String getObjectKey() {
         return objectKey;
     }
 
@@ -82,7 +82,7 @@ public class CompleteMultipartUploadRequest extends OSSRequest {
      *
      * @param objectKey Object objectKey。
      */
-    public void setObjectKey(String objectKey) {
+     void setObjectKey(String objectKey) {
         this.objectKey = objectKey;
     }
 
@@ -91,7 +91,7 @@ public class CompleteMultipartUploadRequest extends OSSRequest {
      *
      * @return the multipart upload Id
      */
-    public String getUploadId() {
+     String getUploadId() {
         return uploadId;
     }
 
@@ -100,7 +100,7 @@ public class CompleteMultipartUploadRequest extends OSSRequest {
      *
      * @param uploadId the multipart upload Id
      */
-    public void setUploadId(String uploadId) {
+     void setUploadId(String uploadId) {
         this.uploadId = uploadId;
     }
 
@@ -109,7 +109,7 @@ public class CompleteMultipartUploadRequest extends OSSRequest {
      *
      * @return The list of PartETag instances
      */
-    public List<PartETag> getPartETags() {
+     List<PartETag> getPartETags() {
         return partETags;
     }
 
@@ -118,43 +118,43 @@ public class CompleteMultipartUploadRequest extends OSSRequest {
      *
      * @param partETags The list of PartETag instances
      */
-    public void setPartETags(List<PartETag> partETags) {
+     void setPartETags(List<PartETag> partETags) {
         this.partETags = partETags;
     }
 
-    public Map<String, String> getCallbackParam() {
+     Map<String, String> getCallbackParam() {
         return callbackParam;
     }
 
     /**
      * Sets the servercallback parameters
      */
-    public void setCallbackParam(Map<String, String> callbackParam) {
+     void setCallbackParam(Map<String, String> callbackParam) {
         this.callbackParam = callbackParam;
     }
 
-    public Map<String, String> getCallbackVars() {
+     Map<String, String> getCallbackVars() {
         return callbackVars;
     }
 
     /**
      * Sets the servercallback custom variables
      */
-    public void setCallbackVars(Map<String, String> callbackVars) {
+     void setCallbackVars(Map<String, String> callbackVars) {
         this.callbackVars = callbackVars;
     }
 
     /**
      * Sets the medatadata
      */
-    public ObjectMetadata getMetadata() {
+     ObjectMetadata getMetadata() {
         return metadata;
     }
 
     /**
      * Gets the metadata
      */
-    public void setMetadata(ObjectMetadata metadata) {
+     void setMetadata(ObjectMetadata metadata) {
         this.metadata = metadata;
     }
 }

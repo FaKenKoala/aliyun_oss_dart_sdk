@@ -12,13 +12,13 @@ import android.os.Build;
 import com.alibaba.sdk.android.oss.common.OSSConstants;
 import com.alibaba.sdk.android.oss.common.OSSLog;
 
-public class VersionInfoUtils {
-    private static String userAgent = null;
+ class VersionInfoUtils {
+     static String userAgent = null;
 
     /*
      * UA sample : aliyun-sdk-java/2.0.5(Windows 7/6.1/amd64;1.7.0_55)/oss-import
      */
-    public static String getUserAgent(String customInfo) {
+     static String getUserAgent(String customInfo) {
         if (OSSUtils.isEmptyString(userAgent)) {
             userAgent = "aliyun-sdk-android/" + getVersion() + getSystemInfo();
         }
@@ -30,7 +30,7 @@ public class VersionInfoUtils {
         }
     }
 
-    public static String getVersion() {
+     static String getVersion() {
         return OSSConstants.SDK_VERSION;
     }
 
@@ -40,7 +40,7 @@ public class VersionInfoUtils {
      *
      * @return
      */
-    private static String getSystemInfo() {
+     static String getSystemInfo() {
         StringBuilder customUA = new StringBuilder();
         customUA.append("(");
         customUA.append(System.getProperty("os.name"));

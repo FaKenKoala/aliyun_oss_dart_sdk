@@ -65,9 +65,9 @@ import java.util.Map;
 /**
  * Created by zhouzhuo on 11/23/15.
  */
-public final class ResponseParsers {
+ final class ResponseParsers {
 
-    private static CopyObjectResult parseCopyObjectResponseXML(InputStream in, CopyObjectResult result)
+     static CopyObjectResult parseCopyObjectResponseXML(InputStream in, CopyObjectResult result)
             throws Exception {
 
         XmlPullParser parser = Xml.newPullParser();
@@ -93,7 +93,7 @@ public final class ResponseParsers {
         return result;
     }
 
-    private static ListPartsResult parseListPartsResponseXML(InputStream in, ListPartsResult result)
+     static ListPartsResult parseListPartsResponseXML(InputStream in, ListPartsResult result)
             throws Exception {
 
         List<PartSummary> partEtagList = new ArrayList<PartSummary>();
@@ -129,7 +129,7 @@ public final class ResponseParsers {
                     } else if ("IsTruncated".equals(name)) {
                         String isTruncated = parser.nextText();
                         if (!OSSUtils.isEmptyString(isTruncated)) {
-                            result.setTruncated(Boolean.valueOf(isTruncated));
+                            result.setTruncated(bool.valueOf(isTruncated));
                         }
                     } else if ("StorageClass".equals(name)) {
                         result.setStorageClass(parser.nextText());
@@ -147,7 +147,7 @@ public final class ResponseParsers {
                     } else if ("Size".equals(name)) {
                         String size = parser.nextText();
                         if (!OSSUtils.isEmptyString(size)) {
-                            partSummary.setSize(Long.valueOf(size));
+                            partSummary.setSize(int.valueOf(size));
                         }
                     }
                     break;
@@ -170,7 +170,7 @@ public final class ResponseParsers {
         return result;
     }
 
-    private static CompleteMultipartUploadResult parseCompleteMultipartUploadResponseXML(InputStream in, CompleteMultipartUploadResult result)
+     static CompleteMultipartUploadResult parseCompleteMultipartUploadResponseXML(InputStream in, CompleteMultipartUploadResult result)
             throws Exception {
         XmlPullParser parser = Xml.newPullParser();
         parser.setInput(in, "utf-8");
@@ -200,7 +200,7 @@ public final class ResponseParsers {
         return result;
     }
 
-    private static InitiateMultipartUploadResult parseInitMultipartResponseXML(InputStream in, InitiateMultipartUploadResult result)
+     static InitiateMultipartUploadResult parseInitMultipartResponseXML(InputStream in, InitiateMultipartUploadResult result)
             throws Exception {
         XmlPullParser parser = Xml.newPullParser();
         parser.setInput(in, "utf-8");
@@ -234,7 +234,7 @@ public final class ResponseParsers {
      * @param result
      * @return
      */
-    private static GetObjectACLResult parseGetObjectACLResponse(InputStream in, GetObjectACLResult result)
+     static GetObjectACLResult parseGetObjectACLResponse(InputStream in, GetObjectACLResult result)
             throws Exception {
         XmlPullParser parser = Xml.newPullParser();
         parser.setInput(in, "utf-8");
@@ -268,7 +268,7 @@ public final class ResponseParsers {
      * @return
      * @throws Exception
      */
-    private static GetBucketInfoResult parseGetBucketInfoResponse(InputStream in, GetBucketInfoResult result)
+     static GetBucketInfoResult parseGetBucketInfoResponse(InputStream in, GetBucketInfoResult result)
             throws Exception {
         XmlPullParser parser = Xml.newPullParser();
         parser.setInput(in, "utf-8");
@@ -358,7 +358,7 @@ public final class ResponseParsers {
      * @return
      * @throws Exception
      */
-    private static GetBucketACLResult parseGetBucketACLResponse(InputStream in, GetBucketACLResult result)
+     static GetBucketACLResult parseGetBucketACLResponse(InputStream in, GetBucketACLResult result)
             throws Exception {
         XmlPullParser parser = Xml.newPullParser();
         parser.setInput(in, "utf-8");
@@ -385,7 +385,7 @@ public final class ResponseParsers {
         return result;
     }
 
-    private static GetBucketRefererResult parseGetBucketRefererResponse(InputStream in, GetBucketRefererResult result) throws Exception {
+     static GetBucketRefererResult parseGetBucketRefererResponse(InputStream in, GetBucketRefererResult result) throws Exception {
         XmlPullParser parser = Xml.newPullParser();
         parser.setInput(in, "utf-8");
         int eventType = parser.getEventType();
@@ -407,7 +407,7 @@ public final class ResponseParsers {
         return result;
     }
 
-    private static GetBucketLoggingResult parseGetBucketLoggingResponse(InputStream in, GetBucketLoggingResult result) throws Exception {
+     static GetBucketLoggingResult parseGetBucketLoggingResponse(InputStream in, GetBucketLoggingResult result) throws Exception {
         XmlPullParser parser = Xml.newPullParser();
         parser.setInput(in, "utf-8");
         int eventType = parser.getEventType();
@@ -434,14 +434,14 @@ public final class ResponseParsers {
         return result;
     }
 
-    private static GetBucketLifecycleResult parseGetBucketLifecycleResponse(InputStream in, GetBucketLifecycleResult result) throws Exception {
+     static GetBucketLifecycleResult parseGetBucketLifecycleResponse(InputStream in, GetBucketLifecycleResult result) throws Exception {
         XmlPullParser parser = Xml.newPullParser();
         parser.setInput(in, "utf-8");
         int eventType = parser.getEventType();
         BucketLifecycleRule lifecycleRule = null;
-        boolean isExpirationConf = false;
-        boolean isMultipartConf = false;
-        boolean isTransitionConf = false;
+        bool isExpirationConf = false;
+        bool isMultipartConf = false;
+        bool isTransitionConf = false;
         String daysValue = null;
         String dateValue = null;
         String storageClass = null;
@@ -541,7 +541,7 @@ public final class ResponseParsers {
         return result;
     }
 
-    private static DeleteMultipleObjectResult parseDeleteMultipleObjectResponse(InputStream in, DeleteMultipleObjectResult result)
+     static DeleteMultipleObjectResult parseDeleteMultipleObjectResponse(InputStream in, DeleteMultipleObjectResult result)
             throws Exception {
         XmlPullParser parser = Xml.newPullParser();
         parser.setInput(in, "utf-8");
@@ -572,7 +572,7 @@ public final class ResponseParsers {
      * @return
      * @throws IOException
      */
-    private static ListBucketsResult parseBucketListResponse(InputStream in, ListBucketsResult result)
+     static ListBucketsResult parseBucketListResponse(InputStream in, ListBucketsResult result)
             throws Exception {
         result.clearBucketList();
         XmlPullParser parser = Xml.newPullParser();
@@ -598,7 +598,7 @@ public final class ResponseParsers {
                     } else if ("IsTruncated".equals(name)) {
                         String isTruncated = parser.nextText();
                         if (isTruncated != null) {
-                            result.setTruncated(Boolean.valueOf(isTruncated));
+                            result.setTruncated(bool.valueOf(isTruncated));
                         }
                     } else if ("NextMarker".equals(name)) {
                         result.setNextMarker(parser.nextText());
@@ -658,7 +658,7 @@ public final class ResponseParsers {
      * @return
      * @throws Exception
      */
-    private static ListObjectsResult parseObjectListResponse(InputStream in, ListObjectsResult result)
+     static ListObjectsResult parseObjectListResponse(InputStream in, ListObjectsResult result)
             throws Exception {
         result.clearCommonPrefixes();
         result.clearObjectSummaries();
@@ -667,7 +667,7 @@ public final class ResponseParsers {
         int eventType = parser.getEventType();
         OSSObjectSummary object = null;
         Owner owner = null;
-        boolean isCommonPrefixes = false;
+        bool isCommonPrefixes = false;
         while (eventType != XmlPullParser.END_DOCUMENT) {
             switch (eventType) {
                 case XmlPullParser.START_TAG:
@@ -700,7 +700,7 @@ public final class ResponseParsers {
                     } else if ("IsTruncated".equals(name)) {
                         String isTruncated = parser.nextText();
                         if (!OSSUtils.isEmptyString(isTruncated)) {
-                            result.setTruncated(Boolean.valueOf(isTruncated));
+                            result.setTruncated(bool.valueOf(isTruncated));
                         }
                     } else if ("Contents".equals(name)) {
                         object = new OSSObjectSummary();
@@ -711,7 +711,7 @@ public final class ResponseParsers {
                     } else if ("Size".equals(name)) {
                         String size = parser.nextText();
                         if (!OSSUtils.isEmptyString(size)) {
-                            object.setSize(Long.valueOf(size));
+                            object.setSize(int.valueOf(size));
                         }
                     } else if ("ETag".equals(name)) {
                         object.setETag(parser.nextText());
@@ -755,7 +755,7 @@ public final class ResponseParsers {
         return result;
     }
 
-    public static String trimQuotes(String s) {
+     static String trimQuotes(String s) {
         if (s == null) return null;
 
         s = s.trim();
@@ -768,7 +768,7 @@ public final class ResponseParsers {
     /**
      * Unmarshall object metadata from response headers.
      */
-    public static ObjectMetadata parseObjectMetadata(Map<String, String> headers)
+     static ObjectMetadata parseObjectMetadata(Map<String, String> headers)
             throws Exception {
 
         try {
@@ -786,7 +786,7 @@ public final class ResponseParsers {
                         throw new IOException(pe.getMessage(), pe);
                     }
                 } else if (key.equalsIgnoreCase(OSSHeaders.CONTENT_LENGTH)) {
-                    Long value = Long.valueOf(headers.get(key));
+                    int value = int.valueOf(headers.get(key));
                     objectMetadata.setHeader(key, value);
                 } else if (key.equalsIgnoreCase(OSSHeaders.ETAG)) {
                     objectMetadata.setHeader(key, trimQuotes(headers.get(key)));
@@ -801,7 +801,7 @@ public final class ResponseParsers {
         }
     }
 
-    public static Exception parseResponseErrorXML(ResponseMessage response, boolean isHeadRequest) {
+     static Exception parseResponseErrorXML(ResponseMessage response, bool isHeadRequest) {
 
         int statusCode = response.getStatusCode();
         String requestId = response.getResponse().header(OSSHeaders.OSS_HEADER_REQUEST_ID);
@@ -862,10 +862,10 @@ public final class ResponseParsers {
         return serviceException;
     }
 
-    public static final class PutObjectResponseParser extends AbstractResponseParser<PutObjectResult> {
+     static final class PutObjectResponseParser extends AbstractResponseParser<PutObjectResult> {
 
         @Override
-        public PutObjectResult parseData(ResponseMessage response, PutObjectResult result)
+         PutObjectResult parseData(ResponseMessage response, PutObjectResult result)
                 throws IOException {
             result.setETag(trimQuotes(response.getHeaders().get(OSSHeaders.ETAG)));
             String body = response.getResponse().body().string();
@@ -876,32 +876,32 @@ public final class ResponseParsers {
         }
     }
 
-    public static final class AppendObjectResponseParser extends AbstractResponseParser<AppendObjectResult> {
+     static final class AppendObjectResponseParser extends AbstractResponseParser<AppendObjectResult> {
 
         @Override
-        public AppendObjectResult parseData(ResponseMessage response, AppendObjectResult result) throws IOException {
+         AppendObjectResult parseData(ResponseMessage response, AppendObjectResult result) throws IOException {
             String nextPosition = response.getHeaders().get(OSSHeaders.OSS_NEXT_APPEND_POSITION);
             if (nextPosition != null) {
-                result.setNextPosition(Long.valueOf(nextPosition));
+                result.setNextPosition(int.valueOf(nextPosition));
             }
             result.setObjectCRC64(response.getHeaders().get(OSSHeaders.OSS_HASH_CRC64_ECMA));
             return result;
         }
     }
 
-    public static final class HeadObjectResponseParser extends AbstractResponseParser<HeadObjectResult> {
+     static final class HeadObjectResponseParser extends AbstractResponseParser<HeadObjectResult> {
 
         @Override
-        public HeadObjectResult parseData(ResponseMessage response, HeadObjectResult result) throws Exception {
+         HeadObjectResult parseData(ResponseMessage response, HeadObjectResult result) throws Exception {
             result.setMetadata(parseObjectMetadata(result.getResponseHeader()));
             return result;
         }
     }
 
-    public static final class GetObjectResponseParser extends AbstractResponseParser<GetObjectResult> {
+     static final class GetObjectResponseParser extends AbstractResponseParser<GetObjectResult> {
 
         @Override
-        public GetObjectResult parseData(ResponseMessage response, GetObjectResult result) throws Exception {
+         GetObjectResult parseData(ResponseMessage response, GetObjectResult result) throws Exception {
             result.setMetadata(parseObjectMetadata(result.getResponseHeader()));
             result.setContentLength(response.getContentLength());
             if (response.getRequest().isCheckCRC64()) {
@@ -915,13 +915,13 @@ public final class ResponseParsers {
         }
 
         @Override
-        public boolean needCloseResponse() {
+         bool needCloseResponse() {
             // keep body stream open for reading content
             return false;
         }
     }
 
-    public static final class GetObjectACLResponseParser extends AbstractResponseParser<GetObjectACLResult> {
+     static final class GetObjectACLResponseParser extends AbstractResponseParser<GetObjectACLResult> {
 
         @Override
         GetObjectACLResult parseData(ResponseMessage response, GetObjectACLResult result) throws Exception {
@@ -930,19 +930,19 @@ public final class ResponseParsers {
         }
     }
 
-    public static final class CopyObjectResponseParser extends AbstractResponseParser<CopyObjectResult> {
+     static final class CopyObjectResponseParser extends AbstractResponseParser<CopyObjectResult> {
 
         @Override
-        public CopyObjectResult parseData(ResponseMessage response, CopyObjectResult result) throws Exception {
+         CopyObjectResult parseData(ResponseMessage response, CopyObjectResult result) throws Exception {
             result = parseCopyObjectResponseXML(response.getContent(), result);
             return result;
         }
     }
 
-    public static final class CreateBucketResponseParser extends AbstractResponseParser<CreateBucketResult> {
+     static final class CreateBucketResponseParser extends AbstractResponseParser<CreateBucketResult> {
 
         @Override
-        public CreateBucketResult parseData(ResponseMessage response, CreateBucketResult result) throws Exception {
+         CreateBucketResult parseData(ResponseMessage response, CreateBucketResult result) throws Exception {
             if (result.getResponseHeader().containsKey("Location")) {
                 result.bucketLocation = result.getResponseHeader().get("Location");
             }
@@ -950,108 +950,108 @@ public final class ResponseParsers {
         }
     }
 
-    public static final class DeleteBucketResponseParser extends AbstractResponseParser<DeleteBucketResult> {
+     static final class DeleteBucketResponseParser extends AbstractResponseParser<DeleteBucketResult> {
 
         @Override
-        public DeleteBucketResult parseData(ResponseMessage response, DeleteBucketResult result) throws Exception {
+         DeleteBucketResult parseData(ResponseMessage response, DeleteBucketResult result) throws Exception {
             return result;
         }
     }
 
-    public static final class GetBucketInfoResponseParser extends AbstractResponseParser<GetBucketInfoResult> {
+     static final class GetBucketInfoResponseParser extends AbstractResponseParser<GetBucketInfoResult> {
 
         @Override
-        public GetBucketInfoResult parseData(ResponseMessage response, GetBucketInfoResult result) throws Exception {
+         GetBucketInfoResult parseData(ResponseMessage response, GetBucketInfoResult result) throws Exception {
             result = parseGetBucketInfoResponse(response.getContent(), result);
             return result;
         }
     }
 
-    public static final class GetBucketACLResponseParser extends AbstractResponseParser<GetBucketACLResult> {
+     static final class GetBucketACLResponseParser extends AbstractResponseParser<GetBucketACLResult> {
 
         @Override
-        public GetBucketACLResult parseData(ResponseMessage response, GetBucketACLResult result) throws Exception {
+         GetBucketACLResult parseData(ResponseMessage response, GetBucketACLResult result) throws Exception {
             result = parseGetBucketACLResponse(response.getContent(), result);
             return result;
         }
     }
 
-    public static final class PutBucketRefererResponseParser extends AbstractResponseParser<PutBucketRefererResult> {
+     static final class PutBucketRefererResponseParser extends AbstractResponseParser<PutBucketRefererResult> {
 
         @Override
-        public PutBucketRefererResult parseData(ResponseMessage response, PutBucketRefererResult result) throws Exception {
+         PutBucketRefererResult parseData(ResponseMessage response, PutBucketRefererResult result) throws Exception {
             return result;
         }
     }
 
-    public static final class GetBucketRefererResponseParser extends AbstractResponseParser<GetBucketRefererResult> {
+     static final class GetBucketRefererResponseParser extends AbstractResponseParser<GetBucketRefererResult> {
 
         @Override
-        public GetBucketRefererResult parseData(ResponseMessage response, GetBucketRefererResult result) throws Exception {
+         GetBucketRefererResult parseData(ResponseMessage response, GetBucketRefererResult result) throws Exception {
             result = parseGetBucketRefererResponse(response.getContent(), result);
             return result;
         }
     }
 
-    public static final class PutBucketLoggingResponseParser extends AbstractResponseParser<PutBucketLoggingResult> {
+     static final class PutBucketLoggingResponseParser extends AbstractResponseParser<PutBucketLoggingResult> {
 
         @Override
-        public PutBucketLoggingResult parseData(ResponseMessage response, PutBucketLoggingResult result) throws Exception {
+         PutBucketLoggingResult parseData(ResponseMessage response, PutBucketLoggingResult result) throws Exception {
             return result;
         }
     }
 
-    public static final class GetBucketLoggingResponseParser extends AbstractResponseParser<GetBucketLoggingResult> {
+     static final class GetBucketLoggingResponseParser extends AbstractResponseParser<GetBucketLoggingResult> {
 
         @Override
-        public GetBucketLoggingResult parseData(ResponseMessage response, GetBucketLoggingResult result) throws Exception {
+         GetBucketLoggingResult parseData(ResponseMessage response, GetBucketLoggingResult result) throws Exception {
             result = parseGetBucketLoggingResponse(response.getContent(), result);
             return result;
         }
     }
 
-    public static final class DeleteBucketLoggingResponseParser extends AbstractResponseParser<DeleteBucketLoggingResult> {
+     static final class DeleteBucketLoggingResponseParser extends AbstractResponseParser<DeleteBucketLoggingResult> {
 
         @Override
-        public DeleteBucketLoggingResult parseData(ResponseMessage response, DeleteBucketLoggingResult result) throws Exception {
+         DeleteBucketLoggingResult parseData(ResponseMessage response, DeleteBucketLoggingResult result) throws Exception {
             return result;
         }
     }
 
-    public static final class PutBucketLifecycleResponseParser extends AbstractResponseParser<PutBucketLifecycleResult> {
+     static final class PutBucketLifecycleResponseParser extends AbstractResponseParser<PutBucketLifecycleResult> {
 
         @Override
-        public PutBucketLifecycleResult parseData(ResponseMessage response, PutBucketLifecycleResult result) throws Exception {
+         PutBucketLifecycleResult parseData(ResponseMessage response, PutBucketLifecycleResult result) throws Exception {
             return result;
         }
     }
 
-    public static final class GetBucketLifecycleResponseParser extends AbstractResponseParser<GetBucketLifecycleResult> {
+     static final class GetBucketLifecycleResponseParser extends AbstractResponseParser<GetBucketLifecycleResult> {
 
         @Override
-        public GetBucketLifecycleResult parseData(ResponseMessage response, GetBucketLifecycleResult result) throws Exception {
+         GetBucketLifecycleResult parseData(ResponseMessage response, GetBucketLifecycleResult result) throws Exception {
             result = parseGetBucketLifecycleResponse(response.getContent(), result);
             return result;
         }
     }
 
-    public static final class DeleteBucketLifecycleResponseParser extends AbstractResponseParser<DeleteBucketLifecycleResult> {
+     static final class DeleteBucketLifecycleResponseParser extends AbstractResponseParser<DeleteBucketLifecycleResult> {
 
         @Override
-        public DeleteBucketLifecycleResult parseData(ResponseMessage response, DeleteBucketLifecycleResult result) throws Exception {
+         DeleteBucketLifecycleResult parseData(ResponseMessage response, DeleteBucketLifecycleResult result) throws Exception {
             return result;
         }
     }
 
-    public static final class DeleteObjectResponseParser extends AbstractResponseParser<DeleteObjectResult> {
+     static final class DeleteObjectResponseParser extends AbstractResponseParser<DeleteObjectResult> {
 
         @Override
-        public DeleteObjectResult parseData(ResponseMessage response, DeleteObjectResult result) throws Exception {
+         DeleteObjectResult parseData(ResponseMessage response, DeleteObjectResult result) throws Exception {
             return result;
         }
     }
 
-    public static final class DeleteMultipleObjectResponseParser extends AbstractResponseParser<DeleteMultipleObjectResult> {
+     static final class DeleteMultipleObjectResponseParser extends AbstractResponseParser<DeleteMultipleObjectResult> {
 
         @Override
         DeleteMultipleObjectResult parseData(ResponseMessage response, DeleteMultipleObjectResult result) throws Exception {
@@ -1060,16 +1060,16 @@ public final class ResponseParsers {
         }
     }
 
-    public static final class ListObjectsResponseParser extends AbstractResponseParser<ListObjectsResult> {
+     static final class ListObjectsResponseParser extends AbstractResponseParser<ListObjectsResult> {
 
         @Override
-        public ListObjectsResult parseData(ResponseMessage response, ListObjectsResult result) throws Exception {
+         ListObjectsResult parseData(ResponseMessage response, ListObjectsResult result) throws Exception {
             result = parseObjectListResponse(response.getContent(), result);
             return result;
         }
     }
 
-    public static final class ListBucketResponseParser extends AbstractResponseParser<ListBucketsResult> {
+     static final class ListBucketResponseParser extends AbstractResponseParser<ListBucketsResult> {
 
         @Override
         ListBucketsResult parseData(ResponseMessage response, ListBucketsResult result) throws Exception {
@@ -1078,35 +1078,35 @@ public final class ResponseParsers {
         }
     }
 
-    public static final class InitMultipartResponseParser extends AbstractResponseParser<InitiateMultipartUploadResult> {
+     static final class InitMultipartResponseParser extends AbstractResponseParser<InitiateMultipartUploadResult> {
 
         @Override
-        public InitiateMultipartUploadResult parseData(ResponseMessage response, InitiateMultipartUploadResult result) throws Exception {
+         InitiateMultipartUploadResult parseData(ResponseMessage response, InitiateMultipartUploadResult result) throws Exception {
             return parseInitMultipartResponseXML(response.getContent(), result);
         }
     }
 
-    public static final class UploadPartResponseParser extends AbstractResponseParser<UploadPartResult> {
+     static final class UploadPartResponseParser extends AbstractResponseParser<UploadPartResult> {
 
         @Override
-        public UploadPartResult parseData(ResponseMessage response, UploadPartResult result) throws Exception {
+         UploadPartResult parseData(ResponseMessage response, UploadPartResult result) throws Exception {
             result.setETag(trimQuotes(response.getHeaders().get(OSSHeaders.ETAG)));
             return result;
         }
     }
 
-    public static final class AbortMultipartUploadResponseParser extends AbstractResponseParser<AbortMultipartUploadResult> {
+     static final class AbortMultipartUploadResponseParser extends AbstractResponseParser<AbortMultipartUploadResult> {
 
         @Override
-        public AbortMultipartUploadResult parseData(ResponseMessage response, AbortMultipartUploadResult result) throws Exception {
+         AbortMultipartUploadResult parseData(ResponseMessage response, AbortMultipartUploadResult result) throws Exception {
             return result;
         }
     }
 
-    public static final class CompleteMultipartUploadResponseParser extends AbstractResponseParser<CompleteMultipartUploadResult> {
+     static final class CompleteMultipartUploadResponseParser extends AbstractResponseParser<CompleteMultipartUploadResult> {
 
         @Override
-        public CompleteMultipartUploadResult parseData(ResponseMessage response, CompleteMultipartUploadResult result) throws Exception {
+         CompleteMultipartUploadResult parseData(ResponseMessage response, CompleteMultipartUploadResult result) throws Exception {
             if (response.getHeaders().get(OSSHeaders.CONTENT_TYPE).equals("application/xml")) {
                 result = parseCompleteMultipartUploadResponseXML(response.getContent(), result);
             } else {
@@ -1119,27 +1119,27 @@ public final class ResponseParsers {
         }
     }
 
-    public static final class ListPartsResponseParser extends AbstractResponseParser<ListPartsResult> {
+     static final class ListPartsResponseParser extends AbstractResponseParser<ListPartsResult> {
 
         @Override
-        public ListPartsResult parseData(ResponseMessage response, ListPartsResult result) throws Exception {
+         ListPartsResult parseData(ResponseMessage response, ListPartsResult result) throws Exception {
             result = parseListPartsResponseXML(response.getContent(), result);
             return result;
         }
     }
 
-    public static final class ListMultipartUploadsResponseParser extends AbstractResponseParser<ListMultipartUploadsResult> {
+     static final class ListMultipartUploadsResponseParser extends AbstractResponseParser<ListMultipartUploadsResult> {
 
         @Override
-        public ListMultipartUploadsResult parseData(ResponseMessage response, ListMultipartUploadsResult result) throws Exception {
+         ListMultipartUploadsResult parseData(ResponseMessage response, ListMultipartUploadsResult result) throws Exception {
             return result.parseData(response);
         }
     }
 
-    public static final class TriggerCallbackResponseParser extends AbstractResponseParser<TriggerCallbackResult> {
+     static final class TriggerCallbackResponseParser extends AbstractResponseParser<TriggerCallbackResult> {
 
         @Override
-        public TriggerCallbackResult parseData(ResponseMessage response, TriggerCallbackResult result) throws Exception {
+         TriggerCallbackResult parseData(ResponseMessage response, TriggerCallbackResult result) throws Exception {
             String body = response.getResponse().body().string();
             if (!TextUtils.isEmpty(body)) {
                 result.setServerCallbackReturnBody(body);
@@ -1148,15 +1148,15 @@ public final class ResponseParsers {
         }
     }
 
-    public static final class ImagePersistResponseParser extends AbstractResponseParser<ImagePersistResult> {
+     static final class ImagePersistResponseParser extends AbstractResponseParser<ImagePersistResult> {
 
         @Override
-        public ImagePersistResult parseData(ResponseMessage response, ImagePersistResult result) throws Exception {
+         ImagePersistResult parseData(ResponseMessage response, ImagePersistResult result) throws Exception {
             return result;
         }
     }
 
-    public static final class PutSymlinkResponseParser extends AbstractResponseParser<PutSymlinkResult> {
+     static final class PutSymlinkResponseParser extends AbstractResponseParser<PutSymlinkResult> {
 
         @Override
         PutSymlinkResult parseData(ResponseMessage response, PutSymlinkResult result) throws Exception {
@@ -1164,7 +1164,7 @@ public final class ResponseParsers {
         }
     }
 
-    public static final class GetSymlinkResponseParser extends AbstractResponseParser<GetSymlinkResult> {
+     static final class GetSymlinkResponseParser extends AbstractResponseParser<GetSymlinkResult> {
 
         @Override
         GetSymlinkResult parseData(ResponseMessage response, GetSymlinkResult result) throws Exception {
@@ -1173,7 +1173,7 @@ public final class ResponseParsers {
         }
     }
 
-    public static final class RestoreObjectResponseParser extends AbstractResponseParser<RestoreObjectResult> {
+     static final class RestoreObjectResponseParser extends AbstractResponseParser<RestoreObjectResult> {
 
         @Override
         RestoreObjectResult parseData(ResponseMessage response, RestoreObjectResult result) throws Exception {

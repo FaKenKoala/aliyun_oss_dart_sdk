@@ -21,45 +21,45 @@ package com.alibaba.sdk.android.oss.model;
 
 import java.util.Date;
 
-public class MultipartUpload {
+ class MultipartUpload {
 
-    private String key;
+     String key;
 
-    private String uploadId;
+     String uploadId;
 
-    private String storageClass;
+     String storageClass;
 
-    private Date initiated;
+     Date initiated;
 
-    public String getKey() {
+     String getKey() {
         return key;
     }
 
-    public void setKey(String key) {
+     void setKey(String key) {
         this.key = key;
     }
 
-    public String getUploadId() {
+     String getUploadId() {
         return uploadId;
     }
 
-    public void setUploadId(String uploadId) {
+     void setUploadId(String uploadId) {
         this.uploadId = uploadId;
     }
 
-    public String getStorageClass() {
+     String getStorageClass() {
         return storageClass;
     }
 
-    public void setStorageClass(String storageClass) {
+     void setStorageClass(String storageClass) {
         this.storageClass = storageClass;
     }
 
-    public Date getInitiated() {
+     Date getInitiated() {
         return initiated;
     }
 
-    public void setInitiated(Date initiated) {
+     void setInitiated(Date initiated) {
         this.initiated = initiated;
     }
 

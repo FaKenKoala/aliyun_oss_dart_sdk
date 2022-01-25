@@ -11,13 +11,13 @@ import java.util.zip.Checksum;
  * Created by jingdan on 2017/11/29.
  */
 
-public class CheckCRC64DownloadInputStream extends CheckedInputStream {
+ class CheckCRC64DownloadInputStream extends CheckedInputStream {
 
-    private long mTotalBytesRead;
-    private long mTotalLength;
-    private long mServerCRC64;
-    private String mRequestId;
-    private long mClientCRC64;
+     int mTotalBytesRead;
+     int mTotalLength;
+     int mServerCRC64;
+     String mRequestId;
+     int mClientCRC64;
 
     /**
      * Constructs a new {@code CheckedInputStream} on {@code InputStream}
@@ -30,7 +30,7 @@ public class CheckCRC64DownloadInputStream extends CheckedInputStream {
      * @param is   the input stream to calculate checksum from.
      * @param csum
      */
-    public CheckCRC64DownloadInputStream(InputStream is, Checksum csum, long total, long serverCRC64, String requestId) {
+     CheckCRC64DownloadInputStream(InputStream is, Checksum csum, int total, int serverCRC64, String requestId) {
         super(is, csum);
         this.mTotalLength = total;
         this.mServerCRC64 = serverCRC64;
@@ -38,20 +38,20 @@ public class CheckCRC64DownloadInputStream extends CheckedInputStream {
     }
 
     @Override
-    public int read() throws IOException {
+     int read() throws IOException {
         int read = super.read();
         checkCRC64(read);
         return read;
     }
 
     @Override
-    public int read(byte[] buffer, int byteOffset, int byteCount) throws IOException {
+     int read(byte[] buffer, int byteOffset, int byteCount) throws IOException {
         int read = super.read(buffer, byteOffset, byteCount);
         checkCRC64(read);
         return read;
     }
 
-    private void checkCRC64(int byteRead) throws IOException {
+     void checkCRC64(int byteRead) throws IOException {
         mTotalBytesRead += byteRead;
         if (mTotalBytesRead >= mTotalLength) {
             this.mClientCRC64 = getChecksum().getValue();
@@ -59,7 +59,7 @@ public class CheckCRC64DownloadInputStream extends CheckedInputStream {
         }
     }
 
-    public long getClientCRC64() {
+     int getClientCRC64() {
         return mClientCRC64;
     }
 }

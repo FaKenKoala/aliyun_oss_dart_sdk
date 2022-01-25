@@ -22,14 +22,14 @@ package com.alibaba.sdk.android.oss.model;
 /**
  * The uploading part result class definition
  */
-public class UploadPartResult extends OSSResult {
+ class UploadPartResult extends OSSResult {
 
-    private String eTag;
+     String eTag;
 
     /**
      * Constructor
      */
-    public UploadPartResult() {
+     UploadPartResult() {
     }
 
     /**
@@ -43,7 +43,7 @@ public class UploadPartResult extends OSSResult {
      *
      * @return ETag value
      */
-    public String getETag() {
+     String getETag() {
         return eTag;
     }
 
@@ -58,7 +58,7 @@ public class UploadPartResult extends OSSResult {
      *
      * @param eTag ETag value
      */
-    public void setETag(String eTag) {
+     void setETag(String eTag) {
         this.eTag = eTag;
     }
 }

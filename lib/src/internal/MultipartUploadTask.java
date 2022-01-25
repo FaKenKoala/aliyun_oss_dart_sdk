@@ -17,17 +17,17 @@ import java.util.concurrent.Callable;
  * Created by jingdan on 2017/10/19.
  * multipart upload support concurrent thread work
  */
-public class MultipartUploadTask extends BaseMultipartUploadTask<MultipartUploadRequest,
+ class MultipartUploadTask extends BaseMultipartUploadTask<MultipartUploadRequest,
         CompleteMultipartUploadResult> implements Callable<CompleteMultipartUploadResult> {
 
-    public MultipartUploadTask(InternalRequestOperation operation, MultipartUploadRequest request,
+     MultipartUploadTask(InternalRequestOperation operation, MultipartUploadRequest request,
                                OSSCompletedCallback<MultipartUploadRequest, CompleteMultipartUploadResult> completedCallback,
                                ExecutionContext context) {
         super(operation, request, completedCallback, context);
     }
 
     @Override
-    protected void initMultipartUploadId() throws ClientException, ServiceException {
+     void initMultipartUploadId() throws ClientException, ServiceException {
         InitiateMultipartUploadRequest init = new InitiateMultipartUploadRequest(
                 mRequest.getBucketName(), mRequest.getObjectKey(), mRequest.getMetadata());
 
@@ -38,7 +38,7 @@ public class MultipartUploadTask extends BaseMultipartUploadTask<MultipartUpload
     }
 
     @Override
-    protected CompleteMultipartUploadResult doMultipartUpload() throws IOException, ServiceException, ClientException, InterruptedException {
+     CompleteMultipartUploadResult doMultipartUpload() throws IOException, ServiceException, ClientException, InterruptedException {
         checkCancel();
         int readByte = mPartAttr[0];
         final int partNumber = mPartAttr[1];
@@ -55,7 +55,7 @@ public class MultipartUploadTask extends BaseMultipartUploadTask<MultipartUpload
                 currentLength += byteCount;
                 mPoolExecutor.execute(new Runnable() {
                     @Override
-                    public void run() {
+                     void run() {
                         uploadPart(readIndex, byteCount, partNumber);
                     }
                 });
@@ -79,7 +79,7 @@ public class MultipartUploadTask extends BaseMultipartUploadTask<MultipartUpload
     }
 
     @Override
-    protected void abortThisUpload() {
+     void abortThisUpload() {
         if (mUploadId != null) {
             AbortMultipartUploadRequest abort = new AbortMultipartUploadRequest(
                     mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId);
@@ -88,7 +88,7 @@ public class MultipartUploadTask extends BaseMultipartUploadTask<MultipartUpload
     }
 
     @Override
-    protected void processException(Exception e) {
+     void processException(Exception e) {
         synchronized (mLock) {
             mPartExceptionCount++;
             if (mUploadException == null) {
@@ -99,7 +99,7 @@ public class MultipartUploadTask extends BaseMultipartUploadTask<MultipartUpload
     }
 
     @Override
-    protected void preUploadPart(int readIndex, int byteCount, int partNumber) throws Exception {
+     void preUploadPart(int readIndex, int byteCount, int partNumber) throws Exception {
         checkException();
     }
 }

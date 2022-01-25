@@ -10,22 +10,22 @@ package com.alibaba.sdk.android.oss.common.utils;
 /**
  * Contains the common HTTP headers.
  */
-public interface HttpHeaders {
+ abstract class HttpHeaders {
 
-    public static final String AUTHORIZATION = "Authorization";
-    public static final String CACHE_CONTROL = "Cache-Control";
-    public static final String CONTENT_DISPOSITION = "Content-Disposition";
-    public static final String CONTENT_ENCODING = "Content-Encoding";
-    public static final String CONTENT_LENGTH = "Content-Length";
-    public static final String CONTENT_MD5 = "Content-MD5";
-    public static final String CONTENT_TYPE = "Content-Type";
-    public static final String DATE = "Date";
-    public static final String ETAG = "ETag";
-    public static final String EXPIRES = "Expires";
-    public static final String HOST = "Host";
-    public static final String LAST_MODIFIED = "Last-Modified";
-    public static final String RANGE = "Range";
-    public static final String LOCATION = "Location";
-    public static final String USER_AGENT = "User-Agent";
+     static final String AUTHORIZATION = "Authorization";
+     static final String CACHE_CONTROL = "Cache-Control";
+     static final String CONTENT_DISPOSITION = "Content-Disposition";
+     static final String CONTENT_ENCODING = "Content-Encoding";
+     static final String CONTENT_LENGTH = "Content-Length";
+     static final String CONTENT_MD5 = "Content-MD5";
+     static final String CONTENT_TYPE = "Content-Type";
+     static final String DATE = "Date";
+     static final String ETAG = "ETag";
+     static final String EXPIRES = "Expires";
+     static final String HOST = "Host";
+     static final String LAST_MODIFIED = "Last-Modified";
+     static final String RANGE = "Range";
+     static final String LOCATION = "Location";
+     static final String USER_AGENT = "User-Agent";
 
 }

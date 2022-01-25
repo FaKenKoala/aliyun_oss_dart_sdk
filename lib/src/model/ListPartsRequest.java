@@ -3,17 +3,17 @@ package com.alibaba.sdk.android.oss.model;
 /**
  * Created by zhouzhuo on 11/25/15.
  */
-public class ListPartsRequest extends OSSRequest {
+ class ListPartsRequest extends OSSRequest {
 
-    private String bucketName;
+     String bucketName;
 
-    private String objectKey;
+     String objectKey;
 
-    private String uploadId;
+     String uploadId;
 
-    private Integer maxParts;
+     Integer maxParts;
 
-    private Integer partNumberMarker;
+     Integer partNumberMarker;
 
     /**
      * Constructor
@@ -22,7 +22,7 @@ public class ListPartsRequest extends OSSRequest {
      * @param objectKey  Object objectKey。
      * @param uploadId   Mutlipart Upload ID。
      */
-    public ListPartsRequest(String bucketName, String objectKey, String uploadId) {
+     ListPartsRequest(String bucketName, String objectKey, String uploadId) {
         setBucketName(bucketName);
         setObjectKey(objectKey);
         setUploadId(uploadId);
@@ -33,7 +33,7 @@ public class ListPartsRequest extends OSSRequest {
      *
      * @return bucket name
      */
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
@@ -42,7 +42,7 @@ public class ListPartsRequest extends OSSRequest {
      *
      * @param bucketName bucket name
      */
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
@@ -51,7 +51,7 @@ public class ListPartsRequest extends OSSRequest {
      *
      * @return Object objectKey。
      */
-    public String getObjectKey() {
+     String getObjectKey() {
         return objectKey;
     }
 
@@ -60,7 +60,7 @@ public class ListPartsRequest extends OSSRequest {
      *
      * @param objectKey Object objectKey。
      */
-    public void setObjectKey(String objectKey) {
+     void setObjectKey(String objectKey) {
         this.objectKey = objectKey;
     }
 
@@ -69,7 +69,7 @@ public class ListPartsRequest extends OSSRequest {
      *
      * @return The Multipart upload Id
      */
-    public String getUploadId() {
+     String getUploadId() {
         return uploadId;
     }
 
@@ -78,7 +78,7 @@ public class ListPartsRequest extends OSSRequest {
      *
      * @param uploadId The Multipart upload Id
      */
-    public void setUploadId(String uploadId) {
+     void setUploadId(String uploadId) {
         this.uploadId = uploadId;
     }
 
@@ -87,7 +87,7 @@ public class ListPartsRequest extends OSSRequest {
      *
      * @return the max parts
      */
-    public Integer getMaxParts() {
+     Integer getMaxParts() {
         return maxParts;
     }
 
@@ -97,7 +97,7 @@ public class ListPartsRequest extends OSSRequest {
      *
      * @param maxParts the max parts to return
      */
-    public void setMaxParts(int maxParts) {
+     void setMaxParts(int maxParts) {
         this.maxParts = maxParts;
     }
 
@@ -106,7 +106,7 @@ public class ListPartsRequest extends OSSRequest {
      *
      * @return The part number marker filter---it means the returned parts' part number must be greater than this value.
      */
-    public Integer getPartNumberMarker() {
+     Integer getPartNumberMarker() {
         return partNumberMarker;
     }
 
@@ -115,7 +115,7 @@ public class ListPartsRequest extends OSSRequest {
      *
      * @param partNumberMarker The part number marker filter
      */
-    public void setPartNumberMarker(Integer partNumberMarker) {
+     void setPartNumberMarker(Integer partNumberMarker) {
         this.partNumberMarker = partNumberMarker;
     }
 }

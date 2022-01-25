@@ -10,7 +10,7 @@ package com.alibaba.sdk.android.oss.common;
 /**
  * HTTP METHOD ENUM
  */
-public enum HttpMethod {
+ enum HttpMethod {
     /**
      * HTTP DELETE
      */

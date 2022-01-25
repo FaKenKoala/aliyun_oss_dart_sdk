@@ -5,7 +5,7 @@ import com.alibaba.sdk.android.oss.ClientException;
 /**
  * Created by zhouzhuo on 11/4/15.
  */
-public interface OSSCredentialProvider {
+ abstract class OSSCredentialProvider {
 
     /**
      * get OSSFederationToken instance

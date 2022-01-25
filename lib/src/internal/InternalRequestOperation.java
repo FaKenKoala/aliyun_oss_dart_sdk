@@ -50,26 +50,26 @@ import okhttp3.OkHttpClient;
 /**
  * Created by zhouzhuo on 11/22/15.
  */
-public class InternalRequestOperation {
+ class InternalRequestOperation {
 
-    private static final int LIST_PART_MAX_RETURNS = 1000;
-    private static final int MAX_PART_NUMBER = 10000;
-    private static ExecutorService executorService =
+     static final int LIST_PART_MAX_RETURNS = 1000;
+     static final int MAX_PART_NUMBER = 10000;
+     static ExecutorService executorService =
             Executors.newFixedThreadPool(OSSConstants.DEFAULT_BASE_THREAD_POOL_SIZE, new ThreadFactory() {
                 @Override
-                public Thread newThread(Runnable r) {
+                 Thread newThread(Runnable r) {
                     return new Thread(r, "oss-android-api-thread");
                 }
             });
-    private volatile URI endpoint;
-    private URI service;
-    private OkHttpClient innerClient;
-    private Context applicationContext;
-    private OSSCredentialProvider credentialProvider;
-    private int maxRetryCount = OSSConstants.DEFAULT_RETRY_COUNT;
-    private ClientConfiguration conf;
+     volatile URI endpoint;
+     URI service;
+     OkHttpClient innerClient;
+     Context applicationContext;
+     OSSCredentialProvider credentialProvider;
+     int maxRetryCount = OSSConstants.DEFAULT_RETRY_COUNT;
+     ClientConfiguration conf;
 
-    public InternalRequestOperation(Context context, final URI endpoint, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
+     InternalRequestOperation(Context context, final URI endpoint, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
         this.applicationContext = context;
         this.endpoint = endpoint;
         this.credentialProvider = credentialProvider;
@@ -82,7 +82,7 @@ public class InternalRequestOperation {
                 .cache(null)
                 .hostnameVerifier(new HostnameVerifier() {
                     @Override
-                    public boolean verify(String hostname, SSLSession session) {
+                     bool verify(String hostname, SSLSession session) {
                         return HttpsURLConnection.getDefaultHostnameVerifier().verify(endpoint.getHost(), session);
                     }
                 });
@@ -105,7 +105,7 @@ public class InternalRequestOperation {
         this.innerClient = builder.build();
     }
 
-    public InternalRequestOperation(Context context, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
+     InternalRequestOperation(Context context, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
         try {
             service = new URI("http://oss.aliyuncs.com");
             endpoint = new URI("http://127.0.0.1"); //构造假的endpoint
@@ -123,7 +123,7 @@ public class InternalRequestOperation {
                 .cache(null)
                 .hostnameVerifier(new HostnameVerifier() {
                     @Override
-                    public boolean verify(String hostname, SSLSession session) {
+                     bool verify(String hostname, SSLSession session) {
                         return HttpsURLConnection.getDefaultHostnameVerifier().verify(service.getHost(), session);
                     }
                 });
@@ -146,14 +146,14 @@ public class InternalRequestOperation {
         this.innerClient = builder.build();
     }
 
-    public PutObjectResult syncPutObject(
+     PutObjectResult syncPutObject(
             PutObjectRequest request) throws ClientException, ServiceException {
         PutObjectResult result = putObject(request, null).getResult();
         checkCRC64(request, result);
         return result;
     }
 
-    public OSSAsyncTask<PutObjectResult> putObject(
+     OSSAsyncTask<PutObjectResult> putObject(
             PutObjectRequest request, final OSSCompletedCallback<PutObjectRequest, PutObjectResult> completedCallback) {
         OSSLog.logDebug(" Internal putObject Start ");
         RequestMessage requestMessage = new RequestMessage();
@@ -186,12 +186,12 @@ public class InternalRequestOperation {
         if (completedCallback != null) {
             executionContext.setCompletedCallback(new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
                 @Override
-                public void onSuccess(PutObjectRequest request, PutObjectResult result) {
+                 void onSuccess(PutObjectRequest request, PutObjectResult result) {
                     checkCRC64(request, result, completedCallback);
                 }
 
                 @Override
-                public void onFailure(PutObjectRequest request, ClientException clientException, ServiceException serviceException) {
+                 void onFailure(PutObjectRequest request, ClientException clientException, ServiceException serviceException) {
                     completedCallback.onFailure(request, clientException, serviceException);
                 }
             });
@@ -209,7 +209,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<CreateBucketResult> createBucket(
+     OSSAsyncTask<CreateBucketResult> createBucket(
             CreateBucketRequest request, OSSCompletedCallback<CreateBucketRequest, CreateBucketResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -242,7 +242,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<DeleteBucketResult> deleteBucket(
+     OSSAsyncTask<DeleteBucketResult> deleteBucket(
             DeleteBucketRequest request, OSSCompletedCallback<DeleteBucketRequest, DeleteBucketResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -259,7 +259,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<GetBucketInfoResult> getBucketInfo(
+     OSSAsyncTask<GetBucketInfoResult> getBucketInfo(
             GetBucketInfoRequest request, OSSCompletedCallback<GetBucketInfoRequest, GetBucketInfoResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
@@ -280,7 +280,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<GetBucketACLResult> getBucketACL(
+     OSSAsyncTask<GetBucketACLResult> getBucketACL(
             GetBucketACLRequest request, OSSCompletedCallback<GetBucketACLRequest, GetBucketACLResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
@@ -301,7 +301,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<PutBucketRefererResult> putBucketReferer(
+     OSSAsyncTask<PutBucketRefererResult> putBucketReferer(
             PutBucketRefererRequest request, OSSCompletedCallback<PutBucketRefererRequest, PutBucketRefererResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
@@ -330,7 +330,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<GetBucketRefererResult> getBucketReferer(
+     OSSAsyncTask<GetBucketRefererResult> getBucketReferer(
             GetBucketRefererRequest request, OSSCompletedCallback<GetBucketRefererRequest, GetBucketRefererResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
@@ -351,7 +351,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<PutBucketLoggingResult> putBucketLogging(
+     OSSAsyncTask<PutBucketLoggingResult> putBucketLogging(
             PutBucketLoggingRequest request, OSSCompletedCallback<PutBucketLoggingRequest, PutBucketLoggingResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
@@ -380,7 +380,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<GetBucketLoggingResult> getBucketLogging(
+     OSSAsyncTask<GetBucketLoggingResult> getBucketLogging(
             GetBucketLoggingRequest request, OSSCompletedCallback<GetBucketLoggingRequest, GetBucketLoggingResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
@@ -401,7 +401,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<DeleteBucketLoggingResult> deleteBucketLogging(
+     OSSAsyncTask<DeleteBucketLoggingResult> deleteBucketLogging(
             DeleteBucketLoggingRequest request, OSSCompletedCallback<DeleteBucketLoggingRequest, DeleteBucketLoggingResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
@@ -422,7 +422,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<PutBucketLifecycleResult> putBucketLifecycle(
+     OSSAsyncTask<PutBucketLifecycleResult> putBucketLifecycle(
             PutBucketLifecycleRequest request, OSSCompletedCallback<PutBucketLifecycleRequest, PutBucketLifecycleResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
@@ -451,7 +451,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<GetBucketLifecycleResult> getBucketLifecycle(
+     OSSAsyncTask<GetBucketLifecycleResult> getBucketLifecycle(
             GetBucketLifecycleRequest request, OSSCompletedCallback<GetBucketLifecycleRequest, GetBucketLifecycleResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
@@ -472,7 +472,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<DeleteBucketLifecycleResult> deleteBucketLifecycle(
+     OSSAsyncTask<DeleteBucketLifecycleResult> deleteBucketLifecycle(
             DeleteBucketLifecycleRequest request, OSSCompletedCallback<DeleteBucketLifecycleRequest, DeleteBucketLifecycleResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
@@ -493,10 +493,10 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public AppendObjectResult syncAppendObject(
+     AppendObjectResult syncAppendObject(
             AppendObjectRequest request) throws ClientException, ServiceException {
         AppendObjectResult result = appendObject(request, null).getResult();
-        boolean checkCRC = request.getCRC64() == OSSRequest.CRC64Config.YES ? true : false;
+        bool checkCRC = request.getCRC64() == OSSRequest.CRC64Config.YES ? true : false;
         if (request.getInitCRC64() != null && checkCRC) {
             result.setClientCRC(CRC64.combine(request.getInitCRC64(), result.getClientCRC(),
                     (result.getNextPosition() - request.getPosition())));
@@ -505,7 +505,7 @@ public class InternalRequestOperation {
         return result;
     }
 
-    public OSSAsyncTask<AppendObjectResult> appendObject(
+     OSSAsyncTask<AppendObjectResult> appendObject(
             AppendObjectRequest request, final OSSCompletedCallback<AppendObjectRequest, AppendObjectResult> completedCallback) {
 
         RequestMessage requestMessage = new RequestMessage();
@@ -535,8 +535,8 @@ public class InternalRequestOperation {
         if (completedCallback != null) {
             executionContext.setCompletedCallback(new OSSCompletedCallback<AppendObjectRequest, AppendObjectResult>() {
                 @Override
-                public void onSuccess(AppendObjectRequest request, AppendObjectResult result) {
-                    boolean checkCRC = request.getCRC64() == OSSRequest.CRC64Config.YES ? true : false;
+                 void onSuccess(AppendObjectRequest request, AppendObjectResult result) {
+                    bool checkCRC = request.getCRC64() == OSSRequest.CRC64Config.YES ? true : false;
                     if (request.getInitCRC64() != null && checkCRC) {
                         result.setClientCRC(CRC64.combine(request.getInitCRC64(), result.getClientCRC(),
                                 (result.getNextPosition() - request.getPosition())));
@@ -545,7 +545,7 @@ public class InternalRequestOperation {
                 }
 
                 @Override
-                public void onFailure(AppendObjectRequest request, ClientException clientException, ServiceException serviceException) {
+                 void onFailure(AppendObjectRequest request, ClientException clientException, ServiceException serviceException) {
                     completedCallback.onFailure(request, clientException, serviceException);
                 }
             });
@@ -558,7 +558,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<HeadObjectResult> headObject(
+     OSSAsyncTask<HeadObjectResult> headObject(
             HeadObjectRequest request, OSSCompletedCallback<HeadObjectRequest, HeadObjectResult> completedCallback) {
 
         RequestMessage requestMessage = new RequestMessage();
@@ -581,7 +581,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<GetObjectResult> getObject(
+     OSSAsyncTask<GetObjectResult> getObject(
             GetObjectRequest request, OSSCompletedCallback<GetObjectRequest, GetObjectResult> completedCallback) {
 
         RequestMessage requestMessage = new RequestMessage();
@@ -619,7 +619,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<GetObjectACLResult> getObjectACL(GetObjectACLRequest request, OSSCompletedCallback<GetObjectACLRequest, GetObjectACLResult> completedCallback) {
+     OSSAsyncTask<GetObjectACLResult> getObjectACL(GetObjectACLRequest request, OSSCompletedCallback<GetObjectACLRequest, GetObjectACLResult> completedCallback) {
 
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
@@ -645,7 +645,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<CopyObjectResult> copyObject(
+     OSSAsyncTask<CopyObjectResult> copyObject(
             CopyObjectRequest request, OSSCompletedCallback<CopyObjectRequest, CopyObjectResult> completedCallback) {
 
         RequestMessage requestMessage = new RequestMessage();
@@ -670,7 +670,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<DeleteObjectResult> deleteObject(
+     OSSAsyncTask<DeleteObjectResult> deleteObject(
             DeleteObjectRequest request, OSSCompletedCallback<DeleteObjectRequest, DeleteObjectResult> completedCallback) {
 
         RequestMessage requestMessage = new RequestMessage();
@@ -693,7 +693,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<DeleteMultipleObjectResult> deleteMultipleObject(
+     OSSAsyncTask<DeleteMultipleObjectResult> deleteMultipleObject(
             DeleteMultipleObjectRequest request, OSSCompletedCallback<DeleteMultipleObjectRequest, DeleteMultipleObjectResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
@@ -729,7 +729,7 @@ public class InternalRequestOperation {
 
     }
 
-    public OSSAsyncTask<ListBucketsResult> listBuckets(
+     OSSAsyncTask<ListBucketsResult> listBuckets(
             ListBucketsRequest request, OSSCompletedCallback<ListBucketsRequest, ListBucketsResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -750,7 +750,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<ListObjectsResult> listObjects(
+     OSSAsyncTask<ListObjectsResult> listObjects(
             ListObjectsRequest request, OSSCompletedCallback<ListObjectsRequest, ListObjectsResult> completedCallback) {
 
         RequestMessage requestMessage = new RequestMessage();
@@ -774,7 +774,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<InitiateMultipartUploadResult> initMultipartUpload(
+     OSSAsyncTask<InitiateMultipartUploadResult> initMultipartUpload(
             InitiateMultipartUploadRequest request, OSSCompletedCallback<InitiateMultipartUploadRequest, InitiateMultipartUploadResult> completedCallback) {
 
         RequestMessage requestMessage = new RequestMessage();
@@ -804,14 +804,14 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public UploadPartResult syncUploadPart(
+     UploadPartResult syncUploadPart(
             UploadPartRequest request) throws ClientException, ServiceException {
         UploadPartResult result = uploadPart(request, null).getResult();
         checkCRC64(request, result);
         return result;
     }
 
-    public OSSAsyncTask<UploadPartResult> uploadPart(
+     OSSAsyncTask<UploadPartResult> uploadPart(
             UploadPartRequest request, final OSSCompletedCallback<UploadPartRequest, UploadPartResult> completedCallback) {
 
         RequestMessage requestMessage = new RequestMessage();
@@ -834,12 +834,12 @@ public class InternalRequestOperation {
         if (completedCallback != null) {
             executionContext.setCompletedCallback(new OSSCompletedCallback<UploadPartRequest, UploadPartResult>() {
                 @Override
-                public void onSuccess(UploadPartRequest request, UploadPartResult result) {
+                 void onSuccess(UploadPartRequest request, UploadPartResult result) {
                     checkCRC64(request, result, completedCallback);
                 }
 
                 @Override
-                public void onFailure(UploadPartRequest request, ClientException clientException, ServiceException serviceException) {
+                 void onFailure(UploadPartRequest request, ClientException clientException, ServiceException serviceException) {
                     completedCallback.onFailure(request, clientException, serviceException);
                 }
             });
@@ -852,18 +852,18 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public CompleteMultipartUploadResult syncCompleteMultipartUpload(
+     CompleteMultipartUploadResult syncCompleteMultipartUpload(
             CompleteMultipartUploadRequest request) throws ClientException, ServiceException {
         CompleteMultipartUploadResult result = completeMultipartUpload(request, null).getResult();
         if (result.getServerCRC() != null) {
-            long crc64 = calcObjectCRCFromParts(request.getPartETags());
+            int crc64 = calcObjectCRCFromParts(request.getPartETags());
             result.setClientCRC(crc64);
         }
         checkCRC64(request, result);
         return result;
     }
 
-    public OSSAsyncTask<CompleteMultipartUploadResult> completeMultipartUpload(
+     OSSAsyncTask<CompleteMultipartUploadResult> completeMultipartUpload(
             CompleteMultipartUploadRequest request, final OSSCompletedCallback<CompleteMultipartUploadRequest, CompleteMultipartUploadResult> completedCallback) {
 
         RequestMessage requestMessage = new RequestMessage();
@@ -891,16 +891,16 @@ public class InternalRequestOperation {
         if (completedCallback != null) {
             executionContext.setCompletedCallback(new OSSCompletedCallback<CompleteMultipartUploadRequest, CompleteMultipartUploadResult>() {
                 @Override
-                public void onSuccess(CompleteMultipartUploadRequest request, CompleteMultipartUploadResult result) {
+                 void onSuccess(CompleteMultipartUploadRequest request, CompleteMultipartUploadResult result) {
                     if (result.getServerCRC() != null) {
-                        long crc64 = calcObjectCRCFromParts(request.getPartETags());
+                        int crc64 = calcObjectCRCFromParts(request.getPartETags());
                         result.setClientCRC(crc64);
                     }
                     checkCRC64(request, result, completedCallback);
                 }
 
                 @Override
-                public void onFailure(CompleteMultipartUploadRequest request, ClientException clientException, ServiceException serviceException) {
+                 void onFailure(CompleteMultipartUploadRequest request, ClientException clientException, ServiceException serviceException) {
                     completedCallback.onFailure(request, clientException, serviceException);
                 }
             });
@@ -912,7 +912,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<AbortMultipartUploadResult> abortMultipartUpload(
+     OSSAsyncTask<AbortMultipartUploadResult> abortMultipartUpload(
             AbortMultipartUploadRequest request, OSSCompletedCallback<AbortMultipartUploadRequest, AbortMultipartUploadResult> completedCallback) {
 
         RequestMessage requestMessage = new RequestMessage();
@@ -937,7 +937,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<ListPartsResult> listParts(
+     OSSAsyncTask<ListPartsResult> listParts(
             ListPartsRequest request, OSSCompletedCallback<ListPartsRequest, ListPartsResult> completedCallback) {
 
         RequestMessage requestMessage = new RequestMessage();
@@ -978,7 +978,7 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public OSSAsyncTask<ListMultipartUploadsResult> listMultipartUploads(
+     OSSAsyncTask<ListMultipartUploadsResult> listMultipartUploads(
             ListMultipartUploadsRequest request, OSSCompletedCallback<ListMultipartUploadsRequest, ListMultipartUploadsResult> completedCallback) {
 
         RequestMessage requestMessage = new RequestMessage();
@@ -1004,13 +1004,13 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    private boolean checkIfHttpDnsAvailable(boolean httpDnsEnable) {
+     bool checkIfHttpDnsAvailable(bool httpDnsEnable) {
         if (httpDnsEnable) {
             if (applicationContext == null) {
                 return false;
             }
 
-            boolean IS_ICS_OR_LATER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
+            bool IS_ICS_OR_LATER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 
             String proxyHost;
 
@@ -1030,11 +1030,11 @@ public class InternalRequestOperation {
         return false;
     }
 
-    public OkHttpClient getInnerClient() {
+     OkHttpClient getInnerClient() {
         return innerClient;
     }
 
-    private void canonicalizeRequestMessage(RequestMessage message, OSSRequest request) {
+     void canonicalizeRequestMessage(RequestMessage message, OSSRequest request) {
         Map<String, String> header = message.getHeaders();
 
         if (header.get(OSSHeaders.DATE) == null) {
@@ -1065,20 +1065,20 @@ public class InternalRequestOperation {
             message.setCheckCRC64(false);
         }
 
-        // Private cloud user could have special endpoint and we need to differentiate it with the CName here.
+        //  cloud user could have special endpoint and we need to differentiate it with the CName here.
         message.setIsInCustomCnameExcludeList(OSSUtils.isInCustomCnameExcludeList(this.endpoint.getHost(), this.conf.getCustomCnameExcludeList()));
 
-        boolean checkCRC64 = request.getCRC64() != OSSRequest.CRC64Config.NULL
+        bool checkCRC64 = request.getCRC64() != OSSRequest.CRC64Config.NULL
                 ? (request.getCRC64() == OSSRequest.CRC64Config.YES ? true : false) : conf.isCheckCRC64();
         message.setCheckCRC64(checkCRC64);
         request.setCRC64(checkCRC64 ? OSSRequest.CRC64Config.YES : OSSRequest.CRC64Config.NO);
     }
 
-    public void setCredentialProvider(OSSCredentialProvider credentialProvider) {
+     void setCredentialProvider(OSSCredentialProvider credentialProvider) {
         this.credentialProvider = credentialProvider;
     }
 
-    private <Request extends OSSRequest, Result extends OSSResult> void checkCRC64(Request request
+     <Request extends OSSRequest, Result extends OSSResult> void checkCRC64(Request request
             , Result result) throws ClientException {
         if (request.getCRC64() == OSSRequest.CRC64Config.YES ? true : false) {
             try {
@@ -1089,7 +1089,7 @@ public class InternalRequestOperation {
         }
     }
 
-    private <Request extends OSSRequest, Result extends OSSResult> void checkCRC64(Request request
+     <Request extends OSSRequest, Result extends OSSResult> void checkCRC64(Request request
             , Result result, OSSCompletedCallback<Request, Result> completedCallback) {
         try {
             checkCRC64(request, result);
@@ -1103,8 +1103,8 @@ public class InternalRequestOperation {
         }
     }
 
-    private long calcObjectCRCFromParts(List<PartETag> partETags) {
-        long crc = 0;
+     int calcObjectCRCFromParts(List<PartETag> partETags) {
+        int crc = 0;
         for (PartETag partETag : partETags) {
             if (partETag.getCRC64() == 0 || partETag.getPartSize() <= 0) {
                 return 0;
@@ -1114,15 +1114,15 @@ public class InternalRequestOperation {
         return crc;
     }
 
-    public Context getApplicationContext() {
+     Context getApplicationContext() {
         return applicationContext;
     }
 
-    public ClientConfiguration getConf() {
+     ClientConfiguration getConf() {
         return conf;
     }
 
-    public OSSAsyncTask<TriggerCallbackResult> triggerCallback(TriggerCallbackRequest request, OSSCompletedCallback<TriggerCallbackRequest, TriggerCallbackResult> completedCallback) {
+     OSSAsyncTask<TriggerCallbackResult> triggerCallback(TriggerCallbackRequest request, OSSCompletedCallback<TriggerCallbackRequest, TriggerCallbackResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
         query.put(RequestParameters.X_OSS_PROCESS, "");
@@ -1149,11 +1149,11 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public TriggerCallbackResult asyncTriggerCallback(TriggerCallbackRequest request) throws ClientException, ServiceException {
+     TriggerCallbackResult asyncTriggerCallback(TriggerCallbackRequest request) throws ClientException, ServiceException {
         return triggerCallback(request, null).getResult();
     }
 
-    public OSSAsyncTask<ImagePersistResult> imageActionPersist(ImagePersistRequest request, OSSCompletedCallback<ImagePersistRequest, ImagePersistResult> completedCallback) {
+     OSSAsyncTask<ImagePersistResult> imageActionPersist(ImagePersistRequest request, OSSCompletedCallback<ImagePersistRequest, ImagePersistResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
         query.put(RequestParameters.X_OSS_PROCESS, "");
@@ -1177,13 +1177,13 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public PutSymlinkResult syncPutSymlink(PutSymlinkRequest request) throws ClientException, ServiceException {
+     PutSymlinkResult syncPutSymlink(PutSymlinkRequest request) throws ClientException, ServiceException {
         return putSymlink(request, null).getResult();
     }
 
     ;
 
-    public OSSAsyncTask<PutSymlinkResult> putSymlink(PutSymlinkRequest request, OSSCompletedCallback<PutSymlinkRequest, PutSymlinkResult> completedCallback) {
+     OSSAsyncTask<PutSymlinkResult> putSymlink(PutSymlinkRequest request, OSSCompletedCallback<PutSymlinkRequest, PutSymlinkResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
         query.put(RequestParameters.X_OSS_SYMLINK, "");
@@ -1211,11 +1211,11 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public GetSymlinkResult syncGetSymlink(GetSymlinkRequest request) throws ClientException, ServiceException {
+     GetSymlinkResult syncGetSymlink(GetSymlinkRequest request) throws ClientException, ServiceException {
         return getSymlink(request, null).getResult();
     }
 
-    public OSSAsyncTask<GetSymlinkResult> getSymlink(GetSymlinkRequest request, OSSCompletedCallback<GetSymlinkRequest, GetSymlinkResult> completedCallback) {
+     OSSAsyncTask<GetSymlinkResult> getSymlink(GetSymlinkRequest request, OSSCompletedCallback<GetSymlinkRequest, GetSymlinkResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
         query.put(RequestParameters.X_OSS_SYMLINK, "");
@@ -1236,11 +1236,11 @@ public class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-    public RestoreObjectResult syncRestoreObject(RestoreObjectRequest request) throws ClientException, ServiceException {
+     RestoreObjectResult syncRestoreObject(RestoreObjectRequest request) throws ClientException, ServiceException {
         return restoreObject(request, null).getResult();
     }
 
-    public OSSAsyncTask<RestoreObjectResult> restoreObject(RestoreObjectRequest request, OSSCompletedCallback<RestoreObjectRequest, RestoreObjectResult> completedCallback) {
+     OSSAsyncTask<RestoreObjectResult> restoreObject(RestoreObjectRequest request, OSSCompletedCallback<RestoreObjectRequest, RestoreObjectResult> completedCallback) {
         RequestMessage requestMessage = new RequestMessage();
         Map<String, String> query = new LinkedHashMap<String, String>();
         query.put(RequestParameters.X_OSS_RESTORE, "");

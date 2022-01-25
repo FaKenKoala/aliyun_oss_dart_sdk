@@ -3,9 +3,9 @@ package com.alibaba.sdk.android.oss.model;
 /**
  * Created by zhouzhuo on 11/27/15.
  */
-public class ResumableUploadResult extends CompleteMultipartUploadResult {
+ class ResumableUploadResult extends CompleteMultipartUploadResult {
 
-    public ResumableUploadResult(CompleteMultipartUploadResult completeResult) {
+     ResumableUploadResult(CompleteMultipartUploadResult completeResult) {
         this.setRequestId(completeResult.getRequestId());
         this.setResponseHeader(completeResult.getResponseHeader());
         this.setStatusCode(completeResult.getStatusCode());

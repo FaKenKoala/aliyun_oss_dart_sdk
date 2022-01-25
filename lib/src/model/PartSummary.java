@@ -24,20 +24,20 @@ import java.util.Date;
 /**
  * The multipart upload's part summary class definition
  */
-public class PartSummary {
+ class PartSummary {
 
-    private int partNumber;
+     int partNumber;
 
-    private Date lastModified;
+     Date lastModified;
 
-    private String eTag;
+     String eTag;
 
-    private long size;
+     int size;
 
     /**
      * Constructor
      */
-    public PartSummary() {
+     PartSummary() {
     }
 
     /**
@@ -45,7 +45,7 @@ public class PartSummary {
      *
      * @return Part number
      */
-    public int getPartNumber() {
+     int getPartNumber() {
         return partNumber;
     }
 
@@ -54,7 +54,7 @@ public class PartSummary {
      *
      * @param partNumber Part number
      */
-    public void setPartNumber(int partNumber) {
+     void setPartNumber(int partNumber) {
         this.partNumber = partNumber;
     }
 
@@ -63,7 +63,7 @@ public class PartSummary {
      *
      * @return Part's last modified time
      */
-    public Date getLastModified() {
+     Date getLastModified() {
         return lastModified;
     }
 
@@ -72,7 +72,7 @@ public class PartSummary {
      *
      * @param lastModified Part's last modified time
      */
-    public void setLastModified(Date lastModified) {
+     void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
     }
 
@@ -81,7 +81,7 @@ public class PartSummary {
      *
      * @return Part ETag value
      */
-    public String getETag() {
+     String getETag() {
         return eTag;
     }
 
@@ -90,7 +90,7 @@ public class PartSummary {
      *
      * @param eTag Part ETag value
      */
-    public void setETag(String eTag) {
+     void setETag(String eTag) {
         this.eTag = eTag;
     }
 
@@ -99,7 +99,7 @@ public class PartSummary {
      *
      * @return Part in byte
      */
-    public long getSize() {
+     int getSize() {
         return size;
     }
 
@@ -108,7 +108,7 @@ public class PartSummary {
      *
      * @param size Part size in byte
      */
-    public void setSize(long size) {
+     void setSize(int size) {
         this.size = size;
     }
 

@@ -23,24 +23,24 @@ package com.alibaba.sdk.android.oss.model;
 /**
  * Successful response of append object operation.
  */
-public class AppendObjectResult extends OSSResult {
+ class AppendObjectResult extends OSSResult {
 
     /* Indicates that which position to append at next time. */
-    private long nextPosition;
+     int nextPosition;
 
     /* Returned value of the appended object crc64 */
-    private String objectCRC64;
+     String objectCRC64;
 
     /**
      * Gets the next position for appending
      *
      * @return
      */
-    public long getNextPosition() {
+     int getNextPosition() {
         return nextPosition;
     }
 
-    public void setNextPosition(Long nextPosition) {
+     void setNextPosition(int nextPosition) {
         this.nextPosition = nextPosition;
     }
 
@@ -49,11 +49,11 @@ public class AppendObjectResult extends OSSResult {
      *
      * @return
      */
-    public String getObjectCRC64() {
+     String getObjectCRC64() {
         return objectCRC64;
     }
 
-    public void setObjectCRC64(String objectCRC64) {
+     void setObjectCRC64(String objectCRC64) {
         this.objectCRC64 = objectCRC64;
     }
 }

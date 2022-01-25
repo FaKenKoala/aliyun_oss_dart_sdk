@@ -7,25 +7,25 @@ package com.alibaba.sdk.android.oss.model;
 /**
  * The result class of uploading an object
  */
-public class PutObjectResult extends OSSResult {
+ class PutObjectResult extends OSSResult {
 
     // Object ETag
-    private String eTag;
+     String eTag;
 
     // The callback response if the servercallback is specified
-    private String serverCallbackReturnBody;
+     String serverCallbackReturnBody;
 
     /**
      * Gets the Etag value of the target object
      */
-    public String getETag() {
+     String getETag() {
         return eTag;
     }
 
     /**
      * @param eTag target object's ETag value.
      */
-    public void setETag(String eTag) {
+     void setETag(String eTag) {
         this.eTag = eTag;
     }
 
@@ -34,11 +34,11 @@ public class PutObjectResult extends OSSResult {
      *
      * @return The callback response in Json
      */
-    public String getServerCallbackReturnBody() {
+     String getServerCallbackReturnBody() {
         return serverCallbackReturnBody;
     }
 
-    public void setServerCallbackReturnBody(String serverCallbackReturnBody) {
+     void setServerCallbackReturnBody(String serverCallbackReturnBody) {
         this.serverCallbackReturnBody = serverCallbackReturnBody;
     }
 }

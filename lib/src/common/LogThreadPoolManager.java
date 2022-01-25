@@ -16,58 +16,58 @@ import java.util.concurrent.TimeUnit;
  * ThreadPool For Log
  */
 
-public class LogThreadPoolManager {
-    private static final int SIZE_CORE_POOL = 1;
-    private static final int SIZE_MAX_POOL = 1;
-    private static final int TIME_KEEP_ALIVE = 5000;
-    private static final int SIZE_WORK_QUEUE = 500;
-    private static final int PERIOD_TASK_QOS = 1000;
-    private static final int SIZE_CACHE_QUEUE = 200;
-    private static LogThreadPoolManager sThreadPoolManager = new LogThreadPoolManager();
-    private final Queue<Runnable> mTaskQueue = new LinkedList<Runnable>();
-    private final RejectedExecutionHandler mHandler = new RejectedExecutionHandler() {
+ class LogThreadPoolManager {
+     static final int SIZE_CORE_POOL = 1;
+     static final int SIZE_MAX_POOL = 1;
+     static final int TIME_KEEP_ALIVE = 5000;
+     static final int SIZE_WORK_QUEUE = 500;
+     static final int PERIOD_TASK_QOS = 1000;
+     static final int SIZE_CACHE_QUEUE = 200;
+     static LogThreadPoolManager sThreadPoolManager = new LogThreadPoolManager();
+     final Queue<Runnable> mTaskQueue = new LinkedList<Runnable>();
+     final RejectedExecutionHandler mHandler = new RejectedExecutionHandler() {
         @Override
-        public void rejectedExecution(Runnable task, ThreadPoolExecutor executor) {
+         void rejectedExecution(Runnable task, ThreadPoolExecutor executor) {
             if (mTaskQueue.size() >= SIZE_CACHE_QUEUE) {
                 mTaskQueue.poll();//remove old
             }
             mTaskQueue.offer(task);
         }
     };
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private final ThreadPoolExecutor mThreadPool = new ThreadPoolExecutor(SIZE_CORE_POOL, SIZE_MAX_POOL,
+     final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+     final ThreadPoolExecutor mThreadPool = new ThreadPoolExecutor(SIZE_CORE_POOL, SIZE_MAX_POOL,
             TIME_KEEP_ALIVE, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(SIZE_WORK_QUEUE), new ThreadFactory() {
         @Override
-        public Thread newThread(Runnable r) {
+         Thread newThread(Runnable r) {
             return new Thread(r, "oss-android-log-thread");
         }
     }, mHandler);
-    private final Runnable mAccessBufferThread = new Runnable() {
+     final Runnable mAccessBufferThread = new Runnable() {
         @Override
-        public void run() {
+         void run() {
             if (hasMoreAcquire()) {
                 mThreadPool.execute(mTaskQueue.poll());
             }
         }
     };
-    protected final ScheduledFuture<?> mTaskHandler = scheduler.scheduleAtFixedRate(mAccessBufferThread, 0,
+     final ScheduledFuture<?> mTaskHandler = scheduler.scheduleAtFixedRate(mAccessBufferThread, 0,
             PERIOD_TASK_QOS, TimeUnit.MILLISECONDS);
 
-    private LogThreadPoolManager() {
+     LogThreadPoolManager() {
     }
 
-    public static LogThreadPoolManager newInstance() {
+     static LogThreadPoolManager newInstance() {
         if (sThreadPoolManager == null) {
             sThreadPoolManager = new LogThreadPoolManager();
         }
         return sThreadPoolManager;
     }
 
-    private boolean hasMoreAcquire() {
+     bool hasMoreAcquire() {
         return !mTaskQueue.isEmpty();
     }
 
-    public void addExecuteTask(Runnable task) {
+     void addExecuteTask(Runnable task) {
         if (task != null) {
             mThreadPool.execute(task);
         }

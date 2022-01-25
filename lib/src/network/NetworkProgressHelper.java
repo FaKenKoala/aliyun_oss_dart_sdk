@@ -12,17 +12,17 @@ import okhttp3.Response;
  * Created by jingdan on 2017/9/12.
  */
 
-public class NetworkProgressHelper {
+ class NetworkProgressHelper {
 
     /**
      * process response progress
      */
-    public static OkHttpClient addProgressResponseListener(OkHttpClient client,
+     static OkHttpClient addProgressResponseListener(OkHttpClient client,
                                                            final ExecutionContext context) {
         OkHttpClient newClient = client.newBuilder()
                 .addNetworkInterceptor(new Interceptor() {
                     @Override
-                    public Response intercept(Chain chain) throws IOException {
+                     Response intercept(Chain chain) throws IOException {
                         Response originalResponse = chain.proceed(chain.request());
                         return originalResponse.newBuilder()
                                 .body(new ProgressTouchableResponseBody(originalResponse.body(),
@@ -37,8 +37,8 @@ public class NetworkProgressHelper {
     /**
      * process request progress
      */
-    public static ProgressTouchableRequestBody addProgressRequestBody(InputStream input,
-                                                                      long contentLength,
+     static ProgressTouchableRequestBody addProgressRequestBody(InputStream input,
+                                                                      int contentLength,
                                                                       String contentType,
                                                                       ExecutionContext context) {
         return new ProgressTouchableRequestBody(input, contentLength, contentType, context);

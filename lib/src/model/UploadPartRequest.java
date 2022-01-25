@@ -24,33 +24,33 @@ import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
 /**
  * The uploading part request class definition
  */
-public class UploadPartRequest extends OSSRequest {
+ class UploadPartRequest extends OSSRequest {
 
-    private String bucketName;
+     String bucketName;
 
-    private String objectKey;
+     String objectKey;
 
-    private String uploadId;
+     String uploadId;
 
-    private int partNumber;
+     int partNumber;
 
-    private byte[] partContent;
+     byte[] partContent;
 
     //run with not ui thread
-    private OSSProgressCallback<UploadPartRequest> progressCallback;
+     OSSProgressCallback<UploadPartRequest> progressCallback;
 
-    private String md5Digest;
+     String md5Digest;
 
     /**
      * Default constructor
      */
-    public UploadPartRequest() {
+     UploadPartRequest() {
     }
 
     /**
      * Constructor
      */
-    public UploadPartRequest(String bucketName, String objectKey, String uploadId, int partNumber) {
+     UploadPartRequest(String bucketName, String objectKey, String uploadId, int partNumber) {
         this.bucketName = bucketName;
         this.objectKey = objectKey;
         this.uploadId = uploadId;
@@ -60,7 +60,7 @@ public class UploadPartRequest extends OSSRequest {
     /**
      * @return bucket name
      */
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
@@ -69,7 +69,7 @@ public class UploadPartRequest extends OSSRequest {
      *
      * @param bucketName bucket name
      */
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
@@ -78,7 +78,7 @@ public class UploadPartRequest extends OSSRequest {
      *
      * @return Object objectKey。
      */
-    public String getObjectKey() {
+     String getObjectKey() {
         return objectKey;
     }
 
@@ -87,7 +87,7 @@ public class UploadPartRequest extends OSSRequest {
      *
      * @param objectKey Object objectKey。
      */
-    public void setObjectKey(String objectKey) {
+     void setObjectKey(String objectKey) {
         this.objectKey = objectKey;
     }
 
@@ -96,7 +96,7 @@ public class UploadPartRequest extends OSSRequest {
      *
      * @return upload Id in the multipart upload
      */
-    public String getUploadId() {
+     String getUploadId() {
         return uploadId;
     }
 
@@ -105,7 +105,7 @@ public class UploadPartRequest extends OSSRequest {
      *
      * @param uploadId upload Id in the multipart upload
      */
-    public void setUploadId(String uploadId) {
+     void setUploadId(String uploadId) {
         this.uploadId = uploadId;
     }
 
@@ -117,7 +117,7 @@ public class UploadPartRequest extends OSSRequest {
      *
      * @return The part number
      */
-    public int getPartNumber() {
+     int getPartNumber() {
         return partNumber;
     }
 
@@ -129,7 +129,7 @@ public class UploadPartRequest extends OSSRequest {
      *
      * @param partNumber Part number
      */
-    public void setPartNumber(int partNumber) {
+     void setPartNumber(int partNumber) {
         this.partNumber = partNumber;
     }
 
@@ -138,7 +138,7 @@ public class UploadPartRequest extends OSSRequest {
      *
      * @return MD5 digest value
      */
-    public String getMd5Digest() {
+     String getMd5Digest() {
         return md5Digest;
     }
 
@@ -147,29 +147,29 @@ public class UploadPartRequest extends OSSRequest {
      *
      * @param md5Digest The MD5 digest value of the part
      */
-    public void setMd5Digest(String md5Digest) {
+     void setMd5Digest(String md5Digest) {
         this.md5Digest = md5Digest;
     }
 
-    public OSSProgressCallback<UploadPartRequest> getProgressCallback() {
+     OSSProgressCallback<UploadPartRequest> getProgressCallback() {
         return progressCallback;
     }
 
     /**
      * Sets the progress callback
      */
-    public void setProgressCallback(OSSProgressCallback<UploadPartRequest> progressCallback) {
+     void setProgressCallback(OSSProgressCallback<UploadPartRequest> progressCallback) {
         this.progressCallback = progressCallback;
     }
 
-    public byte[] getPartContent() {
+     byte[] getPartContent() {
         return partContent;
     }
 
     /**
      * Sets the part's content to upload
      */
-    public void setPartContent(byte[] partContent) {
+     void setPartContent(byte[] partContent) {
         this.partContent = partContent;
     }
 }

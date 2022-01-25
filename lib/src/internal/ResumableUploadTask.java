@@ -42,16 +42,16 @@ import java.util.concurrent.Callable;
  * Created by jingdan on 2017/10/30.
  */
 
-public class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUploadRequest,
+ class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUploadRequest,
         ResumableUploadResult> implements Callable<ResumableUploadResult> {
 
-    private File mRecordFile;
-    private List<Integer> mAlreadyUploadIndex = new ArrayList<Integer>();
-    private OSSSharedPreferences mSp;
-    private File mCRC64RecordFile;
+     File mRecordFile;
+     List<Integer> mAlreadyUploadIndex = new ArrayList<Integer>();
+     OSSSharedPreferences mSp;
+     File mCRC64RecordFile;
 
 
-    public ResumableUploadTask(ResumableUploadRequest request,
+     ResumableUploadTask(ResumableUploadRequest request,
                                OSSCompletedCallback<ResumableUploadRequest, ResumableUploadResult> completedCallback,
                                ExecutionContext context, InternalRequestOperation apiOperation) {
         super(apiOperation, request, completedCallback, context);
@@ -59,9 +59,9 @@ public class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUpload
     }
 
     @Override
-    protected void initMultipartUploadId() throws IOException, ClientException, ServiceException {
+     void initMultipartUploadId() throws IOException, ClientException, ServiceException {
 
-        Map<Integer, Long> recordCrc64 = null;
+        Map<Integer, int> recordCrc64 = null;
 
         if (!OSSUtils.isEmptyString(mRequest.getRecordDirectory())) {
             String fileMd5 = null;
@@ -103,7 +103,7 @@ public class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUpload
                         ObjectInputStream ois = new ObjectInputStream(fs);
 
                         try {
-                            recordCrc64 = (Map<Integer, Long>) ois.readObject();
+                            recordCrc64 = (Map<Integer, int>) ois.readObject();
                             crc64Record.delete();
                         } catch (ClassNotFoundException e) {
                             OSSLog.logThrowable2Local(e);
@@ -115,7 +115,7 @@ public class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUpload
                     }
                 }
 
-                boolean isTruncated = false;
+                bool isTruncated = false;
                 int nextPartNumberMarker = 0;
 
 
@@ -147,7 +147,7 @@ public class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUpload
                             OSSLog.logDebug("[initUploadId] -  " + i + " part.getSize() : " + part.getSize());
 
 
-                            boolean isTotal = part.getPartNumber() == partTotalNumber;
+                            bool isTotal = part.getPartNumber() == partTotalNumber;
 
                             if (isTotal && part.getSize() != mLastPartSize){
                                 throw new ClientException("current part size " + part.getSize() + " setting is inconsistent with PartSize : " + partSize + " or lastPartSize : " + mLastPartSize);
@@ -212,9 +212,9 @@ public class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUpload
     }
 
     @Override
-    protected ResumableUploadResult doMultipartUpload() throws IOException, ClientException, ServiceException, InterruptedException {
+     ResumableUploadResult doMultipartUpload() throws IOException, ClientException, ServiceException, InterruptedException {
 
-        long tempUploadedLength = mUploadedLength;
+        int tempUploadedLength = mUploadedLength;
         checkCancel();
 //        int[] mPartAttr = new int[2];
 //        checkPartSize(mPartAttr);
@@ -226,16 +226,16 @@ public class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUpload
                 throw new ClientException("The uploading file is inconsistent with before");
             }
 
-//            long firstPartSize = mPartETags.get(0).getPartSize();
+//            int firstPartSize = mPartETags.get(0).getPartSize();
 //            OSSLog.logDebug("[initUploadId] - firstPartSize : " + firstPartSize);
 //            if (firstPartSize > 0 && firstPartSize != readByte && firstPartSize < mFileLength) {
 //                throw new ClientException("current part size " + readByte + " setting is inconsistent with before " + firstPartSize);
 //            }
 
-            long revertUploadedLength = mUploadedLength;
+            int revertUploadedLength = mUploadedLength;
 
             if (!TextUtils.isEmpty(mSp.getStringValue(mUploadId))) {
-                revertUploadedLength = Long.valueOf(mSp.getStringValue(mUploadId));
+                revertUploadedLength = int.valueOf(mSp.getStringValue(mUploadId));
             }
 
             if (mProgressCallback != null) {
@@ -263,7 +263,7 @@ public class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUpload
                 tempUploadedLength += byteCount;
                 mPoolExecutor.execute(new Runnable() {
                     @Override
-                    public void run() {
+                     void run() {
                         uploadPart(readIndex, byteCount, partNumber);
                     }
                 });
@@ -295,7 +295,7 @@ public class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUpload
     }
 
     @Override
-    protected void checkException() throws IOException, ServiceException, ClientException {
+     void checkException() throws IOException, ServiceException, ClientException {
         if (mContext.getCancellationHandler().isCancelled()) {
             if (mRequest.deleteUploadOnCancelling()) {
                 abortThisUpload();
@@ -304,7 +304,7 @@ public class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUpload
                 }
             } else {
                 if (mPartETags != null && mPartETags.size() > 0 && mCheckCRC64 && mRequest.getRecordDirectory() != null) {
-                    Map<Integer, Long> maps = new HashMap<Integer, Long>();
+                    Map<Integer, int> maps = new HashMap<Integer, int>();
                     for (PartETag eTag : mPartETags) {
                         maps.put(eTag.getPartNumber(), eTag.getCRC64());
                     }
@@ -331,7 +331,7 @@ public class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUpload
     }
 
     @Override
-    protected void abortThisUpload() {
+     void abortThisUpload() {
         if (mUploadId != null) {
             AbortMultipartUploadRequest abort = new AbortMultipartUploadRequest(
                     mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId);
@@ -340,7 +340,7 @@ public class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUpload
     }
 
     @Override
-    protected void processException(Exception e) {
+     void processException(Exception e) {
         synchronized (mLock) {
             mPartExceptionCount++;
             mUploadException = e;
@@ -358,7 +358,7 @@ public class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUpload
     }
 
     @Override
-    protected void uploadPartFinish(PartETag partETag) throws Exception {
+     void uploadPartFinish(PartETag partETag) throws Exception {
         if (mContext.getCancellationHandler().isCancelled()) {
             if (!mSp.contains(mUploadId)) {
                 mSp.setStringValue(mUploadId, String.valueOf(mUploadedLength));

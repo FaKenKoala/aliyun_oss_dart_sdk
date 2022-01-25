@@ -7,9 +7,9 @@ package com.alibaba.sdk.android.oss.common.auth;
  * We recommend to use STS authentication or custom authentication.
  */
 @Deprecated
-public class OSSPlainTextAKSKCredentialProvider implements OSSCredentialProvider {
-    private String accessKeyId;
-    private String accessKeySecret;
+ class OSSPlainTextAKSKCredentialProvider implements OSSCredentialProvider {
+     String accessKeyId;
+     String accessKeySecret;
 
     /**
      * 用阿里云提供的AccessKeyId， AccessKeySecret构造一个凭证提供器
@@ -17,29 +17,29 @@ public class OSSPlainTextAKSKCredentialProvider implements OSSCredentialProvider
      * @param accessKeyId
      * @param accessKeySecret
      */
-    public OSSPlainTextAKSKCredentialProvider(String accessKeyId, String accessKeySecret) {
+     OSSPlainTextAKSKCredentialProvider(String accessKeyId, String accessKeySecret) {
         setAccessKeyId(accessKeyId.trim());
         setAccessKeySecret(accessKeySecret.trim());
     }
 
-    public String getAccessKeyId() {
+     String getAccessKeyId() {
         return accessKeyId;
     }
 
-    public void setAccessKeyId(String accessKeyId) {
+     void setAccessKeyId(String accessKeyId) {
         this.accessKeyId = accessKeyId;
     }
 
-    public String getAccessKeySecret() {
+     String getAccessKeySecret() {
         return accessKeySecret;
     }
 
-    public void setAccessKeySecret(String accessKeySecret) {
+     void setAccessKeySecret(String accessKeySecret) {
         this.accessKeySecret = accessKeySecret;
     }
 
     @Override
-    public OSSFederationToken getFederationToken() {
+     OSSFederationToken getFederationToken() {
         return null;
     }
 }

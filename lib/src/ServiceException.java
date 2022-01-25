@@ -32,60 +32,60 @@ import com.alibaba.sdk.android.oss.common.OSSLog;
  * for troubleshooting.
  * </p>
  */
-public class ServiceException extends Exception {
+ class ServiceException extends Exception {
 
-    public static final String PARSE_RESPONSE_FAIL = "SDKParseResponseFail";
+     static final String PARSE_RESPONSE_FAIL = "SDKParseResponseFail";
 
-    private static final long serialVersionUID = 430933593095358673L;
+     static final int serialVersionUID = 430933593095358673L;
 
     /**
      * http status code
      */
-    private int statusCode;
+     int statusCode;
 
     /**
      * OSS error code, check out：http://help.aliyun.com/document_detail/oss/api-reference/error-response.html
      */
-    private String errorCode;
+     String errorCode;
 
     /**
      * OSS request Id
      */
-    private String requestId;
+     String requestId;
 
     /**
      * The OSS host Id which is same as the one in the request
      */
-    private String hostId;
+     String hostId;
 
     /**
      * The raw message in the response
      */
-    private String rawMessage;
+     String rawMessage;
 
     /**
      * part number
      */
-    private String partNumber;
+     String partNumber;
 
     /**
      * part etag
      */
-    private String partEtag;
+     String partEtag;
 
-    public String getPartNumber() {
+     String getPartNumber() {
         return partNumber;
     }
 
-    public void setPartNumber(String partNumber) {
+     void setPartNumber(String partNumber) {
         this.partNumber = partNumber;
     }
 
-    public String getPartEtag() {
+     String getPartEtag() {
         return partEtag;
     }
 
-    public void setPartEtag(String partEtag) {
+     void setPartEtag(String partEtag) {
         this.partEtag = partEtag;
     }
 
@@ -98,7 +98,7 @@ public class ServiceException extends Exception {
      * @param requestId  Request ID
      * @param hostId     Host ID
      */
-    public ServiceException(int statusCode, String message,
+     ServiceException(int statusCode, String message,
                             String errorCode, String requestId, String hostId, String rawMessage) {
 
         super(message);
@@ -117,7 +117,7 @@ public class ServiceException extends Exception {
      *
      * @return
      */
-    public int getStatusCode() {
+     int getStatusCode() {
         return statusCode;
     }
 
@@ -126,7 +126,7 @@ public class ServiceException extends Exception {
      *
      * @return error code in string
      */
-    public String getErrorCode() {
+     String getErrorCode() {
         return errorCode;
     }
 
@@ -135,7 +135,7 @@ public class ServiceException extends Exception {
      *
      * @return Request Id
      */
-    public String getRequestId() {
+     String getRequestId() {
         return requestId;
     }
 
@@ -144,12 +144,12 @@ public class ServiceException extends Exception {
      *
      * @return Host Id
      */
-    public String getHostId() {
+     String getHostId() {
         return hostId;
     }
 
     @Override
-    public String toString() {
+     String toString() {
         return "[StatusCode]: " + statusCode + ", "
                 + "[Code]: " + getErrorCode() + ", "
                 + "[Message]: " + getMessage() + ", "
@@ -161,7 +161,7 @@ public class ServiceException extends Exception {
     /**
      * @return The raw message
      */
-    public String getRawMessage() {
+     String getRawMessage() {
         return rawMessage;
     }
 }

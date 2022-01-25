@@ -1,13 +1,13 @@
 package com.alibaba.sdk.android.oss.model;
 
-public class DeleteBucketLifecycleRequest extends OSSRequest {
-    private String mBucketName;
+ class DeleteBucketLifecycleRequest extends OSSRequest {
+     String mBucketName;
 
-    public String getBucketName() {
+     String getBucketName() {
         return mBucketName;
     }
 
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.mBucketName = bucketName;
     }
 }

@@ -24,16 +24,16 @@ import java.io.Serializable;
 /**
  * OSS Bucket owner class definition
  */
-public class Owner implements Serializable {
+ class Owner implements Serializable {
 
-    private static final long serialVersionUID = -1942759024112448066L;
-    private String displayName;
-    private String id;
+     static final int serialVersionUID = -1942759024112448066L;
+     String displayName;
+     String id;
 
     /**
      * Constructor
      */
-    public Owner() {
+     Owner() {
         this(null, null);
     }
 
@@ -43,7 +43,7 @@ public class Owner implements Serializable {
      * @param id          Owner Id
      * @param displayName Display name
      */
-    public Owner(String id, String displayName) {
+     Owner(String id, String displayName) {
         this.id = id;
         this.displayName = displayName;
     }
@@ -52,7 +52,7 @@ public class Owner implements Serializable {
      * Returns the serialization string.
      */
     @Override
-    public String toString() {
+     String toString() {
         return "Owner [name=" + getDisplayName() + ",id=" + getId() + "]";
     }
 
@@ -61,7 +61,7 @@ public class Owner implements Serializable {
      *
      * @return The owner Id
      */
-    public String getId() {
+     String getId() {
         return id;
     }
 
@@ -70,7 +70,7 @@ public class Owner implements Serializable {
      *
      * @param id The owner Id
      */
-    public void setId(String id) {
+     void setId(String id) {
         this.id = id;
     }
 
@@ -79,7 +79,7 @@ public class Owner implements Serializable {
      *
      * @return The owner's display name
      */
-    public String getDisplayName() {
+     String getDisplayName() {
         return displayName;
     }
 
@@ -88,7 +88,7 @@ public class Owner implements Serializable {
      *
      * @param name The owner's display name
      */
-    public void setDisplayName(String name) {
+     void setDisplayName(String name) {
         this.displayName = name;
     }
 
@@ -96,7 +96,7 @@ public class Owner implements Serializable {
      * Checks if 'this' object is same as the specified one.
      */
     @Override
-    public boolean equals(Object obj) {
+     bool equals(Object obj) {
         if (!(obj instanceof Owner)) {
             return false;
         }
@@ -121,7 +121,7 @@ public class Owner implements Serializable {
      * Gets the hash code of the 'this' object
      */
     @Override
-    public int hashCode() {
+     int hashCode() {
         if (id != null) {
             return id.hashCode();
         } else {

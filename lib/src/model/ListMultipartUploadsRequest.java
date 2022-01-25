@@ -4,32 +4,32 @@ package com.alibaba.sdk.android.oss.model;
  * Created by jingdan on 2018/2/13.
  */
 
-public class ListMultipartUploadsRequest extends OSSRequest {
+ class ListMultipartUploadsRequest extends OSSRequest {
 
-    private String bucketName;
+     String bucketName;
 
-    private String delimiter;
+     String delimiter;
 
-    private String prefix;
+     String prefix;
 
-    private Integer maxUploads;
+     Integer maxUploads;
 
-    private String keyMarker;
+     String keyMarker;
 
-    private String uploadIdMarker;
+     String uploadIdMarker;
 
-    private String encodingType;
+     String encodingType;
 
     /**
      * Constructor.
      *
      * @param bucketName Bucket name.
      */
-    public ListMultipartUploadsRequest(String bucketName) {
+     ListMultipartUploadsRequest(String bucketName) {
         this.bucketName = bucketName;
     }
 
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
@@ -38,7 +38,7 @@ public class ListMultipartUploadsRequest extends OSSRequest {
      *
      * @return The max number of uploads.
      */
-    public Integer getMaxUploads() {
+     Integer getMaxUploads() {
         return maxUploads;
     }
 
@@ -48,7 +48,7 @@ public class ListMultipartUploadsRequest extends OSSRequest {
      *
      * @param maxUploads The max number of uploads.
      */
-    public void setMaxUploads(Integer maxUploads) {
+     void setMaxUploads(Integer maxUploads) {
         this.maxUploads = maxUploads;
     }
 
@@ -58,7 +58,7 @@ public class ListMultipartUploadsRequest extends OSSRequest {
      *
      * @return The key marker filter.
      */
-    public String getKeyMarker() {
+     String getKeyMarker() {
         return keyMarker;
     }
 
@@ -68,7 +68,7 @@ public class ListMultipartUploadsRequest extends OSSRequest {
      *
      * @param keyMarker The key marker.
      */
-    public void setKeyMarker(String keyMarker) {
+     void setKeyMarker(String keyMarker) {
         this.keyMarker = keyMarker;
     }
 
@@ -78,7 +78,7 @@ public class ListMultipartUploadsRequest extends OSSRequest {
      *
      * @return The upload Id marker.
      */
-    public String getUploadIdMarker() {
+     String getUploadIdMarker() {
         return uploadIdMarker;
     }
 
@@ -88,23 +88,23 @@ public class ListMultipartUploadsRequest extends OSSRequest {
      *
      * @param uploadIdMarker The upload Id marker.
      */
-    public void setUploadIdMarker(String uploadIdMarker) {
+     void setUploadIdMarker(String uploadIdMarker) {
         this.uploadIdMarker = uploadIdMarker;
     }
 
-    public String getDelimiter() {
+     String getDelimiter() {
         return delimiter;
     }
 
-    public void setDelimiter(String delimiter) {
+     void setDelimiter(String delimiter) {
         this.delimiter = delimiter;
     }
 
-    public String getPrefix() {
+     String getPrefix() {
         return prefix;
     }
 
-    public void setPrefix(String prefix) {
+     void setPrefix(String prefix) {
         this.prefix = prefix;
     }
 
@@ -113,7 +113,7 @@ public class ListMultipartUploadsRequest extends OSSRequest {
      *
      * @return The encoding type of the object in the response body.
      */
-    public String getEncodingType() {
+     String getEncodingType() {
         return encodingType;
     }
 
@@ -123,7 +123,7 @@ public class ListMultipartUploadsRequest extends OSSRequest {
      * @param encodingType The encoding type of the object in the response body. Valid
      *                     value is either 'null' or 'url'.
      */
-    public void setEncodingType(String encodingType) {
+     void setEncodingType(String encodingType) {
         this.encodingType = encodingType;
     }
 

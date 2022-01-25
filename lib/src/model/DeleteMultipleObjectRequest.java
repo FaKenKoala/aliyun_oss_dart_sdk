@@ -6,19 +6,19 @@ import java.util.List;
  * Created by chenjie on 17/11/28.
  */
 
-public class DeleteMultipleObjectRequest extends OSSRequest {
+ class DeleteMultipleObjectRequest extends OSSRequest {
 
-    private String bucketName;
-    private List<String> objectKeys;
-    private boolean isQuiet;
+     String bucketName;
+     List<String> objectKeys;
+     bool isQuiet;
 
-    public DeleteMultipleObjectRequest(String bucketName, List<String> objectKeys, Boolean isQuiet) {
+     DeleteMultipleObjectRequest(String bucketName, List<String> objectKeys, bool isQuiet) {
         setBucketName(bucketName);
         setObjectKeys(objectKeys);
         setQuiet(isQuiet);
     }
 
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
@@ -27,11 +27,11 @@ public class DeleteMultipleObjectRequest extends OSSRequest {
      *
      * @param bucketName
      */
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
-    public List<String> getObjectKeys() {
+     List<String> getObjectKeys() {
         return objectKeys;
     }
 
@@ -40,15 +40,15 @@ public class DeleteMultipleObjectRequest extends OSSRequest {
      *
      * @param objectKeys
      */
-    public void setObjectKeys(List<String> objectKeys) {
+     void setObjectKeys(List<String> objectKeys) {
         this.objectKeys = objectKeys;
     }
 
-    public Boolean getQuiet() {
+     bool getQuiet() {
         return isQuiet;
     }
 
-    public void setQuiet(Boolean isQuiet) {
+     void setQuiet(bool isQuiet) {
         this.isQuiet = isQuiet;
     }
 

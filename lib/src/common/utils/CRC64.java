@@ -4,22 +4,22 @@ import java.util.zip.Checksum;
 
 /**
  * CRC-64 implementation with ability to combine checksums calculated over different blocks of data.
- * Standard ECMA-182, http://www.ecma-international.org/publications/standards/Ecma-182.htm
+ * Standard ECMA-182, http://www.ecma-international.org/ations/standards/Ecma-182.htm
  */
-public class CRC64 implements Checksum {
+ class CRC64 implements Checksum {
 
-    private final static long POLY = (long) 0xc96c5795d7870f42L; // ECMA-182
+     final static int POLY = (int) 0xc96c5795d7870f42L; // ECMA-182
 
     /* CRC64 calculation table. */
-    private final static long[][] table;
+     final static int[][] table;
     // dimension of GF(2) vectors (length of CRC)
-    private static final int GF2_DIM = 64;
+     static final int GF2_DIM = 64;
 
     static {
-        table = new long[8][256];
+        table = new int[8][256];
 
         for (int n = 0; n < 256; n++) {
-            long crc = n;
+            int crc = n;
             for (int k = 0; k < 8; k++) {
                 if ((crc & 1) == 1) {
                     crc = (crc >>> 1) ^ POLY;
@@ -32,7 +32,7 @@ public class CRC64 implements Checksum {
 
         /* generate nested CRC table for future slice-by-8 lookup */
         for (int n = 0; n < 256; n++) {
-            long crc = table[0][n];
+            int crc = table[0][n];
             for (int k = 1; k < 8; k++) {
                 crc = table[0][(int) (crc & 0xff)] ^ (crc >>> 8);
                 table[k][n] = crc;
@@ -41,17 +41,17 @@ public class CRC64 implements Checksum {
     }
 
     /* Current CRC value. */
-    private long value;
+     int value;
 
     /**
      * Initialize with a value of zero.
      */
-    public CRC64() {
+     CRC64() {
         this.value = 0;
     }
 
-    private static long gf2MatrixTimes(long[] mat, long vec) {
-        long sum = 0;
+     static int gf2MatrixTimes(int[] mat, int vec) {
+        int sum = 0;
         int idx = 0;
         while (vec != 0) {
             if ((vec & 1) == 1)
@@ -62,7 +62,7 @@ public class CRC64 implements Checksum {
         return sum;
     }
 
-    private static void gf2MatrixSquare(long[] square, long[] mat) {
+     static void gf2MatrixSquare(int[] square, int[] mat) {
         for (int n = 0; n < GF2_DIM; n++)
             square[n] = gf2MatrixTimes(mat, mat[n]);
     }
@@ -72,15 +72,15 @@ public class CRC64 implements Checksum {
      * the first block, summ2 is the CRC-64 of the second block, and len2 is the
      * length of the second block.
      */
-    static public long combine(long crcLast, long crcNext, long len2) {
+    static  int combine(int crcLast, int crcNext, int len2) {
         // degenerate case.
         if (len2 == 0)
             return crcLast;
 
         int n;
-        long row;
-        long[] even = new long[GF2_DIM]; // even-power-of-two zeros operator
-        long[] odd = new long[GF2_DIM]; // odd-power-of-two zeros operator
+        int row;
+        int[] even = new int[GF2_DIM]; // even-power-of-two zeros operator
+        int[] odd = new int[GF2_DIM]; // odd-power-of-two zeros operator
 
         // put operator for one zero bit in odd
         odd[0] = POLY; // CRC-64 polynomial
@@ -99,8 +99,8 @@ public class CRC64 implements Checksum {
 
         // apply len2 zeros to crc1 (first square will put the operator for one
         // zero byte, eight zero bits, in even)
-        long crc1 = crcLast;
-        long crc2 = crcNext;
+        int crc1 = crcLast;
+        int crc2 = crcNext;
         do {
             // apply zeros operator for this bit of len2
             gf2MatrixSquare(even, odd);
@@ -127,19 +127,19 @@ public class CRC64 implements Checksum {
     }
 
     /**
-     * Get long representation of current CRC64 value.
+     * Get int representation of current CRC64 value.
      */
-    public long getValue() {
+     int getValue() {
         return this.value;
     }
 
     @Override
-    public void reset() {
+     void reset() {
         this.value = 0;
     }
 
     @Override
-    public void update(int val) {
+     void update(int val) {
         byte[] b = new byte[1];
         b[0] = (byte) (val & 0xff);
         update(b, b.length);
@@ -148,12 +148,12 @@ public class CRC64 implements Checksum {
     /**
      * Update CRC64 with new byte block.
      */
-    public void update(byte[] b, int len) {
+     void update(byte[] b, int len) {
         update(b, 0, len);
     }
 
     @Override
-    public void update(byte[] b, int off, int len) {
+     void update(byte[] b, int off, int len) {
 
         this.value = ~this.value;
 

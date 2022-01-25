@@ -4,17 +4,17 @@ package com.alibaba.sdk.android.oss.model;
  * Created by chenjie on 17/11/25.
  */
 
-public class GetObjectACLRequest extends OSSRequest {
+ class GetObjectACLRequest extends OSSRequest {
 
-    private String bucketName;
-    private String objectKey;
+     String bucketName;
+     String objectKey;
 
     /**
      * Creates the request to get the bucket ACL
      *
      * @param bucketName
      */
-    public GetObjectACLRequest(String bucketName, String objectKey) {
+     GetObjectACLRequest(String bucketName, String objectKey) {
         setBucketName(bucketName);
         setObjectKey(objectKey);
     }
@@ -24,7 +24,7 @@ public class GetObjectACLRequest extends OSSRequest {
      *
      * @return
      */
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
@@ -33,7 +33,7 @@ public class GetObjectACLRequest extends OSSRequest {
      *
      * @param bucketName
      */
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
@@ -42,7 +42,7 @@ public class GetObjectACLRequest extends OSSRequest {
      *
      * @return
      */
-    public String getObjectKey() {
+     String getObjectKey() {
         return objectKey;
     }
 
@@ -51,7 +51,7 @@ public class GetObjectACLRequest extends OSSRequest {
      *
      * @param objectKey
      */
-    public void setObjectKey(String objectKey) {
+     void setObjectKey(String objectKey) {
         this.objectKey = objectKey;
     }
 

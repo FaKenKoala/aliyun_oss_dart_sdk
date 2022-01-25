@@ -17,11 +17,11 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-public class IOUtils {
+ class IOUtils {
 
-    private final static int BUFFER_SIZE = 4 * 1024;
+     final static int BUFFER_SIZE = 4 * 1024;
 
-    public static String readStreamAsString(InputStream in, String charset)
+     static String readStreamAsString(InputStream in, String charset)
             throws IOException {
         if (in == null)
             return "";
@@ -54,7 +54,7 @@ public class IOUtils {
         return result;
     }
 
-    public static byte[] readStreamAsBytesArray(InputStream in)
+     static byte[] readStreamAsBytesArray(InputStream in)
             throws IOException {
         if (in == null) {
             return new byte[0];
@@ -71,7 +71,7 @@ public class IOUtils {
         return output.toByteArray();
     }
 
-    public static byte[] readStreamAsBytesArray(InputStream in, int readLength)
+     static byte[] readStreamAsBytesArray(InputStream in, int readLength)
             throws IOException {
         if (in == null) {
             return new byte[0];
@@ -80,7 +80,7 @@ public class IOUtils {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         byte[] buffer = new byte[BUFFER_SIZE];
         int len;
-        long readed = 0;
+        int readed = 0;
         while (readed < readLength && (len = in.read(buffer, 0, Math.min(2048, (int) (readLength - readed)))) > -1) {
             output.write(buffer, 0, len);
             readed += len;
@@ -90,7 +90,7 @@ public class IOUtils {
         return output.toByteArray();
     }
 
-    public static void safeClose(InputStream inputStream) {
+     static void safeClose(InputStream inputStream) {
         if (inputStream != null) {
             try {
                 inputStream.close();
@@ -99,7 +99,7 @@ public class IOUtils {
         }
     }
 
-    public static void safeClose(OutputStream outputStream) {
+     static void safeClose(OutputStream outputStream) {
         if (outputStream != null) {
             try {
                 outputStream.close();

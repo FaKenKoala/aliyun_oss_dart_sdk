@@ -11,15 +11,15 @@ import java.util.concurrent.Future;
 /**
  * Created by zhouzhuo on 11/23/15.
  */
-public class OSSAsyncTask<T extends OSSResult> {
+ class OSSAsyncTask<T extends OSSResult> {
 
-    private Future<T> future;
+     Future<T> future;
 
-    private ExecutionContext context;
+     ExecutionContext context;
 
-    private volatile boolean canceled;
+     volatile bool canceled;
 
-    public static OSSAsyncTask wrapRequestTask(Future future, ExecutionContext context) {
+     static OSSAsyncTask wrapRequestTask(Future future, ExecutionContext context) {
         OSSAsyncTask asynTask = new OSSAsyncTask();
         asynTask.future = future;
         asynTask.context = context;
@@ -29,7 +29,7 @@ public class OSSAsyncTask<T extends OSSResult> {
     /**
      * Cancel the task
      */
-    public void cancel() {
+     void cancel() {
         canceled = true;
         if (context != null) {
             context.getCancellationHandler().cancel();
@@ -41,7 +41,7 @@ public class OSSAsyncTask<T extends OSSResult> {
      *
      * @return
      */
-    public boolean isCompleted() {
+     bool isCompleted() {
         return future.isDone();
     }
 
@@ -52,7 +52,7 @@ public class OSSAsyncTask<T extends OSSResult> {
      * @throws ClientException
      * @throws ServiceException
      */
-    public T getResult() throws ClientException, ServiceException {
+     T getResult() throws ClientException, ServiceException {
         try {
             T result = future.get();
             return result;
@@ -74,7 +74,7 @@ public class OSSAsyncTask<T extends OSSResult> {
     /**
      * Waits until the task is finished
      */
-    public void waitUntilFinished() {
+     void waitUntilFinished() {
         try {
             future.get();
         } catch (Exception ignore) {
@@ -84,7 +84,7 @@ public class OSSAsyncTask<T extends OSSResult> {
     /**
      * Gets the flag if the task has been canceled.
      */
-    public boolean isCanceled() {
+     bool isCanceled() {
         return canceled;
     }
 }

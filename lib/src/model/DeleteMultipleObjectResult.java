@@ -7,13 +7,13 @@ import java.util.List;
  * Created by chenjie on 17/11/28.
  */
 
-public class DeleteMultipleObjectResult extends OSSResult {
+ class DeleteMultipleObjectResult extends OSSResult {
 
-    private List<String> deletedObjects;
-    private List<String> failedObjects;
-    private boolean isQuiet;
+     List<String> deletedObjects;
+     List<String> failedObjects;
+     bool isQuiet;
 
-    public void clear() {
+     void clear() {
         if (deletedObjects != null) {
             deletedObjects.clear();
         }
@@ -22,33 +22,33 @@ public class DeleteMultipleObjectResult extends OSSResult {
         }
     }
 
-    public void addDeletedObject(String object) {
+     void addDeletedObject(String object) {
         if (deletedObjects == null) {
             deletedObjects = new ArrayList<String>();
         }
         deletedObjects.add(object);
     }
 
-    public void addFailedObjects(String object) {
+     void addFailedObjects(String object) {
         if (failedObjects == null) {
             failedObjects = new ArrayList<String>();
         }
         failedObjects.add(object);
     }
 
-    public List<String> getDeletedObjects() {
+     List<String> getDeletedObjects() {
         return deletedObjects;
     }
 
-    public List<String> getFailedObjects() {
+     List<String> getFailedObjects() {
         return failedObjects;
     }
 
-    public boolean getQuiet() {
+     bool getQuiet() {
         return isQuiet;
     }
 
-    public void setQuiet(boolean isQuiet) {
+     void setQuiet(bool isQuiet) {
         this.isQuiet = isQuiet;
     }
 

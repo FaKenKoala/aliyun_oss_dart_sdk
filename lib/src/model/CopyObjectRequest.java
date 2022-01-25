@@ -26,41 +26,41 @@ import java.util.List;
 /**
  * The request class of copying an existing OSS object to another one
  */
-public class CopyObjectRequest extends OSSRequest {
+ class CopyObjectRequest extends OSSRequest {
 
     // Source Object's bucket name
-    private String sourceBucketName;
+     String sourceBucketName;
 
     // Source Object's key
-    private String sourceKey;
+     String sourceKey;
 
     // Target Object's bucket name
-    private String destinationBucketName;
+     String destinationBucketName;
 
     // Target Object Key
-    private String destinationKey;
+     String destinationKey;
 
     // Target Object's server side encryption method
-    private String serverSideEncryption;
+     String serverSideEncryption;
 
     // Target Object Metadata
-    private ObjectMetadata newObjectMetadata;
+     ObjectMetadata newObjectMetadata;
 
     // The ETag matching constraints. If the source object's ETag matches the one user provided, copy the file.
     // Otherwise returns 412 (precondition failed).
-    private List<String> matchingETagConstraints = new ArrayList<String>();
+     List<String> matchingETagConstraints = new ArrayList<String>();
 
     // The ETag non-matching constraints. If the source object's ETag does not match the one user provided, copy the file.
     // Otherwise returns 412 (precondition failed).
-    private List<String> nonmatchingEtagConstraints = new ArrayList<String>();
+     List<String> nonmatchingEtagConstraints = new ArrayList<String>();
 
     // The unmodified since constraint. If the parameter value is same or later than the actual file's modified time, copy the file.
     // Otherwise returns 412 (precondition failed).
-    private Date unmodifiedSinceConstraint;
+     Date unmodifiedSinceConstraint;
 
     // The modified since constraint. If the parameter value is earlier than the actual file's modified time, copy the file.
     // Otherwise returns 412 (precondition failed).
-    private Date modifiedSinceConstraint;
+     Date modifiedSinceConstraint;
 
     /**
      * Creates an instance of {@link CopyObjectRequest}
@@ -70,7 +70,7 @@ public class CopyObjectRequest extends OSSRequest {
      * @param destinationBucketName Target Object's bucket name
      * @param destinationKey        Target Object key
      */
-    public CopyObjectRequest(String sourceBucketName, String sourceKey,
+     CopyObjectRequest(String sourceBucketName, String sourceKey,
                              String destinationBucketName, String destinationKey) {
         setSourceBucketName(sourceBucketName);
         setSourceKey(sourceKey);
@@ -83,7 +83,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @return Source Object's bucket name
      */
-    public String getSourceBucketName() {
+     String getSourceBucketName() {
         return sourceBucketName;
     }
 
@@ -92,7 +92,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @param sourceBucketName Source object's bucket name
      */
-    public void setSourceBucketName(String sourceBucketName) {
+     void setSourceBucketName(String sourceBucketName) {
         this.sourceBucketName = sourceBucketName;
     }
 
@@ -101,7 +101,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @return Source Object key
      */
-    public String getSourceKey() {
+     String getSourceKey() {
         return sourceKey;
     }
 
@@ -110,7 +110,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @param sourceKey Source Object Key
      */
-    public void setSourceKey(String sourceKey) {
+     void setSourceKey(String sourceKey) {
         this.sourceKey = sourceKey;
     }
 
@@ -119,7 +119,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @return Target object's bucket name
      */
-    public String getDestinationBucketName() {
+     String getDestinationBucketName() {
         return destinationBucketName;
     }
 
@@ -128,7 +128,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @param destinationBucketName Target object's bucket name
      */
-    public void setDestinationBucketName(String destinationBucketName) {
+     void setDestinationBucketName(String destinationBucketName) {
         this.destinationBucketName = destinationBucketName;
     }
 
@@ -137,7 +137,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @return The target object key
      */
-    public String getDestinationKey() {
+     String getDestinationKey() {
         return destinationKey;
     }
 
@@ -146,7 +146,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @param destinationKey The target Object key
      */
-    public void setDestinationKey(String destinationKey) {
+     void setDestinationKey(String destinationKey) {
         this.destinationKey = destinationKey;
     }
 
@@ -155,7 +155,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @return the target Object {@link ObjectMetadata} instance
      */
-    public ObjectMetadata getNewObjectMetadata() {
+     ObjectMetadata getNewObjectMetadata() {
         return newObjectMetadata;
     }
 
@@ -164,7 +164,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @param newObjectMetadata he target Object {@link ObjectMetadata} instance
      */
-    public void setNewObjectMetadata(ObjectMetadata newObjectMetadata) {
+     void setNewObjectMetadata(ObjectMetadata newObjectMetadata) {
         this.newObjectMetadata = newObjectMetadata;
     }
 
@@ -174,7 +174,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @return ETag list to match.
      */
-    public List<String> getMatchingETagConstraints() {
+     List<String> getMatchingETagConstraints() {
         return matchingETagConstraints;
     }
 
@@ -184,14 +184,14 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @param matchingETagConstraints ETag list to match.
      */
-    public void setMatchingETagConstraints(List<String> matchingETagConstraints) {
+     void setMatchingETagConstraints(List<String> matchingETagConstraints) {
         this.matchingETagConstraints.clear();
         if (matchingETagConstraints != null && !matchingETagConstraints.isEmpty()) {
             this.matchingETagConstraints.addAll(matchingETagConstraints);
         }
     }
 
-    public void clearMatchingETagConstraints() {
+     void clearMatchingETagConstraints() {
         this.matchingETagConstraints.clear();
     }
 
@@ -202,7 +202,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @return ETag list to match
      */
-    public List<String> getNonmatchingEtagConstraints() {
+     List<String> getNonmatchingEtagConstraints() {
         return nonmatchingEtagConstraints;
     }
 
@@ -213,14 +213,14 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @param nonmatchingEtagConstraints ETag list to match
      */
-    public void setNonmatchingETagConstraints(List<String> nonmatchingEtagConstraints) {
+     void setNonmatchingETagConstraints(List<String> nonmatchingEtagConstraints) {
         this.nonmatchingEtagConstraints.clear();
         if (nonmatchingEtagConstraints != null && !nonmatchingEtagConstraints.isEmpty()) {
             this.nonmatchingEtagConstraints.addAll(nonmatchingEtagConstraints);
         }
     }
 
-    public void clearNonmatchingETagConstraints() {
+     void clearNonmatchingETagConstraints() {
         this.nonmatchingEtagConstraints.clear();
     }
 
@@ -230,7 +230,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @return The timestamp threshold of last modified time.
      */
-    public Date getUnmodifiedSinceConstraint() {
+     Date getUnmodifiedSinceConstraint() {
         return unmodifiedSinceConstraint;
     }
 
@@ -240,7 +240,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @param unmodifiedSinceConstraint The timestamp threshold of last modified time.
      */
-    public void setUnmodifiedSinceConstraint(Date unmodifiedSinceConstraint) {
+     void setUnmodifiedSinceConstraint(Date unmodifiedSinceConstraint) {
         this.unmodifiedSinceConstraint = unmodifiedSinceConstraint;
     }
 
@@ -250,7 +250,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @return The timestamp threshold of last modified time.
      */
-    public Date getModifiedSinceConstraint() {
+     Date getModifiedSinceConstraint() {
         return modifiedSinceConstraint;
     }
 
@@ -260,7 +260,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @param modifiedSinceConstraint The timestamp threshold of last modified time.
      */
-    public void setModifiedSinceConstraint(Date modifiedSinceConstraint) {
+     void setModifiedSinceConstraint(Date modifiedSinceConstraint) {
         this.modifiedSinceConstraint = modifiedSinceConstraint;
     }
 
@@ -269,7 +269,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @return The server side encryption
      */
-    public String getServerSideEncryption() {
+     String getServerSideEncryption() {
         return this.serverSideEncryption;
     }
 
@@ -278,7 +278,7 @@ public class CopyObjectRequest extends OSSRequest {
      *
      * @param serverSideEncryption the server side encryption
      */
-    public void setServerSideEncryption(String serverSideEncryption) {
+     void setServerSideEncryption(String serverSideEncryption) {
         this.serverSideEncryption = serverSideEncryption;
     }
 }

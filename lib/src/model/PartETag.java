@@ -22,15 +22,15 @@ package com.alibaba.sdk.android.oss.model;
 /**
  * The wrapper class of a part's part number and its ETag
  */
-public class PartETag {
+ class PartETag {
 
-    private int partNumber;
+     int partNumber;
 
-    private String eTag;
+     String eTag;
 
-    private long partSize;
+     int partSize;
 
-    private long crc64;
+     int crc64;
 
     /**
      * Constructor
@@ -38,7 +38,7 @@ public class PartETag {
      * @param partNumber Part number
      * @param eTag       Part ETag
      */
-    public PartETag(int partNumber, String eTag) {
+     PartETag(int partNumber, String eTag) {
         setPartNumber(partNumber);
         setETag(eTag);
     }
@@ -48,7 +48,7 @@ public class PartETag {
      *
      * @return Part number
      */
-    public int getPartNumber() {
+     int getPartNumber() {
         return partNumber;
     }
 
@@ -57,7 +57,7 @@ public class PartETag {
      *
      * @param partNumber Part number
      */
-    public void setPartNumber(int partNumber) {
+     void setPartNumber(int partNumber) {
         this.partNumber = partNumber;
     }
 
@@ -66,7 +66,7 @@ public class PartETag {
      *
      * @return Part ETag
      */
-    public String getETag() {
+     String getETag() {
         return eTag;
     }
 
@@ -75,23 +75,23 @@ public class PartETag {
      *
      * @param eTag Part ETag
      */
-    public void setETag(String eTag) {
+     void setETag(String eTag) {
         this.eTag = eTag;
     }
 
-    public long getPartSize() {
+     int getPartSize() {
         return partSize;
     }
 
-    public void setPartSize(long partSize) {
+     void setPartSize(int partSize) {
         this.partSize = partSize;
     }
 
-    public long getCRC64() {
+     int getCRC64() {
         return crc64;
     }
 
-    public void setCRC64(long crc64) {
+     void setCRC64(int crc64) {
         this.crc64 = crc64;
     }
 }

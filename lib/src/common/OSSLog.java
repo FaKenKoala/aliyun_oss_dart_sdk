@@ -5,29 +5,29 @@ import android.util.Log;
 /**
  * Created by zhouzhuo on 11/22/15.
  */
-public class OSSLog {
+ class OSSLog {
 
-    private static final String TAG = "OSS-Android-SDK";
-    private static boolean enableLog = false;
+     static final String TAG = "OSS-Android-SDK";
+     static bool enableLog = false;
 
     /**
      * enable log
      */
-    public static void enableLog() {
+     static void enableLog() {
         enableLog = true;
     }
 
     /**
      * disable log
      */
-    public static void disableLog() {
+     static void disableLog() {
         enableLog = false;
     }
 
     /**
      * @return return log flag
      */
-    public static boolean isEnableLog() {
+     static bool isEnableLog() {
         return enableLog;
     }
 
@@ -36,11 +36,11 @@ public class OSSLog {
      *
      * @param msg
      */
-    public static void logInfo(String msg) {
+     static void logInfo(String msg) {
         logInfo(msg, true);
     }
 
-    public static void logInfo(String msg, boolean write2local) {
+     static void logInfo(String msg, bool write2local) {
         if (enableLog) {
             Log.i(TAG, "[INFO]: ".concat(msg));
             log2Local(msg, write2local);
@@ -52,11 +52,11 @@ public class OSSLog {
      *
      * @param msg
      */
-    public static void logVerbose(String msg) {
+     static void logVerbose(String msg) {
         logVerbose(msg, true);
     }
 
-    public static void logVerbose(String msg, boolean write2local) {
+     static void logVerbose(String msg, bool write2local) {
         if (enableLog) {
             Log.v(TAG, "[Verbose]: ".concat(msg));
             log2Local(msg, write2local);
@@ -68,11 +68,11 @@ public class OSSLog {
      *
      * @param msg
      */
-    public static void logWarn(String msg) {
+     static void logWarn(String msg) {
         logWarn(msg, true);
     }
 
-    public static void logWarn(String msg, boolean write2local) {
+     static void logWarn(String msg, bool write2local) {
         if (enableLog) {
             Log.w(TAG, "[Warn]: ".concat(msg));
             log2Local(msg, write2local);
@@ -84,11 +84,11 @@ public class OSSLog {
      *
      * @param msg
      */
-    public static void logDebug(String msg) {
+     static void logDebug(String msg) {
         logDebug(TAG, msg);
     }
 
-    public static void logDebug(String tag, String msg) {
+     static void logDebug(String tag, String msg) {
         logDebug(tag, msg, true);
     }
 
@@ -98,11 +98,11 @@ public class OSSLog {
      * @param write2local 是否需要写入本地
      * @param msg
      */
-    public static void logDebug(String msg, boolean write2local) {
+     static void logDebug(String msg, bool write2local) {
         logDebug(TAG, msg, write2local);
     }
 
-    public static void logDebug(String tag, String msg, boolean write2local) {
+     static void logDebug(String tag, String msg, bool write2local) {
         if (enableLog) {
             Log.d(tag, "[Debug]: ".concat(msg));
             log2Local(msg, write2local);
@@ -114,11 +114,11 @@ public class OSSLog {
      *
      * @param msg
      */
-    public static void logError(String msg) {
+     static void logError(String msg) {
         logError(TAG, msg);
     }
 
-    public static void logError(String tag, String msg) {
+     static void logError(String tag, String msg) {
         logDebug(tag, msg, true);
     }
 
@@ -127,24 +127,24 @@ public class OSSLog {
      *
      * @param msg
      */
-    public static void logError(String msg, boolean write2local) {
+     static void logError(String msg, bool write2local) {
         logError(TAG, msg, write2local);
     }
 
-    public static void logError(String tag, String msg, boolean write2local) {
+     static void logError(String tag, String msg, bool write2local) {
         if (enableLog) {
             Log.d(tag, "[Error]: ".concat(msg));
             log2Local(msg, write2local);
         }
     }
 
-    public static void logThrowable2Local(Throwable throwable) {
+     static void logThrowable2Local(Throwable throwable) {
         if (enableLog) {
             OSSLogToFileUtils.getInstance().write(throwable);
         }
     }
 
-    private static void log2Local(String msg, boolean write2local) {
+     static void log2Local(String msg, bool write2local) {
         if (write2local) {
             OSSLogToFileUtils.getInstance().write(msg);
         }

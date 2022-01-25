@@ -6,38 +6,38 @@ import java.util.Date;
  * Created by chenjie on 17/12/6.
  */
 
-public class OSSBucketSummary {
+ class OSSBucketSummary {
 
     // Bucket name
-    public String name;
+     String name;
 
     // Bucket owner
-    public Owner owner;
+     Owner owner;
 
     // Created date.
-    public Date createDate;
+     Date createDate;
 
     // Bucket location
-    public String location;
+     String location;
 
     // External endpoint.It could be accessed from anywhere.
-    public String extranetEndpoint;
+     String extranetEndpoint;
 
     // Internal endpoint. It could be accessed within AliCloud under the same
     // location.
-    public String intranetEndpoint;
+     String intranetEndpoint;
 
     // Storage class (Standard, IA, Archive)
-    public String storageClass;
+     String storageClass;
 
-    private CannedAccessControlList acl;
+     CannedAccessControlList acl;
 
     /**
      * Gets bucket ACL
      *
      * @return
      */
-    public String getAcl() {
+     String getAcl() {
         String bucketAcl = null;
         if (acl != null) {
             bucketAcl = acl.toString();
@@ -50,12 +50,12 @@ public class OSSBucketSummary {
      *
      * @param aclString
      */
-    public void setAcl(String aclString) {
+     void setAcl(String aclString) {
         this.acl = CannedAccessControlList.parseACL(aclString);
     }
 
     @Override
-    public String toString() {
+     String toString() {
         if (storageClass == null) {
             return "OSSBucket [name=" + name + ", creationDate=" + createDate + ", owner=" + owner.toString()
                     + ", location=" + location + "]";

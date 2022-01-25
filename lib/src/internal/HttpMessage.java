@@ -12,16 +12,16 @@ import java.util.Map;
  */
 
 abstract class HttpMessage {
-    private Map<String, String> headers = new CaseInsensitiveHashMap<String, String>();
-    private InputStream content;
-    private long contentLength;
-    private String stringBody;
+     Map<String, String> headers = new CaseInsensitiveHashMap<String, String>();
+     InputStream content;
+     int contentLength;
+     String stringBody;
 
-    public Map<String, String> getHeaders() {
+     Map<String, String> getHeaders() {
         return headers;
     }
 
-    public void setHeaders(Map<String, String> headers) {
+     void setHeaders(Map<String, String> headers) {
         if (this.headers == null) {
             this.headers = new CaseInsensitiveHashMap<String, String>();
         }
@@ -32,35 +32,35 @@ abstract class HttpMessage {
         this.headers.putAll(headers);
     }
 
-    public void addHeader(String key, String value) {
+     void addHeader(String key, String value) {
         this.headers.put(key, value);
     }
 
-    public InputStream getContent() {
+     InputStream getContent() {
         return content;
     }
 
-    public void setContent(InputStream content) {
+     void setContent(InputStream content) {
         this.content = content;
     }
 
-    public String getStringBody() {
+     String getStringBody() {
         return stringBody;
     }
 
-    public void setStringBody(String stringBody) {
+     void setStringBody(String stringBody) {
         this.stringBody = stringBody;
     }
 
-    public long getContentLength() {
+     int getContentLength() {
         return contentLength;
     }
 
-    public void setContentLength(long contentLength) {
+     void setContentLength(int contentLength) {
         this.contentLength = contentLength;
     }
 
-    public void close() throws IOException {
+     void close() throws IOException {
         if (content != null) {
             content.close();
             content = null;

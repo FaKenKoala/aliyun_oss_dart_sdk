@@ -22,7 +22,7 @@ package com.alibaba.sdk.android.oss.model;
 /**
  * 存储类型。
  */
-public enum StorageClass {
+ enum StorageClass {
 
     /**
      * Standard
@@ -44,13 +44,13 @@ public enum StorageClass {
      */
     Unknown("Unknown");
 
-    private String storageClassString;
+     String storageClassString;
 
-    private StorageClass(String storageClassString) {
+     StorageClass(String storageClassString) {
         this.storageClassString = storageClassString;
     }
 
-    public static StorageClass parse(String storageClassString) {
+     static StorageClass parse(String storageClassString) {
         for (StorageClass st : StorageClass.values()) {
             if (st.toString().equals(storageClassString)) {
                 return st;
@@ -61,7 +61,7 @@ public enum StorageClass {
     }
 
     @Override
-    public String toString() {
+     String toString() {
         return this.storageClassString;
     }
 }

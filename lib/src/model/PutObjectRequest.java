@@ -14,28 +14,28 @@ import java.util.Map;
 /**
  * The request class definition of uploading an object either from local file or in-memory data
  */
-public class PutObjectRequest extends OSSRequest {
+ class PutObjectRequest extends OSSRequest {
 
-    private String bucketName;
-    private String objectKey;
+     String bucketName;
+     String objectKey;
 
-    private String uploadFilePath;
+     String uploadFilePath;
 
-    private byte[] uploadData;
+     byte[] uploadData;
 
-    private Uri uploadUri;
+     Uri uploadUri;
 
-    private ObjectMetadata metadata;
+     ObjectMetadata metadata;
 
-    private Map<String, String> callbackParam;
+     Map<String, String> callbackParam;
 
-    private Map<String, String> callbackVars;
-
-    //run with not ui thread
-    private OSSProgressCallback<PutObjectRequest> progressCallback;
+     Map<String, String> callbackVars;
 
     //run with not ui thread
-    private OSSRetryCallback retryCallback;
+     OSSProgressCallback<PutObjectRequest> progressCallback;
+
+    //run with not ui thread
+     OSSRetryCallback retryCallback;
 
     /**
      * Constructor
@@ -44,7 +44,7 @@ public class PutObjectRequest extends OSSRequest {
      * @param objectKey      The object key
      * @param uploadFilePath The local file path to upload from
      */
-    public PutObjectRequest(String bucketName, String objectKey, String uploadFilePath) {
+     PutObjectRequest(String bucketName, String objectKey, String uploadFilePath) {
         this(bucketName, objectKey, uploadFilePath, null);
     }
 
@@ -56,7 +56,7 @@ public class PutObjectRequest extends OSSRequest {
      * @param uploadFilePath The local file path
      * @param metadata       The metadata information of the target object
      */
-    public PutObjectRequest(String bucketName, String objectKey, String uploadFilePath, ObjectMetadata metadata) {
+     PutObjectRequest(String bucketName, String objectKey, String uploadFilePath, ObjectMetadata metadata) {
         setBucketName(bucketName);
         setObjectKey(objectKey);
         setUploadFilePath(uploadFilePath);
@@ -70,7 +70,7 @@ public class PutObjectRequest extends OSSRequest {
      * @param objectKey  The object key
      * @param uploadData The in-memory data to upload
      */
-    public PutObjectRequest(String bucketName, String objectKey, byte[] uploadData) {
+     PutObjectRequest(String bucketName, String objectKey, byte[] uploadData) {
         this(bucketName, objectKey, uploadData, null);
     }
 
@@ -82,18 +82,18 @@ public class PutObjectRequest extends OSSRequest {
      * @param uploadData The in-memory data to upload
      * @param metadata   The metadata information of the target object
      */
-    public PutObjectRequest(String bucketName, String objectKey, byte[] uploadData, ObjectMetadata metadata) {
+     PutObjectRequest(String bucketName, String objectKey, byte[] uploadData, ObjectMetadata metadata) {
         setBucketName(bucketName);
         setObjectKey(objectKey);
         setUploadData(uploadData);
         setMetadata(metadata);
     }
 
-    public PutObjectRequest(String bucketName, String objectKey, Uri uploadUri) {
+     PutObjectRequest(String bucketName, String objectKey, Uri uploadUri) {
         this(bucketName, objectKey, uploadUri, null);
     }
 
-    public PutObjectRequest(String bucketName, String objectKey, Uri uploadUri, ObjectMetadata metadata) {
+     PutObjectRequest(String bucketName, String objectKey, Uri uploadUri, ObjectMetadata metadata) {
         setBucketName(bucketName);
         setObjectKey(objectKey);
         setUploadUri(uploadUri);
@@ -105,14 +105,14 @@ public class PutObjectRequest extends OSSRequest {
      *
      * @return The bucket name
      */
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
     /**
      * Sets the bucket name
      */
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
@@ -121,18 +121,18 @@ public class PutObjectRequest extends OSSRequest {
      *
      * @return The object key
      */
-    public String getObjectKey() {
+     String getObjectKey() {
         return objectKey;
     }
 
     /**
      * Sets the object key
      */
-    public void setObjectKey(String objectKey) {
+     void setObjectKey(String objectKey) {
         this.objectKey = objectKey;
     }
 
-    public String getUploadFilePath() {
+     String getUploadFilePath() {
         return uploadFilePath;
     }
 
@@ -141,11 +141,11 @@ public class PutObjectRequest extends OSSRequest {
      *
      * @param uploadFilePath The local upload file path
      */
-    public void setUploadFilePath(String uploadFilePath) {
+     void setUploadFilePath(String uploadFilePath) {
         this.uploadFilePath = uploadFilePath;
     }
 
-    public byte[] getUploadData() {
+     byte[] getUploadData() {
         return uploadData;
     }
 
@@ -154,11 +154,11 @@ public class PutObjectRequest extends OSSRequest {
      *
      * @param uploadData
      */
-    public void setUploadData(byte[] uploadData) {
+     void setUploadData(byte[] uploadData) {
         this.uploadData = uploadData;
     }
 
-    public ObjectMetadata getMetadata() {
+     ObjectMetadata getMetadata() {
         return metadata;
     }
 
@@ -167,11 +167,11 @@ public class PutObjectRequest extends OSSRequest {
      *
      * @param uploadUri
      */
-    public Uri getUploadUri() {
+     Uri getUploadUri() {
         return uploadUri;
     }
 
-    public void setUploadUri(Uri uploadUri) {
+     void setUploadUri(Uri uploadUri) {
         this.uploadUri = uploadUri;
     }
 
@@ -180,11 +180,11 @@ public class PutObjectRequest extends OSSRequest {
      *
      * @param metadata the target object metadata
      */
-    public void setMetadata(ObjectMetadata metadata) {
+     void setMetadata(ObjectMetadata metadata) {
         this.metadata = metadata;
     }
 
-    public OSSProgressCallback<PutObjectRequest> getProgressCallback() {
+     OSSProgressCallback<PutObjectRequest> getProgressCallback() {
         return progressCallback;
     }
 
@@ -193,11 +193,11 @@ public class PutObjectRequest extends OSSRequest {
      *
      * @param progressCallback
      */
-    public void setProgressCallback(OSSProgressCallback<PutObjectRequest> progressCallback) {
+     void setProgressCallback(OSSProgressCallback<PutObjectRequest> progressCallback) {
         this.progressCallback = progressCallback;
     }
 
-    public OSSRetryCallback getRetryCallback() {
+     OSSRetryCallback getRetryCallback() {
         return retryCallback;
     }
 
@@ -206,29 +206,29 @@ public class PutObjectRequest extends OSSRequest {
      *
      * @param retryCallback
      */
-    public void setRetryCallback(OSSRetryCallback retryCallback) {
+     void setRetryCallback(OSSRetryCallback retryCallback) {
         this.retryCallback = retryCallback;
     }
 
-    public Map<String, String> getCallbackParam() {
+     Map<String, String> getCallbackParam() {
         return callbackParam;
     }
 
     /**
      * Sets the callback parameters
      */
-    public void setCallbackParam(Map<String, String> callbackParam) {
+     void setCallbackParam(Map<String, String> callbackParam) {
         this.callbackParam = callbackParam;
     }
 
-    public Map<String, String> getCallbackVars() {
+     Map<String, String> getCallbackVars() {
         return callbackVars;
     }
 
     /**
      * Sets the callback variables
      */
-    public void setCallbackVars(Map<String, String> callbackVars) {
+     void setCallbackVars(Map<String, String> callbackVars) {
         this.callbackVars = callbackVars;
     }
 }

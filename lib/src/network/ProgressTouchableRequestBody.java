@@ -16,16 +16,16 @@ import okio.Source;
  * Created by jingdan on 2017/9/12.
  */
 
-public class ProgressTouchableRequestBody<T extends OSSRequest> extends RequestBody {
-    private static final int SEGMENT_SIZE = 2048; // okio.Segment.SIZE
+ class ProgressTouchableRequestBody<T extends OSSRequest> extends RequestBody {
+     static final int SEGMENT_SIZE = 2048; // okio.Segment.SIZE
 
-    private InputStream inputStream;
-    private String contentType;
-    private long contentLength;
-    private OSSProgressCallback callback;
-    private T request;
+     InputStream inputStream;
+     String contentType;
+     int contentLength;
+     OSSProgressCallback callback;
+     T request;
 
-    public ProgressTouchableRequestBody(InputStream input, long contentLength, String contentType, ExecutionContext context) {
+     ProgressTouchableRequestBody(InputStream input, int contentLength, String contentType, ExecutionContext context) {
         this.inputStream = input;
         this.contentType = contentType;
         this.contentLength = contentLength;
@@ -34,20 +34,20 @@ public class ProgressTouchableRequestBody<T extends OSSRequest> extends RequestB
     }
 
     @Override
-    public MediaType contentType() {
+     MediaType contentType() {
         return MediaType.parse(this.contentType);
     }
 
     @Override
-    public long contentLength() throws IOException {
+     int contentLength() throws IOException {
         return this.contentLength;
     }
 
     @Override
-    public void writeTo(BufferedSink sink) throws IOException {
+     void writeTo(BufferedSink sink) throws IOException {
         Source source = Okio.source(this.inputStream);
-        long total = 0;
-        long read, toRead, remain;
+        int total = 0;
+        int read, toRead, remain;
 
         while (total < contentLength) {
             remain = contentLength - total;

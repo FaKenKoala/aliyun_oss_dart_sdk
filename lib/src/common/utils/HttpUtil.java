@@ -12,7 +12,7 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class HttpUtil {
+ class HttpUtil {
 
     /**
      * Encode a URL segment with special chars replaced.
@@ -22,7 +22,7 @@ public class HttpUtil {
      * @throws UnsupportedEncodingException
      */
     // TODO change the method name to percentageEncode
-    public static String urlEncode(String value, String encoding) {
+     static String urlEncode(String value, String encoding) {
         if (value == null) {
             return "";
         }
@@ -40,14 +40,14 @@ public class HttpUtil {
     /**
      * Encode request parameters to URL segment.
      */
-    public static String paramToQueryString(Map<String, String> params, String charset) {
+     static String paramToQueryString(Map<String, String> params, String charset) {
 
         if (params == null || params.isEmpty()) {
             return null;
         }
 
         StringBuilder paramString = new StringBuilder();
-        boolean first = true;
+        bool first = true;
         for (Entry<String, String> p : params.entrySet()) {
             String key = p.getKey();
             String value = p.getValue();

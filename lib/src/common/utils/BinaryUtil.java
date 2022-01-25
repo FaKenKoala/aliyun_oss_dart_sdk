@@ -18,22 +18,22 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class BinaryUtil {
-    public static String toBase64String(byte[] binaryData) {
+ class BinaryUtil {
+     static String toBase64String(byte[] binaryData) {
         return new String(Base64.encode(binaryData,Base64.DEFAULT)).trim();
     }
 
     /**
      * decode base64 string
      */
-    public static byte[] fromBase64String(String base64String) {
+     static byte[] fromBase64String(String base64String) {
         return Base64.decode(base64String,Base64.DEFAULT);
     }
 
     /**
      * calculate md5 for local file
      */
-    public static byte[] calculateMd5(FileDescriptor fileDescriptor) throws IOException {
+     static byte[] calculateMd5(FileDescriptor fileDescriptor) throws IOException {
         byte[] md5;
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
@@ -54,7 +54,7 @@ public class BinaryUtil {
     /**
      * calculate md5 for bytes
      */
-    public static byte[] calculateMd5(byte[] binaryData) {
+     static byte[] calculateMd5(byte[] binaryData) {
         MessageDigest messageDigest = null;
         try {
             messageDigest = MessageDigest.getInstance("MD5");
@@ -69,7 +69,7 @@ public class BinaryUtil {
     /**
      * calculate md5 for local file
      */
-    public static byte[] calculateMd5(String filePath) throws IOException {
+     static byte[] calculateMd5(String filePath) throws IOException {
         byte[] md5;
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
@@ -90,49 +90,49 @@ public class BinaryUtil {
     /**
      * calculate md5 for bytes and string back
      */
-    public static String calculateMd5Str(byte[] binaryData) {
+     static String calculateMd5Str(byte[] binaryData) {
         return getMd5StrFromBytes(calculateMd5(binaryData));
     }
 
     /**
      * calculate md5 for file and string back
      */
-    public static String calculateMd5Str(String filePath) throws IOException {
+     static String calculateMd5Str(String filePath) throws IOException {
         return getMd5StrFromBytes(calculateMd5(filePath));
     }
 
     /**
      * calculate md5 for file and string back
      */
-    public static String calculateMd5Str(FileDescriptor fileDescriptor) throws IOException {
+     static String calculateMd5Str(FileDescriptor fileDescriptor) throws IOException {
         return getMd5StrFromBytes(calculateMd5(fileDescriptor));
     }
 
     /**
      * calculate md5 for bytes and base64 string back
      */
-    public static String calculateBase64Md5(byte[] binaryData) {
+     static String calculateBase64Md5(byte[] binaryData) {
         return toBase64String(calculateMd5(binaryData));
     }
 
     /**
      * calculate md5 for local file and base64 string back
      */
-    public static String calculateBase64Md5(String filePath) throws IOException {
+     static String calculateBase64Md5(String filePath) throws IOException {
         return toBase64String(calculateMd5(filePath));
     }
 
     /**
      * calculate md5 for local file and base64 string back
      */
-    public static String calculateBase64Md5(FileDescriptor fileDescriptor) throws IOException {
+     static String calculateBase64Md5(FileDescriptor fileDescriptor) throws IOException {
         return toBase64String(calculateMd5(fileDescriptor));
     }
 
     /**
      * MD5sum for string
      */
-    public static String getMd5StrFromBytes(byte[] md5bytes) {
+     static String getMd5StrFromBytes(byte[] md5bytes) {
         if (md5bytes == null) {
             return "";
         }
@@ -149,7 +149,7 @@ public class BinaryUtil {
      * @param filePath The filepath of the file
      * @return The sha1 value
      */
-    public static String fileToSHA1(String filePath) {
+     static String fileToSHA1(String filePath) {
         InputStream inputStream = null;
         try {
             inputStream = new FileInputStream(filePath); // Create an FileInputStream instance according to the filepath
@@ -176,7 +176,7 @@ public class BinaryUtil {
         }
     }
 
-    public static String fileToSHA1(FileDescriptor fileDescriptor) {
+     static String fileToSHA1(FileDescriptor fileDescriptor) {
         InputStream inputStream = null;
         try {
             inputStream = new FileInputStream(fileDescriptor); // Create an FileInputStream instance according to the filepath
@@ -209,7 +209,7 @@ public class BinaryUtil {
      * @param hashBytes
      * @return The converted hex digits string
      */
-    private static String convertHashToString(byte[] hashBytes) {
+     static String convertHashToString(byte[] hashBytes) {
         String returnVal = "";
         for (int i = 0; i < hashBytes.length; i++) {
             returnVal += Integer.toString((hashBytes[i] & 0xff) + 0x100, 16).substring(1);

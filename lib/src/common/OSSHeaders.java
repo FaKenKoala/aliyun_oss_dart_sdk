@@ -2,7 +2,7 @@ package com.alibaba.sdk.android.oss.common;
 
 import com.alibaba.sdk.android.oss.common.utils.HttpHeaders;
 
-public interface OSSHeaders extends HttpHeaders {
+ abstract class OSSHeaders extends HttpHeaders {
 
     static final String OSS_PREFIX = "x-oss-";
     static final String OSS_USER_METADATA_PREFIX = "x-oss-meta-";

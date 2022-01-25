@@ -4,29 +4,29 @@ import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
 
 import java.util.Map;
 
-public class ResumableDownloadRequest extends OSSRequest {
+ class ResumableDownloadRequest extends OSSRequest {
 
     //  Object bucket's name
-    private String bucketName;
+     String bucketName;
 
     // Object Key
-    private String objectKey;
+     String objectKey;
 
     // Gets the range of the object to return (starting from 0 to the object length -1)
-    private Range range;
+     Range range;
 
     // progress callback run with not ui thread
-    private OSSProgressCallback progressListener;
+     OSSProgressCallback progressListener;
 
     //
-    private String downloadToFilePath;
+     String downloadToFilePath;
 
-    private Boolean enableCheckPoint = false;
-    private String checkPointFilePath;
+     bool enableCheckPoint = false;
+     String checkPointFilePath;
 
-    private long partSize = 256 * 1024;
+     int partSize = 256 * 1024;
 
-    private Map<String, String> requestHeader;
+     Map<String, String> requestHeader;
 
     /**
      * Constructor
@@ -35,7 +35,7 @@ public class ResumableDownloadRequest extends OSSRequest {
      * @param objectKey      The target object's key
      * @param downloadToFilePath The local path of the file to download
      */
-    public ResumableDownloadRequest(String bucketName, String objectKey, String downloadToFilePath) {
+     ResumableDownloadRequest(String bucketName, String objectKey, String downloadToFilePath) {
         this.bucketName = bucketName;
         this.objectKey = objectKey;
         this.downloadToFilePath = downloadToFilePath;
@@ -49,7 +49,7 @@ public class ResumableDownloadRequest extends OSSRequest {
      * @param downloadToFilePath The local path of the file to download
      * @param checkPointFilePath The checkpoint files' directory
      */
-    public ResumableDownloadRequest(String bucketName, String objectKey, String downloadToFilePath, String checkPointFilePath) {
+     ResumableDownloadRequest(String bucketName, String objectKey, String downloadToFilePath, String checkPointFilePath) {
         this.bucketName = bucketName;
         this.objectKey = objectKey;
         this.downloadToFilePath = downloadToFilePath;
@@ -57,7 +57,7 @@ public class ResumableDownloadRequest extends OSSRequest {
         this.checkPointFilePath = checkPointFilePath;
     }
 
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
@@ -66,11 +66,11 @@ public class ResumableDownloadRequest extends OSSRequest {
      *
      * @param bucketName
      */
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
-    public String getObjectKey() {
+     String getObjectKey() {
         return objectKey;
     }
 
@@ -79,11 +79,11 @@ public class ResumableDownloadRequest extends OSSRequest {
      *
      * @param objectKey
      */
-    public void setObjectKey(String objectKey) {
+     void setObjectKey(String objectKey) {
         this.objectKey = objectKey;
     }
 
-    public Range getRange() {
+     Range getRange() {
         return range;
     }
 
@@ -92,22 +92,22 @@ public class ResumableDownloadRequest extends OSSRequest {
      *
      * @param range The range to download (starting from 0 to the length -1)
      */
-    public void setRange(Range range) {
+     void setRange(Range range) {
         this.range = range;
     }
 
-    public OSSProgressCallback getProgressListener() {
+     OSSProgressCallback getProgressListener() {
         return progressListener;
     }
 
     /**
      * Sets the upload progress callback
      */
-    public void setProgressListener(OSSProgressCallback progressListener) {
+     void setProgressListener(OSSProgressCallback progressListener) {
         this.progressListener = progressListener;
     }
 
-    public String getDownloadToFilePath() {
+     String getDownloadToFilePath() {
         return downloadToFilePath;
     }
 
@@ -116,20 +116,20 @@ public class ResumableDownloadRequest extends OSSRequest {
      *
      * @param downloadToFilePath the local path of the file to upload
      */
-    public void setDownloadToFilePath(String downloadToFilePath) {
+     void setDownloadToFilePath(String downloadToFilePath) {
         this.downloadToFilePath = downloadToFilePath;
     }
 
-    public Boolean getEnableCheckPoint() {
+     bool getEnableCheckPoint() {
         return enableCheckPoint;
     }
 
 
-    public void setEnableCheckPoint(Boolean enableCheckPoint) {
+     void setEnableCheckPoint(bool enableCheckPoint) {
         this.enableCheckPoint = enableCheckPoint;
     }
 
-    public String getCheckPointFilePath() {
+     String getCheckPointFilePath() {
         return checkPointFilePath;
     }
 
@@ -138,11 +138,11 @@ public class ResumableDownloadRequest extends OSSRequest {
      *
      * @param checkPointFilePath the checkpoint files' directory
      */
-    public void setCheckPointFilePath(String checkPointFilePath) {
+     void setCheckPointFilePath(String checkPointFilePath) {
         this.checkPointFilePath = checkPointFilePath;
     }
 
-    public long getPartSize() {
+     int getPartSize() {
         return partSize;
     }
 
@@ -151,15 +151,15 @@ public class ResumableDownloadRequest extends OSSRequest {
      *
      * @param partSize size in byte
      */
-    public void setPartSize(long partSize) {
+     void setPartSize(int partSize) {
         this.partSize = partSize;
     }
 
-    public String getTempFilePath() {
+     String getTempFilePath() {
         return downloadToFilePath + ".tmp";
     }
 
-    public Map<String, String> getRequestHeader() {
+     Map<String, String> getRequestHeader() {
         return requestHeader;
     }
 
@@ -168,7 +168,7 @@ public class ResumableDownloadRequest extends OSSRequest {
      *
      * @param requestHeader
      */
-    public void setRequestHeader(Map<String, String> requestHeader) {
+     void setRequestHeader(Map<String, String> requestHeader) {
         this.requestHeader = requestHeader;
     }
 }

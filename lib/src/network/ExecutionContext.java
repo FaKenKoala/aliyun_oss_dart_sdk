@@ -13,73 +13,73 @@ import okhttp3.OkHttpClient;
 /**
  * Created by zhouzhuo on 11/22/15.
  */
-public class ExecutionContext<Request extends OSSRequest, Result extends OSSResult> {
+ class ExecutionContext<Request extends OSSRequest, Result extends OSSResult> {
 
-    private Request request;
-    private OkHttpClient client;
-    private CancellationHandler cancellationHandler = new CancellationHandler();
-    private Context applicationContext;
+     Request request;
+     OkHttpClient client;
+     CancellationHandler cancellationHandler = new CancellationHandler();
+     Context applicationContext;
 
-    private OSSCompletedCallback completedCallback;
-    private OSSProgressCallback progressCallback;
-    private OSSRetryCallback retryCallback;
+     OSSCompletedCallback completedCallback;
+     OSSProgressCallback progressCallback;
+     OSSRetryCallback retryCallback;
 
 
-    public ExecutionContext(OkHttpClient client, Request request) {
+     ExecutionContext(OkHttpClient client, Request request) {
         this(client, request, null);
     }
 
-    public ExecutionContext(OkHttpClient client, Request request, Context applicationContext) {
+     ExecutionContext(OkHttpClient client, Request request, Context applicationContext) {
         setClient(client);
         setRequest(request);
         this.applicationContext = applicationContext;
     }
 
-    public Context getApplicationContext() {
+     Context getApplicationContext() {
         return applicationContext;
     }
 
-    public Request getRequest() {
+     Request getRequest() {
         return request;
     }
 
-    public void setRequest(Request request) {
+     void setRequest(Request request) {
         this.request = request;
     }
 
-    public OkHttpClient getClient() {
+     OkHttpClient getClient() {
         return client;
     }
 
-    public void setClient(OkHttpClient client) {
+     void setClient(OkHttpClient client) {
         this.client = client;
     }
 
-    public CancellationHandler getCancellationHandler() {
+     CancellationHandler getCancellationHandler() {
         return cancellationHandler;
     }
 
-    public OSSCompletedCallback<Request, Result> getCompletedCallback() {
+     OSSCompletedCallback<Request, Result> getCompletedCallback() {
         return completedCallback;
     }
 
-    public void setCompletedCallback(OSSCompletedCallback<Request, Result> completedCallback) {
+     void setCompletedCallback(OSSCompletedCallback<Request, Result> completedCallback) {
         this.completedCallback = completedCallback;
     }
 
-    public OSSProgressCallback getProgressCallback() {
+     OSSProgressCallback getProgressCallback() {
         return progressCallback;
     }
 
-    public void setProgressCallback(OSSProgressCallback progressCallback) {
+     void setProgressCallback(OSSProgressCallback progressCallback) {
         this.progressCallback = progressCallback;
     }
 
-    public OSSRetryCallback getRetryCallback() {
+     OSSRetryCallback getRetryCallback() {
         return retryCallback;
     }
 
-    public void setRetryCallback(OSSRetryCallback retryCallback) {
+     void setRetryCallback(OSSRetryCallback retryCallback) {
         this.retryCallback = retryCallback;
     }
 }

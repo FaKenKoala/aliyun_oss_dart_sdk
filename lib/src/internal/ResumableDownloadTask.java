@@ -48,33 +48,33 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.CheckedInputStream;
 
-public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
+ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         Result extends ResumableDownloadResult> implements Callable<Result> {
-    protected final int CPU_SIZE = Runtime.getRuntime().availableProcessors() * 2;
-    protected final int MAX_CORE_POOL_SIZE = CPU_SIZE < 5 ? CPU_SIZE : 5;
-    protected final int MAX_IMUM_POOL_SIZE = CPU_SIZE;
-    protected final int KEEP_ALIVE_TIME = 3000;
-    protected final int MAX_QUEUE_SIZE = 5000;
-    protected ThreadPoolExecutor mPoolExecutor =
+     final int CPU_SIZE = Runtime.getRuntime().availableProcessors() * 2;
+     final int MAX_CORE_POOL_SIZE = CPU_SIZE < 5 ? CPU_SIZE : 5;
+     final int MAX_IMUM_POOL_SIZE = CPU_SIZE;
+     final int KEEP_ALIVE_TIME = 3000;
+     final int MAX_QUEUE_SIZE = 5000;
+     ThreadPoolExecutor mPoolExecutor =
             new ThreadPoolExecutor(MAX_CORE_POOL_SIZE, MAX_IMUM_POOL_SIZE, KEEP_ALIVE_TIME,
                     TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(MAX_QUEUE_SIZE), new ThreadFactory() {
                 @Override
-                public Thread newThread(Runnable runnable) {
+                 Thread newThread(Runnable runnable) {
                     return new Thread(runnable, "oss-android-multipart-thread");
                 }
             });
-    private ResumableDownloadRequest mRequest;
-    private InternalRequestOperation mOperation;
-    private OSSCompletedCallback mCompletedCallback;
-    private ExecutionContext mContext;
-    private OSSProgressCallback mProgressCallback;
-    private CheckPoint mCheckPoint;
-    protected Object mLock = new Object();
-    protected Exception mDownloadException;
-    protected long completedPartSize;
-    protected long downloadPartSize;
-    protected long mPartExceptionCount;
-    protected String checkpointPath;
+     ResumableDownloadRequest mRequest;
+     InternalRequestOperation mOperation;
+     OSSCompletedCallback mCompletedCallback;
+     ExecutionContext mContext;
+     OSSProgressCallback mProgressCallback;
+     CheckPoint mCheckPoint;
+     Object mLock = new Object();
+     Exception mDownloadException;
+     int completedPartSize;
+     int downloadPartSize;
+     int mPartExceptionCount;
+     String checkpointPath;
 
     ResumableDownloadTask(InternalRequestOperation operation,
                           ResumableDownloadRequest request,
@@ -89,7 +89,7 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
 
 
     @Override
-    public Result call() throws Exception {
+     Result call() throws Exception {
         try {
             checkInitData();
             ResumableDownloadResult result = doMultipartDownload();
@@ -116,7 +116,7 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         }
     }
 
-    protected void checkInitData() throws ClientException, ServiceException, IOException {
+     void checkInitData() throws ClientException, ServiceException, IOException {
 
         if (mRequest.getRange() != null && !mRequest.getRange().checkIsValid()) {
             throw new ClientException("Range is invalid");
@@ -145,8 +145,8 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         }
     }
 
-    protected boolean removeFile(String filePath) {
-        boolean flag = false;
+     bool removeFile(String filePath) {
+        bool flag = false;
         File file = new File(filePath);
 
         if (file.isFile() && file.exists()) {
@@ -156,10 +156,10 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         return flag;
     }
 
-    private void initCheckPoint() throws ClientException, ServiceException, IOException {
+     void initCheckPoint() throws ClientException, ServiceException, IOException {
         FileStat fileStat = FileStat.getFileStat(mOperation, mRequest.getBucketName(), mRequest.getObjectKey());
         Range range = correctRange(mRequest.getRange(), fileStat.fileLength);
-        long downloadSize = range.getEnd() - range.getBegin();
+        int downloadSize = range.getEnd() - range.getBegin();
         createFile(mRequest.getTempFilePath(), downloadSize);
 
         mCheckPoint.bucketName = mRequest.getBucketName();
@@ -168,7 +168,7 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         mCheckPoint.parts = splitFile(range, mCheckPoint.fileStat.fileLength, mRequest.getPartSize());
     }
 
-    protected ResumableDownloadResult doMultipartDownload() throws ClientException, ServiceException, IOException, InterruptedException {
+     ResumableDownloadResult doMultipartDownload() throws ClientException, ServiceException, IOException, InterruptedException {
         checkCancel();
         ResumableDownloadResult resumableDownloadResult = new ResumableDownloadResult();
 
@@ -180,7 +180,7 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
             if (mPoolExecutor != null && !part.isCompleted) {
                 mPoolExecutor.execute(new Runnable() {
                     @Override
-                    public void run() {
+                     void run() {
                         downloadPart(result, part);
                         Log.i("partResults", "start: " + part.start + ", end: " + part.end);
                     }
@@ -207,12 +207,12 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         checkException();
         Collections.sort(result.partResults, new Comparator<DownloadPartResult>() {
             @Override
-            public int compare(DownloadPartResult downloadPartResult, DownloadPartResult t1) {
+             int compare(DownloadPartResult downloadPartResult, DownloadPartResult t1) {
                 return downloadPartResult.partNumber - t1.partNumber;
             }
         });
         if (mRequest.getCRC64() == OSSRequest.CRC64Config.YES && mRequest.getRange() == null) {
-            Long clientCRC = calcObjectCRCFromParts(result.partResults);
+            int clientCRC = calcObjectCRCFromParts(result.partResults);
             resumableDownloadResult.setClientCRC(clientCRC);
             try {
                 OSSUtils.checkChecksum(clientCRC, mCheckPoint.fileStat.serverCRC, result.partResults.get(0).requestId);
@@ -236,8 +236,8 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         return resumableDownloadResult;
     }
 
-    private static Long calcObjectCRCFromParts(List<DownloadPartResult> partResults) {
-        long crc = 0;
+     static int calcObjectCRCFromParts(List<DownloadPartResult> partResults) {
+        int crc = 0;
 
         for (DownloadPartResult partResult : partResults) {
             if (partResult.clientCRC == null || partResult.length <= 0) {
@@ -245,10 +245,10 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
             }
             crc = CRC64.combine(crc, partResult.clientCRC, partResult.length);
         }
-        return new Long(crc);
+        return new int(crc);
     }
 
-    private ArrayList<DownloadPart> splitFile(Range range, long fileSize, long partSize) {
+     ArrayList<DownloadPart> splitFile(Range range, int fileSize, int partSize) {
 
         if (fileSize <= 0) {
             DownloadPart part = new DownloadPart();
@@ -261,10 +261,10 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
             parts.add(part);
             return parts;
         }
-        long start = range.getBegin();
-        long size = range.getEnd() - range.getBegin();
+        int start = range.getBegin();
+        int size = range.getEnd() - range.getBegin();
 
-        long count = size / partSize;
+        int count = size / partSize;
         if (size % partSize > 0) {
             count += 1;
         }
@@ -286,9 +286,9 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         return parts;
     }
 
-    private Range correctRange(Range range, long totalSize) {
-        long start = 0;
-        long size = totalSize;
+     Range correctRange(Range range, int totalSize) {
+        int start = 0;
+        int size = totalSize;
         if (range != null) {
             start = range.getBegin();
             if (range.getBegin() == -1) {
@@ -302,7 +302,7 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         return new Range(start, start + size);
     }
 
-    private void downloadPart(DownloadFileResult downloadResult, DownloadPart part) {
+     void downloadPart(DownloadFileResult downloadResult, DownloadPart part) {
 
         RandomAccessFile output = null;
         InputStream content = null;
@@ -327,7 +327,7 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
             content = result.getObjectContent();
 
             byte[] buffer = new byte[(int)(part.length)];
-            long readLength = 0;
+            int readLength = 0;
             if (mRequest.getCRC64() == OSSRequest.CRC64Config.YES) {
                 content = new CheckedInputStream(content, new CRC64());
             }
@@ -343,7 +343,7 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
                 partResult.requestId = result.getRequestId();
                 partResult.length = result.getContentLength();
                 if (mRequest.getCRC64() == OSSRequest.CRC64Config.YES) {
-                    Long clientCRC = ((CheckedInputStream)content).getChecksum().getValue();
+                    int clientCRC = ((CheckedInputStream)content).getChecksum().getValue();
                     partResult.clientCRC = clientCRC;
 
                     part.crc = clientCRC;
@@ -391,7 +391,7 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         }
     }
 
-    private void createFile(String filePath, long length) throws IOException {
+     void createFile(String filePath, int length) throws IOException {
         File file = new File(filePath);
         RandomAccessFile accessFile = null;
 
@@ -405,9 +405,9 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         }
     }
 
-    private void moveFile(File fromFile, File toFile) throws IOException {
+     void moveFile(File fromFile, File toFile) throws IOException {
 
-        boolean rename = fromFile.renameTo(toFile);
+        bool rename = fromFile.renameTo(toFile);
         if (!rename) {
             Log.i("moveFile", "rename");
             InputStream ist = null;
@@ -432,7 +432,7 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         }
     }
 
-    private void copyFile(InputStream ist, OutputStream ost) throws IOException {
+     void copyFile(InputStream ist, OutputStream ost) throws IOException {
         byte[] buffer = new byte[4096];
         int byteCount;
         while ((byteCount = ist.read(buffer)) != -1) {
@@ -440,12 +440,12 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         }
     }
 
-    protected void notifyMultipartThread() {
+     void notifyMultipartThread() {
         mLock.notify();
         mPartExceptionCount = 0;
     }
 
-    protected void processException(Exception e) {
+     void processException(Exception e) {
         synchronized (mLock) {
             mPartExceptionCount++;
             if (mDownloadException == null) {
@@ -455,14 +455,14 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         }
     }
 
-    protected void releasePool() {
+     void releasePool() {
         if (mPoolExecutor != null) {
             mPoolExecutor.getQueue().clear();
             mPoolExecutor.shutdown();
         }
     }
 
-    protected void checkException() throws IOException, ServiceException, ClientException {
+     void checkException() throws IOException, ServiceException, ClientException {
         if (mDownloadException != null) {
             releasePool();
             if (mDownloadException instanceof IOException) {
@@ -479,14 +479,14 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         }
     }
 
-    protected boolean checkWaitCondition(int partNum) {
+     bool checkWaitCondition(int partNum) {
         if (completedPartSize == partNum) {
             return false;
         }
         return true;
     }
 
-    protected void checkCancel() throws ClientException {
+     void checkCancel() throws ClientException {
         if (mContext.getCancellationHandler().isCancelled()) {
             TaskCancelException e = new TaskCancelException("Resumable download cancel");
             throw new ClientException(e.getMessage(), e, true);
@@ -494,18 +494,18 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
     }
 
     static class DownloadPart implements Serializable {
-        private static final long serialVersionUID = -3506020776131733942L;
+         static final int serialVersionUID = -3506020776131733942L;
 
-        public int partNumber;
-        public long start; // start index;
-        public long end; // end index;
-        public boolean isCompleted; // flag of part download finished or not;
-        public long length; // length of part
-        public long fileStart; // start index of file
-        public long crc; // part crc.
+         int partNumber;
+         int start; // start index;
+         int end; // end index;
+         bool isCompleted; // flag of part download finished or not;
+         int length; // length of part
+         int fileStart; // start index of file
+         int crc; // part crc.
 
         @Override
-        public int hashCode() {
+         int hashCode() {
             final int prime = 31;
             int result = 1;
             result = prime * result + partNumber;
@@ -519,20 +519,20 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
 
     static class CheckPoint implements Serializable {
 
-        private static final long serialVersionUID = -8470273912385636504L;
+         static final int serialVersionUID = -8470273912385636504L;
 
-        public int md5;
-        public String downloadFile;
-        public String bucketName;
-        public String objectKey;
-        public FileStat fileStat;
-        public ArrayList<DownloadPart> parts;
-        public long downloadLength;
+         int md5;
+         String downloadFile;
+         String bucketName;
+         String objectKey;
+         FileStat fileStat;
+         ArrayList<DownloadPart> parts;
+         int downloadLength;
 
         /**
          * Loads the checkpoint data from the checkpoint file.
          */
-        public synchronized void load(String cpFile) throws IOException, ClassNotFoundException {
+         synchronized void load(String cpFile) throws IOException, ClassNotFoundException {
             FileInputStream fileIn = null;
             ObjectInputStream in = null;
             try {
@@ -553,7 +553,7 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         /**
          * Writes the checkpoint data to the checkpoint file.
          */
-        public synchronized void dump(String cpFile) throws IOException {
+         synchronized void dump(String cpFile) throws IOException {
             this.md5 = hashCode();
             FileOutputStream fileOut = null;
             ObjectOutputStream outStream = null;
@@ -576,7 +576,7 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
          *
          * @throws IOException
          */
-        public synchronized void update(int index, boolean completed) throws IOException {
+         synchronized void update(int index, bool completed) throws IOException {
             parts.get(index).isCompleted = completed;
             downloadLength += parts.get(index).length;
         }
@@ -584,7 +584,7 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         /**
          * Check if the object matches the checkpoint information.
          */
-        public synchronized boolean isValid(InternalRequestOperation operation) throws ClientException, ServiceException {
+         synchronized bool isValid(InternalRequestOperation operation) throws ClientException, ServiceException {
             // Compare magic and md5 of checkpoint
             if (this.md5 != hashCode()) {
                 return false;
@@ -608,7 +608,7 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         }
 
         @Override
-        public int hashCode() {
+         int hashCode() {
             final int prime = 31;
             int result = 1;
             result = prime * result + ((bucketName == null) ? 0 : bucketName.hashCode());
@@ -620,7 +620,7 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
             return result;
         }
 
-        private void assign(CheckPoint dcp) {
+         void assign(CheckPoint dcp) {
             this.md5 = dcp.md5;
             this.downloadFile = dcp.downloadFile;
             this.bucketName = dcp.bucketName;
@@ -633,16 +633,16 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
 
     static class FileStat implements Serializable {
 
-        private static final long serialVersionUID = 3896323364904643963L;
+         static final int serialVersionUID = 3896323364904643963L;
 
-        public long fileLength;
-        public String md5;
-        public Date lastModified;
-        public String etag;
-        public Long serverCRC;
-        public String requestId;
+         int fileLength;
+         String md5;
+         Date lastModified;
+         String etag;
+         int serverCRC;
+         String requestId;
 
-        public static FileStat getFileStat(InternalRequestOperation operation, String bucketName, String objectKey) throws ClientException, ServiceException {
+         static FileStat getFileStat(InternalRequestOperation operation, String bucketName, String objectKey) throws ClientException, ServiceException {
             HeadObjectRequest request = new HeadObjectRequest(bucketName, objectKey);
             HeadObjectResult result = operation.headObject(request, null).getResult();
 
@@ -657,7 +657,7 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         }
 
         @Override
-        public int hashCode() {
+         int hashCode() {
             final int prime = 31;
             int result = 1;
             result = prime * result + ((etag == null) ? 0 : etag.hashCode());
@@ -669,15 +669,15 @@ public class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
 
     static class DownloadPartResult {
 
-        public int partNumber;
-        public String requestId;
-        public Long clientCRC;
-        public long length;
+         int partNumber;
+         String requestId;
+         int clientCRC;
+         int length;
     }
 
     class DownloadFileResult extends OSSResult {
 
-        public ArrayList<DownloadPartResult> partResults;
-        public ObjectMetadata metadata;
+         ArrayList<DownloadPartResult> partResults;
+         ObjectMetadata metadata;
     }
 }

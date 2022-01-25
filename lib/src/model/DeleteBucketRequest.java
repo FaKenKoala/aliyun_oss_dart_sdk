@@ -3,16 +3,16 @@ package com.alibaba.sdk.android.oss.model;
 /**
  * Created by LK on 15/12/15.
  */
-public class DeleteBucketRequest extends OSSRequest {
+ class DeleteBucketRequest extends OSSRequest {
 
-    private String bucketName;
+     String bucketName;
 
     /**
      * Creates the request to delete the specified bucket
      *
      * @param bucketName
      */
-    public DeleteBucketRequest(String bucketName) {
+     DeleteBucketRequest(String bucketName) {
         setBucketName(bucketName);
     }
 
@@ -21,7 +21,7 @@ public class DeleteBucketRequest extends OSSRequest {
      *
      * @return
      */
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
@@ -30,7 +30,7 @@ public class DeleteBucketRequest extends OSSRequest {
      *
      * @param bucketName
      */
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 

@@ -7,93 +7,93 @@ import java.util.List;
  * Created by chenjie on 17/12/6.
  */
 
-public class ListBucketsResult extends OSSResult {
+ class ListBucketsResult extends OSSResult {
 
-    private String prefix;
+     String prefix;
 
-    private String marker;
+     String marker;
 
-    private int maxKeys;
+     int maxKeys;
 
-    private boolean isTruncated;
+     bool isTruncated;
 
-    private String nextMarker;
+     String nextMarker;
 
-    private String ownerId;
+     String ownerId;
 
-    private String ownerDisplayName;
+     String ownerDisplayName;
 
-    private List<OSSBucketSummary> buckets = new ArrayList<OSSBucketSummary>();
+     List<OSSBucketSummary> buckets = new ArrayList<OSSBucketSummary>();
 
-    public void addBucket(OSSBucketSummary bucket) {
+     void addBucket(OSSBucketSummary bucket) {
         this.buckets.add(bucket);
     }
 
-    public String getPrefix() {
+     String getPrefix() {
         return prefix;
     }
 
-    public void setPrefix(String prefix) {
+     void setPrefix(String prefix) {
         this.prefix = prefix;
     }
 
-    public String getMarker() {
+     String getMarker() {
         return marker;
     }
 
-    public void setMarker(String marker) {
+     void setMarker(String marker) {
         this.marker = marker;
     }
 
-    public int getMaxKeys() {
+     int getMaxKeys() {
         return maxKeys;
     }
 
-    public void setMaxKeys(int maxKeys) {
+     void setMaxKeys(int maxKeys) {
         this.maxKeys = maxKeys;
     }
 
-    public boolean getTruncated() {
+     bool getTruncated() {
         return isTruncated;
     }
 
-    public void setTruncated(boolean isTruncated) {
+     void setTruncated(bool isTruncated) {
         this.isTruncated = isTruncated;
     }
 
-    public String getNextMarker() {
+     String getNextMarker() {
         return nextMarker;
     }
 
-    public void setNextMarker(String nextMarker) {
+     void setNextMarker(String nextMarker) {
         this.nextMarker = nextMarker;
     }
 
-    public String getOwnerId() {
+     String getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(String ownerId) {
+     void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
 
-    public String getOwnerDisplayName() {
+     String getOwnerDisplayName() {
         return ownerDisplayName;
     }
 
-    public void setOwnerDisplayName(String ownerDisplayName) {
+     void setOwnerDisplayName(String ownerDisplayName) {
         this.ownerDisplayName = ownerDisplayName;
     }
 
-    public List<OSSBucketSummary> getBuckets() {
+     List<OSSBucketSummary> getBuckets() {
         return buckets;
     }
 
-    public void setBuckets(List<OSSBucketSummary> buckets) {
+     void setBuckets(List<OSSBucketSummary> buckets) {
         this.buckets = buckets;
     }
 
-    public void clearBucketList() {
+     void clearBucketList() {
         buckets.clear();
     }
 }

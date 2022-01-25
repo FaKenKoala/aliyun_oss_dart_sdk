@@ -32,14 +32,14 @@ import com.alibaba.sdk.android.oss.common.OSSLog;
  * for troubleshooting.
  * </p>
  */
-public class ClientException extends Exception {
+ class ClientException extends Exception {
 
-    private Boolean canceled = false;
+     bool canceled = false;
 
     /**
      * Constructor
      */
-    public ClientException() {
+     ClientException() {
         super();
     }
 
@@ -48,7 +48,7 @@ public class ClientException extends Exception {
      *
      * @param message the error message
      */
-    public ClientException(String message) {
+     ClientException(String message) {
         super("[ErrorMessage]: " + message);
     }
 
@@ -57,7 +57,7 @@ public class ClientException extends Exception {
      *
      * @param cause the exception
      */
-    public ClientException(Throwable cause) {
+     ClientException(Throwable cause) {
         super(cause);
     }
 
@@ -67,14 +67,14 @@ public class ClientException extends Exception {
      * @param message Error message
      * @param cause   The exception instance
      */
-    public ClientException(String message, Throwable cause) {
+     ClientException(String message, Throwable cause) {
         this(message, cause, false);
     }
 
     /**
      * Constructor with error message, exception instance and isCancelled flag
      */
-    public ClientException(String message, Throwable cause, Boolean isCancelled) {
+     ClientException(String message, Throwable cause, bool isCancelled) {
         super("[ErrorMessage]: " + message, cause);
         this.canceled = isCancelled;
         OSSLog.logThrowable2Local(this);
@@ -85,13 +85,13 @@ public class ClientException extends Exception {
      *
      * @return
      */
-    public Boolean isCanceledException() {
+     bool isCanceledException() {
         return canceled;
     }
 
 
     @Override
-    public String getMessage() {
+     String getMessage() {
         String base = super.getMessage();
         return getCause() == null ? base : getCause().getMessage() + "\n" + base;
     }

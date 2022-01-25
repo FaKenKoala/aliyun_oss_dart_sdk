@@ -15,14 +15,14 @@ import java.util.Map;
  * OSS object metadata class definition.
  * It includes user's custom metadata as well as standard HTTP headers (such as Content-Length, ETag, etc)
  */
-public class ObjectMetadata {
+ class ObjectMetadata {
 
-    public static final String AES_256_SERVER_SIDE_ENCRYPTION = "AES256";
+     static final String AES_256_SERVER_SIDE_ENCRYPTION = "AES256";
     // User's custom metadata dictionary. All keys  will be prefixed with x-oss-meta-in the HTTP headers.
     // The keys in this dictionary should include the prefix 'x-oss-meta-'.
-    private Map<String, String> userMetadata = new CaseInsensitiveHashMap<String, String>();
+     Map<String, String> userMetadata = new CaseInsensitiveHashMap<String, String>();
     // Standard metadata
-    private Map<String, Object> metadata = new CaseInsensitiveHashMap<String, Object>();
+     Map<String, Object> metadata = new CaseInsensitiveHashMap<String, Object>();
 
     /**
      * <p>
@@ -37,7 +37,7 @@ public class ObjectMetadata {
      *
      * @return User's custom metadata.
      */
-    public Map<String, String> getUserMetadata() {
+     Map<String, String> getUserMetadata() {
         return userMetadata;
     }
 
@@ -46,7 +46,7 @@ public class ObjectMetadata {
      *
      * @param userMetadata User's custom metadata
      */
-    public void setUserMetadata(Map<String, String> userMetadata) {
+     void setUserMetadata(Map<String, String> userMetadata) {
         this.userMetadata.clear();
         if (userMetadata != null && !userMetadata.isEmpty()) {
             this.userMetadata.putAll(userMetadata);
@@ -59,7 +59,7 @@ public class ObjectMetadata {
      * @param key   Request Key.
      * @param value Request Value.
      */
-    public void setHeader(String key, Object value) {
+     void setHeader(String key, Object value) {
         metadata.put(key, value);
     }
 
@@ -70,7 +70,7 @@ public class ObjectMetadata {
      *              This key should include the prefix "x-oss-meta-"
      * @param value metadata value
      */
-    public void addUserMetadata(String key, String value) {
+     void addUserMetadata(String key, String value) {
         this.userMetadata.put(key, value);
     }
 
@@ -79,7 +79,7 @@ public class ObjectMetadata {
      *
      * @return The object's last modified time.
      */
-    public Date getLastModified() {
+     Date getLastModified() {
         return (Date) metadata.get(OSSHeaders.LAST_MODIFIED);
     }
 
@@ -88,7 +88,7 @@ public class ObjectMetadata {
      *
      * @param lastModified The object's last modified time.
      */
-    public void setLastModified(Date lastModified) {
+     void setLastModified(Date lastModified) {
         metadata.put(OSSHeaders.LAST_MODIFIED, lastModified);
     }
 
@@ -99,7 +99,7 @@ public class ObjectMetadata {
      * @return Expires header value in Rfc822 format.
      * @throws ParseException unable to parse the Expires value into Rfc822 format
      */
-    public Date getExpirationTime() throws ParseException {
+     Date getExpirationTime() throws ParseException {
         return DateUtil.parseRfc822Date((String) metadata.get(OSSHeaders.EXPIRES));
     }
 
@@ -108,7 +108,7 @@ public class ObjectMetadata {
      *
      * @param expirationTime Expires time
      */
-    public void setExpirationTime(Date expirationTime) {
+     void setExpirationTime(Date expirationTime) {
         metadata.put(OSSHeaders.EXPIRES, DateUtil.formatRfc822Date(expirationTime));
     }
 
@@ -118,7 +118,7 @@ public class ObjectMetadata {
      *
      * @return The raw expires header value
      */
-    public String getRawExpiresValue() {
+     String getRawExpiresValue() {
         return (String) metadata.get(OSSHeaders.EXPIRES);
     }
 
@@ -127,11 +127,11 @@ public class ObjectMetadata {
      *
      * @return The value of Content-Length header.
      */
-    public long getContentLength() {
-        Long contentLength = (Long) metadata.get(OSSHeaders.CONTENT_LENGTH);
+     int getContentLength() {
+        int contentLength = (int) metadata.get(OSSHeaders.CONTENT_LENGTH);
 
         if (contentLength == null) return 0;
-        return contentLength.longValue();
+        return contentLength.intValue();
     }
 
     /**
@@ -141,7 +141,7 @@ public class ObjectMetadata {
      * @param contentLength Object content length
      * @throws IllegalArgumentException Object content length is more than 5GB or less than 0.
      */
-    public void setContentLength(long contentLength) {
+     void setContentLength(int contentLength) {
         if (contentLength > OSSConstants.DEFAULT_FILE_SIZE_LIMIT) {
             throw new IllegalArgumentException("The content length could not be more than 5GB.");
         }
@@ -154,7 +154,7 @@ public class ObjectMetadata {
      *
      * @return The object Content-Type value in MIME types.
      */
-    public String getContentType() {
+     String getContentType() {
         return (String) metadata.get(OSSHeaders.CONTENT_TYPE);
     }
 
@@ -163,23 +163,23 @@ public class ObjectMetadata {
      *
      * @param contentType The object Content-Type value in MIME types.
      */
-    public void setContentType(String contentType) {
+     void setContentType(String contentType) {
         metadata.put(OSSHeaders.CONTENT_TYPE, contentType);
     }
 
-    public String getContentMD5() {
+     String getContentMD5() {
         return (String) metadata.get(OSSHeaders.CONTENT_MD5);
     }
 
-    public void setContentMD5(String contentMD5) {
+     void setContentMD5(String contentMD5) {
         metadata.put(OSSHeaders.CONTENT_MD5, contentMD5);
     }
 
-    public String getSHA1() {
+     String getSHA1() {
         return (String) metadata.get(OSSHeaders.OSS_HASH_SHA1);
     }
 
-    public void setSHA1(String value) {
+     void setSHA1(String value) {
         metadata.put(OSSHeaders.OSS_HASH_SHA1, value);
     }
 
@@ -188,7 +188,7 @@ public class ObjectMetadata {
      *
      * @return The object content's encoding
      */
-    public String getContentEncoding() {
+     String getContentEncoding() {
         return (String) metadata.get(OSSHeaders.CONTENT_ENCODING);
     }
 
@@ -197,7 +197,7 @@ public class ObjectMetadata {
      *
      * @param encoding The object content's encoding.
      */
-    public void setContentEncoding(String encoding) {
+     void setContentEncoding(String encoding) {
         metadata.put(OSSHeaders.CONTENT_ENCODING, encoding);
     }
 
@@ -206,7 +206,7 @@ public class ObjectMetadata {
      *
      * @return Cache-Control header value
      */
-    public String getCacheControl() {
+     String getCacheControl() {
         return (String) metadata.get(OSSHeaders.CACHE_CONTROL);
     }
 
@@ -215,7 +215,7 @@ public class ObjectMetadata {
      *
      * @param cacheControl Cache-Control header value
      */
-    public void setCacheControl(String cacheControl) {
+     void setCacheControl(String cacheControl) {
         metadata.put(OSSHeaders.CACHE_CONTROL, cacheControl);
     }
 
@@ -225,7 +225,7 @@ public class ObjectMetadata {
      *
      * @return Content-Disposition header value
      */
-    public String getContentDisposition() {
+     String getContentDisposition() {
         return (String) metadata.get(OSSHeaders.CONTENT_DISPOSITION);
     }
 
@@ -235,7 +235,7 @@ public class ObjectMetadata {
      *
      * @param disposition Content-Disposition header value
      */
-    public void setContentDisposition(String disposition) {
+     void setContentDisposition(String disposition) {
         metadata.put(OSSHeaders.CONTENT_DISPOSITION, disposition);
     }
 
@@ -244,7 +244,7 @@ public class ObjectMetadata {
      *
      * @return The ETag value.
      */
-    public String getETag() {
+     String getETag() {
         return (String) metadata.get(OSSHeaders.ETAG);
     }
 
@@ -253,14 +253,14 @@ public class ObjectMetadata {
      *
      * @return The server side encryption algorithm. No encryption if it returns null.
      */
-    public String getServerSideEncryption() {
+     String getServerSideEncryption() {
         return (String) metadata.get(OSSHeaders.OSS_SERVER_SIDE_ENCRYPTION);
     }
 
     /**
      * Sets the server side encryption algorithm.
      */
-    public void setServerSideEncryption(String serverSideEncryption) {
+     void setServerSideEncryption(String serverSideEncryption) {
         metadata.put(OSSHeaders.OSS_SERVER_SIDE_ENCRYPTION, serverSideEncryption);
     }
 
@@ -269,7 +269,7 @@ public class ObjectMetadata {
      *
      * @return Object type
      */
-    public String getObjectType() {
+     String getObjectType() {
         return (String) metadata.get(OSSHeaders.OSS_OBJECT_TYPE);
     }
 
@@ -278,12 +278,12 @@ public class ObjectMetadata {
      *
      * @return The raw metadata (SDK internal only)
      */
-    public Map<String, Object> getRawMetadata() {
+     Map<String, Object> getRawMetadata() {
         return Collections.unmodifiableMap(metadata);
     }
 
     @Override
-    public String toString() {
+     String toString() {
         String s;
         String expirationTimeStr = "";
         try {

@@ -3,18 +3,18 @@ package com.alibaba.sdk.android.oss.model;
 /**
  * Created by zhouzhuo on 11/24/15.
  */
-public class DeleteObjectRequest extends OSSRequest {
+ class DeleteObjectRequest extends OSSRequest {
 
-    private String bucketName;
+     String bucketName;
 
-    private String objectKey;
+     String objectKey;
 
-    public DeleteObjectRequest(String bucketName, String objectKey) {
+     DeleteObjectRequest(String bucketName, String objectKey) {
         setBucketName(bucketName);
         setObjectKey(objectKey);
     }
 
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
@@ -23,11 +23,11 @@ public class DeleteObjectRequest extends OSSRequest {
      *
      * @param bucketName
      */
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
-    public String getObjectKey() {
+     String getObjectKey() {
         return objectKey;
     }
 
@@ -36,7 +36,7 @@ public class DeleteObjectRequest extends OSSRequest {
      *
      * @param objectKey
      */
-    public void setObjectKey(String objectKey) {
+     void setObjectKey(String objectKey) {
         this.objectKey = objectKey;
     }
 }

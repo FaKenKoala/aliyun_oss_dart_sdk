@@ -2,20 +2,20 @@ package com.alibaba.sdk.android.oss.model;
 
 import java.util.ArrayList;
 
-public class ResumableDownloadResult extends OSSResult {
+ class ResumableDownloadResult extends OSSResult {
 
-    private ObjectMetadata metadata;
+     ObjectMetadata metadata;
 
     /**
      * Gets the metadata
      *
      * @return object metadata
      */
-    public ObjectMetadata getMetadata() {
+     ObjectMetadata getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(ObjectMetadata metadata) {
+     void setMetadata(ObjectMetadata metadata) {
         this.metadata = metadata;
     }
 }

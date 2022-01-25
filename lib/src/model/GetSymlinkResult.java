@@ -1,13 +1,13 @@
 package com.alibaba.sdk.android.oss.model;
 
-public class GetSymlinkResult extends OSSResult {
-    private String targetObjectName;
+ class GetSymlinkResult extends OSSResult {
+     String targetObjectName;
 
-    public String getTargetObjectName() {
+     String getTargetObjectName() {
         return targetObjectName;
     }
 
-    public void setTargetObjectName(String targetObjectName) {
+     void setTargetObjectName(String targetObjectName) {
         this.targetObjectName = targetObjectName;
     }
 }

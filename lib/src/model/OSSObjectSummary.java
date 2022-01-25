@@ -5,37 +5,37 @@ import java.util.Date;
 /**
  * OSSObject summary class definition.
  */
-public class OSSObjectSummary {
+ class OSSObjectSummary {
 
     /**
      * The name of the bucket in which this object is stored
      */
-    private String bucketName;
+     String bucketName;
 
     /**
      * The key under which this object is stored
      */
-    private String key;
+     String key;
 
-    private String type;
+     String type;
 
-    private String eTag;
+     String eTag;
 
-    private long size;
+     int size;
 
-    private Date lastModified;
+     Date lastModified;
 
-    private String storageClass;
+     String storageClass;
 
     /**
      * {@link Owner}
      */
-    private Owner owner;
+     Owner owner;
 
     /**
      * Creates a new {@link OSSObjectSummary}
      */
-    public OSSObjectSummary() {
+     OSSObjectSummary() {
     }
 
     /**
@@ -43,7 +43,7 @@ public class OSSObjectSummary {
      *
      * @return The bucket name
      */
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
@@ -52,7 +52,7 @@ public class OSSObjectSummary {
      *
      * @param bucketName The bucket name
      */
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
@@ -61,7 +61,7 @@ public class OSSObjectSummary {
      *
      * @return Object key
      */
-    public String getKey() {
+     String getKey() {
         return key;
     }
 
@@ -70,7 +70,7 @@ public class OSSObjectSummary {
      *
      * @param key Object Key.
      */
-    public void setKey(String key) {
+     void setKey(String key) {
         this.key = key;
     }
 
@@ -79,7 +79,7 @@ public class OSSObjectSummary {
      *
      * @return The 128 bit MD5 digest in hex encoding.
      */
-    public String getETag() {
+     String getETag() {
         return eTag;
     }
 
@@ -88,7 +88,7 @@ public class OSSObjectSummary {
      *
      * @param eTag The 128 bit MD5 digest in hex encoding.
      */
-    public void setETag(String eTag) {
+     void setETag(String eTag) {
         this.eTag = eTag;
     }
 
@@ -97,7 +97,7 @@ public class OSSObjectSummary {
      *
      * @return Object size in byte
      */
-    public long getSize() {
+     int getSize() {
         return size;
     }
 
@@ -106,7 +106,7 @@ public class OSSObjectSummary {
      *
      * @param size Object size in byte
      */
-    public void setSize(long size) {
+     void setSize(int size) {
         this.size = size;
     }
 
@@ -115,7 +115,7 @@ public class OSSObjectSummary {
      *
      * @return The object's last modified time
      */
-    public Date getLastModified() {
+     Date getLastModified() {
         return lastModified;
     }
 
@@ -124,7 +124,7 @@ public class OSSObjectSummary {
      *
      * @param lastModified The object's last modified time
      */
-    public void setLastModified(Date lastModified) {
+     void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
     }
 
@@ -133,7 +133,7 @@ public class OSSObjectSummary {
      *
      * @return The object's storage class
      */
-    public String getStorageClass() {
+     String getStorageClass() {
         return storageClass;
     }
 
@@ -142,7 +142,7 @@ public class OSSObjectSummary {
      *
      * @param storageClass Object storage class
      */
-    public void setStorageClass(String storageClass) {
+     void setStorageClass(String storageClass) {
         this.storageClass = storageClass;
     }
 
@@ -151,7 +151,7 @@ public class OSSObjectSummary {
      *
      * @return Object type
      */
-    public String getType() {
+     String getType() {
         return type;
     }
 
@@ -160,15 +160,15 @@ public class OSSObjectSummary {
      *
      * @param type Object type
      */
-    public void setType(String type) {
+     void setType(String type) {
         this.type = type;
     }
 
-    public Owner getOwner() {
+     Owner getOwner() {
         return owner;
     }
 
-    public void setOwner(Owner owner) {
+     void setOwner(Owner owner) {
         this.owner = owner;
     }
 }

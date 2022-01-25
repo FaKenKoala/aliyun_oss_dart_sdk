@@ -1,18 +1,18 @@
 package com.alibaba.sdk.android.oss.model;
 
-public class GetBucketInfoRequest extends OSSRequest {
+ class GetBucketInfoRequest extends OSSRequest {
 
-    private String bucketName;
+     String bucketName;
 
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
-    public GetBucketInfoRequest(String bucketName) {
+     GetBucketInfoRequest(String bucketName) {
         this.bucketName = bucketName;
     }
 }

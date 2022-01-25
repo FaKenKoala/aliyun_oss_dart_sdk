@@ -22,24 +22,24 @@ import java.util.concurrent.Executors;
  * @author: zhouzhuo
  * Jun 20, 2015
  */
-public class HttpdnsMini {
+ class HttpdnsMini {
 
 
-    private static final String TAG = "HttpDnsMini";
-    private static final String SERVER_IP = "203.107.1.1";
-    private static final String ACCOUNT_ID = "181345";
-    private static final int MAX_THREAD_NUM = 5;
-    private static final int RESOLVE_TIMEOUT_IN_SEC = 10;
-    private static final int MAX_HOLD_HOST_NUM = 100;
-    private static final int EMPTY_RESULT_HOST_TTL = 30;
-    private static HttpdnsMini instance;
-    private ConcurrentMap<String, HostObject> hostManager = new ConcurrentHashMap<String, HostObject>();
-    private ExecutorService pool = Executors.newFixedThreadPool(MAX_THREAD_NUM);
+     static final String TAG = "HttpDnsMini";
+     static final String SERVER_IP = "203.107.1.1";
+     static final String ACCOUNT_ID = "181345";
+     static final int MAX_THREAD_NUM = 5;
+     static final int RESOLVE_TIMEOUT_IN_SEC = 10;
+     static final int MAX_HOLD_HOST_NUM = 100;
+     static final int EMPTY_RESULT_HOST_TTL = 30;
+     static HttpdnsMini instance;
+     ConcurrentMap<String, HostObject> hostManager = new ConcurrentHashMap<String, HostObject>();
+     ExecutorService pool = Executors.newFixedThreadPool(MAX_THREAD_NUM);
 
-    private HttpdnsMini() {
+     HttpdnsMini() {
     }
 
-    public static HttpdnsMini getInstance() {
+     static HttpdnsMini getInstance() {
         if (instance == null) {
             synchronized (HttpdnsMini.class) {
                 if (instance == null) {
@@ -50,7 +50,7 @@ public class HttpdnsMini {
         return instance;
     }
 
-    public String getIpByHostAsync(String hostName) {
+     String getIpByHostAsync(String hostName) {
         HostObject host = hostManager.get(hostName);
         if (host == null || host.isExpired()) {
             OSSLog.logDebug("[httpdnsmini] - refresh host: " + hostName);
@@ -64,69 +64,69 @@ public class HttpdnsMini {
 
     class HostObject {
 
-        private String hostName;
-        private String ip;
-        private long ttl;
-        private long queryTime;
+         String hostName;
+         String ip;
+         int ttl;
+         int queryTime;
 
         @Override
-        public String toString() {
+         String toString() {
             return "[hostName=" + getHostName() + ", ip=" + ip + ", ttl=" + getTtl() + ", queryTime="
                     + queryTime + "]";
         }
 
-        public boolean isExpired() {
+         bool isExpired() {
             return getQueryTime() + ttl < System.currentTimeMillis() / 1000;
         }
 
         // 一个域名解析结果过期后，异步接口仍然可以返回这个结果，但最多可以容忍过期10分钟
-        public boolean isStillAvailable() {
+         bool isStillAvailable() {
             return getQueryTime() + ttl + 10 * 60 > System.currentTimeMillis() / 1000;
         }
 
-        public String getIp() {
+         String getIp() {
             return ip;
         }
 
-        public void setIp(String ip) {
+         void setIp(String ip) {
             this.ip = ip;
         }
 
-        public String getHostName() {
+         String getHostName() {
             return hostName;
         }
 
-        public void setHostName(String hostName) {
+         void setHostName(String hostName) {
             this.hostName = hostName;
         }
 
-        public long getTtl() {
+         int getTtl() {
             return ttl;
         }
 
-        public void setTtl(long ttl) {
+         void setTtl(int ttl) {
             this.ttl = ttl;
         }
 
-        public long getQueryTime() {
+         int getQueryTime() {
             return queryTime;
         }
 
-        public void setQueryTime(long queryTime) {
+         void setQueryTime(int queryTime) {
             this.queryTime = queryTime;
         }
     }
 
     class QueryHostTask implements Callable<String> {
-        private String hostName;
-        private boolean hasRetryed = false;
+         String hostName;
+         bool hasRetryed = false;
 
-        public QueryHostTask(String hostToQuery) {
+         QueryHostTask(String hostToQuery) {
             this.hostName = hostToQuery;
         }
 
         @Override
-        public String call() {
+         String call() {
             String chooseServerAddress = SERVER_IP;
             String resolveUrl = "https://" + chooseServerAddress + "/" + ACCOUNT_ID + "/d?host=" + hostName;
             InputStream in = null;
@@ -147,7 +147,7 @@ public class HttpdnsMini {
                     }
                     JSONObject json = new JSONObject(sb.toString());
                     String host = json.getString("host");
-                    long ttl = json.getLong("ttl");
+                    int ttl = json.getint("ttl");
                     JSONArray ips = json.getJSONArray("ips");
                     OSSLog.logDebug("[httpdnsmini] - ips:" + ips.toString());
                     if (host != null && ips != null && ips.length() > 0) {

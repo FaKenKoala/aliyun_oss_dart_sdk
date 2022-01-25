@@ -13,11 +13,11 @@ import java.util.TimeZone;
  * @author zhouzhuo
  *         Mar 26, 2015
  */
-public class OSSFederationToken {
-    private String tempAk;
-    private String tempSk;
-    private String securityToken;
-    private long expiration;
+ class OSSFederationToken {
+     String tempAk;
+     String tempSk;
+     String securityToken;
+     int expiration;
 
     /**
      * Creates a new instance of OSSFederationToken
@@ -27,7 +27,7 @@ public class OSSFederationToken {
      * @param securityToken SecurityToken returned from STS
      * @param expiration    The expiration time in seconds from STS, in the Unix Epoch format.
      */
-    public OSSFederationToken(String tempAK, String tempSK, String securityToken, long expiration) {
+     OSSFederationToken(String tempAK, String tempSK, String securityToken, int expiration) {
         setTempAk(tempAK);
         setTempSk(tempSK);
         setSecurityToken(securityToken);
@@ -42,7 +42,7 @@ public class OSSFederationToken {
      * @param securityToken         SecurityToken returned from STS
      * @param expirationInGMTFormat The expiration time in seconds from STS, in the GMT format.
      */
-    public OSSFederationToken(String tempAK, String tempSK, String securityToken, String expirationInGMTFormat) {
+     OSSFederationToken(String tempAK, String tempSK, String securityToken, String expirationInGMTFormat) {
         setTempAk(tempAK);
         setTempSk(tempSK);
         setSecurityToken(securityToken);
@@ -50,47 +50,47 @@ public class OSSFederationToken {
     }
 
     @Override
-    public String toString() {
+     String toString() {
         return "OSSFederationToken [tempAk=" + tempAk + ", tempSk=" + tempSk + ", securityToken="
                 + securityToken + ", expiration=" + expiration + "]";
     }
 
-    public String getTempAK() {
+     String getTempAK() {
         return tempAk;
     }
 
-    public String getTempSK() {
+     String getTempSK() {
         return tempSk;
     }
 
-    public String getSecurityToken() {
+     String getSecurityToken() {
         return securityToken;
     }
 
-    public void setSecurityToken(String securityToken) {
+     void setSecurityToken(String securityToken) {
         this.securityToken = securityToken;
     }
 
-    public void setTempAk(String tempAk) {
+     void setTempAk(String tempAk) {
         this.tempAk = tempAk;
     }
 
-    public void setTempSk(String tempSk) {
+     void setTempSk(String tempSk) {
         this.tempSk = tempSk;
     }
 
     // Gets the expiration time in seconds in Unix Epoch format.
-    public long getExpiration() {
+     int getExpiration() {
         return expiration;
     }
 
     // Sets the expiration time in seconds in Unix Epoch format.
-    public void setExpiration(long expiration) {
+     void setExpiration(int expiration) {
         this.expiration = expiration;
     }
 
     // Sets the expiration time according to the value from STS. The time is in GMT format which is the original format returned from STS.
-    public void setExpirationInGMTFormat(String expirationInGMTFormat) {
+     void setExpirationInGMTFormat(String expirationInGMTFormat) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));

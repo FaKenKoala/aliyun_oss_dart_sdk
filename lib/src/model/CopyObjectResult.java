@@ -24,18 +24,18 @@ import java.util.Date;
 /**
  * The result class of copying an existing object to another one
  */
-public class CopyObjectResult extends OSSResult {
+ class CopyObjectResult extends OSSResult {
 
     // Target object's ETag
-    private String etag;
+     String etag;
 
     // Target Object's last modified time
-    private Date lastModified;
+     Date lastModified;
 
     /**
      * Creates a default instance of {@link CopyObjectResult}
      */
-    public CopyObjectResult() {
+     CopyObjectResult() {
     }
 
     /**
@@ -43,7 +43,7 @@ public class CopyObjectResult extends OSSResult {
      *
      * @return Object ETag
      */
-    public String getETag() {
+     String getETag() {
         return etag;
     }
 
@@ -52,7 +52,7 @@ public class CopyObjectResult extends OSSResult {
      *
      * @param etag Target object's ETag value
      */
-    public void setEtag(String etag) {
+     void setEtag(String etag) {
         this.etag = etag;
     }
 
@@ -61,7 +61,7 @@ public class CopyObjectResult extends OSSResult {
      *
      * @return Target object's last modified time
      */
-    public Date getLastModified() {
+     Date getLastModified() {
         return lastModified;
     }
 
@@ -70,7 +70,7 @@ public class CopyObjectResult extends OSSResult {
      *
      * @param lastModified Target object's last modified time.
      */
-    public void setLastModified(Date lastModified) {
+     void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
     }
 

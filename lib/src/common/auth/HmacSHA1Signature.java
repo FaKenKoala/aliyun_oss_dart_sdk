@@ -20,25 +20,25 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * Hmac-SHA1 signature
  */
-public class HmacSHA1Signature {
-    private static final String DEFAULT_ENCODING = "UTF-8"; // Default encoding
-    private static final String ALGORITHM = "HmacSHA1"; // Signature method.
-    private static final String VERSION = "1"; // Signature version.
-    private static final Object LOCK = new Object();
-    private static Mac macInstance; // Prototype of the Mac instance.
+ class HmacSHA1Signature {
+     static final String DEFAULT_ENCODING = "UTF-8"; // Default encoding
+     static final String ALGORITHM = "HmacSHA1"; // Signature method.
+     static final String VERSION = "1"; // Signature version.
+     static final Object LOCK = new Object();
+     static Mac macInstance; // Prototype of the Mac instance.
 
-    public HmacSHA1Signature() {
+     HmacSHA1Signature() {
     }
 
-    public String getAlgorithm() {
+     String getAlgorithm() {
         return ALGORITHM;
     }
 
-    public String getVersion() {
+     String getVersion() {
         return VERSION;
     }
 
-    public String computeSignature(String key, String data) {
+     String computeSignature(String key, String data) {
         OSSLog.logDebug(getAlgorithm(), false);
         OSSLog.logDebug(getVersion(), false);
         String sign = null;
@@ -56,7 +56,7 @@ public class HmacSHA1Signature {
     }
 
 
-    private byte[] sign(byte[] key, byte[] data) {
+     byte[] sign(byte[] key, byte[] data) {
         byte[] sign = null;
         try {
             // Because Mac.getInstance(String) calls a synchronized method,

@@ -15,12 +15,12 @@ import java.net.URL;
  * Authentication server issued under the agreement of the official website agreement, you can directly use the provider
  */
 
-public class OSSAuthCredentialsProvider extends OSSFederationCredentialProvider {
+ class OSSAuthCredentialsProvider extends OSSFederationCredentialProvider {
 
-    private String mAuthServerUrl;
-    private AuthDecoder mDecoder;
+     String mAuthServerUrl;
+     AuthDecoder mDecoder;
 
-    public OSSAuthCredentialsProvider(String authServerUrl) {
+     OSSAuthCredentialsProvider(String authServerUrl) {
         this.mAuthServerUrl = authServerUrl;
     }
 
@@ -29,7 +29,7 @@ public class OSSAuthCredentialsProvider extends OSSFederationCredentialProvider 
      *
      * @param authServerUrl
      */
-    public void setAuthServerUrl(String authServerUrl) {
+     void setAuthServerUrl(String authServerUrl) {
         this.mAuthServerUrl = authServerUrl;
     }
 
@@ -38,12 +38,12 @@ public class OSSAuthCredentialsProvider extends OSSFederationCredentialProvider 
      *
      * @param decoder
      */
-    public void setDecoder(AuthDecoder decoder) {
+     void setDecoder(AuthDecoder decoder) {
         this.mDecoder = decoder;
     }
 
     @Override
-    public OSSFederationToken getFederationToken() throws ClientException {
+     OSSFederationToken getFederationToken() throws ClientException {
         OSSFederationToken authToken;
         String authData;
         try {
@@ -74,7 +74,7 @@ public class OSSAuthCredentialsProvider extends OSSFederationCredentialProvider 
         }
     }
 
-    public interface AuthDecoder {
+     abstract class AuthDecoder {
         String decode(String data);
     }
 }

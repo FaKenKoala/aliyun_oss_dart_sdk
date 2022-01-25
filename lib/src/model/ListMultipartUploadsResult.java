@@ -15,136 +15,136 @@ import java.util.List;
  * Created by jingdan on 2018/2/13.
  */
 
-public class ListMultipartUploadsResult extends OSSResult {
+ class ListMultipartUploadsResult extends OSSResult {
 
-    private String bucketName;
+     String bucketName;
 
-    private String keyMarker;
+     String keyMarker;
 
-    private String delimiter;
+     String delimiter;
 
-    private String prefix;
+     String prefix;
 
-    private String uploadIdMarker;
+     String uploadIdMarker;
 
-    private int maxUploads;
+     int maxUploads;
 
-    private boolean isTruncated;
+     bool isTruncated;
 
-    private String nextKeyMarker;
+     String nextKeyMarker;
 
-    private String nextUploadIdMarker;
+     String nextUploadIdMarker;
 
-    private List<MultipartUpload> multipartUploads = new ArrayList<MultipartUpload>();
+     List<MultipartUpload> multipartUploads = new ArrayList<MultipartUpload>();
 
-    private List<String> commonPrefixes = new ArrayList<String>();
+     List<String> commonPrefixes = new ArrayList<String>();
 
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
-    public String getKeyMarker() {
+     String getKeyMarker() {
         return keyMarker;
     }
 
-    public void setKeyMarker(String keyMarker) {
+     void setKeyMarker(String keyMarker) {
         this.keyMarker = keyMarker;
     }
 
-    public String getUploadIdMarker() {
+     String getUploadIdMarker() {
         return uploadIdMarker;
     }
 
-    public void setUploadIdMarker(String uploadIdMarker) {
+     void setUploadIdMarker(String uploadIdMarker) {
         this.uploadIdMarker = uploadIdMarker;
     }
 
-    public String getNextKeyMarker() {
+     String getNextKeyMarker() {
         return nextKeyMarker;
     }
 
-    public void setNextKeyMarker(String nextKeyMarker) {
+     void setNextKeyMarker(String nextKeyMarker) {
         this.nextKeyMarker = nextKeyMarker;
     }
 
-    public String getNextUploadIdMarker() {
+     String getNextUploadIdMarker() {
         return nextUploadIdMarker;
     }
 
-    public void setNextUploadIdMarker(String nextUploadIdMarker) {
+     void setNextUploadIdMarker(String nextUploadIdMarker) {
         this.nextUploadIdMarker = nextUploadIdMarker;
     }
 
-    public int getMaxUploads() {
+     int getMaxUploads() {
         return maxUploads;
     }
 
-    public void setMaxUploads(int maxUploads) {
+     void setMaxUploads(int maxUploads) {
         this.maxUploads = maxUploads;
     }
 
-    public boolean isTruncated() {
+     bool isTruncated() {
         return isTruncated;
     }
 
-    public void setTruncated(boolean isTruncated) {
+     void setTruncated(bool isTruncated) {
         this.isTruncated = isTruncated;
     }
 
-    public List<MultipartUpload> getMultipartUploads() {
+     List<MultipartUpload> getMultipartUploads() {
         return multipartUploads;
     }
 
-    public void setMultipartUploads(List<MultipartUpload> multipartUploads) {
+     void setMultipartUploads(List<MultipartUpload> multipartUploads) {
         this.multipartUploads.clear();
         if (multipartUploads != null && !multipartUploads.isEmpty()) {
             this.multipartUploads.addAll(multipartUploads);
         }
     }
 
-    public void addMultipartUpload(MultipartUpload multipartUpload) {
+     void addMultipartUpload(MultipartUpload multipartUpload) {
         this.multipartUploads.add(multipartUpload);
     }
 
-    public String getDelimiter() {
+     String getDelimiter() {
         return delimiter;
     }
 
-    public void setDelimiter(String delimiter) {
+     void setDelimiter(String delimiter) {
         this.delimiter = delimiter;
     }
 
-    public String getPrefix() {
+     String getPrefix() {
         return prefix;
     }
 
-    public void setPrefix(String prefix) {
+     void setPrefix(String prefix) {
         this.prefix = prefix;
     }
 
-    public List<String> getCommonPrefixes() {
+     List<String> getCommonPrefixes() {
         return commonPrefixes;
     }
 
-    public void setCommonPrefixes(List<String> commonPrefixes) {
+     void setCommonPrefixes(List<String> commonPrefixes) {
         this.commonPrefixes.clear();
         if (commonPrefixes != null && !commonPrefixes.isEmpty()) {
             this.commonPrefixes.addAll(commonPrefixes);
         }
     }
 
-    public void addCommonPrefix(String commonPrefix) {
+     void addCommonPrefix(String commonPrefix) {
         this.commonPrefixes.add(commonPrefix);
     }
 
-    public ListMultipartUploadsResult parseData(ResponseMessage responseMessage) throws Exception {
+     ListMultipartUploadsResult parseData(ResponseMessage responseMessage) throws Exception {
         List<MultipartUpload> uploadList = new ArrayList<MultipartUpload>();
         MultipartUpload upload = null;
-        boolean isCommonPrefixes = false;
+        bool isCommonPrefixes = false;
         XmlPullParser parser = Xml.newPullParser();
         parser.setInput(responseMessage.getContent(), "utf-8");
         int eventType = parser.getEventType();
@@ -173,7 +173,7 @@ public class ListMultipartUploadsResult extends OSSResult {
                     } else if ("IsTruncated".equals(name)) {
                         String isTruncated = parser.nextText();
                         if (!OSSUtils.isEmptyString(isTruncated)) {
-                            setTruncated(Boolean.valueOf(isTruncated));
+                            setTruncated(bool.valueOf(isTruncated));
                         }
                     } else if ("KeyMarker".equals(name)) {
                         setKeyMarker(parser.nextText());

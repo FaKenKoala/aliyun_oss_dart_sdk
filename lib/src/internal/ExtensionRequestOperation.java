@@ -32,22 +32,22 @@ import java.util.concurrent.ThreadFactory;
 /**
  * Created by zhouzhuo on 11/27/15.
  */
-public class ExtensionRequestOperation {
+ class ExtensionRequestOperation {
 
-    private static ExecutorService executorService =
+     static ExecutorService executorService =
             Executors.newFixedThreadPool(OSSConstants.DEFAULT_BASE_THREAD_POOL_SIZE, new ThreadFactory() {
                 @Override
-                public Thread newThread(Runnable r) {
+                 Thread newThread(Runnable r) {
                     return new Thread(r, "oss-android-extensionapi-thread");
                 }
             });
-    private InternalRequestOperation apiOperation;
+     InternalRequestOperation apiOperation;
 
-    public ExtensionRequestOperation(InternalRequestOperation apiOperation) {
+     ExtensionRequestOperation(InternalRequestOperation apiOperation) {
         this.apiOperation = apiOperation;
     }
 
-    public boolean doesObjectExist(String bucketName, String objectKey)
+     bool doesObjectExist(String bucketName, String objectKey)
             throws ClientException, ServiceException {
 
         try {
@@ -63,7 +63,7 @@ public class ExtensionRequestOperation {
         }
     }
 
-    public void abortResumableUpload(ResumableUploadRequest request) throws IOException {
+     void abortResumableUpload(ResumableUploadRequest request) throws IOException {
         setCRC64(request);
 
         if (!OSSUtils.isEmptyString(request.getRecordDirectory())) {
@@ -112,7 +112,7 @@ public class ExtensionRequestOperation {
         }
     }
 
-    public OSSAsyncTask<ResumableUploadResult> resumableUpload(
+     OSSAsyncTask<ResumableUploadResult> resumableUpload(
             ResumableUploadRequest request, OSSCompletedCallback<ResumableUploadRequest
             , ResumableUploadResult> completedCallback) {
         setCRC64(request);
@@ -123,7 +123,7 @@ public class ExtensionRequestOperation {
                 completedCallback, executionContext, apiOperation)), executionContext);
     }
 
-    public OSSAsyncTask<ResumableUploadResult> sequenceUpload(
+     OSSAsyncTask<ResumableUploadResult> sequenceUpload(
             ResumableUploadRequest request, OSSCompletedCallback<ResumableUploadRequest
             , ResumableUploadResult> completedCallback) {
         setCRC64(request);
@@ -137,7 +137,7 @@ public class ExtensionRequestOperation {
     }
 
 
-    public OSSAsyncTask<CompleteMultipartUploadResult> multipartUpload(MultipartUploadRequest request
+     OSSAsyncTask<CompleteMultipartUploadResult> multipartUpload(MultipartUploadRequest request
             , OSSCompletedCallback<MultipartUploadRequest
             , CompleteMultipartUploadResult> completedCallback) {
         setCRC64(request);
@@ -148,14 +148,14 @@ public class ExtensionRequestOperation {
                 , request, completedCallback, executionContext)), executionContext);
     }
 
-    public OSSAsyncTask<ResumableDownloadResult> resumableDownload(ResumableDownloadRequest request,
+     OSSAsyncTask<ResumableDownloadResult> resumableDownload(ResumableDownloadRequest request,
                                                                    OSSCompletedCallback<ResumableDownloadRequest, ResumableDownloadResult> completedCallback) {
         ExecutionContext<ResumableDownloadRequest, ResumableDownloadResult> executionContext =
                 new ExecutionContext(apiOperation.getInnerClient(), request, apiOperation.getApplicationContext());
         return OSSAsyncTask.wrapRequestTask(executorService.submit(new ResumableDownloadTask(apiOperation, request, completedCallback, executionContext)), executionContext);
     }
 
-    private void setCRC64(OSSRequest request) {
+     void setCRC64(OSSRequest request) {
         Enum crc64 = request.getCRC64() != OSSRequest.CRC64Config.NULL ? request.getCRC64() :
                 (apiOperation.getConf().isCheckCRC64() ? OSSRequest.CRC64Config.YES : OSSRequest.CRC64Config.NO);
         request.setCRC64(crc64);

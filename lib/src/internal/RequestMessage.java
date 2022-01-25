@@ -25,164 +25,164 @@ import java.util.Map;
 /**
  * Created by zhouzhuo on 11/22/15.
  */
-public class RequestMessage extends HttpMessage {
+ class RequestMessage extends HttpMessage {
 
-    private URI service;
-    private URI endpoint;
-    private String bucketName;
-    private String objectKey;
-    private HttpMethod method;
-    private boolean isAuthorizationRequired = true;
-    private Map<String, String> parameters = new LinkedHashMap<String, String>();
-    private boolean checkCRC64;
-    private OSSCredentialProvider credentialProvider;
-    private boolean httpDnsEnable = false;
-    private boolean pathStyleAccessEnable = false;
-    private boolean customPathPrefixEnable = false;
-    private String ipWithHeader;
-    private boolean isInCustomCnameExcludeList = false;
+     URI service;
+     URI endpoint;
+     String bucketName;
+     String objectKey;
+     HttpMethod method;
+     bool isAuthorizationRequired = true;
+     Map<String, String> parameters = new LinkedHashMap<String, String>();
+     bool checkCRC64;
+     OSSCredentialProvider credentialProvider;
+     bool httpDnsEnable = false;
+     bool pathStyleAccessEnable = false;
+     bool customPathPrefixEnable = false;
+     String ipWithHeader;
+     bool isInCustomCnameExcludeList = false;
 
-    private String uploadFilePath;
-    private byte[] uploadData;
-    private Uri uploadUri;
+     String uploadFilePath;
+     byte[] uploadData;
+     Uri uploadUri;
 
-    public HttpMethod getMethod() {
+     HttpMethod getMethod() {
         return method;
     }
 
-    public void setMethod(HttpMethod method) {
+     void setMethod(HttpMethod method) {
         this.method = method;
     }
 
-    public OSSCredentialProvider getCredentialProvider() {
+     OSSCredentialProvider getCredentialProvider() {
         return credentialProvider;
     }
 
-    public void setCredentialProvider(OSSCredentialProvider credentialProvider) {
+     void setCredentialProvider(OSSCredentialProvider credentialProvider) {
         this.credentialProvider = credentialProvider;
     }
 
-    public URI getService() {
+     URI getService() {
         return service;
     }
 
-    public void setService(URI service) {
+     void setService(URI service) {
         this.service = service;
     }
 
-    public URI getEndpoint() {
+     URI getEndpoint() {
         return endpoint;
     }
 
-    public void setEndpoint(URI endpoint) {
+     void setEndpoint(URI endpoint) {
         this.endpoint = endpoint;
     }
 
-    public boolean isHttpDnsEnable() {
+     bool isHttpDnsEnable() {
         return httpDnsEnable;
     }
 
-    public void setHttpDnsEnable(boolean httpDnsEnable) {
+     void setHttpDnsEnable(bool httpDnsEnable) {
         this.httpDnsEnable = httpDnsEnable;
     }
 
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
-    public String getObjectKey() {
+     String getObjectKey() {
         return objectKey;
     }
 
-    public void setObjectKey(String objectKey) {
+     void setObjectKey(String objectKey) {
         this.objectKey = objectKey;
     }
 
-    public Map<String, String> getParameters() {
+     Map<String, String> getParameters() {
         return parameters;
     }
 
-    public void setParameters(Map<String, String> parameters) {
+     void setParameters(Map<String, String> parameters) {
         this.parameters = parameters;
     }
 
-    public String getUploadFilePath() {
+     String getUploadFilePath() {
         return uploadFilePath;
     }
 
-    public void setUploadFilePath(String uploadFilePath) {
+     void setUploadFilePath(String uploadFilePath) {
         this.uploadFilePath = uploadFilePath;
     }
 
-    public byte[] getUploadData() {
+     byte[] getUploadData() {
         return uploadData;
     }
 
-    public void setUploadData(byte[] uploadData) {
+     void setUploadData(byte[] uploadData) {
         this.uploadData = uploadData;
     }
 
-    public Uri getUploadUri() {
+     Uri getUploadUri() {
         return uploadUri;
     }
 
-    public void setUploadUri(Uri uploadUri) {
+     void setUploadUri(Uri uploadUri) {
         this.uploadUri = uploadUri;
     }
 
-    public boolean isAuthorizationRequired() {
+     bool isAuthorizationRequired() {
         return isAuthorizationRequired;
     }
 
-    public void setIsAuthorizationRequired(boolean isAuthorizationRequired) {
+     void setIsAuthorizationRequired(bool isAuthorizationRequired) {
         this.isAuthorizationRequired = isAuthorizationRequired;
     }
 
-    public boolean isInCustomCnameExcludeList() {
+     bool isInCustomCnameExcludeList() {
         return isInCustomCnameExcludeList;
     }
 
-    public void setIsInCustomCnameExcludeList(boolean isInExcludeCnameList) {
+     void setIsInCustomCnameExcludeList(bool isInExcludeCnameList) {
         this.isInCustomCnameExcludeList = isInExcludeCnameList;
     }
 
-    public boolean isCheckCRC64() {
+     bool isCheckCRC64() {
         return checkCRC64;
     }
 
-    public void setCheckCRC64(boolean checkCRC64) {
+     void setCheckCRC64(bool checkCRC64) {
         this.checkCRC64 = checkCRC64;
     }
 
-    public String getIpWithHeader() {
+     String getIpWithHeader() {
         return ipWithHeader;
     }
 
-    public void setIpWithHeader(String ipWithHeader) {
+     void setIpWithHeader(String ipWithHeader) {
         this.ipWithHeader = ipWithHeader;
     }
 
-    public boolean isPathStyleAccessEnable() {
+     bool isPathStyleAccessEnable() {
         return pathStyleAccessEnable;
     }
 
-    public void setPathStyleAccessEnable(boolean pathStyleAccessEnable) {
+     void setPathStyleAccessEnable(bool pathStyleAccessEnable) {
         this.pathStyleAccessEnable = pathStyleAccessEnable;
     }
 
-    public boolean isCustomPathPrefixEnable() {
+     bool isCustomPathPrefixEnable() {
         return customPathPrefixEnable;
     }
 
-    public void setCustomPathPrefixEnable(boolean customPathPrefixEnable) {
+     void setCustomPathPrefixEnable(bool customPathPrefixEnable) {
         this.customPathPrefixEnable = customPathPrefixEnable;
     }
 
-    public void createBucketRequestBodyMarshall(Map<String, String> configures) throws UnsupportedEncodingException {
+     void createBucketRequestBodyMarshall(Map<String, String> configures) throws UnsupportedEncodingException {
         StringBuffer xmlBody = new StringBuffer();
         if (configures != null) {
             xmlBody.append("<CreateBucketConfiguration>");
@@ -191,14 +191,14 @@ public class RequestMessage extends HttpMessage {
             }
             xmlBody.append("</CreateBucketConfiguration>");
             byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
-            long length = binaryData.length;
+            int length = binaryData.length;
             InputStream inStream = new ByteArrayInputStream(binaryData);
             setContent(inStream);
             setContentLength(length);
         }
     }
 
-    public void putBucketRefererRequestBodyMarshall(ArrayList<String> referers, boolean allowEmpty) throws UnsupportedEncodingException {
+     void putBucketRefererRequestBodyMarshall(ArrayList<String> referers, bool allowEmpty) throws UnsupportedEncodingException {
         StringBuffer xmlBody = new StringBuffer();
         xmlBody.append("<RefererConfiguration>");
         xmlBody.append("<AllowEmptyReferer>" + (allowEmpty ? "true" : "false") + "</AllowEmptyReferer>");
@@ -212,13 +212,13 @@ public class RequestMessage extends HttpMessage {
         xmlBody.append("</RefererConfiguration>");
 
         byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
-        long length = binaryData.length;
+        int length = binaryData.length;
         InputStream inStream = new ByteArrayInputStream(binaryData);
         setContent(inStream);
         setContentLength(length);
     }
 
-    public void putBucketLoggingRequestBodyMarshall(String targetBucketName, String targetPrefix) throws UnsupportedEncodingException {
+     void putBucketLoggingRequestBodyMarshall(String targetBucketName, String targetPrefix) throws UnsupportedEncodingException {
         StringBuffer xmlBody = new StringBuffer();
         xmlBody.append("<BucketLoggingStatus>");
         if (targetBucketName != null) {
@@ -232,13 +232,13 @@ public class RequestMessage extends HttpMessage {
         xmlBody.append("</BucketLoggingStatus>");
 
         byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
-        long length = binaryData.length;
+        int length = binaryData.length;
         InputStream inStream = new ByteArrayInputStream(binaryData);
         setContent(inStream);
         setContentLength(length);
     }
 
-    public void putBucketLifecycleRequestBodyMarshall(ArrayList<BucketLifecycleRule> lifecycleRules) throws UnsupportedEncodingException {
+     void putBucketLifecycleRequestBodyMarshall(ArrayList<BucketLifecycleRule> lifecycleRules) throws UnsupportedEncodingException {
         StringBuffer xmlBody = new StringBuffer();
         xmlBody.append("<LifecycleConfiguration>");
         for (BucketLifecycleRule rule : lifecycleRules) {
@@ -278,13 +278,13 @@ public class RequestMessage extends HttpMessage {
         xmlBody.append("</LifecycleConfiguration>");
 
         byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
-        long length = binaryData.length;
+        int length = binaryData.length;
         InputStream inStream = new ByteArrayInputStream(binaryData);
         setContent(inStream);
         setContentLength(length);
     }
 
-    public byte[] deleteMultipleObjectRequestBodyMarshall(List<String> objectKeys, boolean isQuiet) throws UnsupportedEncodingException {
+     byte[] deleteMultipleObjectRequestBodyMarshall(List<String> objectKeys, bool isQuiet) throws UnsupportedEncodingException {
         StringBuffer xmlBody = new StringBuffer();
         xmlBody.append("<Delete>");
         if (isQuiet) {
@@ -299,14 +299,14 @@ public class RequestMessage extends HttpMessage {
         }
         xmlBody.append("</Delete>");
         byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.DEFAULT_CHARSET_NAME);
-        long length = binaryData.length;
+        int length = binaryData.length;
         InputStream inStream = new ByteArrayInputStream(binaryData);
         setContent(inStream);
         setContentLength(length);
         return binaryData;
     }
 
-    public String buildOSSServiceURL() {
+     String buildOSSServiceURL() {
         OSSUtils.assertTrue(service != null, "Service haven't been set!");
         String originHost = service.getHost();
         String scheme = service.getScheme();
@@ -333,7 +333,7 @@ public class RequestMessage extends HttpMessage {
         }
     }
 
-    public String buildCanonicalURL() throws Exception {
+     String buildCanonicalURL() throws Exception {
         OSSUtils.assertTrue(endpoint != null, "Endpoint haven't been set!");
 
         String scheme = endpoint.getScheme();
@@ -356,7 +356,7 @@ public class RequestMessage extends HttpMessage {
         OSSLog.logDebug(" originHost : " + originHost);
         OSSLog.logDebug(" port : " + portString);
 
-        boolean isPathStyle = false;
+        bool isPathStyle = false;
 
         String baseURL = scheme + "://" + originHost;
         if(!TextUtils.isEmpty(portString)){

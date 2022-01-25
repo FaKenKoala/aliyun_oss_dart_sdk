@@ -4,11 +4,11 @@ package com.alibaba.sdk.android.oss;
  * Created by huaixu on 2018/2/9.
  */
 
-public class TaskCancelException extends Exception {
+ class TaskCancelException extends Exception {
     /**
      * Constructor
      */
-    public TaskCancelException() {
+     TaskCancelException() {
         super();
     }
 
@@ -17,7 +17,7 @@ public class TaskCancelException extends Exception {
      *
      * @param message the error message
      */
-    public TaskCancelException(String message) {
+     TaskCancelException(String message) {
         super("[ErrorMessage]: " + message);
     }
 
@@ -26,7 +26,7 @@ public class TaskCancelException extends Exception {
      *
      * @param cause the exception
      */
-    public TaskCancelException(Throwable cause) {
+     TaskCancelException(Throwable cause) {
         super(cause);
     }
 }

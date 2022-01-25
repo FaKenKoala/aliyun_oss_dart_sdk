@@ -7,30 +7,30 @@ import java.util.Map;
 /**
  * Created by zhouzhuo on 11/23/15.
  */
-public class GetObjectRequest extends OSSRequest {
+ class GetObjectRequest extends OSSRequest {
     //  Object bucket's name
-    private String bucketName;
+     String bucketName;
 
     // Object Key
-    private String objectKey;
+     String objectKey;
 
     // Gets the range of the object to return (starting from 0 to the object length -1)
-    private Range range;
+     Range range;
 
     // image processing parameters
-    private String xOssProcess;
+     String xOssProcess;
 
     // progress callback run with not ui thread
-    private OSSProgressCallback progressListener;
+     OSSProgressCallback progressListener;
 
     // request headers
-    private Map<String, String> requestHeaders;
+     Map<String, String> requestHeaders;
 
-    public Map<String, String> getRequestHeaders() {
+     Map<String, String> getRequestHeaders() {
         return requestHeaders;
     }
 
-    public void setRequestHeaders(Map<String, String> requestHeaders) {
+     void setRequestHeaders(Map<String, String> requestHeaders) {
         this.requestHeaders = requestHeaders;
     }
 
@@ -40,12 +40,12 @@ public class GetObjectRequest extends OSSRequest {
      * @param bucketName Bucket name
      * @param objectKey  Object key
      */
-    public GetObjectRequest(String bucketName, String objectKey) {
+     GetObjectRequest(String bucketName, String objectKey) {
         setBucketName(bucketName);
         setObjectKey(objectKey);
     }
 
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
@@ -54,11 +54,11 @@ public class GetObjectRequest extends OSSRequest {
      *
      * @param bucketName Bucket name
      */
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
-    public String getObjectKey() {
+     String getObjectKey() {
         return objectKey;
     }
 
@@ -67,11 +67,11 @@ public class GetObjectRequest extends OSSRequest {
      *
      * @param objectKey Object key
      */
-    public void setObjectKey(String objectKey) {
+     void setObjectKey(String objectKey) {
         this.objectKey = objectKey;
     }
 
-    public Range getRange() {
+     Range getRange() {
         return range;
     }
 
@@ -80,23 +80,23 @@ public class GetObjectRequest extends OSSRequest {
      *
      * @param range The range to download (starting from 0 to the length -1)
      */
-    public void setRange(Range range) {
+     void setRange(Range range) {
         this.range = range;
     }
 
-    public String getxOssProcess() {
+     String getxOssProcess() {
         return xOssProcess;
     }
 
-    public void setxOssProcess(String xOssProcess) {
+     void setxOssProcess(String xOssProcess) {
         this.xOssProcess = xOssProcess;
     }
 
-    public OSSProgressCallback getProgressListener() {
+     OSSProgressCallback getProgressListener() {
         return progressListener;
     }
 
-    public void setProgressListener(OSSProgressCallback<GetObjectRequest> progressListener) {
+     void setProgressListener(OSSProgressCallback<GetObjectRequest> progressListener) {
         this.progressListener = progressListener;
     }
 }

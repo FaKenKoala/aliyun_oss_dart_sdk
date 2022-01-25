@@ -3,19 +3,19 @@ package com.alibaba.sdk.android.oss.model;
 /**
  * Created by LK on 15/12/18.
  */
-public class GetBucketACLResult extends OSSResult {
+ class GetBucketACLResult extends OSSResult {
 
     // bucket owner
-    private Owner bucketOwner;
+     Owner bucketOwner;
 
     // bucket's ACL
-    private CannedAccessControlList bucketACL;
+     CannedAccessControlList bucketACL;
 
-    public GetBucketACLResult() {
+     GetBucketACLResult() {
         bucketOwner = new Owner();
     }
 
-    public Owner getOwner() {
+     Owner getOwner() {
         return bucketOwner;
     }
 
@@ -24,7 +24,7 @@ public class GetBucketACLResult extends OSSResult {
      *
      * @return
      */
-    public String getBucketOwner() {
+     String getBucketOwner() {
         return bucketOwner.getDisplayName();
     }
 
@@ -33,7 +33,7 @@ public class GetBucketACLResult extends OSSResult {
      *
      * @param ownerName
      */
-    public void setBucketOwner(String ownerName) {
+     void setBucketOwner(String ownerName) {
         this.bucketOwner.setDisplayName(ownerName);
     }
 
@@ -42,7 +42,7 @@ public class GetBucketACLResult extends OSSResult {
      *
      * @return
      */
-    public String getBucketOwnerID() {
+     String getBucketOwnerID() {
         return bucketOwner.getId();
     }
 
@@ -51,7 +51,7 @@ public class GetBucketACLResult extends OSSResult {
      *
      * @param id
      */
-    public void setBucketOwnerID(String id) {
+     void setBucketOwnerID(String id) {
         this.bucketOwner.setId(id);
     }
 
@@ -60,7 +60,7 @@ public class GetBucketACLResult extends OSSResult {
      *
      * @return
      */
-    public String getBucketACL() {
+     String getBucketACL() {
         String acl = null;
         if (bucketACL != null) {
             acl = bucketACL.toString();
@@ -73,7 +73,7 @@ public class GetBucketACLResult extends OSSResult {
      *
      * @param bucketACL
      */
-    public void setBucketACL(String bucketACL) {
+     void setBucketACL(String bucketACL) {
         this.bucketACL = CannedAccessControlList.parseACL(bucketACL);
     }
 }

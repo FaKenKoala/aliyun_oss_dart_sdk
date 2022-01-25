@@ -6,116 +6,116 @@ import java.util.List;
 /**
  * Created by zhouzhuo on 11/24/15.
  */
-public class ListObjectsResult extends OSSResult {
+ class ListObjectsResult extends OSSResult {
 
     /**
      * A list of summary information describing the objects stored in the bucket
      */
-    private List<OSSObjectSummary> objectSummaries = new ArrayList<OSSObjectSummary>();
+     List<OSSObjectSummary> objectSummaries = new ArrayList<OSSObjectSummary>();
 
-    private List<String> commonPrefixes = new ArrayList<String>();
+     List<String> commonPrefixes = new ArrayList<String>();
 
-    private String bucketName;
+     String bucketName;
 
-    private String nextMarker;
+     String nextMarker;
 
-    private boolean isTruncated;
+     bool isTruncated;
 
-    private String prefix;
+     String prefix;
 
-    private String marker;
+     String marker;
 
-    private int maxKeys;
+     int maxKeys;
 
-    private String delimiter;
+     String delimiter;
 
-    private String encodingType;
+     String encodingType;
 
-    public List<OSSObjectSummary> getObjectSummaries() {
+     List<OSSObjectSummary> getObjectSummaries() {
         return objectSummaries;
     }
 
-    public void addObjectSummary(OSSObjectSummary objectSummary) {
+     void addObjectSummary(OSSObjectSummary objectSummary) {
         this.objectSummaries.add(objectSummary);
     }
 
-    public void clearObjectSummaries() {
+     void clearObjectSummaries() {
         this.objectSummaries.clear();
     }
 
-    public List<String> getCommonPrefixes() {
+     List<String> getCommonPrefixes() {
         return commonPrefixes;
     }
 
-    public void addCommonPrefix(String commonPrefix) {
+     void addCommonPrefix(String commonPrefix) {
         this.commonPrefixes.add(commonPrefix);
     }
 
-    public void clearCommonPrefixes() {
+     void clearCommonPrefixes() {
         this.commonPrefixes.clear();
     }
 
-    public String getNextMarker() {
+     String getNextMarker() {
         return nextMarker;
     }
 
-    public void setNextMarker(String nextMarker) {
+     void setNextMarker(String nextMarker) {
         this.nextMarker = nextMarker;
     }
 
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
-    public String getPrefix() {
+     String getPrefix() {
         return prefix;
     }
 
-    public void setPrefix(String prefix) {
+     void setPrefix(String prefix) {
         this.prefix = prefix;
     }
 
-    public String getMarker() {
+     String getMarker() {
         return marker;
     }
 
-    public void setMarker(String marker) {
+     void setMarker(String marker) {
         this.marker = marker;
     }
 
-    public int getMaxKeys() {
+     int getMaxKeys() {
         return maxKeys;
     }
 
-    public void setMaxKeys(int maxKeys) {
+     void setMaxKeys(int maxKeys) {
         this.maxKeys = maxKeys;
     }
 
-    public String getDelimiter() {
+     String getDelimiter() {
         return delimiter;
     }
 
-    public void setDelimiter(String delimiter) {
+     void setDelimiter(String delimiter) {
         this.delimiter = delimiter;
     }
 
-    public String getEncodingType() {
+     String getEncodingType() {
         return encodingType;
     }
 
-    public void setEncodingType(String encodingType) {
+     void setEncodingType(String encodingType) {
         this.encodingType = encodingType;
     }
 
-    public boolean isTruncated() {
+     bool isTruncated() {
         return isTruncated;
     }
 
-    public void setTruncated(boolean isTruncated) {
+     void setTruncated(bool isTruncated) {
         this.isTruncated = isTruncated;
     }
 }

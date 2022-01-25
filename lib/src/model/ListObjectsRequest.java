@@ -3,36 +3,36 @@ package com.alibaba.sdk.android.oss.model;
 /**
  * Created by zhouzhuo on 11/24/15.
  */
-public class ListObjectsRequest extends OSSRequest {
-    private static final int MAX_RETURNED_KEYS_LIMIT = 1000;
+ class ListObjectsRequest extends OSSRequest {
+     static final int MAX_RETURNED_KEYS_LIMIT = 1000;
 
     // bucket name
-    private String bucketName;
+     String bucketName;
 
     // prefix filter
-    private String prefix;
+     String prefix;
 
     // maker filter--the returned objects' keys must be greater than this value in lexicographic order.
-    private String marker;
+     String marker;
 
     // the max keys to return--by default it's 100
-    private Integer maxKeys;
+     Integer maxKeys;
 
     // delimiter for grouping object keys.
-    private String delimiter;
+     String delimiter;
 
     /**
      * The encoding type of the object name in the response body. For now object name could have any unicode character.
      * However the XML1.0 cannot handle some unicode characters such as ASCII 0 to 10.
      * For these unsupported characters, they could be encoded by the the specified encoding type.
      */
-    private String encodingType;
+     String encodingType;
 
-    public ListObjectsRequest() {
+     ListObjectsRequest() {
         this(null);
     }
 
-    public ListObjectsRequest(String bucketName) {
+     ListObjectsRequest(String bucketName) {
         this(bucketName, null, null, null, null);
     }
 
@@ -45,7 +45,7 @@ public class ListObjectsRequest extends OSSRequest {
      * @param maxKeys    Max keys to return, by default it's 100.
      * @param delimiter  delimiter character to group object name
      */
-    public ListObjectsRequest(String bucketName, String prefix, String marker, String delimiter, Integer maxKeys) {
+     ListObjectsRequest(String bucketName, String prefix, String marker, String delimiter, Integer maxKeys) {
         setBucketName(bucketName);
         setPrefix(prefix);
         setMarker(marker);
@@ -60,7 +60,7 @@ public class ListObjectsRequest extends OSSRequest {
      *
      * @return bucket name
      */
-    public String getBucketName() {
+     String getBucketName() {
         return bucketName;
     }
 
@@ -69,7 +69,7 @@ public class ListObjectsRequest extends OSSRequest {
      *
      * @param bucketName bucket name
      */
-    public void setBucketName(String bucketName) {
+     void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
@@ -78,7 +78,7 @@ public class ListObjectsRequest extends OSSRequest {
      *
      * @return prefix
      */
-    public String getPrefix() {
+     String getPrefix() {
         return prefix;
     }
 
@@ -87,7 +87,7 @@ public class ListObjectsRequest extends OSSRequest {
      *
      * @param prefix prefix filter.
      */
-    public void setPrefix(String prefix) {
+     void setPrefix(String prefix) {
         this.prefix = prefix;
     }
 
@@ -96,7 +96,7 @@ public class ListObjectsRequest extends OSSRequest {
      *
      * @return marker filter
      */
-    public String getMarker() {
+     String getMarker() {
         return marker;
     }
 
@@ -105,7 +105,7 @@ public class ListObjectsRequest extends OSSRequest {
      *
      * @param marker marker filter
      */
-    public void setMarker(String marker) {
+     void setMarker(String marker) {
         this.marker = marker;
     }
 
@@ -114,7 +114,7 @@ public class ListObjectsRequest extends OSSRequest {
      *
      * @return The max keys to return
      */
-    public Integer getMaxKeys() {
+     Integer getMaxKeys() {
         return maxKeys;
     }
 
@@ -123,7 +123,7 @@ public class ListObjectsRequest extends OSSRequest {
      *
      * @param maxKeys The max keys to return.
      */
-    public void setMaxKeys(Integer maxKeys) {
+     void setMaxKeys(Integer maxKeys) {
         if (maxKeys < 0 || maxKeys > MAX_RETURNED_KEYS_LIMIT) {
             throw new IllegalArgumentException("Maxkeys should less can not exceed 1000.");
         }
@@ -136,7 +136,7 @@ public class ListObjectsRequest extends OSSRequest {
      *
      * @return the delimiter character.
      */
-    public String getDelimiter() {
+     String getDelimiter() {
         return delimiter;
     }
 
@@ -145,7 +145,7 @@ public class ListObjectsRequest extends OSSRequest {
      *
      * @param delimiter the delimiter to set
      */
-    public void setDelimiter(String delimiter) {
+     void setDelimiter(String delimiter) {
         this.delimiter = delimiter;
     }
 
@@ -154,7 +154,7 @@ public class ListObjectsRequest extends OSSRequest {
      *
      * @return the encoding type of the object
      */
-    public String getEncodingType() {
+     String getEncodingType() {
         return encodingType;
     }
 
@@ -164,7 +164,7 @@ public class ListObjectsRequest extends OSSRequest {
      * @param encodingType Encoding type
      *                     Valid values: null (no encoding) or "url".
      */
-    public void setEncodingType(String encodingType) {
+     void setEncodingType(String encodingType) {
         this.encodingType = encodingType;
     }
 }

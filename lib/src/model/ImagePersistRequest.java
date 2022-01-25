@@ -4,20 +4,20 @@ package com.alibaba.sdk.android.oss.model;
  * Created by huaixu on 2018/1/29.
  */
 
-public class ImagePersistRequest extends OSSRequest {
+ class ImagePersistRequest extends OSSRequest {
 
-    public String mFromBucket;
+     String mFromBucket;
 
-    public String mFromObjectkey;
+     String mFromObjectkey;
 
-    public String mToBucketName;
+     String mToBucketName;
 
-    public String mToObjectKey;
+     String mToObjectKey;
 
-    public String mAction;
+     String mAction;
 
 
-    public ImagePersistRequest(String fromBucket, String fromObjectKey, String toBucketName, String mToObjectKey, String action) {
+     ImagePersistRequest(String fromBucket, String fromObjectKey, String toBucketName, String mToObjectKey, String action) {
         this.mFromBucket = fromBucket;
         this.mFromObjectkey = fromObjectKey;
         this.mToBucketName = toBucketName;
