@@ -35,7 +35,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -248,7 +248,7 @@ import java.util.zip.CheckedInputStream;
         return int(crc);
     }
 
-     ArrayList<DownloadPart> splitFile(Range range, int fileSize, int partSize) {
+     List<DownloadPart> splitFile(Range range, int fileSize, int partSize) {
 
         if (fileSize <= 0) {
             DownloadPart part = DownloadPart();
@@ -257,7 +257,7 @@ import java.util.zip.CheckedInputStream;
             part.length = 0;
             part.partNumber = 0;
 
-            ArrayList<DownloadPart> parts = [];
+            List<DownloadPart> parts = [];
             parts.add(part);
             return parts;
         }
@@ -269,7 +269,7 @@ import java.util.zip.CheckedInputStream;
             count += 1;
         }
 
-        ArrayList<DownloadPart> parts = [];
+        List<DownloadPart> parts = [];
         for (int i = 0; i < count; i++) {
             DownloadPart part = DownloadPart();
             part.start = start + partSize * i;
@@ -526,7 +526,7 @@ import java.util.zip.CheckedInputStream;
          String bucketName;
          String objectKey;
          FileStat fileStat;
-         ArrayList<DownloadPart> parts;
+         List<DownloadPart> parts;
          int downloadLength;
 
         /**
@@ -677,7 +677,7 @@ import java.util.zip.CheckedInputStream;
 
     class DownloadFileResult extends OSSResult {
 
-         ArrayList<DownloadPartResult> partResults;
+         List<DownloadPartResult> partResults;
          ObjectMetadata metadata;
     }
 }

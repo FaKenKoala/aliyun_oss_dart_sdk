@@ -8,7 +8,7 @@ class OSSResult {
   //client crc64
   int _clientCRC = 0;
   int get clientCRC => _clientCRC;
-  void setClientCRC(int? clientCRC) {
+  set clientCRC(int? clientCRC) {
     if (clientCRC != null && clientCRC != 0) {
       _clientCRC = clientCRC;
     }

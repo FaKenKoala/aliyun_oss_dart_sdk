@@ -1,258 +1,69 @@
- import 'lib_model.dart';
+import 'object_metadata.dart';
+import 'oss_request.dart';
 
 class CopyObjectRequest extends OSSRequest {
+  // Source Object's bucket name
+  String sourceBucketName;
 
-    // Source Object's bucket name
-     String sourceBucketName;
+  // Source Object's key
+  String sourceKey;
 
-    // Source Object's key
-     String sourceKey;
+  // Target Object's bucket name
+  String destinationBucketName;
 
-    // Target Object's bucket name
-     String destinationBucketName;
+  // Target Object Key
+  String destinationKey;
 
-    // Target Object Key
-     String destinationKey;
+  // Target Object's server side encryption method
+  String? serverSideEncryption;
 
-    // Target Object's server side encryption method
-     String serverSideEncryption;
+  // Target Object Metadata
+  ObjectMetadata? newObjectMetadata;
 
-    // Target Object Metadata
-     ObjectMetadata newObjectMetadata;
+  // The ETag matching constraints. If the source object's ETag matches the one user provided, copy the file.
+  // Otherwise returns 412 (precondition failed).
+  final List<String> _matchingETagConstraints = [];
 
-    // The ETag matching constraints. If the source object's ETag matches the one user provided, copy the file.
-    // Otherwise returns 412 (precondition failed).
-     List<String> matchingETagConstraints = [];
+  // The ETag non-matching constraints. If the source object's ETag does not match the one user provided, copy the file.
+  // Otherwise returns 412 (precondition failed).
+  final List<String> _nonmatchingEtagConstraints = [];
 
-    // The ETag non-matching constraints. If the source object's ETag does not match the one user provided, copy the file.
-    // Otherwise returns 412 (precondition failed).
-     List<String> nonmatchingEtagConstraints = [];
+  // The unmodified since constraint. If the parameter value is same or later than the actual file's modified time, copy the file.
+  // Otherwise returns 412 (precondition failed).
+  DateTime? unmodifiedSinceConstraint;
 
-    // The unmodified since constraint. If the parameter value is same or later than the actual file's modified time, copy the file.
-    // Otherwise returns 412 (precondition failed).
-     Date unmodifiedSinceConstraint;
+  // The modified since constraint. If the parameter value is earlier than the actual file's modified time, copy the file.
+  // Otherwise returns 412 (precondition failed).
+  DateTime? modifiedSinceConstraint;
 
-    // The modified since constraint. If the parameter value is earlier than the actual file's modified time, copy the file.
-    // Otherwise returns 412 (precondition failed).
-     Date modifiedSinceConstraint;
+  CopyObjectRequest(this.sourceBucketName, this.sourceKey,
+      this.destinationBucketName, this.destinationKey);
 
-    /**
-     * Creates an instance of {@link CopyObjectRequest}
-     *
-     * @param sourceBucketName      Source Object's bucket name
-     * @param sourceKey             Source Object's key
-     * @param destinationBucketName Target Object's bucket name
-     * @param destinationKey        Target Object key
-     */
-     CopyObjectRequest(String sourceBucketName, String sourceKey,
-                             String destinationBucketName, String destinationKey) {
-        setSourceBucketName(sourceBucketName);
-        setSourceKey(sourceKey);
-        setDestinationBucketName(destinationBucketName);
-        setDestinationKey(destinationKey);
-    }
+  List<String> getMatchingETagConstraints() {
+    return _matchingETagConstraints;
+  }
 
-    /**
-     * Gets Object bucket name
-     *
-     * @return Source Object's bucket name
-     */
-     String getSourceBucketName() {
-        return sourceBucketName;
-    }
+  void setMatchingETagConstraints(List<String>? matchingETagConstraints) {
+    _matchingETagConstraints
+      ..clear()
+      ..addAll(matchingETagConstraints ?? []);
+  }
 
-    /**
-     * Sets source object's bucket name
-     *
-     * @param sourceBucketName Source object's bucket name
-     */
-     void setSourceBucketName(String sourceBucketName) {
-        this.sourceBucketName = sourceBucketName;
-    }
+  void clearMatchingETagConstraints() {
+    _matchingETagConstraints.clear();
+  }
 
-    /**
-     * Gets the source object key
-     *
-     * @return Source Object key
-     */
-     String getSourceKey() {
-        return sourceKey;
-    }
+  List<String> getNonmatchingEtagConstraints() {
+    return _nonmatchingEtagConstraints;
+  }
 
-    /**
-     * Sets the object key
-     *
-     * @param sourceKey Source Object Key
-     */
-     void setSourceKey(String sourceKey) {
-        this.sourceKey = sourceKey;
-    }
+  void setNonmatchingETagConstraints(List<String>? nonmatchingEtagConstraints) {
+    _nonmatchingEtagConstraints
+      ..clear()
+      ..addAll(nonmatchingEtagConstraints ?? []);
+  }
 
-    /**
-     * Gets the target bucket name
-     *
-     * @return Target object's bucket name
-     */
-     String getDestinationBucketName() {
-        return destinationBucketName;
-    }
-
-    /**
-     * Sets the target bucket name
-     *
-     * @param destinationBucketName Target object's bucket name
-     */
-     void setDestinationBucketName(String destinationBucketName) {
-        this.destinationBucketName = destinationBucketName;
-    }
-
-    /**
-     * Gets target object's key
-     *
-     * @return The target object key
-     */
-     String getDestinationKey() {
-        return destinationKey;
-    }
-
-    /**
-     * Sets the target object Key
-     *
-     * @param destinationKey The target Object key
-     */
-     void setDestinationKey(String destinationKey) {
-        this.destinationKey = destinationKey;
-    }
-
-    /**
-     * Gets the target Object {@link ObjectMetadata} instance
-     *
-     * @return the target Object {@link ObjectMetadata} instance
-     */
-     ObjectMetadata getNewObjectMetadata() {
-        return newObjectMetadata;
-    }
-
-    /**
-     * Sets the target Object {@link ObjectMetadata} instance
-     *
-     * @param newObjectMetadata he target Object {@link ObjectMetadata} instance
-     */
-     void setNewObjectMetadata(ObjectMetadata newObjectMetadata) {
-        this.newObjectMetadata = newObjectMetadata;
-    }
-
-    /**
-     * Gets the ETag matching constraints. If the object's ETag matches anyone of this list, copy the result.
-     * Otherwise, 412 is returned (precondition failed)
-     *
-     * @return ETag list to match.
-     */
-     List<String> getMatchingETagConstraints() {
-        return matchingETagConstraints;
-    }
-
-    /**
-     * Sets the ETag matching constraints. If the object's ETag matches anyone of this list, copy the result.
-     * Otherwise, 412 is returned (precondition failed)
-     *
-     * @param matchingETagConstraints ETag list to match.
-     */
-     void setMatchingETagConstraints(List<String> matchingETagConstraints) {
-        this.matchingETagConstraints.clear();
-        if (matchingETagConstraints != null && !matchingETagConstraints.isEmpty()) {
-            this.matchingETagConstraints.addAll(matchingETagConstraints);
-        }
-    }
-
-     void clearMatchingETagConstraints() {
-        this.matchingETagConstraints.clear();
-    }
-
-    /**
-     * Gets the ETag's non-matching constraints.
-     * If the object's ETag does not match anyone of this list, copy the result.
-     * Otherwise, 412 is returned (precondition failed).
-     *
-     * @return ETag list to match
-     */
-     List<String> getNonmatchingEtagConstraints() {
-        return nonmatchingEtagConstraints;
-    }
-
-    /**
-     * Sets the ETag's non-matching constraints.
-     * If the object's ETag does not match anyone of this list, copy the result.
-     * Otherwise, 412 is returned (precondition failed).
-     *
-     * @param nonmatchingEtagConstraints ETag list to match
-     */
-     void setNonmatchingETagConstraints(List<String> nonmatchingEtagConstraints) {
-        this.nonmatchingEtagConstraints.clear();
-        if (nonmatchingEtagConstraints != null && !nonmatchingEtagConstraints.isEmpty()) {
-            this.nonmatchingEtagConstraints.addAll(nonmatchingEtagConstraints);
-        }
-    }
-
-     void clearNonmatchingETagConstraints() {
-        this.nonmatchingEtagConstraints.clear();
-    }
-
-    /**
-     * Gets the unmodified-since constraint. If it's same or later than the actual modified time of the file, copy the file.
-     * Otherwise, 412 is returned (precondition failed).
-     *
-     * @return The timestamp threshold of last modified time.
-     */
-     Date getUnmodifiedSinceConstraint() {
-        return unmodifiedSinceConstraint;
-    }
-
-    /**
-     * Gets the unmodified-since constraint. If it's same or later than the actual modified time of the file, copy the file.
-     * Otherwise, 412 is returned (precondition failed).
-     *
-     * @param unmodifiedSinceConstraint The timestamp threshold of last modified time.
-     */
-     void setUnmodifiedSinceConstraint(Date unmodifiedSinceConstraint) {
-        this.unmodifiedSinceConstraint = unmodifiedSinceConstraint;
-    }
-
-    /**
-     * Gets the modified-since constraint. If it's earlier than the actual modified time of the file, copy the file.
-     * Otherwise, 412 is returned (precondition failed).
-     *
-     * @return The timestamp threshold of last modified time.
-     */
-     Date getModifiedSinceConstraint() {
-        return modifiedSinceConstraint;
-    }
-
-    /**
-     * Sets the modified-since constraint. If it's earlier than the actual modified time of the file, copy the file.
-     * Otherwise, 412 is returned (precondition failed).
-     *
-     * @param modifiedSinceConstraint The timestamp threshold of last modified time.
-     */
-     void setModifiedSinceConstraint(Date modifiedSinceConstraint) {
-        this.modifiedSinceConstraint = modifiedSinceConstraint;
-    }
-
-    /**
-     * Gets the server side encryption
-     *
-     * @return The server side encryption
-     */
-     String getServerSideEncryption() {
-        return this.serverSideEncryption;
-    }
-
-    /**
-     * Sets the server side encryption
-     *
-     * @param serverSideEncryption the server side encryption
-     */
-     void setServerSideEncryption(String serverSideEncryption) {
-        this.serverSideEncryption = serverSideEncryption;
-    }
+  void clearNonmatchingETagConstraints() {
+    _nonmatchingEtagConstraints.clear();
+  }
 }

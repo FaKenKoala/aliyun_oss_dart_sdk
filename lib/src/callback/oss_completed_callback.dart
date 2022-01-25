@@ -1,5 +1,6 @@
 import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
-import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/oss_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/oss_result.dart';
 import 'package:aliyun_oss_dart_sdk/src/service_exception.dart';
 
 abstract class OSSCompletedCallback<T1 extends OSSRequest,

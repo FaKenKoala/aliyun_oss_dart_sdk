@@ -119,8 +119,7 @@ class HttpdnsMini {
                     if (inStream != null) {
                         inStream.close();
                     }
-                } catch (OSSIOException e) {
-                    e.printStackTrace();
+                } catch ( e) {
                 }
             }
             if (!hasRetryed) {

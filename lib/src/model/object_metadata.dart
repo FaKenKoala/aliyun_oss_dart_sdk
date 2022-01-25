@@ -1,5 +1,6 @@
  import 'dart:collection';
 
+import 'package:aliyun_oss_dart_sdk/src/common/oss_constants.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/oss_headers.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/http_headers.dart';
@@ -41,7 +42,7 @@ class ObjectMetadata {
     }
 
      DateTime getExpirationTime()  {
-        return DateTimeUtil.parseRfc822DateTime((String) metadata.get(OSSHeaders.EXPIRES));
+        return DateTimeUtil.parseRfc822DateTime((String) metadata.get(HttpHeaders.expires));
     }
 
      void setExpirationTime(DateTime expirationTime) {
@@ -60,7 +61,7 @@ class ObjectMetadata {
     }
 
      void setContentLength(int contentLength) {
-        if (contentLength > OSSConstants.DEFAULT_FILE_SIZE_LIMIT) {
+        if (contentLength > OSSConstants.defaultFileSizeLimit) {
             throw ArgumentError("The content length could not be more than 5GB.");
         }
 

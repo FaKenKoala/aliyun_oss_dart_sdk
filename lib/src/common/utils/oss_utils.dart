@@ -8,7 +8,7 @@ import 'package:aliyun_oss_dart_sdk/src/common/oss_constants.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
 import 'package:aliyun_oss_dart_sdk/src/internal/request_message.dart';
-import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/copy_object_request.dart';
 
 import 'http_util.dart';
 
@@ -527,7 +527,7 @@ if (!first) {
         }
 
         if (request is CopyObjectRequest) {
-            ensureObjectKeyValid((request.getDestinationKey());
+            ensureObjectKeyValid(request.getDestinationKey());
         }
     }
 
