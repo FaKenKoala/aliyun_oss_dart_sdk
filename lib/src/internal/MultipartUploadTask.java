@@ -27,7 +27,7 @@ import java.util.concurrent.Callable;
     }
 
     @override
-     void initMultipartUploadId() throws OSSClientException, OSSServiceException {
+     void initMultipartUploadId()  {
         InitiateMultipartUploadRequest init = InitiateMultipartUploadRequest(
                 mRequest.getBucketName(), mRequest.getObjectKey(), mRequest.getMetadata());
 
@@ -38,7 +38,7 @@ import java.util.concurrent.Callable;
     }
 
     @override
-     CompleteMultipartUploadResult doMultipartUpload() throws IOException, OSSServiceException, OSSClientException, InterruptedException {
+     CompleteMultipartUploadResult doMultipartUpload()  {
         checkCancel();
         int readByte = mPartAttr[0];
         final int partNumber = mPartAttr[1];
@@ -99,7 +99,7 @@ import java.util.concurrent.Callable;
     }
 
     @override
-     void preUploadPart(int readIndex, int byteCount, int partNumber) throws Exception {
+     void preUploadPart(int readIndex, int byteCount, int partNumber)  {
         checkException();
     }
 }

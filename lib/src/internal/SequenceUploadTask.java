@@ -68,7 +68,7 @@ import java.util.zip.CheckedInputStream;
     }
 
     @override
-     void initMultipartUploadId() throws IOException, OSSClientException, OSSServiceException {
+     void initMultipartUploadId()  {
 
         Map<Integer, int> recordCrc64 = null;
 
@@ -196,7 +196,7 @@ import java.util.zip.CheckedInputStream;
     }
 
     @override
-     ResumableUploadResult doMultipartUpload() throws IOException, OSSClientException, OSSServiceException, InterruptedException {
+     ResumableUploadResult doMultipartUpload()  {
 
         int tempUploadedLength = mUploadedLength;
 
@@ -283,7 +283,7 @@ import java.util.zip.CheckedInputStream;
 
             preUploadPart(readIndex, byteCount, partNumber);
             int skip = readIndex * mRequest.getPartSize();
-            byte[] partContent = byte[byteCount];
+            List<int> partContent = byte[byteCount];
 
             if (mUploadUri != null) {
                 inputStream = mContext.getApplicationContext().getContentResolver().openInputStream(mUploadUri);
@@ -330,7 +330,7 @@ import java.util.zip.CheckedInputStream;
                 PartETag partETag = PartETag(uploadPartRequest.getPartNumber(), e.getPartEtag());
                 partETag.setPartSize(uploadPartRequest.getPartContent().length);
                 if (mCheckCRC64) {
-                    byte[] partContent = uploadPartRequest.getPartContent();
+                    List<int> partContent = uploadPartRequest.getPartContent();
                     ByteArrayInputStream byteArrayInputStream = ByteArrayInputStream(partContent);
                     CheckedInputStream checkedInputStream = CheckedInputStream(byteArrayInputStream, new CRC64());
 
@@ -358,7 +358,7 @@ import java.util.zip.CheckedInputStream;
 
 
     @override
-     void checkException() throws IOException, OSSServiceException, OSSClientException {
+     void checkException()  {
         if (mContext.getCancellationHandler().isCancelled()) {
             if (mRequest.deleteUploadOnCancelling()) {
                 abortThisUpload();
@@ -417,7 +417,7 @@ import java.util.zip.CheckedInputStream;
     }
 
     @override
-     void uploadPartFinish(PartETag partETag) throws Exception {
+     void uploadPartFinish(PartETag partETag)  {
         if (mContext.getCancellationHandler().isCancelled()) {
             if (!mSp.contains(mUploadId)) {
                 mSp.setStringValue(mUploadId, String.valueOf(mUploadedLength));

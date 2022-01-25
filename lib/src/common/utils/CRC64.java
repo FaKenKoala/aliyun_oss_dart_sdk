@@ -140,7 +140,7 @@ import java.util.zip.Checksum;
 
     @override
      void update(int val) {
-        byte[] b = byte[1];
+        List<int> b = byte[1];
         b[0] = (byte) (val & 0xff);
         update(b, b.length);
     }
@@ -148,12 +148,12 @@ import java.util.zip.Checksum;
     /**
      * Update CRC64 with byte block.
      */
-     void update(byte[] b, int len) {
+     void update(List<int> b, int len) {
         update(b, 0, len);
     }
 
     @override
-     void update(byte[] b, int off, int len) {
+     void update(List<int> b, int off, int len) {
 
         this.value = ~this.value;
 

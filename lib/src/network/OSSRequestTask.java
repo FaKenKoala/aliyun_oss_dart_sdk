@@ -67,7 +67,7 @@ import okhttp3.Response;
     }
 
     @override
-     T call() throws Exception {
+     T call()  {
 
         Request request = null;
         ResponseMessage responseMessage = null;

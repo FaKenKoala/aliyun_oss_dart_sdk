@@ -52,7 +52,7 @@ import java.util.concurrent.Future;
      * @throws OSSClientException
      * @throws OSSServiceException
      */
-     T getResult() throws OSSClientException, OSSServiceException {
+     T getResult()  {
         try {
             T result = future.get();
             return result;

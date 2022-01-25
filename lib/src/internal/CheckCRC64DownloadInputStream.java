@@ -38,20 +38,20 @@ import java.util.zip.Checksum;
     }
 
     @override
-     int read() throws IOException {
+     int read()  {
         int read = super.read();
         checkCRC64(read);
         return read;
     }
 
     @override
-     int read(byte[] buffer, int byteOffset, int byteCount) throws IOException {
+     int read(List<int> buffer, int byteOffset, int byteCount)  {
         int read = super.read(buffer, byteOffset, byteCount);
         checkCRC64(read);
         return read;
     }
 
-     void checkCRC64(int byteRead) throws IOException {
+     void checkCRC64(int byteRead)  {
         mTotalBytesRead += byteRead;
         if (mTotalBytesRead >= mTotalLength) {
             this.mClientCRC64 = getChecksum().getValue();

@@ -30,7 +30,7 @@ import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
 
      String uploadFilePath;
 
-     byte[] uploadData;
+     List<int> uploadData;
 
      Uri uploadUri;
 
@@ -53,11 +53,11 @@ import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
         setMetadata(metadata);
     }
 
-     AppendObjectRequest(String bucketName, String objectKey, byte[] uploadData) {
+     AppendObjectRequest(String bucketName, String objectKey, List<int> uploadData) {
         this(bucketName, objectKey, uploadData, null);
     }
 
-     AppendObjectRequest(String bucketName, String objectKey, byte[] uploadData, ObjectMetadata metadata) {
+     AppendObjectRequest(String bucketName, String objectKey, List<int> uploadData, ObjectMetadata metadata) {
         setBucketName(bucketName);
         setObjectKey(objectKey);
         setUploadData(uploadData);
@@ -107,11 +107,11 @@ import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
         this.uploadFilePath = uploadFilePath;
     }
 
-     byte[] getUploadData() {
+     List<int> getUploadData() {
         return uploadData;
     }
 
-     void setUploadData(byte[] uploadData) {
+     void setUploadData(List<int> uploadData) {
         this.uploadData = uploadData;
     }
 

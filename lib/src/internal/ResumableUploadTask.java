@@ -59,7 +59,7 @@ import java.util.concurrent.Callable;
     }
 
     @override
-     void initMultipartUploadId() throws IOException, OSSClientException, OSSServiceException {
+     void initMultipartUploadId()  {
 
         Map<Integer, int> recordCrc64 = null;
 
@@ -212,7 +212,7 @@ import java.util.concurrent.Callable;
     }
 
     @override
-     ResumableUploadResult doMultipartUpload() throws IOException, OSSClientException, OSSServiceException, InterruptedException {
+     ResumableUploadResult doMultipartUpload()  {
 
         int tempUploadedLength = mUploadedLength;
         checkCancel();
@@ -295,7 +295,7 @@ import java.util.concurrent.Callable;
     }
 
     @override
-     void checkException() throws IOException, OSSServiceException, OSSClientException {
+     void checkException()  {
         if (mContext.getCancellationHandler().isCancelled()) {
             if (mRequest.deleteUploadOnCancelling()) {
                 abortThisUpload();
@@ -358,7 +358,7 @@ import java.util.concurrent.Callable;
     }
 
     @override
-     void uploadPartFinish(PartETag partETag) throws Exception {
+     void uploadPartFinish(PartETag partETag)  {
         if (mContext.getCancellationHandler().isCancelled()) {
             if (!mSp.contains(mUploadId)) {
                 mSp.setStringValue(mUploadId, String.valueOf(mUploadedLength));

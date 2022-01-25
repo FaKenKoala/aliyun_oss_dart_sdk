@@ -99,7 +99,7 @@ import java.util.Map;
      * @return Expires header value in Rfc822 format.
      * @throws ParseException unable to parse the Expires value into Rfc822 format
      */
-     Date getExpirationTime() throws ParseException {
+     Date getExpirationTime()  {
         return DateUtil.parseRfc822Date((String) metadata.get(OSSHeaders.EXPIRES));
     }
 

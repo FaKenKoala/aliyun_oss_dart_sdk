@@ -54,7 +54,7 @@ import okio.Source;
              int totalBytesRead = 0L;
 
             @override
-             int read(Buffer sink, int byteCount) throws IOException {
+             int read(Buffer sink, int byteCount)  {
                 int bytesRead = super.read(sink, byteCount);
                 totalBytesRead += bytesRead != -1 ? bytesRead : 0;
                 //callback

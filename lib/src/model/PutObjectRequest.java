@@ -21,7 +21,7 @@ import java.util.Map;
 
      String uploadFilePath;
 
-     byte[] uploadData;
+     List<int> uploadData;
 
      Uri uploadUri;
 
@@ -70,7 +70,7 @@ import java.util.Map;
      * @param objectKey  The object key
      * @param uploadData The in-memory data to upload
      */
-     PutObjectRequest(String bucketName, String objectKey, byte[] uploadData) {
+     PutObjectRequest(String bucketName, String objectKey, List<int> uploadData) {
         this(bucketName, objectKey, uploadData, null);
     }
 
@@ -82,7 +82,7 @@ import java.util.Map;
      * @param uploadData The in-memory data to upload
      * @param metadata   The metadata information of the target object
      */
-     PutObjectRequest(String bucketName, String objectKey, byte[] uploadData, ObjectMetadata metadata) {
+     PutObjectRequest(String bucketName, String objectKey, List<int> uploadData, ObjectMetadata metadata) {
         setBucketName(bucketName);
         setObjectKey(objectKey);
         setUploadData(uploadData);
@@ -145,7 +145,7 @@ import java.util.Map;
         this.uploadFilePath = uploadFilePath;
     }
 
-     byte[] getUploadData() {
+     List<int> getUploadData() {
         return uploadData;
     }
 
@@ -154,7 +154,7 @@ import java.util.Map;
      *
      * @param uploadData
      */
-     void setUploadData(byte[] uploadData) {
+     void setUploadData(List<int> uploadData) {
         this.uploadData = uploadData;
     }
 

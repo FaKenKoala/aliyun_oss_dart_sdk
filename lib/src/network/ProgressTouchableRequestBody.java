@@ -39,12 +39,12 @@ import okio.Source;
     }
 
     @override
-     int contentLength() throws IOException {
+     int contentLength()  {
         return this.contentLength;
     }
 
     @override
-     void writeTo(BufferedSink sink) throws IOException {
+     void writeTo(BufferedSink sink)  {
         Source source = Okio.source(this.inputStream);
         int total = 0;
         int read, toRead, remain;

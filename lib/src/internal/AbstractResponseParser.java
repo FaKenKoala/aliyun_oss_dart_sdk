@@ -45,7 +45,7 @@ import okhttp3.Response;
     }
 
     @override
-     T parse(ResponseMessage response) throws IOException {
+     T parse(ResponseMessage response)  {
         try {
             Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
             Class<?> classType = (Class<?>) type;

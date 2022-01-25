@@ -22,7 +22,7 @@ import java.io.Writer;
      final static int BUFFER_SIZE = 4 * 1024;
 
      static String readStreamAsString(InputStream in, String charset)
-            throws IOException {
+             {
         if (in == null)
             return "";
 
@@ -54,14 +54,14 @@ import java.io.Writer;
         return result;
     }
 
-     static byte[] readStreamAsBytesArray(InputStream in)
-            throws IOException {
+     static List<int> readStreamAsBytesArray(InputStream in)
+             {
         if (in == null) {
             return byte[0];
         }
 
         ByteArrayOutputStream output = ByteArrayOutputStream();
-        byte[] buffer = byte[BUFFER_SIZE];
+        List<int> buffer = byte[BUFFER_SIZE];
         int len;
         while ((len = in.read(buffer)) > -1) {
             output.write(buffer, 0, len);
@@ -71,14 +71,14 @@ import java.io.Writer;
         return output.toByteArray();
     }
 
-     static byte[] readStreamAsBytesArray(InputStream in, int readLength)
-            throws IOException {
+     static List<int> readStreamAsBytesArray(InputStream in, int readLength)
+             {
         if (in == null) {
             return byte[0];
         }
 
         ByteArrayOutputStream output = ByteArrayOutputStream();
-        byte[] buffer = byte[BUFFER_SIZE];
+        List<int> buffer = byte[BUFFER_SIZE];
         int len;
         int readed = 0;
         while (readed < readLength && (len = in.read(buffer, 0, Math.min(2048, (int) (readLength - readed)))) > -1) {

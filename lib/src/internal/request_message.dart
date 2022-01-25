@@ -43,7 +43,7 @@ import java.util.Map;
      bool isInCustomCnameExcludeList = false;
 
      String uploadFilePath;
-     byte[] uploadData;
+     List<int> uploadData;
      Uri uploadUri;
 
      HttpMethod getMethod() {
@@ -118,11 +118,11 @@ import java.util.Map;
         this.uploadFilePath = uploadFilePath;
     }
 
-     byte[] getUploadData() {
+     List<int> getUploadData() {
         return uploadData;
     }
 
-     void setUploadData(byte[] uploadData) {
+     void setUploadData(List<int> uploadData) {
         this.uploadData = uploadData;
     }
 
@@ -182,7 +182,7 @@ import java.util.Map;
         this.customPathPrefixEnable = customPathPrefixEnable;
     }
 
-     void createBucketRequestBodyMarshall(Map<String, String> configures) throws UnsupportedEncodingException {
+     void createBucketRequestBodyMarshall(Map<String, String> configures)  {
         StringBuffer xmlBody = StringBuffer();
         if (configures != null) {
             xmlBody.write("<CreateBucketConfiguration>");
@@ -190,7 +190,7 @@ import java.util.Map;
                 xmlBody.write("<" + entry.getKey() + ">" + entry.getValue() + "</" + entry.getKey() + ">");
             }
             xmlBody.write("</CreateBucketConfiguration>");
-            byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.defaultCharsetName);
+            List<int> binaryData = xmlBody.toString().getBytes(OSSConstants.defaultCharsetName);
             int length = binaryData.length;
             InputStream inStream = ByteArrayInputStream(binaryData);
             setContent(inStream);
@@ -198,7 +198,7 @@ import java.util.Map;
         }
     }
 
-     void putBucketRefererRequestBodyMarshall(ArrayList<String> referers, bool allowEmpty) throws UnsupportedEncodingException {
+     void putBucketRefererRequestBodyMarshall(ArrayList<String> referers, bool allowEmpty)  {
         StringBuffer xmlBody = StringBuffer();
         xmlBody.write("<RefererConfiguration>");
         xmlBody.write("<AllowEmptyReferer>" + (allowEmpty ? "true" : "false") + "</AllowEmptyReferer>");
@@ -211,14 +211,14 @@ import java.util.Map;
         }
         xmlBody.write("</RefererConfiguration>");
 
-        byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.defaultCharsetName);
+        List<int> binaryData = xmlBody.toString().getBytes(OSSConstants.defaultCharsetName);
         int length = binaryData.length;
         InputStream inStream = ByteArrayInputStream(binaryData);
         setContent(inStream);
         setContentLength(length);
     }
 
-     void putBucketLoggingRequestBodyMarshall(String targetBucketName, String targetPrefix) throws UnsupportedEncodingException {
+     void putBucketLoggingRequestBodyMarshall(String targetBucketName, String targetPrefix)  {
         StringBuffer xmlBody = StringBuffer();
         xmlBody.write("<BucketLoggingStatus>");
         if (targetBucketName != null) {
@@ -231,14 +231,14 @@ import java.util.Map;
 
         xmlBody.write("</BucketLoggingStatus>");
 
-        byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.defaultCharsetName);
+        List<int> binaryData = xmlBody.toString().getBytes(OSSConstants.defaultCharsetName);
         int length = binaryData.length;
         InputStream inStream = ByteArrayInputStream(binaryData);
         setContent(inStream);
         setContentLength(length);
     }
 
-     void putBucketLifecycleRequestBodyMarshall(ArrayList<BucketLifecycleRule> lifecycleRules) throws UnsupportedEncodingException {
+     void putBucketLifecycleRequestBodyMarshall(ArrayList<BucketLifecycleRule> lifecycleRules)  {
         StringBuffer xmlBody = StringBuffer();
         xmlBody.write("<LifecycleConfiguration>");
         for (BucketLifecycleRule rule : lifecycleRules) {
@@ -277,14 +277,14 @@ import java.util.Map;
 
         xmlBody.write("</LifecycleConfiguration>");
 
-        byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.defaultCharsetName);
+        List<int> binaryData = xmlBody.toString().getBytes(OSSConstants.defaultCharsetName);
         int length = binaryData.length;
         InputStream inStream = ByteArrayInputStream(binaryData);
         setContent(inStream);
         setContentLength(length);
     }
 
-     byte[] deleteMultipleObjectRequestBodyMarshall(List<String> objectKeys, bool isQuiet) throws UnsupportedEncodingException {
+     List<int> deleteMultipleObjectRequestBodyMarshall(List<String> objectKeys, bool isQuiet)  {
         StringBuffer xmlBody = StringBuffer();
         xmlBody.write("<Delete>");
         if (isQuiet) {
@@ -298,7 +298,7 @@ import java.util.Map;
             xmlBody.write("</Object>");
         }
         xmlBody.write("</Delete>");
-        byte[] binaryData = xmlBody.toString().getBytes(OSSConstants.defaultCharsetName);
+        List<int> binaryData = xmlBody.toString().getBytes(OSSConstants.defaultCharsetName);
         int length = binaryData.length;
         InputStream inStream = ByteArrayInputStream(binaryData);
         setContent(inStream);
@@ -333,7 +333,7 @@ import java.util.Map;
         }
     }
 
-     String buildCanonicalURL() throws Exception {
+     String buildCanonicalURL()  {
         OSSUtils.assertTrue(endpoint != null, "Endpoint haven't been set!");
 
         String scheme = endpoint.getScheme();

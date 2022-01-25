@@ -141,7 +141,7 @@ import java.util.List;
         this.commonPrefixes.add(commonPrefix);
     }
 
-     ListMultipartUploadsResult parseData(ResponseMessage responseMessage) throws Exception {
+     ListMultipartUploadsResult parseData(ResponseMessage responseMessage)  {
         List<MultipartUpload> uploadList = [];
         MultipartUpload upload = null;
         bool isCommonPrefixes = false;

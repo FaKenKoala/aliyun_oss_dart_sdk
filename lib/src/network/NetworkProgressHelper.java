@@ -22,7 +22,7 @@ import okhttp3.Response;
         OkHttpClient newClient = client.newBuilder()
                 .addNetworkInterceptor(Interceptor() {
                     @override
-                     Response intercept(Chain chain) throws IOException {
+                     Response intercept(Chain chain)  {
                         Response originalResponse = chain.proceed(chain.request());
                         return originalResponse.newBuilder()
                                 .body(ProgressTouchableResponseBody(originalResponse.body(),

@@ -123,7 +123,7 @@ import java.util.concurrent.TimeUnit;
      *
      * @throws OSSClientException
      */
-     void checkCancel() throws OSSClientException {
+     void checkCancel()  {
         if (mContext.getCancellationHandler().isCancelled()) {
             TaskCancelException e = TaskCancelException("multipart cancel");
             throw OSSClientException(e.getMessage(), e, true);
@@ -131,15 +131,15 @@ import java.util.concurrent.TimeUnit;
     }
 
 
-     void preUploadPart(int readIndex, int byteCount, int partNumber) throws Exception {
+     void preUploadPart(int readIndex, int byteCount, int partNumber)  {
 
     }
 
-     void uploadPartFinish(PartETag partETag) throws Exception {
+     void uploadPartFinish(PartETag partETag)  {
     }
 
     @override
-     Result call() throws Exception {
+     Result call()  {
         try {
             checkInitData();
             initMultipartUploadId();
@@ -168,7 +168,7 @@ import java.util.concurrent.TimeUnit;
         }
     }
 
-     void checkInitData() throws OSSClientException {
+     void checkInitData()  {
         if (mRequest.getUploadFilePath() != null) {
             mUploadFilePath = mRequest.getUploadFilePath();
             mUploadedLength = 0;
@@ -229,7 +229,7 @@ import java.util.concurrent.TimeUnit;
 
             preUploadPart(readIndex, byteCount, partNumber);
 
-            byte[] partContent = byte[byteCount];
+            List<int> partContent = byte[byteCount];
             int skip = readIndex * mRequest.getPartSize();
             if (mUploadUri != null) {
                 inputStream = mContext.getApplicationContext().getContentResolver().openInputStream(mUploadUri);
@@ -302,7 +302,7 @@ import java.util.concurrent.TimeUnit;
      * @throws OSSClientException
      * @throws OSSServiceException
      */
-     CompleteMultipartUploadResult completeMultipartUploadResult() throws OSSClientException, OSSServiceException {
+     CompleteMultipartUploadResult completeMultipartUploadResult()  {
         //complete sort
         CompleteMultipartUploadResult completeResult = null;
         if (mPartETags.size() > 0) {
@@ -351,7 +351,7 @@ import java.util.concurrent.TimeUnit;
         }
     }
 
-     void checkException() throws IOException, OSSServiceException, OSSClientException {
+     void checkException()  {
         if (mUploadException != null) {
             releasePool();
             if (mUploadException instanceof IOException) {

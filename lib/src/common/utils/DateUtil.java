@@ -47,7 +47,7 @@ import java.util.SimpleTimeZone;
      * @return
      * @throws ParseException
      */
-     static Date parseRfc822Date(String dateString) throws ParseException {
+     static Date parseRfc822Date(String dateString)  {
         return getRfc822DateFormat().parse(dateString);
     }
 
@@ -74,7 +74,7 @@ import java.util.SimpleTimeZone;
      * @return
      * @throws ParseException
      */
-     static Date parseIso8601Date(String dateString) throws ParseException {
+     static Date parseIso8601Date(String dateString)  {
         try {
             return getIso8601DateFormat().parse(dateString);
         } catch (ParseException e) {

@@ -130,7 +130,7 @@ import java.io.IOException;
 
     @override
      ListBucketsResult listBuckets(ListBucketsRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
         return mOss.listBuckets(request);
     }
 
@@ -143,7 +143,7 @@ import java.io.IOException;
 
     @override
      CreateBucketResult createBucket(CreateBucketRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.createBucket(request);
     }
@@ -157,7 +157,7 @@ import java.io.IOException;
 
     @override
      DeleteBucketResult deleteBucket(DeleteBucketRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.deleteBucket(request);
     }
@@ -168,7 +168,7 @@ import java.io.IOException;
     }
 
     @override
-     GetBucketInfoResult getBucketInfo(GetBucketInfoRequest request) throws OSSClientException, OSSServiceException {
+     GetBucketInfoResult getBucketInfo(GetBucketInfoRequest request)  {
         return mOss.getBucketInfo(request);
     }
 
@@ -181,7 +181,7 @@ import java.io.IOException;
 
     @override
      GetBucketACLResult getBucketACL(GetBucketACLRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.getBucketACL(request);
     }
@@ -192,12 +192,12 @@ import java.io.IOException;
     }
 
     @override
-     PutBucketRefererResult putBucketReferer(PutBucketRefererRequest request) throws OSSClientException, OSSServiceException {
+     PutBucketRefererResult putBucketReferer(PutBucketRefererRequest request)  {
         return mOss.putBucketReferer(request);
     }
 
     @override
-     GetBucketRefererResult getBucketReferer(GetBucketRefererRequest request) throws OSSClientException, OSSServiceException {
+     GetBucketRefererResult getBucketReferer(GetBucketRefererRequest request)  {
         return mOss.getBucketReferer(request);
     }
 
@@ -207,7 +207,7 @@ import java.io.IOException;
     }
 
     @override
-     DeleteBucketLoggingResult deleteBucketLogging(DeleteBucketLoggingRequest request) throws OSSClientException, OSSServiceException {
+     DeleteBucketLoggingResult deleteBucketLogging(DeleteBucketLoggingRequest request)  {
         return mOss.deleteBucketLogging(request);
     }
 
@@ -217,7 +217,7 @@ import java.io.IOException;
     }
 
     @override
-     PutBucketLoggingResult putBucketLogging(PutBucketLoggingRequest request) throws OSSClientException, OSSServiceException {
+     PutBucketLoggingResult putBucketLogging(PutBucketLoggingRequest request)  {
         return mOss.putBucketLogging(request);
     }
 
@@ -227,7 +227,7 @@ import java.io.IOException;
     }
 
     @override
-     GetBucketLoggingResult getBucketLogging(GetBucketLoggingRequest request) throws OSSClientException, OSSServiceException {
+     GetBucketLoggingResult getBucketLogging(GetBucketLoggingRequest request)  {
         return mOss.getBucketLogging(request);
     }
 
@@ -237,7 +237,7 @@ import java.io.IOException;
     }
 
     @override
-     PutBucketLifecycleResult putBucketLifecycle(PutBucketLifecycleRequest request) throws OSSClientException, OSSServiceException {
+     PutBucketLifecycleResult putBucketLifecycle(PutBucketLifecycleRequest request)  {
         return mOss.putBucketLifecycle(request);
     }
 
@@ -247,7 +247,7 @@ import java.io.IOException;
     }
 
     @override
-     GetBucketLifecycleResult getBucketLifecycle(GetBucketLifecycleRequest request) throws OSSClientException, OSSServiceException {
+     GetBucketLifecycleResult getBucketLifecycle(GetBucketLifecycleRequest request)  {
         return mOss.getBucketLifecycle(request);
     }
 
@@ -257,7 +257,7 @@ import java.io.IOException;
     }
 
     @override
-     DeleteBucketLifecycleResult deleteBucketLifecycle(DeleteBucketLifecycleRequest request) throws OSSClientException, OSSServiceException {
+     DeleteBucketLifecycleResult deleteBucketLifecycle(DeleteBucketLifecycleRequest request)  {
         return mOss.deleteBucketLifecycle(request);
     }
 
@@ -275,7 +275,7 @@ import java.io.IOException;
 
     @override
      PutObjectResult putObject(PutObjectRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.putObject(request);
     }
@@ -289,7 +289,7 @@ import java.io.IOException;
 
     @override
      GetObjectResult getObject(GetObjectRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.getObject(request);
     }
@@ -302,7 +302,7 @@ import java.io.IOException;
 
     @override
      GetObjectACLResult getObjectACL(GetObjectACLRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
         return mOss.getObjectACL(request);
     }
 
@@ -315,7 +315,7 @@ import java.io.IOException;
 
     @override
      DeleteObjectResult deleteObject(DeleteObjectRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.deleteObject(request);
     }
@@ -329,7 +329,7 @@ import java.io.IOException;
 
     @override
      DeleteMultipleObjectResult deleteMultipleObject(DeleteMultipleObjectRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
         return mOss.deleteMultipleObject(request);
     }
 
@@ -342,7 +342,7 @@ import java.io.IOException;
 
     @override
      AppendObjectResult appendObject(AppendObjectRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.appendObject(request);
     }
@@ -355,7 +355,7 @@ import java.io.IOException;
 
     @override
      HeadObjectResult headObject(HeadObjectRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.headObject(request);
     }
@@ -368,7 +368,7 @@ import java.io.IOException;
 
     @override
      CopyObjectResult copyObject(CopyObjectRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.copyObject(request);
     }
@@ -382,7 +382,7 @@ import java.io.IOException;
 
     @override
      ListObjectsResult listObjects(ListObjectsRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.listObjects(request);
     }
@@ -395,7 +395,7 @@ import java.io.IOException;
 
     @override
      InitiateMultipartUploadResult initMultipartUpload(InitiateMultipartUploadRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.initMultipartUpload(request);
     }
@@ -408,7 +408,7 @@ import java.io.IOException;
 
     @override
      UploadPartResult uploadPart(UploadPartRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.uploadPart(request);
     }
@@ -421,7 +421,7 @@ import java.io.IOException;
 
     @override
      CompleteMultipartUploadResult completeMultipartUpload(CompleteMultipartUploadRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.completeMultipartUpload(request);
     }
@@ -434,7 +434,7 @@ import java.io.IOException;
 
     @override
      AbortMultipartUploadResult abortMultipartUpload(AbortMultipartUploadRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.abortMultipartUpload(request);
     }
@@ -447,7 +447,7 @@ import java.io.IOException;
 
     @override
      ListPartsResult listParts(ListPartsRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.listParts(request);
     }
@@ -458,7 +458,7 @@ import java.io.IOException;
     }
 
     @override
-     ListMultipartUploadsResult listMultipartUploads(ListMultipartUploadsRequest request) throws OSSClientException, OSSServiceException {
+     ListMultipartUploadsResult listMultipartUploads(ListMultipartUploadsRequest request)  {
         return mOss.listMultipartUploads(request);
     }
 
@@ -476,7 +476,7 @@ import java.io.IOException;
 
     @override
      CompleteMultipartUploadResult multipartUpload(MultipartUploadRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.multipartUpload(request);
     }
@@ -490,7 +490,7 @@ import java.io.IOException;
 
     @override
      ResumableUploadResult resumableUpload(ResumableUploadRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
         return mOss.resumableUpload(request);
     }
 
@@ -500,18 +500,18 @@ import java.io.IOException;
     }
 
     @override
-     ResumableUploadResult sequenceUpload(ResumableUploadRequest request) throws OSSClientException, OSSServiceException {
+     ResumableUploadResult sequenceUpload(ResumableUploadRequest request)  {
         return mOss.sequenceUpload(request);
     }
 
     @override
-     String presignConstrainedObjectURL(GeneratePresignedUrlRequest request) throws OSSClientException {
+     String presignConstrainedObjectURL(GeneratePresignedUrlRequest request)  {
         return mOss.presignConstrainedObjectURL(request);
     }
 
     @override
      String presignConstrainedObjectURL(String bucketName, String objectKey, int expiredTimeInSeconds)
-            throws OSSClientException {
+             {
 
         return mOss.presignConstrainedObjectURL(bucketName, objectKey, expiredTimeInSeconds);
     }
@@ -524,13 +524,13 @@ import java.io.IOException;
 
     @override
      bool doesObjectExist(String bucketName, String objectKey)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return mOss.doesObjectExist(bucketName, objectKey);
     }
 
     @override
-     void abortResumableUpload(ResumableUploadRequest request) throws IOException {
+     void abortResumableUpload(ResumableUploadRequest request)  {
 
         mOss.abortResumableUpload(request);
     }
@@ -541,7 +541,7 @@ import java.io.IOException;
     }
 
     @override
-     TriggerCallbackResult triggerCallback(TriggerCallbackRequest request) throws OSSClientException, OSSServiceException {
+     TriggerCallbackResult triggerCallback(TriggerCallbackRequest request)  {
         return mOss.triggerCallback(request);
     }
 
@@ -551,12 +551,12 @@ import java.io.IOException;
     }
 
     @override
-     ImagePersistResult imagePersist(ImagePersistRequest request) throws OSSClientException, OSSServiceException {
+     ImagePersistResult imagePersist(ImagePersistRequest request)  {
         return mOss.imagePersist(request);
     }
 
     @override
-     PutSymlinkResult putSymlink(PutSymlinkRequest request) throws OSSClientException, OSSServiceException {
+     PutSymlinkResult putSymlink(PutSymlinkRequest request)  {
         return mOss.putSymlink(request);
     }
 
@@ -566,7 +566,7 @@ import java.io.IOException;
     }
 
     @override
-     GetSymlinkResult getSymlink(GetSymlinkRequest request) throws OSSClientException, OSSServiceException {
+     GetSymlinkResult getSymlink(GetSymlinkRequest request)  {
         return mOss.getSymlink(request);
     }
 
@@ -576,7 +576,7 @@ import java.io.IOException;
     }
 
     @override
-     RestoreObjectResult restoreObject(RestoreObjectRequest request) throws OSSClientException, OSSServiceException {
+     RestoreObjectResult restoreObject(RestoreObjectRequest request)  {
         return mOss.restoreObject(request);
     }
 
@@ -591,7 +591,7 @@ import java.io.IOException;
     }
 
     @override
-     ResumableDownloadResult syncResumableDownload(ResumableDownloadRequest request) throws OSSClientException, OSSServiceException {
+     ResumableDownloadResult syncResumableDownload(ResumableDownloadRequest request)  {
         return mOss.syncResumableDownload(request);
     }
 }

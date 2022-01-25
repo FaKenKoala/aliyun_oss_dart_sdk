@@ -163,7 +163,7 @@ class OSSImpl implements OSS {
 
     @override
      ListBucketsResult listBuckets(ListBucketsRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
         return internalRequestOperation.listBuckets(request, null).getResult();
     }
 
@@ -176,7 +176,7 @@ class OSSImpl implements OSS {
 
     @override
      CreateBucketResult createBucket(CreateBucketRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return internalRequestOperation.createBucket(request, null).getResult();
     }
@@ -190,7 +190,7 @@ class OSSImpl implements OSS {
 
     @override
      DeleteBucketResult deleteBucket(DeleteBucketRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return internalRequestOperation.deleteBucket(request, null).getResult();
     }
@@ -201,7 +201,7 @@ class OSSImpl implements OSS {
     }
 
     @override
-     GetBucketInfoResult getBucketInfo(GetBucketInfoRequest request) throws OSSClientException, OSSServiceException {
+     GetBucketInfoResult getBucketInfo(GetBucketInfoRequest request)  {
         return internalRequestOperation.getBucketInfo(request, null).getResult();
     }
 
@@ -214,7 +214,7 @@ class OSSImpl implements OSS {
 
     @override
      GetBucketACLResult getBucketACL(GetBucketACLRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return internalRequestOperation.getBucketACL(request, null).getResult();
     }
@@ -225,12 +225,12 @@ class OSSImpl implements OSS {
     }
 
     @override
-     PutBucketRefererResult putBucketReferer(PutBucketRefererRequest request) throws OSSClientException, OSSServiceException {
+     PutBucketRefererResult putBucketReferer(PutBucketRefererRequest request)  {
         return internalRequestOperation.putBucketReferer(request, null).getResult();
     }
 
     @override
-     GetBucketRefererResult getBucketReferer(GetBucketRefererRequest request) throws OSSClientException, OSSServiceException {
+     GetBucketRefererResult getBucketReferer(GetBucketRefererRequest request)  {
         return internalRequestOperation.getBucketReferer(request, null).getResult();
     }
 
@@ -240,7 +240,7 @@ class OSSImpl implements OSS {
     }
 
     @override
-     DeleteBucketLoggingResult deleteBucketLogging(DeleteBucketLoggingRequest request) throws OSSClientException, OSSServiceException {
+     DeleteBucketLoggingResult deleteBucketLogging(DeleteBucketLoggingRequest request)  {
         return internalRequestOperation.deleteBucketLogging(request, null).getResult();
     }
 
@@ -250,7 +250,7 @@ class OSSImpl implements OSS {
     }
 
     @override
-     PutBucketLoggingResult putBucketLogging(PutBucketLoggingRequest request) throws OSSClientException, OSSServiceException {
+     PutBucketLoggingResult putBucketLogging(PutBucketLoggingRequest request)  {
         return internalRequestOperation.putBucketLogging(request, null).getResult();
     }
 
@@ -260,7 +260,7 @@ class OSSImpl implements OSS {
     }
 
     @override
-     GetBucketLoggingResult getBucketLogging(GetBucketLoggingRequest request) throws OSSClientException, OSSServiceException {
+     GetBucketLoggingResult getBucketLogging(GetBucketLoggingRequest request)  {
         return internalRequestOperation.getBucketLogging(request, null).getResult();
     }
 
@@ -270,7 +270,7 @@ class OSSImpl implements OSS {
     }
 
     @override
-     PutBucketLifecycleResult putBucketLifecycle(PutBucketLifecycleRequest request) throws OSSClientException, OSSServiceException {
+     PutBucketLifecycleResult putBucketLifecycle(PutBucketLifecycleRequest request)  {
         return internalRequestOperation.putBucketLifecycle(request, null).getResult();
     }
 
@@ -280,7 +280,7 @@ class OSSImpl implements OSS {
     }
 
     @override
-     GetBucketLifecycleResult getBucketLifecycle(GetBucketLifecycleRequest request) throws OSSClientException, OSSServiceException {
+     GetBucketLifecycleResult getBucketLifecycle(GetBucketLifecycleRequest request)  {
         return internalRequestOperation.getBucketLifecycle(request, null).getResult();
     }
 
@@ -290,7 +290,7 @@ class OSSImpl implements OSS {
     }
 
     @override
-     DeleteBucketLifecycleResult deleteBucketLifecycle(DeleteBucketLifecycleRequest request) throws OSSClientException, OSSServiceException {
+     DeleteBucketLifecycleResult deleteBucketLifecycle(DeleteBucketLifecycleRequest request)  {
         return internalRequestOperation.deleteBucketLifecycle(request,null).getResult();
     }
 
@@ -307,7 +307,7 @@ class OSSImpl implements OSS {
 
     @override
      PutObjectResult putObject(PutObjectRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
         return internalRequestOperation.syncPutObject(request);
     }
 
@@ -320,7 +320,7 @@ class OSSImpl implements OSS {
 
     @override
      GetObjectResult getObject(GetObjectRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return internalRequestOperation.getObject(request, null).getResult();
     }
@@ -333,7 +333,7 @@ class OSSImpl implements OSS {
 
     @override
      GetObjectACLResult getObjectACL(GetObjectACLRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return internalRequestOperation.getObjectACL(request, null).getResult();
     }
@@ -347,7 +347,7 @@ class OSSImpl implements OSS {
 
     @override
      DeleteObjectResult deleteObject(DeleteObjectRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return internalRequestOperation.deleteObject(request, null).getResult();
     }
@@ -361,7 +361,7 @@ class OSSImpl implements OSS {
 
     @override
      DeleteMultipleObjectResult deleteMultipleObject(DeleteMultipleObjectRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return internalRequestOperation.deleteMultipleObject(request, null).getResult();
     }
@@ -374,7 +374,7 @@ class OSSImpl implements OSS {
 
     @override
      AppendObjectResult appendObject(AppendObjectRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
         return internalRequestOperation.syncAppendObject(request);
     }
 
@@ -386,7 +386,7 @@ class OSSImpl implements OSS {
 
     @override
      HeadObjectResult headObject(HeadObjectRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return internalRequestOperation.headObject(request, null).getResult();
     }
@@ -399,7 +399,7 @@ class OSSImpl implements OSS {
 
     @override
      CopyObjectResult copyObject(CopyObjectRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return internalRequestOperation.copyObject(request, null).getResult();
     }
@@ -413,7 +413,7 @@ class OSSImpl implements OSS {
 
     @override
      ListObjectsResult listObjects(ListObjectsRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return internalRequestOperation.listObjects(request, null).getResult();
     }
@@ -426,7 +426,7 @@ class OSSImpl implements OSS {
 
     @override
      InitiateMultipartUploadResult initMultipartUpload(InitiateMultipartUploadRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return internalRequestOperation.initMultipartUpload(request, null).getResult();
     }
@@ -439,7 +439,7 @@ class OSSImpl implements OSS {
 
     @override
      UploadPartResult uploadPart(UploadPartRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
         return internalRequestOperation.syncUploadPart(request);
     }
 
@@ -452,7 +452,7 @@ class OSSImpl implements OSS {
 
     @override
      CompleteMultipartUploadResult completeMultipartUpload(CompleteMultipartUploadRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
         return internalRequestOperation.syncCompleteMultipartUpload(request);
     }
 
@@ -465,7 +465,7 @@ class OSSImpl implements OSS {
 
     @override
      AbortMultipartUploadResult abortMultipartUpload(AbortMultipartUploadRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return internalRequestOperation.abortMultipartUpload(request, null).getResult();
     }
@@ -478,7 +478,7 @@ class OSSImpl implements OSS {
 
     @override
      ListPartsResult listParts(ListPartsRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return internalRequestOperation.listParts(request, null).getResult();
     }
@@ -489,7 +489,7 @@ class OSSImpl implements OSS {
     }
 
     @override
-     ListMultipartUploadsResult listMultipartUploads(ListMultipartUploadsRequest request) throws OSSClientException, OSSServiceException {
+     ListMultipartUploadsResult listMultipartUploads(ListMultipartUploadsRequest request)  {
         return internalRequestOperation.listMultipartUploads(request, null).getResult();
     }
 
@@ -508,7 +508,7 @@ class OSSImpl implements OSS {
 
     @override
      CompleteMultipartUploadResult multipartUpload(MultipartUploadRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return extensionRequestOperation.multipartUpload(request, null).getResult();
     }
@@ -522,7 +522,7 @@ class OSSImpl implements OSS {
 
     @override
      ResumableUploadResult resumableUpload(ResumableUploadRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return extensionRequestOperation.resumableUpload(request, null).getResult();
     }
@@ -537,20 +537,20 @@ class OSSImpl implements OSS {
 
     @override
      ResumableUploadResult sequenceUpload(ResumableUploadRequest request)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return extensionRequestOperation.sequenceUpload(request, null).getResult();
     }
 
     @override
-     String presignConstrainedObjectURL(GeneratePresignedUrlRequest request) throws OSSClientException {
+     String presignConstrainedObjectURL(GeneratePresignedUrlRequest request)  {
         return ObjectURLPresigner(this.endpointURI, this.credentialProvider, this.conf)
                 .presignConstrainedURL(request);
     }
 
     @override
      String presignConstrainedObjectURL(String bucketName, String objectKey, int expiredTimeInSeconds)
-            throws OSSClientException {
+             {
 
         return ObjectURLPresigner(this.endpointURI, this.credentialProvider, this.conf)
                 .presignConstrainedURL(bucketName, objectKey, expiredTimeInSeconds);
@@ -565,13 +565,13 @@ class OSSImpl implements OSS {
 
     @override
      bool doesObjectExist(String bucketName, String objectKey)
-            throws OSSClientException, OSSServiceException {
+             {
 
         return extensionRequestOperation.doesObjectExist(bucketName, objectKey);
     }
 
     @override
-     void abortResumableUpload(ResumableUploadRequest request) throws IOException {
+     void abortResumableUpload(ResumableUploadRequest request)  {
 
         extensionRequestOperation.abortResumableUpload(request);
     }
@@ -582,7 +582,7 @@ class OSSImpl implements OSS {
     }
 
     @override
-     TriggerCallbackResult triggerCallback(TriggerCallbackRequest request) throws OSSClientException, OSSServiceException {
+     TriggerCallbackResult triggerCallback(TriggerCallbackRequest request)  {
         return internalRequestOperation.asyncTriggerCallback(request);
     }
 
@@ -592,12 +592,12 @@ class OSSImpl implements OSS {
     }
 
     @override
-     ImagePersistResult imagePersist(ImagePersistRequest request) throws OSSClientException, OSSServiceException {
+     ImagePersistResult imagePersist(ImagePersistRequest request)  {
         return internalRequestOperation.imageActionPersist(request, null).getResult();
     }
 
     @override
-     PutSymlinkResult putSymlink(PutSymlinkRequest request) throws OSSClientException, OSSServiceException {
+     PutSymlinkResult putSymlink(PutSymlinkRequest request)  {
         return internalRequestOperation.syncPutSymlink(request);
     }
 
@@ -607,7 +607,7 @@ class OSSImpl implements OSS {
     }
 
     @override
-     GetSymlinkResult getSymlink(GetSymlinkRequest request) throws OSSClientException, OSSServiceException {
+     GetSymlinkResult getSymlink(GetSymlinkRequest request)  {
         return internalRequestOperation.syncGetSymlink(request);
     }
 
@@ -617,7 +617,7 @@ class OSSImpl implements OSS {
     }
 
     @override
-     RestoreObjectResult restoreObject(RestoreObjectRequest request) throws OSSClientException, OSSServiceException {
+     RestoreObjectResult restoreObject(RestoreObjectRequest request)  {
         return internalRequestOperation.syncRestoreObject(request);
     }
 
@@ -632,7 +632,7 @@ class OSSImpl implements OSS {
     }
 
     @override
-     ResumableDownloadResult syncResumableDownload(ResumableDownloadRequest request) throws OSSClientException, OSSServiceException {
+     ResumableDownloadResult syncResumableDownload(ResumableDownloadRequest request)  {
         return extensionRequestOperation.resumableDownload(request, null).getResult();
     }
 

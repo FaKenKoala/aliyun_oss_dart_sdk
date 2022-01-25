@@ -34,7 +34,7 @@ import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
 
      int partNumber;
 
-     byte[] partContent;
+     List<int> partContent;
 
     //run with not ui thread
      OSSProgressCallback<UploadPartRequest> progressCallback;
@@ -162,14 +162,14 @@ import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
         this.progressCallback = progressCallback;
     }
 
-     byte[] getPartContent() {
+     List<int> getPartContent() {
         return partContent;
     }
 
     /**
      * Sets the part's content to upload
      */
-     void setPartContent(byte[] partContent) {
+     void setPartContent(List<int> partContent) {
         this.partContent = partContent;
     }
 }

@@ -39,7 +39,7 @@ import java.util.Map;
         this.conf = conf;
     }
 
-     String presignConstrainedURL(GeneratePresignedUrlRequest request) throws OSSClientException {
+     String presignConstrainedURL(GeneratePresignedUrlRequest request)  {
 
         String bucketName = request.getBucketName();
         String objectKey = request.getKey();
@@ -119,7 +119,7 @@ import java.util.Map;
     }
 
      String presignConstrainedURL(String bucketName, String objectKey, int expiredTimeInSeconds)
-            throws OSSClientException {
+             {
         GeneratePresignedUrlRequest presignedUrlRequest = GeneratePresignedUrlRequest(bucketName, objectKey);
         presignedUrlRequest.setExpiration(expiredTimeInSeconds);
         return presignConstrainedURL(presignedUrlRequest);

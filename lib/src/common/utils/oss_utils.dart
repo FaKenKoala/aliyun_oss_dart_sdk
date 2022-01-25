@@ -356,7 +356,7 @@ class OSSUtils {
 
      static String populateMapToBase64JsonString(Map<String, String> map) {
         JSONObject jsonObj = JSONObject(map);
-        return Base64.encodeToString(jsonObj.toString().getBytes(), Base64.NOWRAP);
+        return base64.encodeToString(jsonObj.toString().getBytes(), base64.NOWRAP);
     }
 
     /// 根据ak/sk、content生成token
@@ -451,7 +451,7 @@ class OSSUtils {
         if (objectKey.length() <= 0 || objectKey.length() > 1023) {
             return false;
         }
-        byte[] keyBytes;
+        List<int> keyBytes;
         try {
             keyBytes = objectKey.getBytes(OSSConstants.defaultCharsetName);
         } catch (UnsupportedEncodingException e) {
@@ -551,7 +551,7 @@ class OSSUtils {
         return "application/octet-stream";
     }
 
-     static void signRequest(RequestMessage message) throws Exception {
+     static void signRequest(RequestMessage message)  {
         OSSLog.logDebug("signRequest start");
         if (!message.isAuthorizationRequired()) {
             return;
@@ -606,7 +606,7 @@ class OSSUtils {
     }
 
     /// Checks if OSS and SDK's checksum is same. If not, throws InconsistentException.
-     static void checkChecksum(int clientChecksum, int serverChecksum, String requestId) throws InconsistentException {
+     static void checkChecksum(int clientChecksum, int serverChecksum, String requestId)  {
         if (clientChecksum != null && serverChecksum != null &&
                 !clientChecksum.equals(serverChecksum)) {
             throw InconsistentException(clientChecksum, serverChecksum, requestId);
@@ -637,7 +637,7 @@ class OSSUtils {
     /// *
     /// @param host
     /// @return
-     static bool isValidateIP(String host) throws Exception {
+     static bool isValidateIP(String host)  {
         if (host == null) {
             throw Exception("host is null");
         }
@@ -670,14 +670,14 @@ class OSSUtils {
 
         if (callbackParams != null && callbackParams.size() > 0) {
             JSONObject jsonObj = JSONObject(callbackParams);
-            String paramsJsonString = Base64.encodeToString(jsonObj.toString().getBytes(), Base64.NOWRAP);
+            String paramsJsonString = base64.encodeToString(jsonObj.toString().getBytes(), base64.NOWRAP);
             builder.write(paramsJsonString);
         }
         builder.write("," + "callback-var");
 
         if (callbackVars != null && callbackVars.size() > 0) {
             JSONObject jsonObj = JSONObject(callbackVars);
-            String varsJsonString = Base64.encodeToString(jsonObj.toString().getBytes(), Base64.NOWRAP);
+            String varsJsonString = base64.encodeToString(jsonObj.toString().getBytes(), base64.NOWRAP);
             builder.write(varsJsonString);
         }
 
@@ -695,8 +695,8 @@ class OSSUtils {
         }
         builder.write("|sys/");
         if (!TextUtils.isEmpty(toBucketName) && !TextUtils.isEmpty(toObjectKey)) {
-            String bucketNameBase64 = Base64.encodeToString(toBucketName.getBytes(), Base64.NOWRAP);
-            String objectkeyBase64 = Base64.encodeToString(toObjectKey.getBytes(), Base64.NOWRAP);
+            String bucketNameBase64 = base64.encodeToString(toBucketName.getBytes(), base64.NOWRAP);
+            String objectkeyBase64 = base64.encodeToString(toObjectKey.getBytes(), base64.NOWRAP);
             builder.write("saveas,o");
             builder.write(objectkeyBase64);
             builder.write(",b");

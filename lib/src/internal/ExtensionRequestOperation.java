@@ -48,7 +48,7 @@ import java.util.concurrent.ThreadFactory;
     }
 
      bool doesObjectExist(String bucketName, String objectKey)
-            throws OSSClientException, OSSServiceException {
+             {
 
         try {
             HeadObjectRequest head = HeadObjectRequest(bucketName, objectKey);
@@ -63,7 +63,7 @@ import java.util.concurrent.ThreadFactory;
         }
     }
 
-     void abortResumableUpload(ResumableUploadRequest request) throws IOException {
+     void abortResumableUpload(ResumableUploadRequest request)  {
         setCRC64(request);
 
         if (!OSSUtils.isEmptyString(request.getRecordDirectory())) {

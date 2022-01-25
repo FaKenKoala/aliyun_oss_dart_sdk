@@ -89,7 +89,7 @@ import java.util.zip.CheckedInputStream;
 
 
     @override
-     Result call() throws Exception {
+     Result call()  {
         try {
             checkInitData();
             ResumableDownloadResult result = doMultipartDownload();
@@ -116,7 +116,7 @@ import java.util.zip.CheckedInputStream;
         }
     }
 
-     void checkInitData() throws OSSClientException, OSSServiceException, IOException {
+     void checkInitData()  {
 
         if (mRequest.getRange() != null && !mRequest.getRange().checkIsValid()) {
             throw OSSClientException("Range is invalid");
@@ -156,7 +156,7 @@ import java.util.zip.CheckedInputStream;
         return flag;
     }
 
-     void initCheckPoint() throws OSSClientException, OSSServiceException, IOException {
+     void initCheckPoint()  {
         FileStat fileStat = FileStat.getFileStat(mOperation, mRequest.getBucketName(), mRequest.getObjectKey());
         Range range = correctRange(mRequest.getRange(), fileStat.fileLength);
         int downloadSize = range.getEnd() - range.getBegin();
@@ -168,7 +168,7 @@ import java.util.zip.CheckedInputStream;
         mCheckPoint.parts = splitFile(range, mCheckPoint.fileStat.fileLength, mRequest.getPartSize());
     }
 
-     ResumableDownloadResult doMultipartDownload() throws OSSClientException, OSSServiceException, IOException, InterruptedException {
+     ResumableDownloadResult doMultipartDownload()  {
         checkCancel();
         ResumableDownloadResult resumableDownloadResult = ResumableDownloadResult();
 
@@ -326,7 +326,7 @@ import java.util.zip.CheckedInputStream;
 
             content = result.getObjectContent();
 
-            byte[] buffer = byte[(int)(part.length)];
+            List<int> buffer = byte[(int)(part.length)];
             int readLength = 0;
             if (mRequest.getCRC64() == OSSRequest.CRC64Config.YES) {
                 content = CheckedInputStream(content, new CRC64());
@@ -391,7 +391,7 @@ import java.util.zip.CheckedInputStream;
         }
     }
 
-     void createFile(String filePath, int length) throws IOException {
+     void createFile(String filePath, int length)  {
         File file = File(filePath);
         RandomAccessFile accessFile = null;
 
@@ -405,7 +405,7 @@ import java.util.zip.CheckedInputStream;
         }
     }
 
-     void moveFile(File fromFile, File toFile) throws IOException {
+     void moveFile(File fromFile, File toFile)  {
 
         bool rename = fromFile.renameTo(toFile);
         if (!rename) {
@@ -432,8 +432,8 @@ import java.util.zip.CheckedInputStream;
         }
     }
 
-     void copyFile(InputStream ist, OutputStream ost) throws IOException {
-        byte[] buffer = byte[4096];
+     void copyFile(InputStream ist, OutputStream ost)  {
+        List<int> buffer = byte[4096];
         int byteCount;
         while ((byteCount = ist.read(buffer)) != -1) {
             ost.write(buffer, 0, byteCount);
@@ -462,7 +462,7 @@ import java.util.zip.CheckedInputStream;
         }
     }
 
-     void checkException() throws IOException, OSSServiceException, OSSClientException {
+     void checkException()  {
         if (mDownloadException != null) {
             releasePool();
             if (mDownloadException instanceof IOException) {
@@ -486,7 +486,7 @@ import java.util.zip.CheckedInputStream;
         return true;
     }
 
-     void checkCancel() throws OSSClientException {
+     void checkCancel()  {
         if (mContext.getCancellationHandler().isCancelled()) {
             TaskCancelException e = TaskCancelException("Resumable download cancel");
             throw OSSClientException(e.getMessage(), e, true);
@@ -532,7 +532,7 @@ import java.util.zip.CheckedInputStream;
         /**
          * Loads the checkpoint data from the checkpoint file.
          */
-         synchronized void load(String cpFile) throws IOException, ClassNotFoundException {
+         synchronized void load(String cpFile)  {
             FileInputStream fileIn = null;
             ObjectInputStream in = null;
             try {
@@ -553,7 +553,7 @@ import java.util.zip.CheckedInputStream;
         /**
          * Writes the checkpoint data to the checkpoint file.
          */
-         synchronized void dump(String cpFile) throws IOException {
+         synchronized void dump(String cpFile)  {
             this.md5 = hashCode();
             FileOutputStream fileOut = null;
             ObjectOutputStream outStream = null;
@@ -576,7 +576,7 @@ import java.util.zip.CheckedInputStream;
          *
          * @throws IOException
          */
-         synchronized void update(int index, bool completed) throws IOException {
+         synchronized void update(int index, bool completed)  {
             parts.get(index).isCompleted = completed;
             downloadLength += parts.get(index).length;
         }
@@ -584,7 +584,7 @@ import java.util.zip.CheckedInputStream;
         /**
          * Check if the object matches the checkpoint information.
          */
-         synchronized bool isValid(InternalRequestOperation operation) throws OSSClientException, OSSServiceException {
+         synchronized bool isValid(InternalRequestOperation operation)  {
             // Compare magic and md5 of checkpoint
             if (this.md5 != hashCode()) {
                 return false;
@@ -642,7 +642,7 @@ import java.util.zip.CheckedInputStream;
          int serverCRC;
          String requestId;
 
-         static FileStat getFileStat(InternalRequestOperation operation, String bucketName, String objectKey) throws OSSClientException, OSSServiceException {
+         static FileStat getFileStat(InternalRequestOperation operation, String bucketName, String objectKey)  {
             HeadObjectRequest request = HeadObjectRequest(bucketName, objectKey);
             HeadObjectResult result = operation.headObject(request, null).getResult();
 

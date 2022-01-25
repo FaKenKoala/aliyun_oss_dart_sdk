@@ -147,7 +147,7 @@ import okhttp3.OkHttpClient;
     }
 
      PutObjectResult syncPutObject(
-            PutObjectRequest request) throws OSSClientException, OSSServiceException {
+            PutObjectRequest request)  {
         PutObjectResult result = putObject(request, null).getResult();
         checkCRC64(request, result);
         return result;
@@ -494,7 +494,7 @@ import okhttp3.OkHttpClient;
     }
 
      AppendObjectResult syncAppendObject(
-            AppendObjectRequest request) throws OSSClientException, OSSServiceException {
+            AppendObjectRequest request)  {
         AppendObjectResult result = appendObject(request, null).getResult();
         bool checkCRC = request.getCRC64() == OSSRequest.CRC64Config.YES ? true : false;
         if (request.getInitCRC64() != null && checkCRC) {
@@ -705,7 +705,7 @@ import okhttp3.OkHttpClient;
         requestMessage.setBucketName(request.getBucketName());
         requestMessage.setParameters(query);
         try {
-            byte[] bodyBytes = requestMessage.deleteMultipleObjectRequestBodyMarshall(request.getObjectKeys(), request.getQuiet());
+            List<int> bodyBytes = requestMessage.deleteMultipleObjectRequestBodyMarshall(request.getObjectKeys(), request.getQuiet());
             if (bodyBytes != null && bodyBytes.length > 0) {
                 requestMessage.getHeaders()[OSSHeaders.CONTENT_MD5] = BinaryUtil.calculateBase64Md5(bodyBytes);
                 requestMessage.getHeaders()[OSSHeaders.CONTENT_LENGTH] = String.valueOf(bodyBytes.length);
@@ -805,7 +805,7 @@ import okhttp3.OkHttpClient;
     }
 
      UploadPartResult syncUploadPart(
-            UploadPartRequest request) throws OSSClientException, OSSServiceException {
+            UploadPartRequest request)  {
         UploadPartResult result = uploadPart(request, null).getResult();
         checkCRC64(request, result);
         return result;
@@ -853,7 +853,7 @@ import okhttp3.OkHttpClient;
     }
 
      CompleteMultipartUploadResult syncCompleteMultipartUpload(
-            CompleteMultipartUploadRequest request) throws OSSClientException, OSSServiceException {
+            CompleteMultipartUploadRequest request)  {
         CompleteMultipartUploadResult result = completeMultipartUpload(request, null).getResult();
         if (result.getServerCRC() != null) {
             int crc64 = calcObjectCRCFromParts(request.getPartETags());
@@ -1079,7 +1079,7 @@ import okhttp3.OkHttpClient;
     }
 
      <Request extends OSSRequest, Result extends OSSResult> void checkCRC64(Request request
-            , Result result) throws OSSClientException {
+            , Result result)  {
         if (request.getCRC64() == OSSRequest.CRC64Config.YES ? true : false) {
             try {
                 OSSUtils.checkChecksum(result.getClientCRC(), result.getServerCRC(), result.getRequestId());
@@ -1149,7 +1149,7 @@ import okhttp3.OkHttpClient;
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     TriggerCallbackResult asyncTriggerCallback(TriggerCallbackRequest request) throws OSSClientException, OSSServiceException {
+     TriggerCallbackResult asyncTriggerCallback(TriggerCallbackRequest request)  {
         return triggerCallback(request, null).getResult();
     }
 
@@ -1177,7 +1177,7 @@ import okhttp3.OkHttpClient;
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     PutSymlinkResult syncPutSymlink(PutSymlinkRequest request) throws OSSClientException, OSSServiceException {
+     PutSymlinkResult syncPutSymlink(PutSymlinkRequest request)  {
         return putSymlink(request, null).getResult();
     }
 
@@ -1211,7 +1211,7 @@ import okhttp3.OkHttpClient;
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     GetSymlinkResult syncGetSymlink(GetSymlinkRequest request) throws OSSClientException, OSSServiceException {
+     GetSymlinkResult syncGetSymlink(GetSymlinkRequest request)  {
         return getSymlink(request, null).getResult();
     }
 
@@ -1236,7 +1236,7 @@ import okhttp3.OkHttpClient;
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     RestoreObjectResult syncRestoreObject(RestoreObjectRequest request) throws OSSClientException, OSSServiceException {
+     RestoreObjectResult syncRestoreObject(RestoreObjectRequest request)  {
         return restoreObject(request, null).getResult();
     }
 
