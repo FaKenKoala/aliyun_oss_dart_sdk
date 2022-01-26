@@ -10,19 +10,19 @@
     @override
      void initMultipartUploadId()  {
         InitiateMultipartUploadRequest init = InitiateMultipartUploadRequest(
-                mRequest.getBucketName(), mRequest.getObjectKey(), mRequest.getMetadata());
+                request.getBucketName(), request.getObjectKey(), request.getMetadata());
 
-        InitiateMultipartUploadResult initResult = mApiOperation.initMultipartUpload(init, null).getResult();
+        InitiateMultipartUploadResult initResult = operation.initMultipartUpload(init, null).getResult();
 
         mUploadId = initResult.getUploadId();
-        mRequest.setUploadId(mUploadId);
+        request.setUploadId(mUploadId);
     }
 
     @override
      CompleteMultipartUploadResult doMultipartUpload()  {
         checkCancel();
-        int readByte = mPartAttr[0];
-        final int partNumber = mPartAttr[1];
+        int readByte = partAttr[0];
+        final int partNumber = partAttr[1];
         int currentLength = 0;
         for (int i = 0; i < partNumber; i++) {
             checkException();
@@ -48,7 +48,7 @@
                 mLock.wait();
             }
         }
-        if (mUploadException != null) {
+        if (uploadException != null) {
             abortThisUpload();
         }
         checkException();
@@ -63,8 +63,8 @@
      void abortThisUpload() {
         if (mUploadId != null) {
             AbortMultipartUploadRequest abort = AbortMultipartUploadRequest(
-                    mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId);
-            mApiOperation.abortMultipartUpload(abort, null).waitUntilFinished();
+                    request.getBucketName(), request.getObjectKey(), mUploadId);
+            operation.abortMultipartUpload(abort, null).waitUntilFinished();
         }
     }
 
@@ -72,8 +72,8 @@
      void processException(Exception e) {
          (mLock) {
             mPartExceptionCount++;
-            if (mUploadException == null) {
-                mUploadException = e;
+            if (uploadException == null) {
+                uploadException = e;
                 mLock.notify();
             }
         }

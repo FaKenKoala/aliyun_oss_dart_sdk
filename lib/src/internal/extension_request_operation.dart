@@ -1,6 +1,24 @@
- import 'package:aliyun_oss_dart_sdk/src/common/oss_constants.dart';
+ import 'dart:convert';
+import 'dart:io';
+
+import 'package:aliyun_oss_dart_sdk/src/callback/oss_completed_callback.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/oss_constants.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/binary_util.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/oss_utils.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/abort_multipart_upload_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/head_object_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/oss_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/resumable_upload_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/resumable_upload_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/network/execution_context.dart';
+import 'package:aliyun_oss_dart_sdk/src/service_exception.dart';
+
+import 'internal_request_operation.dart';
+import 'package:path/path.dart' as path;
+
+import 'oss_async_task.dart';
 
 class ExtensionRequestOperation {
 
@@ -13,9 +31,7 @@ class ExtensionRequestOperation {
             });
      InternalRequestOperation apiOperation;
 
-     ExtensionRequestOperation(InternalRequestOperation apiOperation) {
-        this.apiOperation = apiOperation;
-    }
+     ExtensionRequestOperation(this. apiOperation);
 
      bool doesObjectExist(String bucketName, String objectKey)
              {
@@ -24,11 +40,11 @@ class ExtensionRequestOperation {
             HeadObjectRequest head = HeadObjectRequest(bucketName, objectKey);
             apiOperation.headObject(head, null).getResult();
             return true;
-        } catch (OSSServiceException e) {
-            if (e.getStatusCode() == 404) {
+        } on OSSServiceException catch ( e) {
+            if (e.statusCode == HttpStatus.notFound) {
                 return false;
             } else {
-                throw e;
+                rethrow;
             }
         }
     }
@@ -37,7 +53,7 @@ class ExtensionRequestOperation {
         setCRC64(request);
 
         if (request.getRecordDirectory().notNullOrEmpty) {
-            String? uploadFilePath = request.getUploadFilePath();
+            String? uploadFilePath = request.uploadFilePath;
             String? fileMd5;
             if (uploadFilePath != null) {
                 fileMd5 = BinaryUtil.calculateMd5Str(uploadFilePath);
@@ -51,34 +67,32 @@ class ExtensionRequestOperation {
                     }
                 }
             }
-            String recordFileName = BinaryUtil.calculateMd5Str((fileMd5 + request.getBucketName()
-                    + request.getObjectKey() + String.valueOf(request.getPartSize())).getBytes());
-            String recordPath = request.getRecordDirectory() + "/" + recordFileName;
+            String recordFileName = BinaryUtil.calculateMd5Str(utf8.encode(fileMd5 + request.bucketName
+                    + request.objectKey + "${request.partSize}"));
+            String recordPath = "${request.getRecordDirectory()}/$recordFileName";
             File recordFile = File(recordPath);
 
-            if (recordFile.exists()) {
-                BufferedReader br = BufferedReader(new FileReader(recordFile));
+            if (recordFile.existsSync()) {
+                BufferedReader br = BufferedReader(FileReader(recordFile));
                 String uploadId = br.readLine();
                 br.close();
 
                 OSSLog.logDebug("[initUploadId] - Found record file, uploadid: " + uploadId);
 
-                if (request.getCRC64() == OSSRequest.CRC64Config.YES) {
-                    String filePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "oss" + File.separator + uploadId;
+                if (request.crc64 == CRC64Config.yes) {
+                    String filePath = Environment.getExternalStorageDirectory().getPath() + path.separator + "oss" + path.separator + uploadId;
                     File file = File(filePath);
-                    if (file.exists()) {
+                    if (file.existsSync()) {
                         file.delete();
                     }
                 }
 
                 AbortMultipartUploadRequest abort = AbortMultipartUploadRequest(
-                        request.getBucketName(), request.getObjectKey(), uploadId);
+                        request.bucketName, request.objectKey, uploadId);
                 apiOperation.abortMultipartUpload(abort, null);
             }
 
-            if (recordFile != null) {
-                recordFile.delete();
-            }
+                recordFile.deleteSync();
         }
     }
 
@@ -126,8 +140,8 @@ class ExtensionRequestOperation {
     }
 
      void setCRC64(OSSRequest request) {
-        Enum crc64 = request.getCRC64() != OSSRequest.CRC64Config.NULL ? request.getCRC64() :
-                (apiOperation.getConf().isCheckCRC64() ? OSSRequest.CRC64Config.YES : OSSRequest.CRC64Config.NO);
-        request.setCRC64(crc64);
+        CRC64Config crc64 = request.crc64 != CRC64Config.$null ? request.crc64 :
+                (apiOperation.getConf().isCheckCRC64() ? CRC64Config.yes : CRC64Config.no);
+        request.crc64 = crc64;
     }
 }

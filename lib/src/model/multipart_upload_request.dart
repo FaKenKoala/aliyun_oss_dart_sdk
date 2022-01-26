@@ -18,7 +18,7 @@ class MultipartUploadRequest
   Map<String, String>? callbackParam;
   Map<String, String>? callbackVars;
 
-  OSSProgressCallback<MultipartUploadRequest>? progressCallback;
+  OSSProgressCallback? progressCallback;
 
   MultipartUploadRequest(this.bucketName, this.objectKey,
       {this.uploadFilePath, this.metadata, this.uploadUri});

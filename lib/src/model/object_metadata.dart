@@ -1,226 +1,206 @@
- import 'dart:collection';
+import 'dart:collection';
 
 import 'package:aliyun_oss_dart_sdk/src/common/oss_constants.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/oss_headers.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/date_util.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/http_headers.dart';
 
 class ObjectMetadata {
+  static final String AES_256_SERVER_SIDE_ENCRYPTION = "AES256";
+  // User's custom metadata dictionary. All keys  will be prefixed with x-oss-meta-in the HTTP headers.
+  // The keys in this dictionary should include the prefix 'x-oss-meta-'.
+  final Map<String, String> _userMetadata = LinkedHashMap<String, String>(
+      equals: (p0, p1) => p0.equalsIgnoreCase(p1));
+  // Standard metadata
+  Map<String, Object> metadata = LinkedHashMap<String, Object>(
+    equals: (p0, p1) => p0.equalsIgnoreCase(p1),
+  );
 
-     static final String AES_256_SERVER_SIDE_ENCRYPTION = "AES256";
-    // User's custom metadata dictionary. All keys  will be prefixed with x-oss-meta-in the HTTP headers.
-    // The keys in this dictionary should include the prefix 'x-oss-meta-'.
-     Map<String, String> userMetadata = LinkedHashMap<String, String>(equals: (p0, p1) => p0.equalsIgnoreCase(p1));
-    // Standard metadata
-     Map<String, Object> metadata = LinkedHashMap<String, Object>(equals: (p0, p1) => p0.equalsIgnoreCase(p1),);
+  Map<String, String> getUserMetadata() {
+    return _userMetadata;
+  }
 
-     Map<String, String> getUserMetadata() {
-        return userMetadata;
+  void setUserMetadata(Map<String, String>? userMetadata) {
+    _userMetadata
+      ..clear
+      ..addAll(userMetadata ?? {});
+  }
+
+  void setHeader(String key, Object value) {
+    metadata[key] = value;
+  }
+
+  void addUserMetadata(String key, String value) {
+    _userMetadata[key] = value;
+  }
+
+  DateTime? getLastModified() {
+    return metadata[HttpHeaders.lastModified] as DateTime?;
+  }
+
+  void setLastModified(DateTime lastModified) {
+    metadata[HttpHeaders.lastModified] = lastModified;
+  }
+
+  DateTime getExpirationTime() {
+    return DateUtil.parseRfc822Date(metadata[HttpHeaders.expires] as String);
+  }
+
+  void setExpirationTime(DateTime expirationTime) {
+    metadata[HttpHeaders.expires] = DateUtil.formatRfc822Date(expirationTime);
+  }
+
+  String? getRawExpiresValue() {
+    return metadata[HttpHeaders.expires] as String?;
+  }
+
+  int getContentLength() {
+    return (metadata[HttpHeaders.contentLength] as int?) ?? 0;
+  }
+
+  void setContentLength(int contentLength) {
+    if (contentLength > OSSConstants.defaultFileSizeLimit) {
+      throw ArgumentError("The content length could not be more than 5GB.");
     }
 
-     void setUserMetadata(Map<String, String>? userMetadata) {
-        this.userMetadata.clear();
-        if (userMetadata != null && userMetadata.isNotEmpty) {
-            this.userMetadata.addAll(userMetadata);
-        }
-    }
+    metadata[HttpHeaders.contentLength] = contentLength;
+  }
 
-     void setHeader(String key, Object value) {
-        metadata[key] = value;
-    }
+  /// Gets Content-Type header value in MIME types, which means the object's type.
+  String? getContentType() {
+    return metadata[HttpHeaders.contentType] as String?;
+  }
 
-     void addUserMetadata(String key, String value) {
-        userMetadata[key] = value;
-    }
+  /// Sets Content-Type header value in MIME types, which means the object's type.
+  ///
+  /// @param contentType The object Content-Type value in MIME types.
+  void setContentType(String contentType) {
+    metadata[HttpHeaders.contentType] = contentType;
+  }
 
-     DateTime? getLastModified() {
-        return metadata[HttpHeaders.lastModified] as DateTime?;
-    }
+  String? getContentMD5() {
+    return metadata[HttpHeaders.contentMd5] as String?;
+  }
 
-     void setLastModified(DateTime lastModified) {
-        metadata[HttpHeaders.lastModified] = lastModified;
-    }
+  void setContentMD5(String contentMD5) {
+    metadata[HttpHeaders.contentMd5] = contentMD5;
+  }
 
-     DateTime getExpirationTime()  {
-        return DateTimeUtil.parseRfc822DateTime((String) metadata.get(HttpHeaders.expires));
-    }
+  String? getSHA1() {
+    return metadata[OSSHeaders.ossHashSha1] as String?;
+  }
 
-     void setExpirationTime(DateTime expirationTime) {
-        metadata[OSSHeaders.EXPIRES] = DateTimeUtil.formatRfc822DateTime(expirationTime);
-    }
+  void setSHA1(String value) {
+    metadata[OSSHeaders.ossHashSha1] = value;
+  }
 
-     String getRawExpiresValue() {
-        return (String) metadata.get(OSSHeaders.EXPIRES);
-    }
+  /// Gets Content-Encoding header value which means the object content's encoding method.
+  String? getContentEncoding() {
+    return metadata[HttpHeaders.contentEncoding] as String?;
+  }
 
-     int getContentLength() {
-        int contentLength = (int) metadata.get(OSSHeaders.CONTENT_LENGTH);
+  /// Gets Content-Encoding header value which means the object content's encoding method.
+  void setContentEncoding(String encoding) {
+    metadata[HttpHeaders.contentEncoding] = encoding;
+  }
 
-        if (contentLength == null) return 0;
-        return contentLength.intValue();
-    }
+  /// Gets Cache-Control header value, which specifies the cache behavior of accessing the object.
+  String? getCacheControl() {
+    return metadata[HttpHeaders.cacheControl] as String?;
+  }
 
-     void setContentLength(int contentLength) {
-        if (contentLength > OSSConstants.defaultFileSizeLimit) {
-            throw ArgumentError("The content length could not be more than 5GB.");
-        }
+  /// Sets Cache-Control header value, which specifies the cache behavior of accessing the object.
+  void setCacheControl(String cacheControl) {
+    metadata[HttpHeaders.cacheControl] = cacheControl;
+  }
 
-        metadata[OSSHeaders.CONTENT_LENGTH] = contentLength;
-    }
+  /// Gets Content-Disposition header value, which specifies how MIME agent is going to handle
+  /// attachments.
+  String? getContentDisposition() {
+    return metadata[HttpHeaders.contentDisposition] as String?;
+  }
 
-    /**
-     * Gets Content-Type header value in MIME types, which means the object's type.
-     *
-     * @return The object Content-Type value in MIME types.
-     */
-     String getContentType() {
-        return (String) metadata.get(OSSHeaders.CONTENT_TYPE);
-    }
+  /// Gets Content-Disposition header value, which specifies how MIME agent is going to handle
+  /// attachments.
+  void setContentDisposition(String disposition) {
+    metadata[HttpHeaders.contentDisposition] = disposition;
+  }
 
-    /**
-     * Sets Content-Type header value in MIME types, which means the object's type.
-     *
-     * @param contentType The object Content-Type value in MIME types.
-     */
-     void setContentType(String contentType) {
-        metadata[OSSHeaders.CONTENT_TYPE] = contentType;
-    }
+  /// Gets the ETag value which is the 128bit MD5 digest in HEX encoding.
+  String? getETag() {
+    return metadata[HttpHeaders.etag] as String?;
+  }
 
-     String getContentMD5() {
-        return (String) metadata.get(OSSHeaders.CONTENT_MD5);
-    }
+  /// Gets the server side encryption algorithm.
+  String? getServerSideEncryption() {
+    return metadata[OSSHeaders.ossServerSideEncryption] as String?;
+  }
 
-     void setContentMD5(String contentMD5) {
-        metadata[OSSHeaders.CONTENT_MD5] = contentMD5;
-    }
+  /// Sets the server side encryption algorithm.
+  void setServerSideEncryption(String serverSideEncryption) {
+    metadata[OSSHeaders.ossServerSideEncryption] = serverSideEncryption;
+  }
 
-     String getSHA1() {
-        return (String) metadata.get(OSSHeaders.OSS_HASH_SHA1);
-    }
+  /// Gets Object type---Normal or Appendable
+  String? getObjectType() {
+    return metadata[OSSHeaders.ossObjectType] as String?;
+  }
 
-     void setSHA1(String value) {
-        metadata[OSSHeaders.OSS_HASH_SHA1] = value;
-    }
+  /// Gets the raw metadata dictionary (SDK internal only)
+  Map<String, Object> getRawMetadata() {
+    return UnmodifiableMapView(metadata);
+  }
 
-    /**
-     * Gets Content-Encoding header value which means the object content's encoding method.
-     *
-     * @return The object content's encoding
-     */
-     String getContentEncoding() {
-        return (String) metadata.get(OSSHeaders.CONTENT_ENCODING);
-    }
+  @override
+  String toString() {
+    String s;
+    String expirationTimeStr = "";
+    try {
+      DateTime expirationTime = getExpirationTime();
+      expirationTimeStr = expirationTime.toString();
+    } catch (e) {}
+    s = HttpHeaders.lastModified +
+        ":" +
+        "${getLastModified()}" +
+        "\n" +
+        HttpHeaders.expires +
+        ":" +
+        expirationTimeStr +
+        "\n" +
+        "rawExpires" +
+        ":" +
+        "${getRawExpiresValue()}" +
+        "\n" +
+        HttpHeaders.contentMd5 +
+        ":" +
+        "${getContentMD5()}" +
+        "\n" +
+        OSSHeaders.ossObjectType +
+        ":" +
+        "${getObjectType()}" +
+        "\n" +
+        OSSHeaders.ossServerSideEncryption +
+        ":" +
+        "${getServerSideEncryption()}" +
+        "\n" +
+        HttpHeaders.contentDisposition +
+        ":" +
+        "${getContentDisposition()}" +
+        "\n" +
+        HttpHeaders.contentEncoding +
+        ":" +
+        "${getContentEncoding()}" +
+        "\n" +
+        HttpHeaders.cacheControl +
+        ":" +
+        "${getCacheControl()}" +
+        "\n" +
+        HttpHeaders.etag +
+        ":" +
+        "${getETag()}" +
+        "\n";
 
-    /**
-     * Gets Content-Encoding header value which means the object content's encoding method.
-     *
-     * @param encoding The object content's encoding.
-     */
-     void setContentEncoding(String encoding) {
-        metadata[OSSHeaders.CONTENT_ENCODING] = encoding;
-    }
-
-    /**
-     * Gets Cache-Control header value, which specifies the cache behavior of accessing the object.
-     *
-     * @return Cache-Control header value
-     */
-     String getCacheControl() {
-        return (String) metadata.get(OSSHeaders.CACHE_CONTROL);
-    }
-
-    /**
-     * Sets Cache-Control header value, which specifies the cache behavior of accessing the object.
-     *
-     * @param cacheControl Cache-Control header value
-     */
-     void setCacheControl(String cacheControl) {
-        metadata[OSSHeaders.CACHE_CONTROL] = cacheControl;
-    }
-
-    /**
-     * Gets Content-Disposition header value, which specifies how MIME agent is going to handle
-     * attachments.
-     *
-     * @return Content-Disposition header value
-     */
-     String getContentDisposition() {
-        return (String) metadata.get(OSSHeaders.CONTENT_DISPOSITION);
-    }
-
-    /**
-     * Gets Content-Disposition header value, which specifies how MIME agent is going to handle
-     * attachments.
-     *
-     * @param disposition Content-Disposition header value
-     */
-     void setContentDisposition(String disposition) {
-        metadata[OSSHeaders.CONTENT_DISPOSITION] = disposition;
-    }
-
-    /**
-     * Gets the ETag value which is the 128bit MD5 digest in HEX encoding.
-     *
-     * @return The ETag value.
-     */
-     String getETag() {
-        return (String) metadata.get(OSSHeaders.ETAG);
-    }
-
-    /**
-     * Gets the server side encryption algorithm.
-     *
-     * @return The server side encryption algorithm. No encryption if it returns null.
-     */
-     String getServerSideEncryption() {
-        return (String) metadata.get(OSSHeaders.OSS_SERVER_SIDE_ENCRYPTION);
-    }
-
-    /**
-     * Sets the server side encryption algorithm.
-     */
-     void setServerSideEncryption(String serverSideEncryption) {
-        metadata[OSSHeaders.OSS_SERVER_SIDE_ENCRYPTION] = serverSideEncryption;
-    }
-
-    /**
-     * Gets Object type---Normal or Appendable
-     *
-     * @return Object type
-     */
-     String getObjectType() {
-        return (String) metadata.get(OSSHeaders.OSS_OBJECT_TYPE);
-    }
-
-    /**
-     * Gets the raw metadata dictionary (SDK internal only)
-     *
-     * @return The raw metadata (SDK internal only)
-     */
-     Map<String, Object> getRawMetadata() {
-        return Collections.unmodifiableMap(metadata);
-    }
-
-    @override
-     String toString() {
-        String s;
-        String expirationTimeStr = "";
-        try {
-            DateTime expirationTime = getExpirationTime();
-            expirationTimeStr = expirationTime.toString();
-        } catch ( e) {
-        }
-        s = HttpHeaders.lastModified + ":" + getLastModified() + "\n"
-                + HttpHeaders.expires + ":" + expirationTimeStr + "\n"
-                + "rawExpires" + ":" + getRawExpiresValue() + "\n"
-                + HttpHeaders.contentMd5 + ":" + getContentMD5() + "\n"
-                + OSSHeaders.ossObjectType + ":" + getObjectType() + "\n"
-                + OSSHeaders.ossServerSideEncryption + ":" + getServerSideEncryption() + "\n"
-                + HttpHeaders.contentDisposition + ":" + getContentDisposition() + "\n"
-                + HttpHeaders.contentEncoding + ":" + getContentEncoding() + "\n"
-                + HttpHeaders.cacheControl + ":" + getCacheControl() + "\n"
-                + HttpHeaders.etag + ":" + getETag() + "\n";
-
-        return s;
-    }
+    return s;
+  }
 }

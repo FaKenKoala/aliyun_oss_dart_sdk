@@ -1,8 +1,14 @@
- import 'package:aliyun_oss_dart_sdk/src/common/oss_constants.dart';
+ import 'package:aliyun_oss_dart_sdk/src/common/http_method.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/oss_constants.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/date_util.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/oss_utils.dart';
 import 'package:aliyun_oss_dart_sdk/src/internal/response_parser.dart';
 import 'package:aliyun_oss_dart_sdk/src/internal/response_parsers.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/oss_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/oss_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/oss_request.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/put_object_result.dart';
 
 class InternalRequestOperation {
@@ -979,8 +985,7 @@ class InternalRequestOperation {
             if (confProxyHost).notNullOrEmpty {
                 proxyHost = confProxyHost;
             }
-
-            return TextUtils.isEmpty(proxyHost);
+return proxyHost.nullOrEmpty;
         }
         return false;
     }
@@ -996,7 +1001,7 @@ class InternalRequestOperation {
             header[OSSHeaders.DATE] = DateUtil.currentFixedSkewedTimeInRFC822Format();
         }
 
-        if (message.getMethod() == HttpMethod.POST || message.getMethod() == HttpMethod.PUT) {
+        if (message.getMethod() == HttpMethod.post || message.getMethod() == HttpMethod.put) {
             if (OSSUtils.isEmptyString(header.get(OSSHeaders.CONTENT_TYPE))) {
                 String determineContentType = OSSUtils.determineContentType(null,
                         message.getUploadFilePath(), message.getObjectKey());

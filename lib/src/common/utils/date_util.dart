@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 /// Util class for DateTime.
 class DateUtil {
   // RFC 822 DateTime Format
@@ -10,32 +12,21 @@ class DateUtil {
   static int amendTimeSkewed = 0;
 
   /// Formats DateTime to GMT string.
-  ///
-  /// @param date
-  /// @return
   static String formatRfc822Date(DateTime date) {
-    return getRfc822DateFormat().format(date);
+    return getRfc822DateFormat().format(date.toUtc());
   }
 
   /// Parses a GMT-format string.
-  ///
-  /// @param dateString
-  /// @return
-  /// @throws ParseException
   static DateTime parseRfc822Date(String dateString) {
     return getRfc822DateFormat().parse(dateString);
   }
 
   static DateFormat getRfc822DateFormat() {
-    SimpleDateFormat rfc822DateFormat =
-        SimpleDateFormat(RFC822_DATE_FORMAT, Locale.US);
-    rfc822DateFormat.setTimeZone(SimpleTimeZone(0, "GMT"));
-
-    return rfc822DateFormat;
+    return DateFormat(RFC822_DATE_FORMAT, 'en-us');
   }
 
   static String formatIso8601Date(DateTime date) {
-    return getIso8601DateFormat().format(date);
+    return getIso8601DateFormat().format(date.toUtc());
   }
 
   static String formatAlternativeIso8601Date(DateTime date) {
@@ -43,10 +34,6 @@ class DateUtil {
   }
 
   /// Parse a date string in the format of ISO 8601.
-  ///
-  /// @param dateString
-  /// @return
-  /// @throws ParseException
   static DateTime parseIso8601Date(String dateString) {
     try {
       return getIso8601DateFormat().parse(dateString);
@@ -56,22 +43,15 @@ class DateUtil {
   }
 
   static DateFormat getIso8601DateFormat() {
-    SimpleDateFormat df = SimpleDateFormat(ISO8601_DATE_FORMAT, Locale.US);
-    df.setTimeZone(SimpleTimeZone(0, "GMT"));
-
-    return df;
+    return DateFormat(ISO8601_DATE_FORMAT, 'en-US');
   }
 
   static DateFormat getAlternativeIso8601DateFormat() {
-    SimpleDateFormat df =
-        SimpleDateFormat(ALTERNATIVE_ISO8601_DATE_FORMAT, Locale.US);
-    df.setTimeZone(SimpleTimeZone(0, "GMT"));
-
-    return df;
+    return DateFormat(ALTERNATIVE_ISO8601_DATE_FORMAT, 'en-US');
   }
 
   static int getFixedSkewedTimeMillis() {
-    return currentTimeMillis + amendTimeSkewed;
+    return DateTime.now().millisecondsSinceEpoch + amendTimeSkewed;
   }
 
   static String currentFixedSkewedTimeInRFC822Format() {
@@ -79,10 +59,10 @@ class DateUtil {
   }
 
   static void setCurrentServerTime(int serverTime) {
-    amendTimeSkewed = serverTime - currentTimeMillis;
+    amendTimeSkewed = serverTime - DateTime.now().millisecondsSinceEpoch;
   }
 
-  static int get currentTimeMillis => DateTime.now().millisecondsSinceEpoch;
-  static int get currentTimeSecond =>
-      DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  // static int get currentTimeMillis => DateTime.now().millisecondsSinceEpoch;
+  // static int get currentTimeSecond =>
+  //     DateTime.now().millisecondsSinceEpoch ~/ 1000;
 }

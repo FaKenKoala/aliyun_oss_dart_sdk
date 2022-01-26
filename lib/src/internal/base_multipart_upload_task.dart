@@ -1,8 +1,26 @@
 
- abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
+ import 'dart:io';
+
+import 'package:aliyun_oss_dart_sdk/src/callback/oss_completed_callback.dart';
+import 'package:aliyun_oss_dart_sdk/src/callback/oss_progress_callback.dart';
+import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
+import 'package:aliyun_oss_dart_sdk/src/exception/oss_ioexption.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/complete_multipart_upload_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/multipart_upload_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/oss_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/part_e_tag.dart';
+import 'package:aliyun_oss_dart_sdk/src/network/execution_context.dart';
+import 'package:aliyun_oss_dart_sdk/src/service_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/task_cancel_exception.dart';
+
+import 'http_message.dart';
+import 'internal_request_operation.dart';
+
+abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
         Result extends CompleteMultipartUploadResult> implements Callable<Result> {
 
-     final int CPU_SIZE = Runtime.getRuntime().availableProcessors() * 2;
+     final int CPU_SIZE = Platform.numberOfProcessors * 2;
      final int MAX_CORE_POOL_SIZE = CPU_SIZE < 5 ? CPU_SIZE : 5;
      final int MAX_IMUM_POOL_SIZE = CPU_SIZE;
      final int KEEP_ALIVE_TIME = 3000;
@@ -16,72 +34,48 @@
                     return Thread(runnable, "oss-android-multipart-thread");
                 }
             });
-     List<PartETag> mPartETags = [];
+     List<PartETag> partETags = [];
      Object mLock = Object();
-     InternalRequestOperation mApiOperation;
-     ExecutionContext mContext;
-     Exception mUploadException;
-     bool mIsCancel;
-     File mUploadFile;
-     String mUploadId;
-     int mFileLength;
-     int mPartExceptionCount;
-     int mRunPartTaskCount;
-     int mUploadedLength = 0;
-     bool mCheckCRC64 = false;
-     Request mRequest;
-     OSSCompletedCallback<Request, Result> mCompletedCallback;
-     OSSProgressCallback<Request> mProgressCallback;
-     int[] mPartAttr = int[2];
-     String mUploadFilePath;
-     int mLastPartSize;//最后一个分片的大小
-     Uri mUploadUri;
+     InternalRequestOperation operation;
+     ExecutionContext context;
+     Exception uploadException;
+     bool isCancel;
+     File uploadFile;
+     String uploadId;
+     int fileLength;
+     int partExceptionCount;
+     int runPartTaskCount;
+     int uploadedLength = 0;
+     bool checkCRC64 = false;
+     Request request;
+     OSSCompletedCallback<Request, Result>? completedCallback;
+     OSSProgressCallback<Request>? progressCallback;
+     List<int> partAttr = [0,0];
+     String uploadFilePath;
+     int lastPartSize;//最后一个分片的大小
+     Uri uploadUri;
 
-     BaseMultipartUploadTask(InternalRequestOperation operation, Request request,
-                                   OSSCompletedCallback<Request, Result> completedCallback,
-                                   ExecutionContext context) {
-        mApiOperation = operation;
-        mRequest = request;
-        mProgressCallback = request.getProgressCallback();
-        mCompletedCallback = completedCallback;
-        mContext = context;
-        mCheckCRC64 = (request.getCRC64() == OSSRequest.CRC64Config.YES);
+     BaseMultipartUploadTask(this. operation, this.request,
+                                   this.completedCallback,
+                                   this.context) {
+        progressCallback = request.progressCallback as OSSProgressCallback<Request>?;
+        checkCRC64 = (request.crc64 == CRC64Config.yes);
     }
 
-    /**
-     * abort upload
-     */
-     abstract void abortThisUpload();
+    /// abort upload
+      void abortThisUpload();
 
-    /**
-     * init multipart upload id
-     *
-     * @throws OSSIOException
-     * @throws OSSClientException
-     * @throws OSSServiceException
-     */
-     abstract void initMultipartUploadId() throws OSSIOException, OSSClientException, OSSServiceException;
+    /// init multipart upload id
+      void initMultipartUploadId() ;
 
-    /**
-     * do multipart upload task
-     *
-     * @return
-     * @throws OSSIOException
-     * @throws OSSServiceException
-     * @throws OSSClientException
-     * @throws InterruptedException
-     */
-     abstract Result doMultipartUpload() throws OSSIOException, OSSServiceException, OSSClientException, InterruptedException;
+    /// do multipart upload task
+      Result doMultipartUpload() ;
 
-    /**
-     * check is or not cancel
-     *
-     * @throws OSSClientException
-     */
+    /// check is or not cancel
      void checkCancel()  {
-        if (mContext.getCancellationHandler().isCancelled()) {
+        if (context.getCancellationHandler().isCancelled()) {
             TaskCancelException e = TaskCancelException("multipart cancel");
-            throw OSSClientException(e.getMessage(), e, true);
+            throw OSSClientException( e, true);
         }
     }
 
@@ -100,65 +94,56 @@
             initMultipartUploadId();
             Result result = doMultipartUpload();
 
-            if (mCompletedCallback != null) {
-                mCompletedCallback.onSuccess(mRequest, result);
-            }
+                completedCallback?.onSuccess(request, result);
             return result;
-        } catch (OSSServiceException e) {
-            if (mCompletedCallback != null) {
-                mCompletedCallback.onFailure(mRequest, null, e);
-            }
-            throw e;
+        } on OSSServiceException catch ( e) {
+                completedCallback?.onFailure(request, null, e);
+            rethrow;
         } catch ( e) {
-            OSSClientException temp;
-            if (e instanceof OSSClientException) {
-                temp = (OSSClientException) e;
-            } else {
-                temp = OSSClientException(e.toString(), e);
-            }
-            if (mCompletedCallback != null) {
-                mCompletedCallback.onFailure(mRequest, temp, null);
+            OSSClientException temp = OSSClientException(e);
+            if (completedCallback != null) {
+                completedCallback?.onFailure(request, temp, null);
             }
             throw temp;
         }
     }
 
      void checkInitData()  {
-        if (mRequest.getUploadFilePath() != null) {
-            mUploadFilePath = mRequest.getUploadFilePath();
-            mUploadedLength = 0;
-            mUploadFile = File(mUploadFilePath);
-            mFileLength = mUploadFile.length();
+        if (request.uploadFilePath != null) {
+            uploadFilePath = request.uploadFilePath!;
+            uploadedLength = 0;
+            uploadFile = File(uploadFilePath);
+            fileLength = uploadFile.lengthSync();
 
-        } else if (mRequest.getUploadUri() != null) {
-            mUploadUri = mRequest.getUploadUri();
-            ParcelFileDescriptor mUploadFileDescriptor = null;
+        } else if (request.uploadUri != null) {
+            uploadUri = request.uploadUri!;
+            ParcelFileDescriptor? uploadFileDescriptor;
             try {
-                mUploadFileDescriptor = mContext.getApplicationContext().getContentResolver().openFileDescriptor(mUploadUri, "r");
-                mFileLength = mUploadFileDescriptor.getStatSize();
-            } catch (OSSIOException e) {
-                throw OSSClientException(e.getMessage(), e, true);
+                uploadFileDescriptor = context.getApplicationContext().getContentResolver().openFileDescriptor(uploadUri, "r");
+                fileLength = uploadFileDescriptor.getStatSize();
+            } on OSSIOException catch ( e) {
+                throw OSSClientException(e, true);
             } finally {
                 try {
-                    if (mUploadFileDescriptor != null) {
-                        mUploadFileDescriptor.close();
+                    if (uploadFileDescriptor != null) {
+                        uploadFileDescriptor.close();
                     }
-                } catch (OSSIOException e) {
+                } on OSSIOException catch ( e) {
                     OSSLog.logThrowable2Local(e);
                 }
             }
         }
-        if (mFileLength == 0) {
+        if (fileLength == 0) {
             throw OSSClientException("file length must not be 0");
         }
 
-        checkPartSize(mPartAttr);
+        checkPartSize(partAttr);
 
-        final int partSize = mRequest.getPartSize();
-        final int partNumber = mPartAttr[1];
+        final int partSize = request.partSize;
+        final int partNumber = partAttr[1];
 
-        OSSLog.logDebug("[checkInitData] - partNumber : " + partNumber);
-        OSSLog.logDebug("[checkInitData] - partSize : " + partSize);
+        OSSLog.logDebug("[checkInitData] - partNumber : $partNumber");
+        OSSLog.logDebug("[checkInitData] - partSize : $partSize");
 
 
         if (partNumber > 1 && partSize < 102400) {
@@ -168,12 +153,12 @@
 
      void uploadPart(int readIndex, int byteCount, int partNumber) {
 
-        RandomAccessFile raf = null;
-        InputStream inputStream = null;
-        BufferedInputStream bufferedInputStream = null;
+        RandomAccessFile? raf;
+        InputStream? inputStream;
+        BufferedInputStream? bufferedInputStream;
         try {
 
-            if (mContext.getCancellationHandler().isCancelled()) {
+            if (context.getCancellationHandler().isCancelled()) {
                 mPoolExecutor.getQueue().clear();
                 return;
             }
@@ -184,10 +169,10 @@
 
             preUploadPart(readIndex, byteCount, partNumber);
 
-            List<int> partContent = byte[byteCount];
-            int skip = readIndex * mRequest.getPartSize();
-            if (mUploadUri != null) {
-                inputStream = mContext.getApplicationContext().getContentResolver().openInputStream(mUploadUri);
+            List<int> partContent = List.filled(byteCount, 0);
+            int skip = readIndex * request.partSize;
+            if (uploadUri != null) {
+                inputStream = context.getApplicationContext().getContentResolver().openInputStream(uploadUri);
                 bufferedInputStream = BufferedInputStream(inputStream);
                 bufferedInputStream.skip(skip);
                 bufferedInputStream.read(partContent, 0, byteCount);
@@ -199,11 +184,11 @@
             }
 
             UploadPartRequest uploadPart = UploadPartRequest(
-                    mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId, readIndex + 1);
+                    request.getBucketName(), request.getObjectKey(), mUploadId, readIndex + 1);
             uploadPart.setPartContent(partContent);
             uploadPart.setMd5Digest(BinaryUtil.calculateBase64Md5(partContent));
-            uploadPart.setCRC64(mRequest.getCRC64());
-            UploadPartResult uploadPartResult = mApiOperation.syncUploadPart(uploadPart);
+            uploadPart.setCRC64(request.getCRC64());
+            UploadPartResult uploadPartResult = operation.syncUploadPart(uploadPart);
             //check isComplete
              (mLock) {
                 PartETag partETag = PartETag(uploadPart.getPartNumber(), uploadPartResult.getETag());
@@ -212,22 +197,22 @@
                     partETag.setCRC64(uploadPartResult.getClientCRC());
                 }
 
-                mPartETags.add(partETag);
+                partETags.add(partETag);
                 mUploadedLength += byteCount;
 
                 uploadPartFinish(partETag);
 
-                if (mContext.getCancellationHandler().isCancelled()) {
-                    if (mPartETags.size() == (mRunPartTaskCount - mPartExceptionCount)) {
+                if (context.getCancellationHandler().isCancelled()) {
+                    if (partETags.size() == (mRunPartTaskCount - mPartExceptionCount)) {
                         TaskCancelException e = TaskCancelException("multipart cancel");
 
                         throw OSSClientException(e.getMessage(), e, true);
                     }
                 } else {
-                    if (mPartETags.size() == (partNumber - mPartExceptionCount)) {
+                    if (partETags.length == (partNumber - partExceptionCount)) {
                         notifyMultipartThread();
                     }
-                    onProgressCallback(mRequest, mUploadedLength, mFileLength);
+                    onProgressCallback(request, uploadedLength, fileLength);
                 }
 
             }
@@ -248,20 +233,18 @@
         }
     }
 
-    abstract  void processException(Exception e);
+      void processException(Exception e);
 
-    /**
-     * complete multipart upload
-     *
-     * @return
-     * @throws OSSClientException
-     * @throws OSSServiceException
-     */
+    /// complete multipart upload
+    ///
+    /// @return
+    /// @throws OSSClientException
+    /// @throws OSSServiceException
      CompleteMultipartUploadResult completeMultipartUploadResult()  {
         //complete sort
-        CompleteMultipartUploadResult completeResult = null;
-        if (mPartETags.size() > 0) {
-            Collections.sort(mPartETags, Comparator<PartETag>() {
+        CompleteMultipartUploadResult? completeResult;
+        if (partETags.isNotEmpty) {
+            Collections.sort(partETags, Comparator<PartETag>() {
                 @override
                  int compare(PartETag lhs, PartETag rhs) {
                     if (lhs.getPartNumber() < rhs.getPartNumber()) {
@@ -275,25 +258,25 @@
             });
 
             CompleteMultipartUploadRequest complete = CompleteMultipartUploadRequest(
-                    mRequest.getBucketName(), mRequest.getObjectKey(), mUploadId, mPartETags);
-            if (mRequest.getCallbackParam() != null) {
-                complete.setCallbackParam(mRequest.getCallbackParam());
+                    request.getBucketName(), request.getObjectKey(), mUploadId, partETags);
+            if (request.getCallbackParam() != null) {
+                complete.setCallbackParam(request.getCallbackParam());
             }
-            if (mRequest.getCallbackVars() != null) {
-                complete.setCallbackVars(mRequest.getCallbackVars());
+            if (request.getCallbackVars() != null) {
+                complete.setCallbackVars(request.getCallbackVars());
             }
-            if (mRequest.getMetadata() != null) {
+            if (request.getMetadata() != null) {
                 ObjectMetadata metadata = ObjectMetadata();
-                for (String key : mRequest.getMetadata().getRawMetadata().keySet()) {
+                for (String key : request.getMetadata().getRawMetadata().keySet()) {
                     if (!key.equals(OSSHeaders.STORAGE_CLASS)) {
-                        metadata.setHeader(key, mRequest.getMetadata().getRawMetadata().get(key));
+                        metadata.setHeader(key, request.getMetadata().getRawMetadata().get(key));
                     }
                 }
                 complete.setMetadata(metadata);
             }
 
-            complete.setCRC64(mRequest.getCRC64());
-            completeResult = mApiOperation.syncCompleteMultipartUpload(complete);
+            complete.setCRC64(request.getCRC64());
+            completeResult = operation.syncCompleteMultipartUpload(complete);
         }
         mUploadedLength = 0;
         return completeResult;
@@ -307,44 +290,40 @@
     }
 
      void checkException()  {
-        if (mUploadException != null) {
+        if (uploadException != null) {
             releasePool();
-            if (mUploadException instanceof OSSIOException) {
-                throw (OSSIOException) mUploadException;
-            } else if (mUploadException instanceof OSSServiceException) {
-                throw (OSSServiceException) mUploadException;
-            } else if (mUploadException instanceof OSSClientException) {
-                throw (OSSClientException) mUploadException;
+            if (uploadException instanceof OSSIOException) {
+                throw (OSSIOException) uploadException;
+            } else if (uploadException instanceof OSSServiceException) {
+                throw (OSSServiceException) uploadException;
+            } else if (uploadException instanceof OSSClientException) {
+                throw (OSSClientException) uploadException;
             } else {
                 OSSClientException clientException =
-                        OSSClientException(mUploadException.getMessage(), mUploadException);
+                        OSSClientException(uploadException.getMessage(), uploadException);
                 throw clientException;
             }
         }
     }
 
      bool checkWaitCondition(int partNum) {
-        if (mPartETags.size() == partNum) {
+        if (partETags.size() == partNum) {
             return false;
         }
         return true;
     }
 
-    /**
-     * notify wait thread
-     */
+    /// notify wait thread
      void notifyMultipartThread() {
         mLock.notify();
         mPartExceptionCount = 0;
     }
 
-    /**
-     * check part size
-     *
-     * @param partAttr
-     */
+    /// check part size
+    ///
+    /// @param partAttr
      void checkPartSize(int[] partAttr) {
-        int partSize = mRequest.getPartSize();
+        int partSize = request.getPartSize();
         OSSLog.logDebug("[checkPartSize] - mFileLength : " + mFileLength);
         OSSLog.logDebug("[checkPartSize] - partSize : " + partSize);
         int partNumber = mFileLength / partSize;
@@ -362,7 +341,7 @@
         }
         partAttr[0] = (int) partSize;
         partAttr[1] = (int) partNumber;
-        mRequest.setPartSize((int) partSize);
+        request.setPartSize((int) partSize);
 
         OSSLog.logDebug("[checkPartSize] - partNumber : " + partNumber);
         OSSLog.logDebug("[checkPartSize] - partSize : " + (int) partSize);
@@ -376,16 +355,14 @@
         return partSize;
     }
 
-    /**
-     * progress callback
-     *
-     * @param request
-     * @param currentSize
-     * @param totalSize
-     */
+    /// progress callback
+    ///
+    /// @param request
+    /// @param currentSize
+    /// @param totalSize
      void onProgressCallback(Request request, int currentSize, int totalSize) {
-        if (mProgressCallback != null) {
-            mProgressCallback.onProgress(request, currentSize, totalSize);
+        if (progressCallback != null) {
+            progressCallback.onProgress(request, currentSize, totalSize);
         }
     }
 

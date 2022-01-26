@@ -1,22 +1,29 @@
- abstract class AbstractResponseParser<T extends OSSResult> implements ResponseParser {
+ import 'dart:collection';
+
+import 'package:aliyun_oss_dart_sdk/src/common/oss_headers.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
+import 'package:aliyun_oss_dart_sdk/src/exception/oss_ioexption.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/oss_result.dart';
+import 'package:http/http.dart';
+
+import 'http_message.dart';
+import 'response_message.dart';
+import 'response_parser.dart';
+
+abstract class AbstractResponseParser<T extends OSSResult> implements ResponseParser {
 
     //关闭okhttp响应链接
      static void safeCloseResponse(ResponseMessage response) {
         try {
             response.close();
         } catch ( e) {
+          /// ignored
         }
     }
 
-    /**
-     * 数据解析，子类需要复写自己的具体实现
-     *
-     * @param response 服务器返回数据
-     * @param result   根据范型生成的业务对象
-     * @return 解析后的业务对象
-     * @throws Exception
-     */
-    abstract T parseData(ResponseMessage response, T result) throws Exception;
+    /// 数据解析，子类需要复写自己的具体实现
+     T parseData(ResponseMessage response, T result);
 
      bool needCloseResponse() {
         return true;
@@ -25,20 +32,17 @@
     @override
      T parse(ResponseMessage response)  {
         try {
-            Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-            Class<?> classType = (Class<?>) type;
-            T result = (T) classType.newInstance();
-            if (result != null) {
-                result.setRequestId(response.getHeaders().get(OSSHeaders.OSS_HEADER_REQUEST_ID));
-                result.setStatusCode(response.getStatusCode());
-                result.setResponseHeader(parseResponseHeader(response.getResponse()));
+            
+            var result = OSSResult();
+                result.requestId = response.headers[OSSHeaders.ossHeaderRequestId];
+                result.statusCode = response.statusCode;
+                result.responseHeader = parseResponseHeader(response.response!);
                 setCRC(result, response);
-                result = parseData(response, result);
-            }
+                result = parseData(response, result as T);
             return result;
         } catch ( e) {
-            OSSIOException ioException = OSSIOException(e.getMessage(), e);
-            e.printStackTrace();
+            OSSIOException ioException = OSSIOException(e);
+            // e.printStackTrace();
             OSSLog.logThrowable2Local(e);
             throw ioException;
         } finally {
@@ -49,27 +53,23 @@
     }
 
     //处理返回信息的信息头
-     CaseInsensitiveHashMap<String, String> parseResponseHeader(Response response) {
-        CaseInsensitiveHashMap<String, String> result = CaseInsensitiveHashMap<String, String>();
-        Headers headers = response.headers();
-        for (int i = 0; i < headers.size(); i++) {
-            result[headers.name(i)] = headers.value(i);
-        }
+     Map<String, String> parseResponseHeader(Response response) {
+        Map<String, String> result = LinkedHashMap<String, String>(equals: (p0, p1) => p0.equalsIgnoreCase(p1),);
+        result.addAll( response.headers);
         return result;
     }
 
-     <Result extends OSSResult> void setCRC(Result result,
+      void setCRC<Result extends OSSResult>(Result result,
                                                   ResponseMessage response) {
-        InputStream inputStream = response.getRequest().getContent();
-        if (inputStream != null && inputStream instanceof CheckedInputStream) {
+        InputStream? inputStream = response.request?.content;
+        if (inputStream != null && inputStream is CheckedInputStream) {
             CheckedInputStream checkedInputStream = (CheckedInputStream) inputStream;
-            result.setClientCRC(checkedInputStream.getChecksum().getValue());
+            result.clientCRC = checkedInputStream.getChecksum().getValue();
         }
 
-        String strSrvCrc = response.getHeaders().get(OSSHeaders.OSS_HASH_CRC64_ECMA);
+        String? strSrvCrc = response.headers[OSSHeaders.ossHashCrc64Ecma];
         if (strSrvCrc != null) {
-            BigInteger bi = BigInteger(strSrvCrc);
-            result.setServerCRC(bi.intValue());
+            result.serverCRC = int.parse(strSrvCrc);
         }
     }
 }

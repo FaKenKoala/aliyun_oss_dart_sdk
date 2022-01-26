@@ -691,13 +691,14 @@ if (!first) {
             builder.write(action);
         }
         builder.write("|sys/");
-        if (OSSUtils.isEmptyString(str)toBucketName) && !TextUtils.isEmpty(toObjectKey).notNullOrEmpty {
-            String bucketNameBase64 = base64.encodeToString(toBucketName.getBytes(), base64.NOWRAP);
-            String objectkeyBase64 = base64.encodeToString(toObjectKey.getBytes(), base64.NOWRAP);
-            builder.write("saveas,o");
-            builder.write(objectkeyBase64);
-            builder.write(",b");
-            builder.write(bucketNameBase64);
+        if (toBucketName.notNullOrEmpty && toObjectKey.notNullOrEmpty) {
+          
+            String bucketName_base64 = base64.encode(utf8.encode(toBucketName));
+            String objectkey_base64 = base64.encode(utf8.encode(toObjectKey));
+            builder.write("saveas,o_");
+            builder.write(objectkey_base64);
+            builder.write(",b_");
+            builder.write(bucketName_base64);
         }
         String body = builder.toString();
         OSSLog.logDebug("ImagePersistent body : " + body);

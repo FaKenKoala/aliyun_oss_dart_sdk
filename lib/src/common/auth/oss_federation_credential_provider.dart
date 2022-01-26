@@ -11,7 +11,7 @@ abstract class OSSFederationCredentialProvider
   Future<OSSFederationToken?> getValidFederationToken() async {
     // Checks if the STS token is expired. To avoid returning staled data, here we pre-fetch the token 5 minutes a head of the real expiration.
     // The minimal expiration time is 15 minutes
-    int nowSecond = DateUtil.currentTimeSecond;
+    final nowSecond = DateUtil.getFixedSkewedTimeMillis() / 1000;
     if (_cachedToken == null || nowSecond > _cachedToken!.expiration - 5 * 60) {
       if (_cachedToken != null) {
         OSSLog.logDebug(

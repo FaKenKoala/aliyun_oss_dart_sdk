@@ -30,7 +30,7 @@ class ObjectURLPresigner {
     String bucketName = request.bucketName;
     String objectKey = request.key;
     String expires =
-        (DateUtil.currentTimeSecond + request.expiration).toString();
+        (DateUtil.getFixedSkewedTimeMillis() ~/ 1000 + request.expiration).toString();
     HttpMethod method = request.method;
 
     RequestMessage requestMessage = RequestMessage()

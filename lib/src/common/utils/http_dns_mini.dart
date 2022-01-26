@@ -46,13 +46,13 @@ class HttpdnsMini {
             return "[hostName=$hostName, ip=$ip, ttl=$ttl, queryTime=$queryTime]";
         }
 
-         bool isExpired() {
-            return queryTime + ttl < DateUtil.currentTimeSecond;
+          bool isExpired() {
+            return queryTime + ttl < DateTime.now().millisecondsSinceEpoch / 1000;
         }
 
         // 一个域名解析结果过期后，异步接口仍然可以返回这个结果，但最多可以容忍过期10分钟
          bool isStillAvailable() {
-            return queryTime + ttl + 10 * 60 > DateUtil.currentTimeSecond;
+            return queryTime + ttl + 10 * 60 > DateTime.now().millisecondsSinceEpoch / 1000;
         }
 
     
@@ -100,7 +100,7 @@ class HttpdnsMini {
                         hostObject..hostName = host
                         ..ttl =ttl
                         ..ip = ip
-                        ..queryTime = DateUtil.currentTimeSecond;
+                        ..queryTime = DateTime.now().millisecondsSinceEpoch ~/ 1000;
                         OSSLog.logDebug("[httpdnsmini] - resolve result:" + hostObject.toString());
                         if (hostManager.size() < _maxHoldHostNum) {
                             hostManager[hostName] = hostObject;
