@@ -127,6 +127,7 @@ class BinaryUtil {
                 try {
                     inputStream.close(); // Close the InputStream
                 } catch ( e) {
+                  /// ignored
                 }
             }
         }
