@@ -1,20 +1,3 @@
-package com.alibaba.sdk.android.oss.network;
-
-import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
-import com.alibaba.sdk.android.oss.model.OSSRequest;
-
-import java.io.OSSIOException;
-import java.io.InputStream;
-
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
-import okio.BufferedSink;
-import okio.Okio;
-import okio.Source;
-
-/**
- * Created by jingdan on 2017/9/12.
- */
 
  class ProgressTouchableRequestBody<T extends OSSRequest> extends RequestBody {
      static final int SEGMENT_SIZE = 2048; // okio.Segment.SIZE

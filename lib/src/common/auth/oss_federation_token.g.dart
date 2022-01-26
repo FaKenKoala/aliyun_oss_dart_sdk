@@ -16,8 +16,8 @@ OSSFederationToken _$OSSFederationTokenFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$OSSFederationTokenToJson(OSSFederationToken instance) =>
     <String, dynamic>{
-      'AccessKeyId': instance.tempAk,
-      'AccessKeySecret': instance.tempSk,
+      'AccessKeyId': instance.tempAK,
+      'AccessKeySecret': instance.tempSK,
       'SecurityToken': instance.securityToken,
       'Expiration': instance.expiration,
     };

@@ -1,16 +1,3 @@
-package com.alibaba.sdk.android.oss.network;
-
-
-import java.io.OSSIOException;
-import java.io.InputStream;
-
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Response;
-
-/**
- * Created by jingdan on 2017/9/12.
- */
 
  class NetworkProgressHelper {
 

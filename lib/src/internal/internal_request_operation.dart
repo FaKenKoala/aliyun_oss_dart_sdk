@@ -1,56 +1,11 @@
-package com.alibaba.sdk.android.oss.internal;
+ import 'package:aliyun_oss_dart_sdk/src/common/oss_constants.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/oss_utils.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/response_parser.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/response_parsers.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/put_object_result.dart';
 
-import android.content.Context;
-import android.os.Build;
-import android.text.TextUtils;
-
-import com.alibaba.sdk.android.oss.ClientConfiguration;
-import com.alibaba.sdk.android.oss.OSSClientException;
-import com.alibaba.sdk.android.oss.OSSServiceException;
-import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
-import com.alibaba.sdk.android.oss.common.HttpMethod;
-import com.alibaba.sdk.android.oss.common.OSSConstants;
-import com.alibaba.sdk.android.oss.common.OSSHeaders;
-import com.alibaba.sdk.android.oss.common.OSSLog;
-import com.alibaba.sdk.android.oss.common.RequestParameters;
-import com.alibaba.sdk.android.oss.common.auth.OSSCredentialProvider;
-import com.alibaba.sdk.android.oss.common.utils.BinaryUtil;
-import com.alibaba.sdk.android.oss.common.utils.CRC64;
-import com.alibaba.sdk.android.oss.common.utils.DateUtil;
-import com.alibaba.sdk.android.oss.common.utils.HttpHeaders;
-import com.alibaba.sdk.android.oss.common.utils.HttpUtil;
-import com.alibaba.sdk.android.oss.common.utils.OSSUtils;
-import com.alibaba.sdk.android.oss.common.utils.VersionInfoUtils;
-import com.alibaba.sdk.android.oss.exception.InconsistentException;
-import com.alibaba.sdk.android.oss.model.*;
-import com.alibaba.sdk.android.oss.network.ExecutionContext;
-import com.alibaba.sdk.android.oss.network.OSSRequestTask;
-
-import java.io.UnsupportedEncodingException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
-
-import okhttp3.Dispatcher;
-import okhttp3.OkHttpClient;
-
-/**
- * Created by zhouzhuo on 11/22/15.
- */
- class InternalRequestOperation {
+class InternalRequestOperation {
 
      static final int LIST_PART_MAX_RETURNS = 1000;
      static final int MAX_PART_NUMBER = 10000;
@@ -66,7 +21,7 @@ import okhttp3.OkHttpClient;
      OkHttpClient innerClient;
      Context applicationContext;
      OSSCredentialProvider credentialProvider;
-     int maxRetryCount = OSSConstants.DEFAULT_RETRY_COUNT;
+     int maxRetryCount = OSSConstants.defaultRetryCount;
      ClientConfiguration conf;
 
      InternalRequestOperation(Context context, final URI endpoint, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {

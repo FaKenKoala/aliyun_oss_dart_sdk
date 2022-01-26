@@ -1,4 +1,5 @@
- import 'dart:math';
+ import 'dart:async';
+import 'dart:math';
 
 import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
@@ -32,7 +33,7 @@ class OSSRetryHandler {
 
             Exception localException = (Exception) e.getCause();
             if (localException is InterruptedOSSIOException
-                    && (localException is! SocketTimeoutException)) {
+                    && (localException is! TimeoutException)) {
                 OSSLog.logError("[shouldRetry] - is interrupted!");
                 return OSSRetryType.OSSRetryTypeShouldNotRetry;
             } else if (localException is ArgumentError) {

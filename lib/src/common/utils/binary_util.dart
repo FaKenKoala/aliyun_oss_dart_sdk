@@ -3,6 +3,7 @@
 import 'dart:html';
 
 import 'package:aliyun_oss_dart_sdk/src/internal/http_message.dart';
+import 'package:crypto/crypto.dart';
 
 class BinaryUtil {
      static String toBase64String(List<int> binaryData) {
@@ -16,20 +17,14 @@ class BinaryUtil {
 
     /// calculate md5 for bytes
      static List<int> calculateMd5(List<int> binaryData) {
-        MessageDigest messageDigest = null;
-        try {
-            messageDigest = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            throw RuntimeException("MD5 algorithm not found.");
-        }
-        messageDigest.update(binaryData);
-        return messageDigest.digest();
+       return md5.convert(binaryData).bytes;
+        
 
     }
 
     /// calculate md5 for local file
      static List<int> calculateMd5FromFile(String filePath)  {
-        List<int> md5;
+        List<int> result;
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
             List<int> buffer = byte[10 * 1024];
@@ -39,11 +34,11 @@ class BinaryUtil {
                 digest.update(buffer, 0, len);
             }
             is.close();
-            md5 = digest.digest();
+            result = digest.digest();
         } catch (NoSuchAlgorithmException e) {
             throw RuntimeException("MD5 algorithm not found.");
         }
-        return md5;
+        return result;
     }
 
     /// calculate md5 for bytes and string back

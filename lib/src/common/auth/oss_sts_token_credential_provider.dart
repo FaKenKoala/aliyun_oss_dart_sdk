@@ -11,7 +11,7 @@ class OSSStsTokenCredentialProvider implements OSSCredentialProvider {
 
   factory OSSStsTokenCredentialProvider.fromTken(OSSFederationToken token) {
     return OSSStsTokenCredentialProvider(
-        token.tempAk, token.tempSk, token.securityToken);
+        token.tempAK, token.tempSK, token.securityToken);
   }
 
   @override

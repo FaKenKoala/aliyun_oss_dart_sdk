@@ -1,4 +1,4 @@
-import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/oss_result.dart';
 
 import 'response_message.dart';
 

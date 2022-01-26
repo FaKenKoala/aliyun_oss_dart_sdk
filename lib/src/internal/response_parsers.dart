@@ -1,4 +1,29 @@
- class ResponseParsers {
+ import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/oss_headers.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/oss_utils.dart';
+import 'package:aliyun_oss_dart_sdk/src/exception/oss_ioexption.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/copy_object_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/delete_multiple_object_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/get_bucket_a_c_l_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/get_bucket_info_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/get_bucket_lifecycle_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/get_bucket_logging_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/get_bucket_referer_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/initiate_multipart_upload_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/list_buckets_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/list_objects_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/list_parts_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/object_metadata.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/part_summary.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/put_object_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/service_exception.dart';
+
+import 'http_message.dart';
+import 'response_message.dart';
+
+class ResponseParsers {
 
      static CopyObjectResult parseCopyObjectResponseXML(InputStream inStream, CopyObjectResult result)
              {
@@ -712,7 +737,7 @@
      static Exception parseResponseErrorXML(ResponseMessage response, bool isHeadRequest) {
 
         int statusCode = response.getStatusCode();
-        String requestId = response.getResponse().header(OSSHeaders.OSS_HEADER_REQUEST_ID);
+        String requestId = response.getResponse().header(OSSHeaders.ossHeaderRequestId);
         String code = null;
         String message = null;
         String hostId = null;
@@ -750,7 +775,7 @@
                         eventType = parser.next();
                     }
                 }
-            } catch (OSSIOException e) {
+            } on OSSIOException catch ( e) {
                 return OSSClientException(e.getMessage(), e);
             } catch (XmlPullParserException e) {
                 return OSSClientException(e.getMessage(), e);
@@ -758,19 +783,20 @@
         }
 
         OSSServiceException serviceException = OSSServiceException(statusCode, message, code, requestId, hostId, errorMessage);
-        if (partEtag).notNullOrEmpty {
-            serviceException.setPartEtag(partEtag);
+        if (partEtag.notNullOrEmpty) {
+            serviceException.partEtag =partEtag;
         }
 
-        if (partNumber).notNullOrEmpty {
-            serviceException.setPartNumber(partNumber);
+        if (partNumber.notNullOrEmpty) {
+            serviceException.partNumber = partNumber;
         }
 
 
         return serviceException;
     }
+}
 
-     static class PutObjectResponseParser extends AbstractResponseParser<PutObjectResult> {
+     class PutObjectResponseParser extends AbstractResponseParser<PutObjectResult> {
 
         @override
          PutObjectResult parseData(ResponseMessage response, PutObjectResult result)
@@ -784,7 +810,7 @@
         }
     }
 
-     static class AppendObjectResponseParser extends AbstractResponseParser<AppendObjectResult> {
+     class AppendObjectResponseParser extends AbstractResponseParser<AppendObjectResult> {
 
         @override
          AppendObjectResult parseData(ResponseMessage response, AppendObjectResult result)  {
@@ -797,7 +823,7 @@
         }
     }
 
-     static class HeadObjectResponseParser extends AbstractResponseParser<HeadObjectResult> {
+     class HeadObjectResponseParser extends AbstractResponseParser<HeadObjectResult> {
 
         @override
          HeadObjectResult parseData(ResponseMessage response, HeadObjectResult result)  {
@@ -806,7 +832,7 @@
         }
     }
 
-     static class GetObjectResponseParser extends AbstractResponseParser<GetObjectResult> {
+     class GetObjectResponseParser extends AbstractResponseParser<GetObjectResult> {
 
         @override
          GetObjectResult parseData(ResponseMessage response, GetObjectResult result)  {
@@ -829,7 +855,7 @@
         }
     }
 
-     static class GetObjectACLResponseParser extends AbstractResponseParser<GetObjectACLResult> {
+     class GetObjectACLResponseParser extends AbstractResponseParser<GetObjectACLResult> {
 
         @override
         GetObjectACLResult parseData(ResponseMessage response, GetObjectACLResult result)  {
@@ -838,7 +864,7 @@
         }
     }
 
-     static class CopyObjectResponseParser extends AbstractResponseParser<CopyObjectResult> {
+     class CopyObjectResponseParser extends AbstractResponseParser<CopyObjectResult> {
 
         @override
          CopyObjectResult parseData(ResponseMessage response, CopyObjectResult result)  {
@@ -847,7 +873,7 @@
         }
     }
 
-     static class CreateBucketResponseParser extends AbstractResponseParser<CreateBucketResult> {
+     class CreateBucketResponseParser extends AbstractResponseParser<CreateBucketResult> {
 
         @override
          CreateBucketResult parseData(ResponseMessage response, CreateBucketResult result)  {
@@ -858,7 +884,7 @@
         }
     }
 
-     static class DeleteBucketResponseParser extends AbstractResponseParser<DeleteBucketResult> {
+     class DeleteBucketResponseParser extends AbstractResponseParser<DeleteBucketResult> {
 
         @override
          DeleteBucketResult parseData(ResponseMessage response, DeleteBucketResult result)  {
@@ -866,7 +892,7 @@
         }
     }
 
-     static class GetBucketInfoResponseParser extends AbstractResponseParser<GetBucketInfoResult> {
+     class GetBucketInfoResponseParser extends AbstractResponseParser<GetBucketInfoResult> {
 
         @override
          GetBucketInfoResult parseData(ResponseMessage response, GetBucketInfoResult result)  {
@@ -875,7 +901,7 @@
         }
     }
 
-     static class GetBucketACLResponseParser extends AbstractResponseParser<GetBucketACLResult> {
+     class GetBucketACLResponseParser extends AbstractResponseParser<GetBucketACLResult> {
 
         @override
          GetBucketACLResult parseData(ResponseMessage response, GetBucketACLResult result)  {
@@ -884,7 +910,7 @@
         }
     }
 
-     static class PutBucketRefererResponseParser extends AbstractResponseParser<PutBucketRefererResult> {
+     class PutBucketRefererResponseParser extends AbstractResponseParser<PutBucketRefererResult> {
 
         @override
          PutBucketRefererResult parseData(ResponseMessage response, PutBucketRefererResult result)  {
@@ -892,7 +918,7 @@
         }
     }
 
-     static class GetBucketRefererResponseParser extends AbstractResponseParser<GetBucketRefererResult> {
+     class GetBucketRefererResponseParser extends AbstractResponseParser<GetBucketRefererResult> {
 
         @override
          GetBucketRefererResult parseData(ResponseMessage response, GetBucketRefererResult result)  {
@@ -901,7 +927,7 @@
         }
     }
 
-     static class PutBucketLoggingResponseParser extends AbstractResponseParser<PutBucketLoggingResult> {
+     class PutBucketLoggingResponseParser extends AbstractResponseParser<PutBucketLoggingResult> {
 
         @override
          PutBucketLoggingResult parseData(ResponseMessage response, PutBucketLoggingResult result)  {
@@ -909,7 +935,7 @@
         }
     }
 
-     static class GetBucketLoggingResponseParser extends AbstractResponseParser<GetBucketLoggingResult> {
+     class GetBucketLoggingResponseParser extends AbstractResponseParser<GetBucketLoggingResult> {
 
         @override
          GetBucketLoggingResult parseData(ResponseMessage response, GetBucketLoggingResult result)  {
@@ -918,7 +944,7 @@
         }
     }
 
-     static class DeleteBucketLoggingResponseParser extends AbstractResponseParser<DeleteBucketLoggingResult> {
+     class DeleteBucketLoggingResponseParser extends AbstractResponseParser<DeleteBucketLoggingResult> {
 
         @override
          DeleteBucketLoggingResult parseData(ResponseMessage response, DeleteBucketLoggingResult result)  {
@@ -926,7 +952,7 @@
         }
     }
 
-     static class PutBucketLifecycleResponseParser extends AbstractResponseParser<PutBucketLifecycleResult> {
+     class PutBucketLifecycleResponseParser extends AbstractResponseParser<PutBucketLifecycleResult> {
 
         @override
          PutBucketLifecycleResult parseData(ResponseMessage response, PutBucketLifecycleResult result)  {
@@ -934,7 +960,7 @@
         }
     }
 
-     static class GetBucketLifecycleResponseParser extends AbstractResponseParser<GetBucketLifecycleResult> {
+     class GetBucketLifecycleResponseParser extends AbstractResponseParser<GetBucketLifecycleResult> {
 
         @override
          GetBucketLifecycleResult parseData(ResponseMessage response, GetBucketLifecycleResult result)  {
@@ -943,7 +969,7 @@
         }
     }
 
-     static class DeleteBucketLifecycleResponseParser extends AbstractResponseParser<DeleteBucketLifecycleResult> {
+     class DeleteBucketLifecycleResponseParser extends AbstractResponseParser<DeleteBucketLifecycleResult> {
 
         @override
          DeleteBucketLifecycleResult parseData(ResponseMessage response, DeleteBucketLifecycleResult result)  {
@@ -951,7 +977,7 @@
         }
     }
 
-     static class DeleteObjectResponseParser extends AbstractResponseParser<DeleteObjectResult> {
+     class DeleteObjectResponseParser extends AbstractResponseParser<DeleteObjectResult> {
 
         @override
          DeleteObjectResult parseData(ResponseMessage response, DeleteObjectResult result)  {
@@ -959,7 +985,7 @@
         }
     }
 
-     static class DeleteMultipleObjectResponseParser extends AbstractResponseParser<DeleteMultipleObjectResult> {
+     class DeleteMultipleObjectResponseParser extends AbstractResponseParser<DeleteMultipleObjectResult> {
 
         @override
         DeleteMultipleObjectResult parseData(ResponseMessage response, DeleteMultipleObjectResult result)  {
@@ -968,7 +994,7 @@
         }
     }
 
-     static class ListObjectsResponseParser extends AbstractResponseParser<ListObjectsResult> {
+     class ListObjectsResponseParser extends AbstractResponseParser<ListObjectsResult> {
 
         @override
          ListObjectsResult parseData(ResponseMessage response, ListObjectsResult result)  {
@@ -977,7 +1003,7 @@
         }
     }
 
-     static class ListBucketResponseParser extends AbstractResponseParser<ListBucketsResult> {
+     class ListBucketResponseParser extends AbstractResponseParser<ListBucketsResult> {
 
         @override
         ListBucketsResult parseData(ResponseMessage response, ListBucketsResult result)  {
@@ -986,7 +1012,7 @@
         }
     }
 
-     static class InitMultipartResponseParser extends AbstractResponseParser<InitiateMultipartUploadResult> {
+     class InitMultipartResponseParser extends AbstractResponseParser<InitiateMultipartUploadResult> {
 
         @override
          InitiateMultipartUploadResult parseData(ResponseMessage response, InitiateMultipartUploadResult result)  {
@@ -994,7 +1020,7 @@
         }
     }
 
-     static class UploadPartResponseParser extends AbstractResponseParser<UploadPartResult> {
+     class UploadPartResponseParser extends AbstractResponseParser<UploadPartResult> {
 
         @override
          UploadPartResult parseData(ResponseMessage response, UploadPartResult result)  {
@@ -1003,7 +1029,7 @@
         }
     }
 
-     static class AbortMultipartUploadResponseParser extends AbstractResponseParser<AbortMultipartUploadResult> {
+     class AbortMultipartUploadResponseParser extends AbstractResponseParser<AbortMultipartUploadResult> {
 
         @override
          AbortMultipartUploadResult parseData(ResponseMessage response, AbortMultipartUploadResult result)  {
@@ -1011,7 +1037,7 @@
         }
     }
 
-     static class CompleteMultipartUploadResponseParser extends AbstractResponseParser<CompleteMultipartUploadResult> {
+     class CompleteMultipartUploadResponseParser extends AbstractResponseParser<CompleteMultipartUploadResult> {
 
         @override
          CompleteMultipartUploadResult parseData(ResponseMessage response, CompleteMultipartUploadResult result)  {
@@ -1027,7 +1053,7 @@
         }
     }
 
-     static class ListPartsResponseParser extends AbstractResponseParser<ListPartsResult> {
+     class ListPartsResponseParser extends AbstractResponseParser<ListPartsResult> {
 
         @override
          ListPartsResult parseData(ResponseMessage response, ListPartsResult result)  {
@@ -1036,7 +1062,7 @@
         }
     }
 
-     static class ListMultipartUploadsResponseParser extends AbstractResponseParser<ListMultipartUploadsResult> {
+     class ListMultipartUploadsResponseParser extends AbstractResponseParser<ListMultipartUploadsResult> {
 
         @override
          ListMultipartUploadsResult parseData(ResponseMessage response, ListMultipartUploadsResult result)  {
@@ -1044,7 +1070,7 @@
         }
     }
 
-     static class TriggerCallbackResponseParser extends AbstractResponseParser<TriggerCallbackResult> {
+     class TriggerCallbackResponseParser extends AbstractResponseParser<TriggerCallbackResult> {
 
         @override
          TriggerCallbackResult parseData(ResponseMessage response, TriggerCallbackResult result)  {
@@ -1056,7 +1082,7 @@
         }
     }
 
-     static class ImagePersistResponseParser extends AbstractResponseParser<ImagePersistResult> {
+     class ImagePersistResponseParser extends AbstractResponseParser<ImagePersistResult> {
 
         @override
          ImagePersistResult parseData(ResponseMessage response, ImagePersistResult result)  {
@@ -1064,7 +1090,7 @@
         }
     }
 
-     static class PutSymlinkResponseParser extends AbstractResponseParser<PutSymlinkResult> {
+     class PutSymlinkResponseParser extends AbstractResponseParser<PutSymlinkResult> {
 
         @override
         PutSymlinkResult parseData(ResponseMessage response, PutSymlinkResult result)  {
@@ -1072,7 +1098,7 @@
         }
     }
 
-     static class GetSymlinkResponseParser extends AbstractResponseParser<GetSymlinkResult> {
+     class GetSymlinkResponseParser extends AbstractResponseParser<GetSymlinkResult> {
 
         @override
         GetSymlinkResult parseData(ResponseMessage response, GetSymlinkResult result)  {
@@ -1081,11 +1107,11 @@
         }
     }
 
-     static class RestoreObjectResponseParser extends AbstractResponseParser<RestoreObjectResult> {
+     class RestoreObjectResponseParser extends AbstractResponseParser<RestoreObjectResult> {
 
         @override
         RestoreObjectResult parseData(ResponseMessage response, RestoreObjectResult result)  {
             return result;
         }
     }
-}
+

@@ -1,22 +1,3 @@
-package com.alibaba.sdk.android.oss.network;
-
-import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
-import com.alibaba.sdk.android.oss.model.OSSRequest;
-
-import java.io.OSSIOException;
-
-import okhttp3.MediaType;
-import okhttp3.ResponseBody;
-import okio.Buffer;
-import okio.BufferedSource;
-import okio.ForwardingSource;
-import okio.Okio;
-import okio.Source;
-
-/**
- * Created by jingdan on 2017/9/12.
- * response progress
- */
 
  class ProgressTouchableResponseBody<T extends OSSRequest> extends ResponseBody {
 

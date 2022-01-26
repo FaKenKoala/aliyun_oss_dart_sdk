@@ -1,25 +1,3 @@
-package com.alibaba.sdk.android.oss.internal;
-
-import com.alibaba.sdk.android.oss.common.OSSHeaders;
-import com.alibaba.sdk.android.oss.common.OSSLog;
-import com.alibaba.sdk.android.oss.common.utils.CaseInsensitiveHashMap;
-import com.alibaba.sdk.android.oss.model.OSSResult;
-
-import java.io.OSSIOException;
-import java.io.InputStream;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.zip.CheckedInputStream;
-
-import okhttp3.Headers;
-import okhttp3.Response;
-
-/**
- * create by jingdan 15/08/17
- */
  abstract class AbstractResponseParser<T extends OSSResult> implements ResponseParser {
 
     //关闭okhttp响应链接

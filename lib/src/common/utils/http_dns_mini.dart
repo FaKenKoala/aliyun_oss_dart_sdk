@@ -17,9 +17,7 @@ class HttpdnsMini {
     //  ExecutorService pool = Executors.newFixedThreadPool(_maxThreadNum);
 
      static HttpdnsMini getInstance() {
-        if (_instance == null) {
-                    _instance = HttpdnsMini();
-        }
+        _instance ??= HttpdnsMini();
         return _instance!;
     }
 

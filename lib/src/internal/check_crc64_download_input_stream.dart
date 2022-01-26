@@ -1,15 +1,3 @@
-package com.alibaba.sdk.android.oss.internal;
-
-import com.alibaba.sdk.android.oss.common.utils.OSSUtils;
-
-import java.io.OSSIOException;
-import java.io.InputStream;
-import java.util.zip.CheckedInputStream;
-import java.util.zip.Checksum;
-
-/**
- * Created by jingdan on 2017/11/29.
- */
 
  class CheckCRC64DownloadInputStream extends CheckedInputStream {
 

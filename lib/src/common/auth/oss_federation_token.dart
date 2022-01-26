@@ -4,16 +4,16 @@ part 'oss_federation_token.g.dart';
 @JsonSerializable()
 class OSSFederationToken {
   @JsonKey(name: 'AccessKeyId')
-  String tempAk;
+  String tempAK;
   @JsonKey(name: 'AccessKeySecret')
-  String tempSk;
+  String tempSK;
   @JsonKey(name: 'SecurityToken')
   String securityToken;
   @JsonKey(name: 'Expiration')
   int expiration;
 
   OSSFederationToken(
-      this.tempAk, this.tempSk, this.securityToken, this.expiration);
+      this.tempAK, this.tempSK, this.securityToken, this.expiration);
 
   factory OSSFederationToken.fromJson(Map<String, dynamic> json) =>
       _$OSSFederationTokenFromJson(json);

@@ -1,21 +1,3 @@
-/**
- * Copyright (C) Alibaba Cloud Computing, 2015
- * All rights reserved.
- * <p>
- * 版权所有 （C）阿里巴巴云计算，2015
- */
-
-package com.alibaba.sdk.android.oss.common.utils;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.OSSIOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 
  class IOUtils {
 

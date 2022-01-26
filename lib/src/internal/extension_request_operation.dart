@@ -1,41 +1,11 @@
-package com.alibaba.sdk.android.oss.internal;
+ import 'package:aliyun_oss_dart_sdk/src/common/oss_constants.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/binary_util.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/oss_utils.dart';
 
-import android.os.Environment;
-import android.os.ParcelFileDescriptor;
-
-import com.alibaba.sdk.android.oss.OSSClientException;
-import com.alibaba.sdk.android.oss.OSSServiceException;
-import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
-import com.alibaba.sdk.android.oss.common.OSSConstants;
-import com.alibaba.sdk.android.oss.common.OSSLog;
-import com.alibaba.sdk.android.oss.common.utils.BinaryUtil;
-import com.alibaba.sdk.android.oss.common.utils.OSSUtils;
-import com.alibaba.sdk.android.oss.model.AbortMultipartUploadRequest;
-import com.alibaba.sdk.android.oss.model.ResumableDownloadResult;
-import com.alibaba.sdk.android.oss.model.CompleteMultipartUploadResult;
-import com.alibaba.sdk.android.oss.model.HeadObjectRequest;
-import com.alibaba.sdk.android.oss.model.ResumableDownloadRequest;
-import com.alibaba.sdk.android.oss.model.MultipartUploadRequest;
-import com.alibaba.sdk.android.oss.model.OSSRequest;
-import com.alibaba.sdk.android.oss.model.ResumableUploadRequest;
-import com.alibaba.sdk.android.oss.model.ResumableUploadResult;
-import com.alibaba.sdk.android.oss.network.ExecutionContext;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.OSSIOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-
-/**
- * Created by zhouzhuo on 11/27/15.
- */
- class ExtensionRequestOperation {
+class ExtensionRequestOperation {
 
      static ExecutorService executorService =
-            Executors.newFixedThreadPool(OSSConstants.DEFAULT_BASE_THREAD_POOL_SIZE, ThreadFactory() {
+            Executors.newFixedThreadPool(OSSConstants.defaultBaseThreadPoolSize, ThreadFactory() {
                 @override
                  Thread newThread(Runnable r) {
                     return Thread(r, "oss-android-extensionapi-thread");
@@ -66,9 +36,9 @@ import java.util.concurrent.ThreadFactory;
      void abortResumableUpload(ResumableUploadRequest request)  {
         setCRC64(request);
 
-        if (!OSSUtils.isEmptyString(request.getRecordDirectory())) {
-            String uploadFilePath = request.getUploadFilePath();
-            String fileMd5 = null;
+        if (request.getRecordDirectory().notNullOrEmpty) {
+            String? uploadFilePath = request.getUploadFilePath();
+            String? fileMd5;
             if (uploadFilePath != null) {
                 fileMd5 = BinaryUtil.calculateMd5Str(uploadFilePath);
             } else {
