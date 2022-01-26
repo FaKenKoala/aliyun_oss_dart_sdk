@@ -1,53 +1,49 @@
+import 'package:aliyun_oss_dart_sdk/src/common/utils/crc64.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/oss_utils.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/http_message.dart';
+import 'package:crypto/crypto.dart';
 
- class CheckCRC64DownloadInputStream extends CheckedInputStream {
+class CheckCRC64DownloadInputStream extends CheckedInputStream {
+  int totalBytesRead;
+  int totalLength;
+  int serverCRC64;
+  String requestId;
+  int _clientCRC64 = 0;
 
-     int mTotalBytesRead;
-     int mTotalLength;
-     int mServerCRC64;
-     String mRequestId;
-     int mClientCRC64;
+  CheckCRC64DownloadInputStream(InputStream inStream, Checksum csum,
+      this.totalLength, this.serverCRC64, this.requestId)
+      : super(inStream, csum);
 
-    /**
-     * Constructs a {@code CheckedInputStream} on {@code InputStream}
-     * {@code is}. The checksum will be calculated using the algorithm
-     * implemented by {@code csum}.
-     * <p>
-     * <p><strong>Warning:</strong> passing a null source creates an invalid
-     * {@code CheckedInputStream}. All operations on such a stream will fail.
-     *
-     * @param is   the input stream to calculate checksum from.
-     * @param csum
-     */
-     CheckCRC64DownloadInputStream(InputStream is, Checksum csum, int total, int serverCRC64, String requestId) {
-        super(is, csum);
-        this.mTotalLength = total;
-        this.mServerCRC64 = serverCRC64;
-        this.mRequestId = requestId;
+  @override
+  int read() {
+    int read = super.read();
+    Checksum
+    checkCRC64(read);
+    return read;
+  }
+
+  @override
+  int read(List<int> buffer, int byteOffset, int byteCount) {
+    int read = super.read(buffer, byteOffset, byteCount);
+    checkCRC64(read);
+    return read;
+  }
+
+  void checkCRC64(int byteRead) {
+    totalBytesRead += byteRead;
+    if (totalBytesRead >= totalLength) {
+      _clientCRC64 = getChecksum().getValue();
+      OSSUtils.checkChecksum(_clientCRC64, serverCRC64, requestId);
     }
+  }
 
-    @override
-     int read()  {
-        int read = super.read();
-        checkCRC64(read);
-        return read;
-    }
+  int get clientCRC64 {
+    return _clientCRC64;
+  }
+}
 
-    @override
-     int read(List<int> buffer, int byteOffset, int byteCount)  {
-        int read = super.read(buffer, byteOffset, byteCount);
-        checkCRC64(read);
-        return read;
-    }
-
-     void checkCRC64(int byteRead)  {
-        mTotalBytesRead += byteRead;
-        if (mTotalBytesRead >= mTotalLength) {
-            this.mClientCRC64 = getChecksum().getValue();
-            OSSUtils.checkChecksum(mClientCRC64, mServerCRC64, mRequestId);
-        }
-    }
-
-     int getClientCRC64() {
-        return mClientCRC64;
-    }
+class CheckedInputStream extends InputStream {
+  final InputStream inStream;
+  final Checksum checksum;
+  CheckedInputStream(this.inStream, this.checksum);
 }

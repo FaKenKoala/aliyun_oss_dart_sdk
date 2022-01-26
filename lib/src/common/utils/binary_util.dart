@@ -133,9 +133,6 @@ class BinaryUtil {
     }
 
     /// Convert the hash bytes to hex digits string
-    ///
-    /// @param hashBytes
-    /// @return The converted hex digits string
      static String convertHashToString(List<int> hashBytes) {
         String returnVal = "";
         for (int i = 0; i < hashBytes.length; i++) {

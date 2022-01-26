@@ -6,7 +6,7 @@ import 'package:aliyun_oss_dart_sdk/src/common/utils/oss_utils.dart';
 import 'package:aliyun_oss_dart_sdk/src/exception/oss_ioexption.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/copy_object_result.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/delete_multiple_object_result.dart';
-import 'package:aliyun_oss_dart_sdk/src/model/get_bucket_a_c_l_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/get_bucket_acl_result.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/get_bucket_info_result.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/get_bucket_lifecycle_result.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/get_bucket_logging_result.dart';

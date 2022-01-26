@@ -1,15 +1,27 @@
- import 'package:aliyun_oss_dart_sdk/src/common/http_method.dart';
+ import 'dart:convert';
+
+import 'package:aliyun_oss_dart_sdk/src/callback/lib_callback.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/http_method.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/lib_common.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/oss_constants.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/oss_headers.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/date_util.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/lib_utils.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/oss_utils.dart';
 import 'package:aliyun_oss_dart_sdk/src/internal/response_parser.dart';
 import 'package:aliyun_oss_dart_sdk/src/internal/response_parsers.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/oss_request.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/oss_request.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/oss_request.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/oss_request.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/put_object_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/network/lib_network.dart';
+
+import 'lib_internal.dart';
 
 class InternalRequestOperation {
 
@@ -25,17 +37,11 @@ class InternalRequestOperation {
       URI endpoint;
      URI service;
      OkHttpClient innerClient;
-     Context applicationContext;
      OSSCredentialProvider credentialProvider;
      int maxRetryCount = OSSConstants.defaultRetryCount;
      ClientConfiguration conf;
 
-     InternalRequestOperation(Context context, final URI endpoint, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
-        this.applicationContext = context;
-        this.endpoint = endpoint;
-        this.credentialProvider = credentialProvider;
-        this.conf = conf;
-
+     InternalRequestOperation.endpoint(this.endpoint, this.credentialProvider, this.conf) {
         OkHttpClient.Builder builder = OkHttpClient.Builder()
                 .followRedirects(false)
                 .followSslRedirects(false)
@@ -66,17 +72,14 @@ class InternalRequestOperation {
         this.innerClient = builder.build();
     }
 
-     InternalRequestOperation(Context context, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
+     InternalRequestOperation(this.credentialProvider, this.conf) {
         try {
-            service = URI("http://oss.aliyuncs.com");
-            endpoint = URI("http://127.0.0.1"); //构造假的endpoint
+            service = Uri("http://oss.aliyuncs.com");
+            endpoint = Uri("http://127.0.0.1"); //构造假的endpoint
         } catch ( e) {
             throw ArgumentError("Endpoint must be a string like 'http://oss-cn-****.aliyuncs.com'," +
                     "or your cname like 'http://image.cnamedomain.com'!");
         }
-        this.applicationContext = context;
-        this.credentialProvider = credentialProvider;
-        this.conf = conf;
         OkHttpClient.Builder builder = OkHttpClient.Builder()
                 .followRedirects(false)
                 .followSslRedirects(false)
@@ -107,15 +110,15 @@ class InternalRequestOperation {
         this.innerClient = builder.build();
     }
 
-     PutObjectResult syncPutObject(
-            PutObjectRequest request)  {
-        PutObjectResult result = putObject(request, null).getResult();
+     Future<PutObjectResult> syncPutObject(
+            PutObjectRequest request)  async{
+        PutObjectResult result = await putObject(request, null).getResult();
         checkCRC64(request, result);
         return result;
     }
 
      OSSAsyncTask<PutObjectResult> putObject(
-            PutObjectRequest request, final OSSCompletedCallback<PutObjectRequest, PutObjectResult> completedCallback) {
+            PutObjectRequest request, final OSSCompletedCallback<PutObjectRequest, PutObjectResult>? completedCallback) {
         OSSLog.logDebug(" Internal putObject Start ");
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -171,7 +174,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<CreateBucketResult> createBucket(
-            CreateBucketRequest request, OSSCompletedCallback<CreateBucketRequest, CreateBucketResult> completedCallback) {
+            CreateBucketRequest request, OSSCompletedCallback<CreateBucketRequest, CreateBucketResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
@@ -204,7 +207,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<DeleteBucketResult> deleteBucket(
-            DeleteBucketRequest request, OSSCompletedCallback<DeleteBucketRequest, DeleteBucketResult> completedCallback) {
+            DeleteBucketRequest request, OSSCompletedCallback<DeleteBucketRequest, DeleteBucketResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setEndpoint(endpoint);
@@ -221,7 +224,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<GetBucketInfoResult> getBucketInfo(
-            GetBucketInfoRequest request, OSSCompletedCallback<GetBucketInfoRequest, GetBucketInfoResult> completedCallback) {
+            GetBucketInfoRequest request, OSSCompletedCallback<GetBucketInfoRequest, GetBucketInfoResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
         query["bucketInfo"] = "";
@@ -242,7 +245,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<GetBucketACLResult> getBucketACL(
-            GetBucketACLRequest request, OSSCompletedCallback<GetBucketACLRequest, GetBucketACLResult> completedCallback) {
+            GetBucketACLRequest request, OSSCompletedCallback<GetBucketACLRequest, GetBucketACLResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
         query["acl"] = "";
@@ -263,7 +266,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<PutBucketRefererResult> putBucketReferer(
-            PutBucketRefererRequest request, OSSCompletedCallback<PutBucketRefererRequest, PutBucketRefererResult> completedCallback) {
+            PutBucketRefererRequest request, OSSCompletedCallback<PutBucketRefererRequest, PutBucketRefererResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
         query["referer"] = "";
@@ -292,7 +295,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<GetBucketRefererResult> getBucketReferer(
-            GetBucketRefererRequest request, OSSCompletedCallback<GetBucketRefererRequest, GetBucketRefererResult> completedCallback) {
+            GetBucketRefererRequest request, OSSCompletedCallback<GetBucketRefererRequest, GetBucketRefererResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
         query["referer"] = "";
@@ -313,7 +316,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<PutBucketLoggingResult> putBucketLogging(
-            PutBucketLoggingRequest request, OSSCompletedCallback<PutBucketLoggingRequest, PutBucketLoggingResult> completedCallback) {
+            PutBucketLoggingRequest request, OSSCompletedCallback<PutBucketLoggingRequest, PutBucketLoggingResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
         query["logging"] = "";
@@ -342,7 +345,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<GetBucketLoggingResult> getBucketLogging(
-            GetBucketLoggingRequest request, OSSCompletedCallback<GetBucketLoggingRequest, GetBucketLoggingResult> completedCallback) {
+            GetBucketLoggingRequest request, OSSCompletedCallback<GetBucketLoggingRequest, GetBucketLoggingResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
         query["logging"] = "";
@@ -363,7 +366,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<DeleteBucketLoggingResult> deleteBucketLogging(
-            DeleteBucketLoggingRequest request, OSSCompletedCallback<DeleteBucketLoggingRequest, DeleteBucketLoggingResult> completedCallback) {
+            DeleteBucketLoggingRequest request, OSSCompletedCallback<DeleteBucketLoggingRequest, DeleteBucketLoggingResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
         query["logging"] = "";
@@ -384,7 +387,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<PutBucketLifecycleResult> putBucketLifecycle(
-            PutBucketLifecycleRequest request, OSSCompletedCallback<PutBucketLifecycleRequest, PutBucketLifecycleResult> completedCallback) {
+            PutBucketLifecycleRequest request, OSSCompletedCallback<PutBucketLifecycleRequest, PutBucketLifecycleResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
         query["lifecycle"] = "";
@@ -413,7 +416,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<GetBucketLifecycleResult> getBucketLifecycle(
-            GetBucketLifecycleRequest request, OSSCompletedCallback<GetBucketLifecycleRequest, GetBucketLifecycleResult> completedCallback) {
+            GetBucketLifecycleRequest request, OSSCompletedCallback<GetBucketLifecycleRequest, GetBucketLifecycleResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
         query["lifecycle"] = "";
@@ -434,7 +437,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<DeleteBucketLifecycleResult> deleteBucketLifecycle(
-            DeleteBucketLifecycleRequest request, OSSCompletedCallback<DeleteBucketLifecycleRequest, DeleteBucketLifecycleResult> completedCallback) {
+            DeleteBucketLifecycleRequest request, OSSCompletedCallback<DeleteBucketLifecycleRequest, DeleteBucketLifecycleResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
         query["lifecycle"] = "";
@@ -454,9 +457,9 @@ class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     AppendObjectResult syncAppendObject(
+     Future<AppendObjectResult> syncAppendObject(
             AppendObjectRequest request)  {
-        AppendObjectResult result = appendObject(request, null).getResult();
+        AppendObjectResult result = await appendObject(request, null).getResult();
         bool checkCRC = request.getCRC64() == OSSRequest.CRC64Config.YES ? true : false;
         if (request.getInitCRC64() != null && checkCRC) {
             result.setClientCRC(CRC64.combine(request.getInitCRC64(), result.getClientCRC(),
@@ -467,7 +470,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<AppendObjectResult> appendObject(
-            AppendObjectRequest request, final OSSCompletedCallback<AppendObjectRequest, AppendObjectResult> completedCallback) {
+            AppendObjectRequest request, final OSSCompletedCallback<AppendObjectRequest, AppendObjectResult>? completedCallback) {
 
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -520,7 +523,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<HeadObjectResult> headObject(
-            HeadObjectRequest request, OSSCompletedCallback<HeadObjectRequest, HeadObjectResult> completedCallback) {
+            HeadObjectRequest request, OSSCompletedCallback<HeadObjectRequest, HeadObjectResult>? completedCallback) {
 
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -543,7 +546,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<GetObjectResult> getObject(
-            GetObjectRequest request, OSSCompletedCallback<GetObjectRequest, GetObjectResult> completedCallback) {
+            GetObjectRequest request, OSSCompletedCallback<GetObjectRequest, GetObjectResult>? completedCallback) {
 
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -580,7 +583,7 @@ class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     OSSAsyncTask<GetObjectACLResult> getObjectACL(GetObjectACLRequest request, OSSCompletedCallback<GetObjectACLRequest, GetObjectACLResult> completedCallback) {
+     OSSAsyncTask<GetObjectACLResult> getObjectACL(GetObjectACLRequest request, OSSCompletedCallback<GetObjectACLRequest, GetObjectACLResult>? completedCallback) {
 
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
@@ -607,7 +610,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<CopyObjectResult> copyObject(
-            CopyObjectRequest request, OSSCompletedCallback<CopyObjectRequest, CopyObjectResult> completedCallback) {
+            CopyObjectRequest request, OSSCompletedCallback<CopyObjectRequest, CopyObjectResult>? completedCallback) {
 
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -632,7 +635,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<DeleteObjectResult> deleteObject(
-            DeleteObjectRequest request, OSSCompletedCallback<DeleteObjectRequest, DeleteObjectResult> completedCallback) {
+            DeleteObjectRequest request, OSSCompletedCallback<DeleteObjectRequest, DeleteObjectResult>? completedCallback) {
 
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -655,7 +658,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<DeleteMultipleObjectResult> deleteMultipleObject(
-            DeleteMultipleObjectRequest request, OSSCompletedCallback<DeleteMultipleObjectRequest, DeleteMultipleObjectResult> completedCallback) {
+            DeleteMultipleObjectRequest request, OSSCompletedCallback<DeleteMultipleObjectRequest, DeleteMultipleObjectResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
         query["delete"] = "";
@@ -691,7 +694,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<ListBucketsResult> listBuckets(
-            ListBucketsRequest request, OSSCompletedCallback<ListBucketsRequest, ListBucketsResult> completedCallback) {
+            ListBucketsRequest request, OSSCompletedCallback<ListBucketsRequest, ListBucketsResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
         requestMessage.setMethod(HttpMethod.GET);
@@ -712,7 +715,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<ListObjectsResult> listObjects(
-            ListObjectsRequest request, OSSCompletedCallback<ListObjectsRequest, ListObjectsResult> completedCallback) {
+            ListObjectsRequest request, OSSCompletedCallback<ListObjectsRequest, ListObjectsResult>? completedCallback) {
 
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -736,7 +739,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<InitiateMultipartUploadResult> initMultipartUpload(
-            InitiateMultipartUploadRequest request, OSSCompletedCallback<InitiateMultipartUploadRequest, InitiateMultipartUploadResult> completedCallback) {
+            InitiateMultipartUploadRequest request, OSSCompletedCallback<InitiateMultipartUploadRequest, InitiateMultipartUploadResult>? completedCallback) {
 
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -765,15 +768,15 @@ class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     UploadPartResult syncUploadPart(
-            UploadPartRequest request)  {
-        UploadPartResult result = uploadPart(request, null).getResult();
+     Future<UploadPartResult> syncUploadPart(
+            UploadPartRequest request)  async{
+        UploadPartResult result = await uploadPart(request, null).getResult();
         checkCRC64(request, result);
         return result;
     }
 
      OSSAsyncTask<UploadPartResult> uploadPart(
-            UploadPartRequest request, final OSSCompletedCallback<UploadPartRequest, UploadPartResult> completedCallback) {
+            UploadPartRequest request, final OSSCompletedCallback<UploadPartRequest, UploadPartResult>? completedCallback) {
 
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -813,9 +816,9 @@ class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     CompleteMultipartUploadResult syncCompleteMultipartUpload(
-            CompleteMultipartUploadRequest request)  {
-        CompleteMultipartUploadResult result = completeMultipartUpload(request, null).getResult();
+     Future<CompleteMultipartUploadResult> syncCompleteMultipartUpload(
+            CompleteMultipartUploadRequest request) async {
+        CompleteMultipartUploadResult result = await completeMultipartUpload(request, null).getResult();
         if (result.getServerCRC() != null) {
             int crc64 = calcObjectCRCFromParts(request.getPartETags());
             result.setClientCRC(crc64);
@@ -825,7 +828,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<CompleteMultipartUploadResult> completeMultipartUpload(
-            CompleteMultipartUploadRequest request, final OSSCompletedCallback<CompleteMultipartUploadRequest, CompleteMultipartUploadResult> completedCallback) {
+            CompleteMultipartUploadRequest request, final OSSCompletedCallback<CompleteMultipartUploadRequest, CompleteMultipartUploadResult>? completedCallback) {
 
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -874,7 +877,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<AbortMultipartUploadResult> abortMultipartUpload(
-            AbortMultipartUploadRequest request, OSSCompletedCallback<AbortMultipartUploadRequest, AbortMultipartUploadResult> completedCallback) {
+            AbortMultipartUploadRequest request, OSSCompletedCallback<AbortMultipartUploadRequest, AbortMultipartUploadResult>? completedCallback) {
 
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -899,7 +902,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<ListPartsResult> listParts(
-            ListPartsRequest request, OSSCompletedCallback<ListPartsRequest, ListPartsResult> completedCallback) {
+            ListPartsRequest request, OSSCompletedCallback<ListPartsRequest, ListPartsResult>? completedCallback) {
 
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -940,7 +943,7 @@ class InternalRequestOperation {
     }
 
      OSSAsyncTask<ListMultipartUploadsResult> listMultipartUploads(
-            ListMultipartUploadsRequest request, OSSCompletedCallback<ListMultipartUploadsRequest, ListMultipartUploadsResult> completedCallback) {
+            ListMultipartUploadsRequest request, OSSCompletedCallback<ListMultipartUploadsRequest, ListMultipartUploadsResult>? completedCallback) {
 
         RequestMessage requestMessage = RequestMessage();
         requestMessage.setIsAuthorizationRequired(request.isAuthorizationRequired());
@@ -997,15 +1000,15 @@ return proxyHost.nullOrEmpty;
      void canonicalizeRequestMessage(RequestMessage message, OSSRequest request) {
         Map<String, String> header = message.getHeaders();
 
-        if (header.get(OSSHeaders.DATE) == null) {
-            header[OSSHeaders.DATE] = DateUtil.currentFixedSkewedTimeInRFC822Format();
+        if (header[HttpHeaders.date] == null) {
+            header[HttpHeaders.date] = DateUtil.currentFixedSkewedTimeInRFC822Format();
         }
 
         if (message.getMethod() == HttpMethod.post || message.getMethod() == HttpMethod.put) {
-            if (OSSUtils.isEmptyString(header.get(OSSHeaders.CONTENT_TYPE))) {
+            if (header[HttpHeaders.contentType].nullOrEmpty) {
                 String determineContentType = OSSUtils.determineContentType(null,
                         message.getUploadFilePath(), message.getObjectKey());
-                header[OSSHeaders.CONTENT_TYPE] = determineContentType;
+                header[HttpHeaders.contentType] = determineContentType;
             }
         }
 
@@ -1018,9 +1021,9 @@ return proxyHost.nullOrEmpty;
         // set ip with header
         message.setIpWithHeader(conf.getIpWithHeader());
 
-        message.getHeaders()[HttpHeaders.USER_AGENT] = VersionInfoUtils.getUserAgent(conf.getCustomUserMark());
+        message.getHeaders()[HttpHeaders.userAgent] = VersionInfoUtils.getUserAgent(conf.getCustomUserMark());
 
-        if (message.getHeaders().containsKey(OSSHeaders.RANGE) || message.getParameters().containsKey(RequestParameters.X_OSS_PROCESS)) {
+        if (message.getHeaders().containsKey(HttpHeaders.range) || message.getParameters().containsKey(RequestParameters.xOSSProcess)) {
             //if contain range or x-oss-process , then don't crc64
             message.setCheckCRC64(false);
         }
@@ -1038,7 +1041,7 @@ return proxyHost.nullOrEmpty;
         this.credentialProvider = credentialProvider;
     }
 
-     <Request extends OSSRequest, Result extends OSSResult> void checkCRC64(Request request
+      void checkCRC64<Request extends OSSRequest, Result extends OSSResult>(Request request
             , Result result)  {
         if (request.getCRC64() == OSSRequest.CRC64Config.YES ? true : false) {
             try {
@@ -1066,10 +1069,10 @@ return proxyHost.nullOrEmpty;
      int calcObjectCRCFromParts(List<PartETag> partETags) {
         int crc = 0;
         for (PartETag partETag : partETags) {
-            if (partETag.getCRC64() == 0 || partETag.getPartSize() <= 0) {
+            if (partETag.crc64 == 0 || partETag.partSize <= 0) {
                 return 0;
             }
-            crc = CRC64.combine(crc, partETag.getCRC64(), partETag.getPartSize());
+            crc = CRC64.combine(crc, partETag.crc64, partETag.partSize);
         }
         return crc;
     }
@@ -1082,22 +1085,22 @@ return proxyHost.nullOrEmpty;
         return conf;
     }
 
-     OSSAsyncTask<TriggerCallbackResult> triggerCallback(TriggerCallbackRequest request, OSSCompletedCallback<TriggerCallbackRequest, TriggerCallbackResult> completedCallback) {
+     OSSAsyncTask<TriggerCallbackResult> triggerCallback(TriggerCallbackRequest request, OSSCompletedCallback<TriggerCallbackRequest, TriggerCallbackResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
-        Map<String, String> query = LinkedHashMap<String, String>();
-        query[RequestParameters.X_OSS_PROCESS] = "";
+        Map<String, String> query = <String, String>{};
+        query[RequestParameters.xOSSProcess] = "";
 
-        requestMessage.setEndpoint(endpoint);
-        requestMessage.setMethod(HttpMethod.POST);
-        requestMessage.setBucketName(request.getBucketName());
-        requestMessage.setObjectKey(request.getObjectKey());
-        requestMessage.setParameters(query);
+        requestMessage..endpoint = endpoint
+        ..method = HttpMethod.post
+        ..bucketName = request.bucketName
+        ..objectKey = request.objectKey
+        ..parameters = query;
 
         String bodyString = OSSUtils.buildTriggerCallbackBody(request.getCallbackParam(), request.getCallbackVars());
-        requestMessage.setStringBody(bodyString);
+        requestMessage.stringBody = bodyString;
 
-        String md5String = BinaryUtil.calculateBase64Md5(bodyString.getBytes());
-        requestMessage.getHeaders()[HttpHeaders.CONTENT_MD5] = md5String;
+        String md5String = BinaryUtil.calculateBase64Md5(utf8.encode(bodyString));
+        requestMessage.headers[HttpHeaders.contentMd5] = md5String;
 
         canonicalizeRequestMessage(requestMessage, request);
         ExecutionContext<TriggerCallbackRequest, TriggerCallbackResult> executionContext = ExecutionContext(getInnerClient(), request, applicationContext);
@@ -1109,11 +1112,11 @@ return proxyHost.nullOrEmpty;
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     TriggerCallbackResult asyncTriggerCallback(TriggerCallbackRequest request)  {
+     Future<TriggerCallbackResult> asyncTriggerCallback(TriggerCallbackRequest request)  {
         return triggerCallback(request, null).getResult();
     }
 
-     OSSAsyncTask<ImagePersistResult> imageActionPersist(ImagePersistRequest request, OSSCompletedCallback<ImagePersistRequest, ImagePersistResult> completedCallback) {
+     OSSAsyncTask<ImagePersistResult> imageActionPersist(ImagePersistRequest request, OSSCompletedCallback<ImagePersistRequest, ImagePersistResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
         query[RequestParameters.X_OSS_PROCESS] = "";
@@ -1137,13 +1140,12 @@ return proxyHost.nullOrEmpty;
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     PutSymlinkResult syncPutSymlink(PutSymlinkRequest request)  {
+     Future<PutSymlinkResult> syncPutSymlink(PutSymlinkRequest request)  {
         return putSymlink(request, null).getResult();
     }
 
-    ;
 
-     OSSAsyncTask<PutSymlinkResult> putSymlink(PutSymlinkRequest request, OSSCompletedCallback<PutSymlinkRequest, PutSymlinkResult> completedCallback) {
+     OSSAsyncTask<PutSymlinkResult> putSymlink(PutSymlinkRequest request, OSSCompletedCallback<PutSymlinkRequest, PutSymlinkResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
         query[RequestParameters.X_OSS_SYMLINK] = "";
@@ -1171,11 +1173,11 @@ return proxyHost.nullOrEmpty;
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     GetSymlinkResult syncGetSymlink(GetSymlinkRequest request)  {
+     Future<GetSymlinkResult> syncGetSymlink(GetSymlinkRequest request)  {
         return getSymlink(request, null).getResult();
     }
 
-     OSSAsyncTask<GetSymlinkResult> getSymlink(GetSymlinkRequest request, OSSCompletedCallback<GetSymlinkRequest, GetSymlinkResult> completedCallback) {
+     OSSAsyncTask<GetSymlinkResult> getSymlink(GetSymlinkRequest request, OSSCompletedCallback<GetSymlinkRequest, GetSymlinkResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
         query[RequestParameters.X_OSS_SYMLINK] = "";
@@ -1196,11 +1198,11 @@ return proxyHost.nullOrEmpty;
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     RestoreObjectResult syncRestoreObject(RestoreObjectRequest request)  {
+     Future<RestoreObjectResult> syncRestoreObject(RestoreObjectRequest request)  {
         return restoreObject(request, null).getResult();
     }
 
-     OSSAsyncTask<RestoreObjectResult> restoreObject(RestoreObjectRequest request, OSSCompletedCallback<RestoreObjectRequest, RestoreObjectResult> completedCallback) {
+     OSSAsyncTask<RestoreObjectResult> restoreObject(RestoreObjectRequest request, OSSCompletedCallback<RestoreObjectRequest, RestoreObjectResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = LinkedHashMap<String, String>();
         query[RequestParameters.X_OSS_RESTORE] = "";

@@ -1,16 +1,7 @@
  import 'dart:convert';
 
-import 'package:aliyun_oss_dart_sdk/src/common/auth/hmac_sha1_signature.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/auth/oss_credential_provider.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/auth/oss_federation_credential_provider.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/auth/oss_federation_token.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/oss_constants.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
-import 'package:aliyun_oss_dart_sdk/src/internal/request_message.dart';
-import 'package:aliyun_oss_dart_sdk/src/model/copy_object_request.dart';
-
-import 'http_util.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/lib_common.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
 
 class OSSUtils {
 
@@ -28,95 +19,63 @@ class OSSUtils {
      ];
 
     /// Populate metadata to headers.
-     static void populateRequestMetadata(Map<String, String> headers, ObjectMetadata metadata) {
+     static void populateRequestMetadata(Map<String, String> headers, ObjectMetadata? metadata) {
         if (metadata == null) {
             return;
         }
 
         Map<String, Object> rawMetadata = metadata.getRawMetadata();
-        if (rawMetadata != null) {
-            for (Map.Entry<String, Object> entry : rawMetadata.entrySet()) {
-                headers[entry.getKey()] = entry.getValue().toString();
-            }
-        }
+        rawMetadata.forEach((key, value) { 
+          headers[key] = value.toString();
+        });
 
         Map<String, String> userMetadata = metadata.getUserMetadata();
-        if (userMetadata != null) {
-            for (Map.Entry<String, String> entry : userMetadata.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                if (key != null) key = key.trim();
-                if (value != null) value = value.trim();
-                headers[key] = value;
-            }
-        }
+        userMetadata.forEach((key, value) { 
+          headers[key.trim()] = value.trim();
+        });
     }
 
      static void populateListBucketRequestParameters(ListBucketsRequest listBucketsRequest,
                                                            Map<String, String> params) {
-        if (listBucketsRequest.getPrefix() != null) {
-            params[PREFIX] = listBucketsRequest.getPrefix();
-        }
 
-        if (listBucketsRequest.getMarker() != null) {
-            params[MARKER] = listBucketsRequest.getMarker();
-        }
+        listBucketsRequest.prefix.apply((str) => params[RequestParameters.prefix] = str);
 
-        if (listBucketsRequest.getMaxKeys() != null) {
-            params[MAXKEYS] = Integer.toString(listBucketsRequest.getMaxKeys());
-        }
+        listBucketsRequest.marker.apply((str) => params[RequestParameters.marker] = str);
+
+        listBucketsRequest.maxKeys.apply((str) => params[RequestParameters.maxKeys] = str.toString());
     }
 
      static void populateListObjectsRequestParameters(ListObjectsRequest listObjectsRequest,
                                                             Map<String, String> params) {
 
-        if (listObjectsRequest.getPrefix() != null) {
-            params[PREFIX] = listObjectsRequest.getPrefix();
-        }
+        listObjectsRequest.prefix.apply((str) => params[RequestParameters.prefix] = str);
 
-        if (listObjectsRequest.getMarker() != null) {
-            params[MARKER] = listObjectsRequest.getMarker();
-        }
+        listObjectsRequest.marker.apply((str) => params[RequestParameters.marker] = str);
 
-        if (listObjectsRequest.getDelimiter() != null) {
-            params[DELIMITER] = listObjectsRequest.getDelimiter();
-        }
+        listObjectsRequest.delimiter.apply((str) => params[RequestParameters.delimiter] = str);
 
-        if (listObjectsRequest.getMaxKeys() != null) {
-            params[MAXKEYS] = Integer.toString(listObjectsRequest.getMaxKeys());
-        }
+        listObjectsRequest.maxKeys.apply((str) => params[RequestParameters.maxKeys] = str.toString());
 
-        if (listObjectsRequest.getEncodingType() != null) {
-            params[ENCODINGTYPE] = listObjectsRequest.getEncodingType();
-        }
+        listObjectsRequest.encodingType.apply((str) => params[RequestParameters.encodingType] = str);
     }
 
      static void populateListMultipartUploadsRequestParameters(ListMultipartUploadsRequest request,
                                                                      Map<String, String> params) {
 
-        if (request.getDelimiter() != null) {
-            params[DELIMITER] = request.getDelimiter();
-        }
+        request.delimiter.apply((str) => params[RequestParameters.delimiter] = str);
 
-        if (request.getMaxUploads() != null) {
-            params[MAXUPLOADS] = Integer.toString(request.getMaxUploads());
-        }
+request.maxUploads.apply((str) => params[RequestParameters.maxUploads] = str.toString());
 
-        if (request.getKeyMarker() != null) {
-            params[KEYMARKER] = request.getKeyMarker();
-        }
 
-        if (request.getPrefix() != null) {
-            params[PREFIX] = request.getPrefix();
-        }
+request.keyMarker.apply((str) => params[RequestParameters.keyMarker] = str);
 
-        if (request.getUploadIdMarker() != null) {
-            params[UPLOADIDMARKER] = request.getUploadIdMarker();
-        }
 
-        if (request.getEncodingType() != null) {
-            params[ENCODINGTYPE] = request.getEncodingType();
-        }
+request.prefix.apply((str) => params[RequestParameters.prefix] = str);
+
+request.uploadIdMarker.apply((str) => params[RequestParameters.uploadIdMarker] = str);
+
+request.encodingType.apply((str) => params[RequestParameters.encodingType] = str);
+
     }
 
      static bool checkParamRange(int param, int from, bool leftInclusive,
@@ -169,12 +128,12 @@ class OSSUtils {
                 copyObjectRequest.getNonmatchingEtagConstraints());
 
         addHeader(headers,
-                OSSHeaders.OSSSERVERSIDEENCRYPTION,
-                copyObjectRequest.getServerSideEncryption());
+                OSSHeaders.ossServerSideEncryption,
+                copyObjectRequest.serverSideEncryption);
 
-        ObjectMetadata newObjectMetadata = copyObjectRequest.getNewObjectMetadata();
+        ObjectMetadata? newObjectMetadata = copyObjectRequest.newObjectMetadata;
         if (newObjectMetadata != null) {
-            headers[OSSHeaders.COPYOBJECTMETADATADIRECTIVE] = MetadataDirective.REPLACE.toString();
+            headers[OSSHeaders.copyObjectMetadataDirective] = MetadataDirective.REPLACE.toString();
             populateRequestMetadata(headers, newObjectMetadata);
         }
 
@@ -195,26 +154,26 @@ class OSSUtils {
         return builder.toString();
     }
 
-     static void addHeader(Map<String, String> headers, String header, String value) {
+     static void addHeader(Map<String, String> headers, String header, String? value) {
         if (value != null) {
             headers[header] = value;
         }
     }
 
-     static void addDateHeader(Map<String, String> headers, String header, Date value) {
+     static void addDateHeader(Map<String, String> headers, String header, DateTime? value) {
         if (value != null) {
             headers[header] = DateUtil.formatRfc822Date(value);
         }
     }
 
      static void addStringListHeader(Map<String, String> headers, String header,
-                                           List<String> values) {
-        if (values != null && !values.isEmpty()) {
+                                           List<String>? values) {
+        if (values != null && values.isNotEmpty) {
             headers[header] = join(values);
         }
     }
 
-     static void removeHeader(Map<String, String> headers, String header) {
+     static void removeHeader(Map<String, String> headers, String? header) {
         if (header != null && headers.containsKey(header)) {
             headers.remove(header);
         }
@@ -224,7 +183,7 @@ class OSSUtils {
         StringBuffer result = StringBuffer();
 
         bool first = true;
-        for (String s : strings) {
+        for (String s in strings) {
             if (!first) result.write(", ");
 
             result.write(s);

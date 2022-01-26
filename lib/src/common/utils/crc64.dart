@@ -1,15 +1,11 @@
-package com.alibaba.sdk.android.oss.common.utils;
+import 'package:crclib/catalog.dart';
 
-import java.util.zip.Checksum;
-
-/**
- * CRC-64 implementation with ability to combine checksums calculated over different blocks of data.
- * Standard ECMA-182, http://www.ecma-international.org/ations/standards/Ecma-182.htm
- */
+/// CRC-64 implementation with ability to combine checksums calculated over different blocks of data.
+/// Standard ECMA-182, http://www.ecma-international.org/ations/standards/Ecma-182.htm
  class CRC64 implements Checksum {
 
      final static int POLY = (int) 0xc96c5795d7870f42L; // ECMA-182
-
+    Crc64Ecma182 crc64ecma182;
     /* CRC64 calculation table. */
      final static int[][] table;
     // dimension of GF(2) vectors (length of CRC)
@@ -43,9 +39,7 @@ import java.util.zip.Checksum;
     /* Current CRC value. */
      int value;
 
-    /**
-     * Initialize with a value of zero.
-     */
+    /// Initialize with a value of zero.
      CRC64() {
         this.value = 0;
     }
@@ -126,9 +120,7 @@ import java.util.zip.Checksum;
         return crc1;
     }
 
-    /**
-     * Get int representation of current CRC64 value.
-     */
+    /// Get int representation of current CRC64 value.
      int getValue() {
         return this.value;
     }
@@ -145,9 +137,7 @@ import java.util.zip.Checksum;
         update(b, b.length);
     }
 
-    /**
-     * Update CRC64 with byte block.
-     */
+    /// Update CRC64 with byte block.
      void update(List<int> b, int len) {
         update(b, 0, len);
     }

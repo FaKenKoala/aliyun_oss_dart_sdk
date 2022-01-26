@@ -1,4 +1,13 @@
- class OSSRequestTask<T extends OSSResult> implements Callable<T> {
+ import 'package:aliyun_oss_dart_sdk/src/internal/oss_retry_handler.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/request_message.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/response_message.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/response_parser.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/oss_result.dart';
+import 'package:http/http.dart';
+
+import 'execution_context.dart';
+
+class OSSRequestTask<T extends OSSResult> implements Callable<T> {
 
      ResponseParser<T> responseParser;
 
@@ -241,17 +250,15 @@
 
      ResponseMessage buildResponseMessage(RequestMessage request, Response response) {
         ResponseMessage responseMessage = ResponseMessage();
-        responseMessage.setRequest(request);
-        responseMessage.setResponse(response);
-        Map<String, String> headers = HashMap<String, String>();
-        Headers responseHeaders = response.headers();
-        for (int i = 0; i < responseHeaders.size(); i++) {
-            headers[responseHeaders.name(i)] = responseHeaders.value(i);
-        }
-        responseMessage.setHeaders(headers);
-        responseMessage.setStatusCode(response.code());
-        responseMessage.setContentLength(response.body().contentLength());
-        responseMessage.setContent(response.body().byteStream());
+        responseMessage.request = request;
+        responseMessage.response  = response;
+        Map<String, String> headers = <String, String>{};
+        headers.addAll(response.headers);
+
+        responseMessage.headers = headers;
+        responseMessage.statusCode  = response.statusCode;
+        responseMessage.contentLength = response.contentLength ?? -1;
+        responseMessage.content = response.body;
         return responseMessage;
     }
 }

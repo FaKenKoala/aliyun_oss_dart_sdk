@@ -9,6 +9,7 @@ import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/oss_utils.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/abort_multipart_upload_request.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/head_object_request.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/oss_request.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/resumable_upload_request.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/resumable_upload_result.dart';
@@ -98,7 +99,7 @@ class ExtensionRequestOperation {
 
      OSSAsyncTask<ResumableUploadResult> resumableUpload(
             ResumableUploadRequest request, OSSCompletedCallback<ResumableUploadRequest
-            , ResumableUploadResult> completedCallback) {
+            , ResumableUploadResult>? completedCallback) {
         setCRC64(request);
         ExecutionContext<ResumableUploadRequest, ResumableUploadResult> executionContext =
                 ExecutionContext(apiOperation.getInnerClient(), request, apiOperation.getApplicationContext());
@@ -109,7 +110,7 @@ class ExtensionRequestOperation {
 
      OSSAsyncTask<ResumableUploadResult> sequenceUpload(
             ResumableUploadRequest request, OSSCompletedCallback<ResumableUploadRequest
-            , ResumableUploadResult> completedCallback) {
+            , ResumableUploadResult>? completedCallback) {
         setCRC64(request);
         ExecutionContext<ResumableUploadRequest, ResumableUploadResult> executionContext =
                 ExecutionContext(apiOperation.getInnerClient(), request, apiOperation.getApplicationContext());
@@ -123,7 +124,7 @@ class ExtensionRequestOperation {
 
      OSSAsyncTask<CompleteMultipartUploadResult> multipartUpload(MultipartUploadRequest request
             , OSSCompletedCallback<MultipartUploadRequest
-            , CompleteMultipartUploadResult> completedCallback) {
+            , CompleteMultipartUploadResult>? completedCallback) {
         setCRC64(request);
         ExecutionContext<MultipartUploadRequest, CompleteMultipartUploadResult> executionContext =
                 ExecutionContext(apiOperation.getInnerClient(), request, apiOperation.getApplicationContext());
@@ -133,7 +134,7 @@ class ExtensionRequestOperation {
     }
 
      OSSAsyncTask<ResumableDownloadResult> resumableDownload(ResumableDownloadRequest request,
-                                                                   OSSCompletedCallback<ResumableDownloadRequest, ResumableDownloadResult> completedCallback) {
+                                                                   OSSCompletedCallback<ResumableDownloadRequest, ResumableDownloadResult>? completedCallback) {
         ExecutionContext<ResumableDownloadRequest, ResumableDownloadResult> executionContext =
                 ExecutionContext(apiOperation.getInnerClient(), request, apiOperation.getApplicationContext());
         return OSSAsyncTask.wrapRequestTask(executorService.submit(ResumableDownloadTask(apiOperation, request, completedCallback, executionContext)), executionContext);

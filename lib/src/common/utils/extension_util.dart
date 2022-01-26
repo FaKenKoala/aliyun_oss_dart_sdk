@@ -12,3 +12,11 @@ extension StringNullX on String? {
     return this?.toLowerCase() == match.toLowerCase();
   }
 }
+
+extension IntNullX on int? {
+  apply(Function(int str) func) {
+    if (this != null) {
+      func(this!);
+    }
+  }
+}

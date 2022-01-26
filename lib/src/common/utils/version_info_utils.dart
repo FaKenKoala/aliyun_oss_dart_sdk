@@ -1,8 +1,5 @@
-import 'package:aliyun_oss_dart_sdk/src/common/oss_constants.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
 
-import 'http_util.dart';
-import 'oss_utils.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/lib_common.dart';
 
 class VersionInfoUtils {
   static String? userAgent;
@@ -11,11 +8,11 @@ class VersionInfoUtils {
      * UA sample : aliyun-sdk-java/2.0.5(Windows 7/6.1/amd64;1.7.0_55)/oss-import
      */
   static String getUserAgent(String? customInfo) {
-    if (OSSUtils.isEmptyString(userAgent)) {
+    if (customInfo.nullOrEmpty) {
       userAgent = "aliyun-sdk-dart/" + getVersion() + getSystemInfo();
     }
 
-    if (OSSUtils.isEmptyString(customInfo)) {
+    if (customInfo.nullOrEmpty) {
       return userAgent!;
     } else {
       return "$userAgent/$customInfo";
@@ -41,7 +38,8 @@ class VersionInfoUtils {
     customUA.write(")");
     String ua = customUA.toString();
     OSSLog.logDebug("user agent : " + ua);
-    if (OSSUtils.isEmptyString(ua)) {
+
+    if (ua.nullOrEmpty) {
       String propertyUA = deviceInfo.httpAgent;
       ua = propertyUA.replaceAll("[^\\p{ASCII}]", "?");
     }
