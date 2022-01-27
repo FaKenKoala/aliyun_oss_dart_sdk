@@ -6,6 +6,7 @@ import 'package:aliyun_oss_dart_sdk/src/exception/inconsistent_exception.dart';
 import 'package:aliyun_oss_dart_sdk/src/exception/oss_ioexption.dart';
 import 'package:aliyun_oss_dart_sdk/src/internal/lib_internal.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
+import 'package:mime/mime.dart' as mime;
 
 class OSSUtils {
   static final String _newLine = "\n";
@@ -528,19 +529,17 @@ class OSSUtils {
       return initValue;
     }
 
-    MimeTypeMap typeMap = MimeTypeMap.getSingleton();
     if (srcPath != null) {
-      String extension = srcPath.substring(srcPath.lastIndexOf('.') + 1);
-      String? contentType = typeMap.getMimeTypeFromExtension(extension);
+      // String extension = srcPath.substring(srcPath.lastIndexOf('.') + 1);
+      String? contentType = mime.lookupMimeType(srcPath);
       if (contentType != null) {
         return contentType;
       }
     }
 
     if (toObjectKey != null) {
-      String extension =
-          toObjectKey.substring(toObjectKey.lastIndexOf('.') + 1);
-      String? contentType = typeMap.getMimeTypeFromExtension(extension);
+      // String extension = toObjectKey.substring(toObjectKey.lastIndexOf('.') + 1);
+      String? contentType = mime.lookupMimeType(toObjectKey);
       if (contentType != null) {
         return contentType;
       }

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 void main() {
-  Map<String, String> map = {'hello': 'world'};
+  Map<String, String> map = {};
   final mapStr = jsonEncode(map);
   print(mapStr);
 
