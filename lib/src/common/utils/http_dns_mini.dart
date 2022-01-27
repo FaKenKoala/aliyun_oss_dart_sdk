@@ -1,5 +1,4 @@
  import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/utils/date_util.dart';
 
  final String _tag = "HttpDnsMini";
       final String _serverIP = "203.107.1.1";
@@ -118,6 +117,7 @@ class HttpdnsMini {
                         inStream.close();
                     }
                 } catch ( e) {
+                  /// 
                 }
             }
             if (!hasRetryed) {

@@ -1,92 +1,92 @@
 
  class IOUtils {
 
-     final static int BUFFER_SIZE = 4 * 1024;
+    //  final static int BUFFER_SIZE = 4 * 1024;
 
-     static String readStreamAsString(InputStream in, String charset)
-             {
-        if (in == null)
-            return "";
+    //  static String readStreamAsString(InputStream in, String charset)
+    //          {
+    //     if (in == null)
+    //         return "";
 
-        Reader reader = null;
-        Writer writer = StringWriter();
-        String result;
+    //     Reader reader = null;
+    //     Writer writer = StringWriter();
+    //     String result;
 
-        char[] buffer = char[BUFFER_SIZE];
-        try {
-            reader = BufferedReader(
-                    InputStreamReader(in, charset));
+    //     char[] buffer = char[BUFFER_SIZE];
+    //     try {
+    //         reader = BufferedReader(
+    //                 InputStreamReader(in, charset));
 
-            int n;
-            while ((n = reader.read(buffer)) > 0) {
-                writer.write(buffer, 0, n);
-            }
+    //         int n;
+    //         while ((n = reader.read(buffer)) > 0) {
+    //             writer.write(buffer, 0, n);
+    //         }
 
-            result = writer.toString();
-        } finally {
-            safeClose(in);
-            if (reader != null) {
-                reader.close();
-            }
-            if (writer != null) {
-                writer.close();
-            }
-        }
+    //         result = writer.toString();
+    //     } finally {
+    //         safeClose(in);
+    //         if (reader != null) {
+    //             reader.close();
+    //         }
+    //         if (writer != null) {
+    //             writer.close();
+    //         }
+    //     }
 
-        return result;
-    }
+    //     return result;
+    // }
 
-     static List<int> readStreamAsBytesArray(InputStream in)
-             {
-        if (in == null) {
-            return byte[0];
-        }
+    //  static List<int> readStreamAsBytesArray(InputStream in)
+    //          {
+    //     if (in == null) {
+    //         return byte[0];
+    //     }
 
-        ByteArrayOutputStream output = ByteArrayOutputStream();
-        List<int> buffer = byte[BUFFER_SIZE];
-        int len;
-        while ((len = in.read(buffer)) > -1) {
-            output.write(buffer, 0, len);
-        }
-        output.flush();
-        safeClose(output);
-        return output.toByteArray();
-    }
+    //     ByteArrayOutputStream output = ByteArrayOutputStream();
+    //     List<int> buffer = byte[BUFFER_SIZE];
+    //     int len;
+    //     while ((len = in.read(buffer)) > -1) {
+    //         output.write(buffer, 0, len);
+    //     }
+    //     output.flush();
+    //     safeClose(output);
+    //     return output.toByteArray();
+    // }
 
-     static List<int> readStreamAsBytesArray(InputStream in, int readLength)
-             {
-        if (in == null) {
-            return byte[0];
-        }
+    //  static List<int> readStreamAsBytesArray(InputStream in, int readLength)
+    //          {
+    //     if (in == null) {
+    //         return byte[0];
+    //     }
 
-        ByteArrayOutputStream output = ByteArrayOutputStream();
-        List<int> buffer = byte[BUFFER_SIZE];
-        int len;
-        int readed = 0;
-        while (readed < readLength && (len = in.read(buffer, 0, Math.min(2048, (int) (readLength - readed)))) > -1) {
-            output.write(buffer, 0, len);
-            readed += len;
-        }
-        output.flush();
-        safeClose(output);
-        return output.toByteArray();
-    }
+    //     ByteArrayOutputStream output = ByteArrayOutputStream();
+    //     List<int> buffer = byte[BUFFER_SIZE];
+    //     int len;
+    //     int readed = 0;
+    //     while (readed < readLength && (len = in.read(buffer, 0, Math.min(2048, (int) (readLength - readed)))) > -1) {
+    //         output.write(buffer, 0, len);
+    //         readed += len;
+    //     }
+    //     output.flush();
+    //     safeClose(output);
+    //     return output.toByteArray();
+    // }
 
-     static void safeClose(InputStream inputStream) {
-        if (inputStream != null) {
-            try {
-                inputStream.close();
-            } catch (OSSIOException e) {
-            }
-        }
-    }
+    //  static void safeClose(InputStream inputStream) {
+    //     if (inputStream != null) {
+    //         try {
+    //             inputStream.close();
+    //         } catch (OSSIOException e) {
+    //         }
+    //     }
+    // }
 
-     static void safeClose(OutputStream outputStream) {
-        if (outputStream != null) {
-            try {
-                outputStream.close();
-            } catch (OSSIOException e) {
-            }
-        }
-    }
+    //  static void safeClose(OutputStream outputStream) {
+    //     if (outputStream != null) {
+    //         try {
+    //             outputStream.close();
+    //         } catch (OSSIOException e) {
+    //         }
+    //     }
+    // }
 }

@@ -17,7 +17,6 @@ class CheckCRC64DownloadInputStream extends CheckedInputStream {
   @override
   int read() {
     int read = super.read();
-    Checksum
     checkCRC64(read);
     return read;
   }
