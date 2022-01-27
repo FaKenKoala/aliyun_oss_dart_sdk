@@ -1,12 +1,13 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:mime/mime.dart' as mime;
+
 import 'package:aliyun_oss_dart_sdk/src/common/lib_common.dart';
 import 'package:aliyun_oss_dart_sdk/src/exception/inconsistent_exception.dart';
-import 'package:aliyun_oss_dart_sdk/src/exception/oss_ioexption.dart';
+import 'package:aliyun_oss_dart_sdk/src/exception/oss_ioexception.dart';
 import 'package:aliyun_oss_dart_sdk/src/internal/lib_internal.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
-import 'package:mime/mime.dart' as mime;
 
 class OSSUtils {
   static final String _newLine = "\n";
@@ -46,7 +47,7 @@ class OSSUtils {
       return;
     }
 
-    Map<String, Object> rawMetadata = metadata.getRawMetadata();
+    Map<String, Object?> rawMetadata = metadata.getRawMetadata();
     rawMetadata.forEach((key, value) {
       headers[key] = value.toString();
     });
@@ -222,14 +223,6 @@ class OSSUtils {
     }
 
     return result.toString();
-  }
-
-  /// 判断一个字符串是否为空
-  ///
-  /// @param str
-  /// @return
-  static bool isEmptyString(String? str) {
-    return str?.isEmpty ?? true;
   }
 
   static String buildCanonicalString(RequestMessage request) {
@@ -612,7 +605,7 @@ class OSSUtils {
 
   /// Checks if OSS and SDK's checksum is same. If not, throws InconsistentException.
   static void checkChecksum(
-      int? clientChecksum, int? serverChecksum, String requestId) {
+      String? clientChecksum, String? serverChecksum, String? requestId) {
     if (clientChecksum != null &&
         serverChecksum != null &&
         clientChecksum != serverChecksum) {

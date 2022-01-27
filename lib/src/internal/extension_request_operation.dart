@@ -1,25 +1,14 @@
- import 'dart:convert';
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:aliyun_oss_dart_sdk/src/callback/oss_completed_callback.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/oss_constants.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/utils/binary_util.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/utils/oss_utils.dart';
-import 'package:aliyun_oss_dart_sdk/src/model/abort_multipart_upload_request.dart';
-import 'package:aliyun_oss_dart_sdk/src/model/head_object_request.dart';
-import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
-import 'package:aliyun_oss_dart_sdk/src/model/oss_request.dart';
-import 'package:aliyun_oss_dart_sdk/src/model/resumable_upload_request.dart';
-import 'package:aliyun_oss_dart_sdk/src/model/resumable_upload_result.dart';
-import 'package:aliyun_oss_dart_sdk/src/network/execution_context.dart';
-import 'package:aliyun_oss_dart_sdk/src/service_exception.dart';
-
-import 'internal_request_operation.dart';
 import 'package:path/path.dart' as path;
 
-import 'oss_async_task.dart';
+import 'package:aliyun_oss_dart_sdk/src/callback/lib_callback.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/lib_common.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/lib_internal.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
+import 'package:aliyun_oss_dart_sdk/src/network/lib_network.dart';
+import 'package:aliyun_oss_dart_sdk/src/service_exception.dart';
 
 class ExtensionRequestOperation {
 
@@ -57,7 +46,7 @@ class ExtensionRequestOperation {
             String? uploadFilePath = request.uploadFilePath;
             String? fileMd5;
             if (uploadFilePath != null) {
-                fileMd5 = BinaryUtil.calculateMd5Str(uploadFilePath);
+                fileMd5 = BinaryUtil.calculateMd5StrFromPath(uploadFilePath);
             } else {
                 ParcelFileDescriptor parcelFileDescriptor = apiOperation.getApplicationContext().getContentResolver().openFileDescriptor(request.getUploadUri(), "r");
                 try {
@@ -80,7 +69,7 @@ class ExtensionRequestOperation {
 
                 OSSLog.logDebug("[initUploadId] - Found record file, uploadid: " + uploadId);
 
-                if (request.crc64 == CRC64Config.yes) {
+                if (request.crc64Config == CRC64Config.yes) {
                     String filePath = Environment.getExternalStorageDirectory().getPath() + path.separator + "oss" + path.separator + uploadId;
                     File file = File(filePath);
                     if (file.existsSync()) {
@@ -102,7 +91,7 @@ class ExtensionRequestOperation {
             , ResumableUploadResult>? completedCallback) {
         setCRC64(request);
         ExecutionContext<ResumableUploadRequest, ResumableUploadResult> executionContext =
-                ExecutionContext(apiOperation.getInnerClient(), request, apiOperation.getApplicationContext());
+                ExecutionContext(request);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(ResumableUploadTask(request,
                 completedCallback, executionContext, apiOperation)), executionContext);
@@ -113,7 +102,7 @@ class ExtensionRequestOperation {
             , ResumableUploadResult>? completedCallback) {
         setCRC64(request);
         ExecutionContext<ResumableUploadRequest, ResumableUploadResult> executionContext =
-                ExecutionContext(apiOperation.getInnerClient(), request, apiOperation.getApplicationContext());
+                ExecutionContext( request);
 
         SequenceUploadTask task = SequenceUploadTask(request,
                 completedCallback, executionContext, apiOperation);
@@ -127,7 +116,7 @@ class ExtensionRequestOperation {
             , CompleteMultipartUploadResult>? completedCallback) {
         setCRC64(request);
         ExecutionContext<MultipartUploadRequest, CompleteMultipartUploadResult> executionContext =
-                ExecutionContext(apiOperation.getInnerClient(), request, apiOperation.getApplicationContext());
+                ExecutionContext( request);
 
         return OSSAsyncTask.wrapRequestTask(executorService.submit(MultipartUploadTask(apiOperation
                 , request, completedCallback, executionContext)), executionContext);
@@ -136,13 +125,13 @@ class ExtensionRequestOperation {
      OSSAsyncTask<ResumableDownloadResult> resumableDownload(ResumableDownloadRequest request,
                                                                    OSSCompletedCallback<ResumableDownloadRequest, ResumableDownloadResult>? completedCallback) {
         ExecutionContext<ResumableDownloadRequest, ResumableDownloadResult> executionContext =
-                ExecutionContext(apiOperation.getInnerClient(), request, apiOperation.getApplicationContext());
+                ExecutionContext( request);
         return OSSAsyncTask.wrapRequestTask(executorService.submit(ResumableDownloadTask(apiOperation, request, completedCallback, executionContext)), executionContext);
     }
 
      void setCRC64(OSSRequest request) {
-        CRC64Config crc64 = request.crc64 != CRC64Config.$null ? request.crc64 :
-                (apiOperation.getConf().isCheckCRC64() ? CRC64Config.yes : CRC64Config.no);
-        request.crc64 = crc64;
+        CRC64Config crc64 = request.crc64Config != CRC64Config.$null ? request.crc64Config :
+                (apiOperation.conf.checkCRC64 ? CRC64Config.yes : CRC64Config.no);
+        request.crc64Config = crc64;
     }
 }

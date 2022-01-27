@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'dart:io';
 
 import 'package:convert/convert.dart';
@@ -36,7 +35,7 @@ class BinaryUtil {
   }
 
   /// calculate md5 for file and string back
-  static String calculateMd5StrFromFile(String filePath) {
+  static String calculateMd5StrFromPath(String filePath) {
     return getMd5Str(calculateMd5FromFile(filePath));
   }
 
@@ -46,7 +45,7 @@ class BinaryUtil {
   }
 
   /// calculate md5 for local file and base64 string back
-  static String calculateBase64Md5FromFile(String filePath) {
+  static String calculateBase64Md5FromPath(String filePath) {
     return toBase64String(calculateMd5FromFile(filePath));
   }
 

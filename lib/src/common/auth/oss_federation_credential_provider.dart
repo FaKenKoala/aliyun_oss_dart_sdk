@@ -1,6 +1,5 @@
 import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/date_util.dart';
-
 import 'oss_credential_provider.dart';
 import 'oss_federation_token.dart';
 

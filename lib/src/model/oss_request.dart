@@ -2,7 +2,7 @@ class OSSRequest {
   // Flag of explicitly requiring authorization.
   bool isAuthorizationRequired = true;
   // crc64
-  CRC64Config crc64 = CRC64Config.$null;
+  CRC64Config crc64Config = CRC64Config.$null;
 }
 
 enum CRC64Config {

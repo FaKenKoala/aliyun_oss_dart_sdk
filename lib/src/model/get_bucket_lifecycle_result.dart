@@ -4,9 +4,10 @@ import 'oss_result.dart';
 class GetBucketLifecycleResult extends OSSResult {
   List<BucketLifecycleRule>? lifecycleRules;
 
-  void addLifecycleRule(BucketLifecycleRule lifecycleRule) {
+  void addLifecycleRule(BucketLifecycleRule? lifecycleRule) {
     lifecycleRules ??= [];
-
-    lifecycleRules!.add(lifecycleRule);
+    if (lifecycleRule != null) {
+      lifecycleRules!.add(lifecycleRule);
+    }
   }
 }

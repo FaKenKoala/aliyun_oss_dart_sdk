@@ -10,12 +10,11 @@ import 'package:aliyun_oss_dart_sdk/src/common/http_method.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/request_parameters.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/date_util.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/http_headers.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/http_util.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/oss_utils.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/generate_presigned_url_request.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
-
 import 'request_message.dart';
 
 class ObjectURLPresigner {

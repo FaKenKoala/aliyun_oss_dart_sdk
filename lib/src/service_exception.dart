@@ -17,13 +17,13 @@ class OSSServiceException implements Exception {
   final String? errorCode;
 
   /// OSS request Id
-  final String requestId;
+  final String? requestId;
 
   /// The OSS host Id which is same as the one in the request
-  final String hostId;
+  final String? hostId;
 
   /// The raw message in the response
-  final String rawMessage;
+  final String? rawMessage;
 
   /// part number
   String? partNumber;

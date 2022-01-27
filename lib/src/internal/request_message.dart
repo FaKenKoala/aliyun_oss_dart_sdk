@@ -9,7 +9,6 @@ import 'package:aliyun_oss_dart_sdk/src/common/utils/http_headers.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/http_util.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/oss_utils.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/bucket_lifecycle_rule.dart';
-
 import 'http_message.dart';
 
 class RequestMessage extends HttpMessage {
@@ -302,7 +301,7 @@ class RequestMessage extends HttpMessage {
 
     OSSLog.logDebug(printReq.toString());
 
-    if (OSSUtils.isEmptyString(queryString)) {
+    if (queryString.nullOrEmpty) {
       return baseURL;
     } else {
       return "$baseURL?$queryString";

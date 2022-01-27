@@ -253,7 +253,7 @@
 
     @override
      void checkException()  {
-        if (context.getCancellationHandler().isCancelled()) {
+        if (context.cancellationHandler.isCancelled) {
             if (request.deleteUploadOnCancelling()) {
                 abortThisUpload();
                 if (mRecordFile != null) {
@@ -302,7 +302,7 @@
             mPartExceptionCount++;
             uploadException = e;
             OSSLog.logThrowable2Local(e);
-            if (context.getCancellationHandler().isCancelled()) {
+            if (context.cancellationHandler.isCancelled) {
                 if (!mIsCancel) {
                     mIsCancel = true;
                     mLock.notify();
@@ -316,7 +316,7 @@
 
     @override
      void uploadPartFinish(PartETag partETag)  {
-        if (context.getCancellationHandler().isCancelled()) {
+        if (context.cancellationHandler.isCancelled) {
             if (!mSp.contains(mUploadId)) {
                 mSp.setStringValue(mUploadId, String.valueOf(mUploadedLength));
                 onProgressCallback(request, mUploadedLength, mFileLength);

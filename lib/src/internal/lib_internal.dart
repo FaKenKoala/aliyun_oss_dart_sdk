@@ -16,3 +16,4 @@ export 'response_parsers.dart';
 export 'resumable_download_task.dart';
 export 'resumable_upload_task.dart';
 export 'sequence_upload_task.dart';
+export 'callable.dart';

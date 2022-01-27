@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+
 part 'oss_federation_token.g.dart';
 
 @JsonSerializable()

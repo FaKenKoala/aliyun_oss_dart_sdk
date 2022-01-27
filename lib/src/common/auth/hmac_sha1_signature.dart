@@ -1,8 +1,9 @@
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
+
 import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/binary_util.dart';
-import 'package:crypto/crypto.dart';
 
 /// Hmac-SHA1 signature
 class HmacSHA1Signature {

@@ -13,7 +13,7 @@ class ObjectMetadata {
   final Map<String, String> _userMetadata = LinkedHashMap<String, String>(
       equals: (p0, p1) => p0.equalsIgnoreCase(p1));
   // Standard metadata
-  Map<String, Object> metadata = LinkedHashMap<String, Object>(
+  Map<String, Object?> metadata = LinkedHashMap<String, Object>(
     equals: (p0, p1) => p0.equalsIgnoreCase(p1),
   );
 
@@ -27,7 +27,7 @@ class ObjectMetadata {
       ..addAll(userMetadata ?? {});
   }
 
-  void setHeader(String key, Object value) {
+  void setHeader(String key, Object? value) {
     metadata[key] = value;
   }
 
@@ -129,7 +129,7 @@ class ObjectMetadata {
 
   /// Gets the ETag value which is the 128bit MD5 digest in HEX encoding.
   String? getETag() {
-    return metadata[HttpHeaders.etag] as String?;
+    return metadata[HttpHeaders.eTag] as String?;
   }
 
   /// Gets the server side encryption algorithm.
@@ -148,7 +148,7 @@ class ObjectMetadata {
   }
 
   /// Gets the raw metadata dictionary (SDK internal only)
-  Map<String, Object> getRawMetadata() {
+  Map<String, Object?> getRawMetadata() {
     return UnmodifiableMapView(metadata);
   }
 
@@ -196,7 +196,7 @@ class ObjectMetadata {
         ":" +
         "${getCacheControl()}" +
         "\n" +
-        HttpHeaders.etag +
+        HttpHeaders.eTag +
         ":" +
         "${getETag()}" +
         "\n";

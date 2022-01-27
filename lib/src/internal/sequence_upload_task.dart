@@ -223,7 +223,7 @@
         UploadPartRequest uploadPartRequest = null;
         try {
 
-            if (context.getCancellationHandler().isCancelled()) {
+            if (context.cancellationHandler.isCancelled) {
                 return;
             }
 
@@ -263,7 +263,7 @@
 
             uploadPartFinish(partETag);
 
-            if (context.getCancellationHandler().isCancelled()) {
+            if (context.cancellationHandler.isCancelled) {
                 //cancel immediately for sequence upload
                 TaskCancelException e = TaskCancelException("sequence upload task cancel");
                 throw OSSClientException(e.getMessage(), e, true);
@@ -307,7 +307,7 @@
 
     @override
      void checkException()  {
-        if (context.getCancellationHandler().isCancelled()) {
+        if (context.cancellationHandler.isCancelled) {
             if (request.deleteUploadOnCancelling()) {
                 abortThisUpload();
                 if (mRecordFile != null) {
@@ -357,7 +357,7 @@
             uploadException = e;
         }
         OSSLog.logThrowable2Local(e);
-        if (context.getCancellationHandler().isCancelled()) {
+        if (context.cancellationHandler.isCancelled) {
             if (!mIsCancel) {
                 mIsCancel = true;
             }
@@ -366,7 +366,7 @@
 
     @override
      void uploadPartFinish(PartETag partETag)  {
-        if (context.getCancellationHandler().isCancelled()) {
+        if (context.cancellationHandler.isCancelled) {
             if (!mSp.contains(mUploadId)) {
                 mSp.setStringValue(mUploadId, String.valueOf(mUploadedLength));
                 onProgressCallback(request, mUploadedLength, mFileLength);

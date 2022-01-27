@@ -1,5 +1,7 @@
 
- class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
+ import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
+
+class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         Result extends ResumableDownloadResult> implements Callable<Result> {
      final int CPU_SIZE = Runtime.getRuntime().availableProcessors() * 2;
      final int MAX_CORE_POOL_SIZE = CPU_SIZE < 5 ? CPU_SIZE : 5;
@@ -259,7 +261,7 @@
         InputStream content = null;
         try {
 
-            if (mContext.getCancellationHandler().isCancelled()) {
+            if (mContext.cancellationHandler.isCancelled) {
                 mPoolExecutor.getQueue().clear();
             }
 
@@ -306,7 +308,7 @@
 
                 completedPartSize += 1;
 
-                if (mContext.getCancellationHandler().isCancelled()) {
+                if (mContext.cancellationHandler.isCancelled) {
                     // Cancel after the last task is completed
                     if (downloadPartSize == completedPartSize - mPartExceptionCount) {
                         checkCancel();
@@ -438,7 +440,7 @@
     }
 
      void checkCancel()  {
-        if (mContext.getCancellationHandler().isCancelled()) {
+        if (mContext.cancellationHandler.isCancelled) {
             TaskCancelException e = TaskCancelException("Resumable download cancel");
             throw OSSClientException(e.getMessage(), e, true);
         }
@@ -546,12 +548,12 @@
             // Object's size, last modified time or ETAG are not same as the one
             // in the checkpoint.
             if (this.fileStat.lastModified == null) {
-                if (this.fileStat.fileLength != fileStat.fileLength || !this.fileStat.etag.equals(fileStat.etag)) {
+                if (this.fileStat.fileLength != fileStat.fileLength || !this.fileStat.eTag.equals(fileStat.eTag)) {
                     return false;
                 }
             } else {
                 if (this.fileStat.fileLength != fileStat.fileLength || !this.fileStat.lastModified.equals(fileStat.lastModified)
-                        || !this.fileStat.etag.equals(fileStat.etag)) {
+                        || !this.fileStat.eTag.equals(fileStat.eTag)) {
                     return false;
                 }
             }
@@ -599,7 +601,7 @@
 
             FileStat fileStat = FileStat();
             fileStat.fileLength = result.getMetadata().getContentLength();
-            fileStat.etag = result.getMetadata().getETag();
+            fileStat.eTag = result.getMetadata().getETag();
             fileStat.lastModified = result.getMetadata().getLastModified();
             fileStat.serverCRC = result.getServerCRC();
             fileStat.requestId = result.getRequestId();

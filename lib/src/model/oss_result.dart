@@ -6,19 +6,19 @@ class OSSResult {
   String? requestId;
 
   //client crc64
-  int _clientCRC = 0;
-  int get clientCRC => _clientCRC;
-  set clientCRC(int? clientCRC) {
-    if (clientCRC != null && clientCRC != 0) {
+  String? _clientCRC;
+  String? get clientCRC => _clientCRC;
+  set clientCRC(String? clientCRC) {
+    if (clientCRC != null) {
       _clientCRC = clientCRC;
     }
   }
 
   //server crc64
-  int _serverCRC = 0;
-  int get serverCRC => _serverCRC;
-  set serverCRC(int? serverCRC) {
-    if (serverCRC != null && serverCRC != 0) {
+  String? _serverCRC;
+  String? get serverCRC => _serverCRC;
+  set serverCRC(String? serverCRC) {
+    if (serverCRC != null) {
       _serverCRC = serverCRC;
     }
   }

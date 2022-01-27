@@ -1,10 +1,11 @@
 import 'dart:io';
 
-import 'package:aliyun_oss_dart_sdk/src/client_configuration.dart';
 import 'package:intl/intl.dart';
-import 'package:path/path.dart';
-import 'oss_log.dart';
 import 'package:path/path.dart' as path;
+import 'package:path/path.dart';
+
+import 'package:aliyun_oss_dart_sdk/src/client_configuration.dart';
+import 'oss_log.dart';
 
 class OSSLogToFileUtils {
   static void init(ClientConfiguration? cfg) {}

@@ -1,8 +1,8 @@
 import 'dart:io';
 
+import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
 import 'multipart_upload_request.dart';
 import 'object_metadata.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/utils/extension_util.dart';
 
 class ResumableUploadRequest extends MultipartUploadRequest {
   bool deleteUploadOnCancelling = true;

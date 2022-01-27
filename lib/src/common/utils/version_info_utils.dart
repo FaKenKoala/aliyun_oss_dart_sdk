@@ -1,4 +1,3 @@
-
 import 'package:aliyun_oss_dart_sdk/src/common/lib_common.dart';
 
 class VersionInfoUtils {

@@ -1,4 +1,5 @@
  import 'object_metadata.dart';
+
 import 'oss_result.dart';
 
 class HeadObjectResult extends OSSResult {

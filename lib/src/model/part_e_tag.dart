@@ -1,11 +1,11 @@
 class PartETag {
   int partNumber;
 
-  String eTag;
+  String? eTag;
 
   int partSize = 0;
 
-  int crc64 = 0;
+  String? crc64 ;
 
   PartETag(this.partNumber, this.eTag);
 }

@@ -1,9 +1,9 @@
-import 'oss_ioexption.dart';
+import 'oss_ioexception.dart';
 
 class InconsistentException extends OSSIOException {
-  int clientChecksum;
-  int serverChecksum;
-  String requestId;
+  String? clientChecksum;
+  String? serverChecksum;
+  String? requestId;
 
   InconsistentException(
       this.clientChecksum, this.serverChecksum, this.requestId)

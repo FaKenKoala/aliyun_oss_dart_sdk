@@ -1,5 +1,5 @@
+import 'package:aliyun_oss_dart_sdk/src/common/lib_common.dart';
 import 'package:aliyun_oss_dart_sdk/src/internal/response_message.dart';
-
 import 'multipart_upload.dart';
 import 'oss_result.dart';
 
@@ -56,7 +56,7 @@ class ListMultipartUploadsResult extends OSSResult {
 
   ListMultipartUploadsResult parseData(ResponseMessage responseMessage) {
     List<MultipartUpload> uploadList = [];
-    MultipartUpload? upload = null;
+    MultipartUpload? upload;
     bool isCommonPrefixes = false;
     XmlPullParser parser = Xml.newPullParser();
     parser.setI[responseMessage.getContent()] = "utf-8";

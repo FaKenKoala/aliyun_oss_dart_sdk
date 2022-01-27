@@ -1,12 +1,14 @@
 import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/exception/lib_exception.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/oss_result.dart';
+import 'package:aliyun_oss_dart_sdk/src/network/lib_network.dart';
 import 'package:aliyun_oss_dart_sdk/src/service_exception.dart';
 
 class OSSAsyncTask<T extends OSSResult> {
   Future<T> future;
 
   /// TODO:使用dio的CancelToken替代
-  ExecutionContext context;
+  ExecutionContext? context;
 
   bool _canceled = false;
   bool _isCompleted = false;
@@ -26,9 +28,7 @@ class OSSAsyncTask<T extends OSSResult> {
   /// Cancel the task
   void cancel() {
     _canceled = true;
-    if (context != null) {
-      context.getCancellationHandler().cancel();
-    }
+      context?.cancellationHandler.cancel();
   }
 
   /// Checks if the task is complete
@@ -41,7 +41,7 @@ class OSSAsyncTask<T extends OSSResult> {
       return result;
     } on InterruptedException catch (e) {
       throw OSSClientException(
-          " InterruptedException and message : " + e.getMessage(), e);
+          " InterruptedException and message : $e");
     } catch (e) {
       if (e is OSSClientException || e is OSSServiceException) {
         rethrow;
@@ -55,7 +55,9 @@ class OSSAsyncTask<T extends OSSResult> {
   void waitUntilFinished() async {
     try {
       await future;
-    } catch (ignore) {}
+    } catch (ignore) {
+      ///
+    }
   }
 
   /// Gets the flag if the task has been canceled.

@@ -4,25 +4,20 @@
 import 'package:aliyun_oss_dart_sdk/src/callback/oss_completed_callback.dart';
 import 'package:aliyun_oss_dart_sdk/src/callback/oss_progress_callback.dart';
 import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
-import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
-import 'package:aliyun_oss_dart_sdk/src/exception/oss_ioexption.dart';
-import 'package:aliyun_oss_dart_sdk/src/model/complete_multipart_upload_result.dart';
-import 'package:aliyun_oss_dart_sdk/src/model/multipart_upload_request.dart';
-import 'package:aliyun_oss_dart_sdk/src/model/oss_request.dart';
-import 'package:aliyun_oss_dart_sdk/src/model/part_e_tag.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/lib_common.dart';
+import 'package:aliyun_oss_dart_sdk/src/exception/oss_ioexception.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
 import 'package:aliyun_oss_dart_sdk/src/network/execution_context.dart';
 import 'package:aliyun_oss_dart_sdk/src/service_exception.dart';
 import 'package:aliyun_oss_dart_sdk/src/task_cancel_exception.dart';
-
-import 'http_message.dart';
-import 'internal_request_operation.dart';
+import 'lib_internal.dart';
 
 abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
         Result extends CompleteMultipartUploadResult> implements Callable<Result> {
 
      final int CPU_SIZE = Platform.numberOfProcessors * 2;
-     final int MAX_CORE_POOL_SIZE = CPU_SIZE < 5 ? CPU_SIZE : 5;
-     final int MAX_IMUM_POOL_SIZE = CPU_SIZE;
+     final int MAX_CORE_POOL_SIZE = Platform.numberOfProcessors * 2 < 5 ? Platform.numberOfProcessors * 2 : 5;
+     final int MAX_IMUM_POOL_SIZE = Platform.numberOfProcessors * 2;
      final int KEEP_ALIVE_TIME = 3000;
      final int MAX_QUEUE_SIZE = 5000;
      final int PART_SIZE_ALIGN_NUM = 4 * 1024;
@@ -38,28 +33,28 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
      Object mLock = Object();
      InternalRequestOperation operation;
      ExecutionContext context;
-     Exception uploadException;
-     bool isCancel;
-     File uploadFile;
-     String uploadId;
-     int fileLength;
-     int partExceptionCount;
-     int runPartTaskCount;
+     Exception? uploadException;
+     bool isCancel = false;
+     File? uploadFile;
+     String? uploadId;
+     int fileLength = 0;
+     int partExceptionCount = 0;
+     int runPartTaskCount = 0;
      int uploadedLength = 0;
      bool checkCRC64 = false;
      Request request;
      OSSCompletedCallback<Request, Result>? completedCallback;
      OSSProgressCallback<Request>? progressCallback;
      List<int> partAttr = [0,0];
-     String uploadFilePath;
-     int lastPartSize;//最后一个分片的大小
-     Uri uploadUri;
+     String? uploadFilePath;
+     int lastPartSize = 0;//最后一个分片的大小
+     Uri? uploadUri;
 
      BaseMultipartUploadTask(this. operation, this.request,
                                    this.completedCallback,
                                    this.context) {
         progressCallback = request.progressCallback as OSSProgressCallback<Request>?;
-        checkCRC64 = (request.crc64 == CRC64Config.yes);
+        checkCRC64 = (request.crc64Config == CRC64Config.yes);
     }
 
     /// abort upload
@@ -73,7 +68,7 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
 
     /// check is or not cancel
      void checkCancel()  {
-        if (context.getCancellationHandler().isCancelled()) {
+        if (context.cancellationHandler.isCancelled) {
             TaskCancelException e = TaskCancelException("multipart cancel");
             throw OSSClientException( e, true);
         }
@@ -112,8 +107,8 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
         if (request.uploadFilePath != null) {
             uploadFilePath = request.uploadFilePath!;
             uploadedLength = 0;
-            uploadFile = File(uploadFilePath);
-            fileLength = uploadFile.lengthSync();
+            uploadFile = File(uploadFilePath??'');
+            fileLength = uploadFile?.lengthSync() ?? 0;
 
         } else if (request.uploadUri != null) {
             uploadUri = request.uploadUri!;
@@ -158,14 +153,12 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
         BufferedInputStream? bufferedInputStream;
         try {
 
-            if (context.getCancellationHandler().isCancelled()) {
+            if (context.cancellationHandler.isCancelled) {
                 mPoolExecutor.getQueue().clear();
                 return;
             }
 
-             (mLock) {
-                mRunPartTaskCount++;
-            }
+                runPartTaskCount++;
 
             preUploadPart(readIndex, byteCount, partNumber);
 
@@ -177,36 +170,35 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
                 bufferedInputStream.skip(skip);
                 bufferedInputStream.read(partContent, 0, byteCount);
             } else {
-                raf = RandomAccessFile(mUploadFile, "r");
+                raf = RandomAccessFile(uploadFile, "r");
 
                 raf.seek(skip);
                 raf.readFully(partContent, 0, byteCount);
             }
 
             UploadPartRequest uploadPart = UploadPartRequest(
-                    request.getBucketName(), request.getObjectKey(), mUploadId, readIndex + 1);
-            uploadPart.setPartContent(partContent);
-            uploadPart.setMd5Digest(BinaryUtil.calculateBase64Md5(partContent));
-            uploadPart.setCRC64(request.getCRC64());
+                    request.bucketName, request.objectKey, uploadId, readIndex + 1);
+            uploadPart.partContent = (partContent);
+            uploadPart.md5Digest = (BinaryUtil.calculateBase64Md5(partContent));
+            uploadPart.crc64Config = (request.crc64Config);
             UploadPartResult uploadPartResult = operation.syncUploadPart(uploadPart);
             //check isComplete
-             (mLock) {
-                PartETag partETag = PartETag(uploadPart.getPartNumber(), uploadPartResult.getETag());
-                partETag.setPartSize(byteCount);
-                if (mCheckCRC64) {
-                    partETag.setCRC64(uploadPartResult.getClientCRC());
+                PartETag partETag = PartETag(uploadPart.partNumber, uploadPartResult.eTag);
+                partETag.partSize = byteCount;
+                if (checkCRC64) {
+                    partETag.crc64 = uploadPartResult.clientCRC;
                 }
 
                 partETags.add(partETag);
-                mUploadedLength += byteCount;
+                uploadedLength += byteCount;
 
                 uploadPartFinish(partETag);
 
-                if (context.getCancellationHandler().isCancelled()) {
-                    if (partETags.size() == (mRunPartTaskCount - mPartExceptionCount)) {
+                if (context.cancellationHandler.isCancelled) {
+                    if (partETags.length == (runPartTaskCount - partExceptionCount)) {
                         TaskCancelException e = TaskCancelException("multipart cancel");
 
-                        throw OSSClientException(e.getMessage(), e, true);
+                        throw OSSClientException(e, true);
                     }
                 } else {
                     if (partETags.length == (partNumber - partExceptionCount)) {
@@ -215,19 +207,21 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
                     onProgressCallback(request, uploadedLength, fileLength);
                 }
 
-            }
 
-        } catch ( e) {
+        } on Exception catch ( e) {
             processException(e);
         } finally {
             try {
-                if (raf != null)
-                    raf.close();
-                if (bufferedInputStream != null)
-                    bufferedInputStream.close();
-                if (inputStream != null)
-                    inputStream.close();
-            } catch (OSSIOException e) {
+                if (raf != null) {
+                  raf.close();
+                }
+                if (bufferedInputStream != null) {
+                  bufferedInputStream.close();
+                }
+                if (inputStream != null) {
+                  inputStream.close();
+                }
+            } catch ( e) {
                 OSSLog.logThrowable2Local(e);
             }
         }
@@ -236,49 +230,38 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
       void processException(Exception e);
 
     /// complete multipart upload
-    ///
-    /// @return
-    /// @throws OSSClientException
-    /// @throws OSSServiceException
-     CompleteMultipartUploadResult completeMultipartUploadResult()  {
+     CompleteMultipartUploadResult? completeMultipartUploadResult()  {
         //complete sort
         CompleteMultipartUploadResult? completeResult;
         if (partETags.isNotEmpty) {
-            Collections.sort(partETags, Comparator<PartETag>() {
-                @override
-                 int compare(PartETag lhs, PartETag rhs) {
-                    if (lhs.getPartNumber() < rhs.getPartNumber()) {
-                        return -1;
-                    } else if (lhs.getPartNumber() > rhs.getPartNumber()) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }
+          partETags.sort((lhs, rhs){
+
+          return lhs.partNumber.compareTo(rhs.partNumber);
+                
             });
 
             CompleteMultipartUploadRequest complete = CompleteMultipartUploadRequest(
-                    request.getBucketName(), request.getObjectKey(), mUploadId, partETags);
-            if (request.getCallbackParam() != null) {
-                complete.setCallbackParam(request.getCallbackParam());
+                    request.bucketName, request.objectKey, uploadId, partETags);
+            if (request.callbackParam != null) {
+                complete.callbackParam = request.callbackParam;
             }
-            if (request.getCallbackVars() != null) {
-                complete.setCallbackVars(request.getCallbackVars());
+            if (request.callbackVars != null) {
+                complete.callbackVars = request.callbackVars;
             }
-            if (request.getMetadata() != null) {
+            if (request.metadata != null) {
                 ObjectMetadata metadata = ObjectMetadata();
-                for (String key : request.getMetadata().getRawMetadata().keySet()) {
-                    if (!key.equals(OSSHeaders.STORAGE_CLASS)) {
-                        metadata.setHeader(key, request.getMetadata().getRawMetadata().get(key));
+                request.metadata?.getRawMetadata().forEach((key, value) {
+if (key !=(OSSHeaders.storageClass)) {
+                        metadata.setHeader(key, value);
                     }
-                }
-                complete.setMetadata(metadata);
+                 });
+                complete.metadata = metadata;
             }
 
-            complete.setCRC64(request.getCRC64());
+            complete.crc64Config = request.crc64Config;
             completeResult = operation.syncCompleteMultipartUpload(complete);
         }
-        mUploadedLength = 0;
+        uploadedLength = 0;
         return completeResult;
     }
 
@@ -292,22 +275,19 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
      void checkException()  {
         if (uploadException != null) {
             releasePool();
-            if (uploadException instanceof OSSIOException) {
-                throw (OSSIOException) uploadException;
-            } else if (uploadException instanceof OSSServiceException) {
-                throw (OSSServiceException) uploadException;
-            } else if (uploadException instanceof OSSClientException) {
-                throw (OSSClientException) uploadException;
+
+            if (uploadException is OSSIOException ||uploadException is OSSServiceException || uploadException is OSSClientException) {
+                throw uploadException!;
             } else {
                 OSSClientException clientException =
-                        OSSClientException(uploadException.getMessage(), uploadException);
+                        OSSClientException(uploadException);
                 throw clientException;
             }
         }
     }
 
      bool checkWaitCondition(int partNum) {
-        if (partETags.size() == partNum) {
+        if (partETags.length == partNum) {
             return false;
         }
         return true;
@@ -316,42 +296,42 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
     /// notify wait thread
      void notifyMultipartThread() {
         mLock.notify();
-        mPartExceptionCount = 0;
+        partExceptionCount = 0;
     }
 
     /// check part size
     ///
     /// @param partAttr
-     void checkPartSize(int[] partAttr) {
-        int partSize = request.getPartSize();
-        OSSLog.logDebug("[checkPartSize] - mFileLength : " + mFileLength);
-        OSSLog.logDebug("[checkPartSize] - partSize : " + partSize);
-        int partNumber = mFileLength / partSize;
-        if (mFileLength % partSize != 0) {
+     void checkPartSize(List<int> partAttr) {
+        int partSize = request.partSize;
+        OSSLog.logDebug("[checkPartSize] - fileLength : $fileLength");
+        OSSLog.logDebug("[checkPartSize] - partSize : $partSize");
+        int partNumber = fileLength ~/ partSize;
+        if (fileLength % partSize != 0) {
             partNumber = partNumber + 1;
         }
         int MAX_PART_NUM = 5000;
         if (partNumber == 1) {
-            partSize = mFileLength;
+            partSize = fileLength;
         } else if (partNumber > MAX_PART_NUM) {
-            partSize = mFileLength / (MAX_PART_NUM - 1);
+            partSize = fileLength ~/ (MAX_PART_NUM - 1);
             partSize = ceilPartSize(partSize);
-            partNumber = mFileLength / partSize;
-            partNumber += (mFileLength % partSize != 0) ? 1 : 0;
+            partNumber = fileLength ~/ partSize;
+            partNumber += (fileLength % partSize != 0) ? 1 : 0;
         }
-        partAttr[0] = (int) partSize;
-        partAttr[1] = (int) partNumber;
-        request.setPartSize((int) partSize);
+        partAttr[0] =  partSize;
+        partAttr[1] =  partNumber;
+        request.partSize = partSize;
 
-        OSSLog.logDebug("[checkPartSize] - partNumber : " + partNumber);
-        OSSLog.logDebug("[checkPartSize] - partSize : " + (int) partSize);
+        OSSLog.logDebug("[checkPartSize] - partNumber : $partNumber");
+        OSSLog.logDebug("[checkPartSize] - partSize : $partSize");
 
-        int lastPartSize = mFileLength % partSize;
-        mLastPartSize = lastPartSize == 0 ? partSize : lastPartSize;
+        int lastPartSize = fileLength % partSize;
+        lastPartSize = lastPartSize == 0 ? partSize : lastPartSize;
     }
 
      int ceilPartSize(int partSize) {
-        partSize = (((partSize + (PART_SIZE_ALIGN_NUM - 1)) / PART_SIZE_ALIGN_NUM) * PART_SIZE_ALIGN_NUM);
+        partSize = (((partSize + (PART_SIZE_ALIGN_NUM - 1)) ~/ PART_SIZE_ALIGN_NUM) * PART_SIZE_ALIGN_NUM);
         return partSize;
     }
 
@@ -361,9 +341,7 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
     /// @param currentSize
     /// @param totalSize
      void onProgressCallback(Request request, int currentSize, int totalSize) {
-        if (progressCallback != null) {
-            progressCallback.onProgress(request, currentSize, totalSize);
-        }
+            progressCallback?.onProgress(request, currentSize, totalSize);
     }
 
 }

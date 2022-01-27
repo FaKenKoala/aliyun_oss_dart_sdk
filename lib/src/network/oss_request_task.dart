@@ -1,11 +1,15 @@
- import 'package:aliyun_oss_dart_sdk/src/internal/oss_retry_handler.dart';
-import 'package:aliyun_oss_dart_sdk/src/internal/request_message.dart';
-import 'package:aliyun_oss_dart_sdk/src/internal/response_message.dart';
-import 'package:aliyun_oss_dart_sdk/src/internal/response_parser.dart';
-import 'package:aliyun_oss_dart_sdk/src/model/oss_result.dart';
+ import 'dart:convert';
+import 'dart:io';
+
+import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/lib_common.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/lib_internal.dart';
+
 import 'package:http/http.dart';
 
+import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
 import 'execution_context.dart';
+import 'lib_network.dart';
 
 class OSSRequestTask<T extends OSSResult> implements Callable<T> {
 
@@ -15,18 +19,15 @@ class OSSRequestTask<T extends OSSResult> implements Callable<T> {
 
      ExecutionContext context;
 
-     OkHttpClient client;
+     late OkHttpClient client;
 
-     OSSRetryHandler retryHandler;
+     late OSSRetryHandler retryHandler;
 
      int currentRetryCount = 0;
 
-     OSSRequestTask(RequestMessage message, ResponseParser parser, ExecutionContext context, int maxRetry) {
-        this.responseParser = parser;
-        this.message = message;
-        this.context = context;
-        this.client = context.getClient();
-        this.retryHandler = OSSRetryHandler(maxRetry);
+     OSSRequestTask(this.message,this.responseParser, this.context, int maxRetry) {
+        client = context.getClient();
+        retryHandler = OSSRetryHandler(maxRetry);
     }
 
     @override
@@ -51,7 +52,7 @@ class OSSRequestTask<T extends OSSResult> implements Callable<T> {
             // signing
             OSSUtils.signRequest(message);
 
-            if (context.getCancellationHandler().isCancelled()) {
+            if (context.cancellationHandler.isCancelled) {
                 throw InterruptedOSSIOException("This task is cancelled!");
             }
 
@@ -60,7 +61,7 @@ class OSSRequestTask<T extends OSSResult> implements Callable<T> {
             // build request url
             String url;
             //区分是否按Endpoint进行URL初始化
-            if (ossRequest instanceof ListBucketsRequest) {
+            if (ossRequest is ListBucketsRequest) {
                 url = message.buildOSSServiceURL();
             } else {
                 url = message.buildCanonicalURL();
@@ -68,33 +69,33 @@ class OSSRequestTask<T extends OSSResult> implements Callable<T> {
             requestBuilder = requestBuilder.url(url);
 
             // set request headers
-            for (String key : message.getHeaders().keySet()) {
-                requestBuilder = requestBuilder.addHeader(key, message.getHeaders().get(key));
-            }
+            message.headers.forEach((key, value) { 
+              requestBuilder = requestBuilder.addHeader(key, value);
+            });
 
-            String contentType = message.getHeaders().get(OSSHeaders.CONTENT_TYPE);
-            OSSLog.logDebug("request method = " + message.getMethod());
+            String? contentType = message.headers[HttpHeaders.contentType];
+            OSSLog.logDebug("request method = ${message.method}");
             // set request body
-            switch (message.getMethod()) {
-                case POST:
-                case PUT:
+            switch (message.method) {
+                case HttpMethod.post:
+                case HttpMethod.put:
                     OSSUtils.assertTrue(contentType != null, "Content type can't be null when upload!");
-                    InputStream inputStream = null;
-                    String stringBody = null;
+                    InputStream? inputStream ;
+                    String? stringBody ;
                     int length = 0;
-                    if (message.getUploadData() != null) {
-                        inputStream = ByteArrayInputStream(message.getUploadData());
-                        length = message.getUploadData().length;
-                    } else if (message.getUploadFilePath() != null) {
-                        File file = File(message.getUploadFilePath());
+                    if (message.uploadData != null) {
+                        inputStream = ByteArrayInputStream(message.uploadData!);
+                        length = message.uploadData!.length;
+                    } else if (message.uploadFilePath != null) {
+                        File file = File(message.uploadFilePath!);
                         inputStream = FileInputStream(file);
-                        length = file.length();
+                        length = file.lengthSync();
                         if (length <= 0) {
                             throw OSSClientException("the length of file is 0!");
                         }
-                    } else if (message.getUploadUri() != null) {
-                        inputStream = context.getApplicationContext().getContentResolver().openInputStream(message.getUploadUri());
-                        ParcelFileDescriptor parcelFileDescriptor = null;
+                    } else if (message.uploadUri != null) {
+                        inputStream = context.getApplicationContext().getContentResolver().openInputStream(message.uploadUri);
+                        ParcelFileDescriptor? parcelFileDescriptor;
                         try {
                             parcelFileDescriptor = context.getApplicationContext().getContentResolver().openFileDescriptor(message.getUploadUri(), "r");
                             length = parcelFileDescriptor.getStatSize();
@@ -103,36 +104,36 @@ class OSSRequestTask<T extends OSSResult> implements Callable<T> {
                                 parcelFileDescriptor.close();
                             }
                         }
-                    } else if (message.getContent() != null) {
-                        inputStream = message.getContent();
-                        length = message.getContentLength();
+                    } else if (message.content != null) {
+                        inputStream = message.content;
+                        length = message.contentLength;
                     } else {
-                        stringBody = message.getStringBody();
+                        stringBody = message.stringBody;
                     }
 
                     if (inputStream != null) {
-                        if (message.isCheckCRC64()) {
-                            inputStream = CheckedInputStream(inputStream, new CRC64());
+                        if (message.checkCRC64) {
+                            inputStream = CheckedInputStream(inputStream,  OSSCRC64());
                         }
-                        message.setContent(inputStream);
-                        message.setContentLength(length);
-                        requestBuilder = requestBuilder.method(message.getMethod().toString(),
+                        message.content = inputStream;
+                        message.contentLength = (length);
+                        requestBuilder = requestBuilder.method(message.method.toString(),
                                 NetworkProgressHelper.addProgressRequestBody(inputStream, length, contentType, context));
                     } else if (stringBody != null) {
-                        requestBuilder = requestBuilder.method(message.getMethod().toString()
-                                , RequestBody.create(MediaType.parse(contentType), stringBody.getBytes("UTF-8")));
+                        requestBuilder = requestBuilder.method(message.method.toString()
+                                , RequestBody.create(MediaType.parse(contentType), utf8.encode(stringBody)));
                     } else {
-                        requestBuilder = requestBuilder.method(message.getMethod().toString()
+                        requestBuilder = requestBuilder.method(message.method.toString()
                                 , RequestBody.create(null, byte[0]));
                     }
                     break;
-                case GET:
+                case HttpMethod.get:
                     requestBuilder = requestBuilder.get();
                     break;
-                case HEAD:
+                case HttpMethod.head:
                     requestBuilder = requestBuilder.head();
                     break;
-                case DELETE:
+                case HttpMethod.delete:
                     requestBuilder = requestBuilder.delete();
                     break;
                 default:
@@ -141,28 +142,29 @@ class OSSRequestTask<T extends OSSResult> implements Callable<T> {
 
             request = requestBuilder.build();
 
-            if (ossRequest instanceof GetObjectRequest) {
+            if (ossRequest is GetObjectRequest) {
                 client = NetworkProgressHelper.addProgressResponseListener(client, context);
                 OSSLog.logDebug("getObject");
             }
 
             call = client.newCall(request);
 
-            context.getCancellationHandler().setCall(call);
+            context.cancellationHandler.call = (call);
 
             // send sync request
             Response response = call.execute();
 
             if (OSSLog.isEnableLog()) {
                 // response log
-                Map<String, List<String>> headerMap = response.headers().toMultimap();
+                Map<String, List<String>> headerMap = response.headers.toMultimap();
                 StringBuffer printRsp = StringBuffer();
                 printRsp.write("response:---------------------\n");
-                printRsp.write("response code: " + response.code() + " for url: " + request.url() + "\n");
+                printRsp.write("response code: ${response.statusCode} for url: ${request.url}\n");
 //                printRsp.write("response body: " + response.body().string() + "\n");
-                for (String key : headerMap.keySet()) {
-                    printRsp.write("responseHeader [" + key + "]: ").write(headerMap.get(key).get(0) + "\n");
-                }
+headerMap.forEach((key, value) { 
+                    printRsp..write("responseHeader [$key]: ")..write("${value[0]}\n");
+
+});
                 OSSLog.logDebug(printRsp.toString());
             }
 
@@ -172,9 +174,9 @@ class OSSRequestTask<T extends OSSResult> implements Callable<T> {
         } catch ( e) {
             OSSLog.logError("Encounter local execpiton: " + e.toString());
             if (OSSLog.isEnableLog()) {
-                e.printStackTrace();
+                print(e);
             }
-            exception = OSSClientException(e.getMessage(), e);
+            exception = OSSClientException(e);
         }
 
         if (exception == null && (responseMessage.getStatusCode() == 203 || responseMessage.getStatusCode() >= 300)) {
@@ -194,14 +196,14 @@ class OSSRequestTask<T extends OSSResult> implements Callable<T> {
 
         // reconstruct exception caused by manually cancelling
         if ((call != null && call.isCanceled())
-                || context.getCancellationHandler().isCancelled()) {
+                || context.cancellationHandler.isCancelled) {
             exception = OSSClientException("Task is cancelled!", exception.getCause(), true);
         }
 
         OSSRetryType retryType = retryHandler.shouldRetry(exception, currentRetryCount);
         OSSLog.logError("[run] - retry, retry type: " + retryType);
         if (retryType == OSSRetryType.OSSRetryTypeShouldRetry) {
-            this.currentRetryCount++;
+            currentRetryCount++;
             if (context.getRetryCallback() != null) {
                 context.getRetryCallback().onRetryCallback();
             }
@@ -229,13 +231,13 @@ class OSSRequestTask<T extends OSSResult> implements Callable<T> {
                 }
             }
 
-            this.currentRetryCount++;
+            currentRetryCount++;
             if (context.getRetryCallback() != null) {
                 context.getRetryCallback().onRetryCallback();
             }
             return call();
         } else {
-            if (exception instanceof OSSClientException) {
+            if (exception is OSSClientException) {
                 if (context.getCompletedCallback() != null) {
                     context.getCompletedCallback().onFailure(context.getRequest(), (OSSClientException) exception, null);
                 }

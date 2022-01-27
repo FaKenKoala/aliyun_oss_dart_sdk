@@ -10,7 +10,7 @@ class CompleteMultipartUploadRequest extends OSSRequest {
   String objectKey;
 
   /// The ID of the multipart upload to complete
-  String uploadId;
+  String? uploadId;
 
   /// The list of part numbers and ETags to use when completing the multipart upload
   List<PartETag> partETags = [];

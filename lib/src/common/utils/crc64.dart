@@ -12,11 +12,14 @@ class OSSCRC64 {
   late AccumulatorSink<CrcValue> _output;
   late dynamic _input;
 
-  BigInt _value = BigInt.zero;
-  BigInt get value {
-    _input.close();
-    _value = _output.events.single.toBigInt();
-    return _value;
+  BigInt? _value;
+  String get value {
+    if (_value == null) {
+      _input.close();
+      _value = _output.events.single.toBigInt();
+      _output.clear();
+    }
+    return _value!.toRadixString(16);
   }
 
   add(String data) {

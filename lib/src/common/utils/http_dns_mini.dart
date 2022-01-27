@@ -1,5 +1,7 @@
  import 'package:aliyun_oss_dart_sdk/src/common/oss_log.dart';
 
+import 'package:aliyun_oss_dart_sdk/src/internal/lib_internal.dart';
+
  final String _tag = "HttpDnsMini";
       final String _serverIP = "203.107.1.1";
       final String _accountID = "181345";
@@ -64,10 +66,10 @@ class HttpdnsMini {
          QueryHostTask(this.hostName);
 
         @override
-         String call() {
+         String? call() {
             String chooseServerAddress = _serverIP;
             String resolveUrl = "https://" + chooseServerAddress + "/" + _accountID + "/d?host=" + hostName;
-            InputStream inStream = null;
+            InputStream? inStream;
             OSSLog.logDebug("[httpdnsmini] - buildUrl: " + resolveUrl);
             try {
                 HttpURLConnection conn = (HttpURLConnection) URL(resolveUrl).openConnection();
@@ -91,7 +93,7 @@ class HttpdnsMini {
                     if (host != null && ips != null && ips.length() > 0) {
                         if (ttl == 0) {
                             // 如果有结果返回，但是ip列表为空，ttl也为空，那默认没有ip就是解析结果，并设置ttl为一个较长的时间
-                            // 避免一直请求同一个ip冲击sever
+                            // 避免一直请求同一个ip冲击server
                             ttl = _emptyResultHostTtl;
                         }
                         HostObject hostObject = HostObject();

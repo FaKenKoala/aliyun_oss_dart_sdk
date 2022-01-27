@@ -1,6 +1,5 @@
 import 'package:aliyun_oss_dart_sdk/src/callback/oss_progress_callback.dart';
 import 'package:aliyun_oss_dart_sdk/src/callback/oss_retry_callback.dart';
-
 import 'object_metadata.dart';
 import 'oss_request.dart';
 

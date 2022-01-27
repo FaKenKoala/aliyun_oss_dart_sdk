@@ -1,11 +1,12 @@
 
  import 'dart:convert';
 
-import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
+import 'package:http/http.dart' as http;
 
+import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
 import 'oss_federation_credential_provider.dart';
 import 'oss_federation_token.dart';
-import 'package:http/http.dart' as http;
+
 class OSSAuthCredentialProvider extends OSSFederationCredentialProvider {
 
      String authServerUrl;
