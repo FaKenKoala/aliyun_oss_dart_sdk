@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:aliyun_oss_dart_sdk/src/callback/lib_callback.dart';
 import 'package:aliyun_oss_dart_sdk/src/internal/lib_internal.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
@@ -23,7 +25,7 @@ class ProgressTouchableRequestBody<T extends OSSRequest> extends RequestBody {
 
     while (total < contentLength) {
       remain = contentLength - total;
-      toRead = Math.min(remain, SEGMENT_SIZE);
+      toRead = min(remain, SEGMENT_SIZE);
 
       read = source.read(sink.buffer(), toRead);
       if (read == -1) {

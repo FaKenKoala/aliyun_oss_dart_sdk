@@ -1,29 +1,40 @@
 
- class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUploadRequest,
+ import 'dart:io';
+
+import 'package:aliyun_oss_dart_sdk/src/callback/lib_callback.dart';
+import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/lib_common.dart';
+import 'package:aliyun_oss_dart_sdk/src/exception/lib_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/lib_internal.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
+import 'package:aliyun_oss_dart_sdk/src/network/lib_network.dart';
+import 'package:aliyun_oss_dart_sdk/src/service_exception.dart';
+import 'package:path/path.dart' as path;
+class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUploadRequest,
         ResumableUploadResult> implements Callable<ResumableUploadResult> {
 
-     File mRecordFile;
-     List<Integer> mAlreadyUploadIndex = [];
-     OSSSharedPreferences mSp;
-     File mCRC64RecordFile;
+     File? recordFile;
+     List<int> alreadyUploadIndex = [];
+     OSSSharedPreferences sp;
+     File? crc64RecordFile;
 
 
      ResumableUploadTask(ResumableUploadRequest request,
-                               OSSCompletedCallback<ResumableUploadRequest, ResumableUploadResult> completedCallback,
-                               ExecutionContext context, InternalRequestOperation apiOperation) {
+                               OSSCompletedCallback<ResumableUploadRequest, ResumableUploadResult>? completedCallback,
+                               ExecutionContext context, InternalRequestOperation apiOperation) :
+        sp = OSSSharedPreferences.instance(context.getApplicationContext()),
         super(apiOperation, request, completedCallback, context);
-        mSp = OSSSharedPreferences.instance(context.getApplicationContext());
-    }
+
 
     @override
-     void initMultipartUploadId()  {
+     void initMultipartUploadId() async {
 
-        Map<Integer, int> recordCrc64 = null;
+        Map<int, String> recordCrc64 = {};
 
-        if (!OSSUtils.isEmptyString(request.getRecordDirectory())) {
-            String fileMd5 = null;
+        if (request.recordDirectory.notNullOrEmpty) {
+            String? fileMd5;
             if (uploadUri != null) {
-                OSSLog.logDebug("[initUploadId] - mUploadFilePath : " + uploadUri.getPath());
+                OSSLog.logDebug("[initUploadId] - mUploadFilePath : ${uploadUri!.path}");
                 ParcelFileDescriptor parcelFileDescriptor = context.getApplicationContext().getContentResolver().openFileDescriptor(uploadUri, "r");
                 try {
                     fileMd5 = BinaryUtil.calculateMd5Str(parcelFileDescriptor.getFileDescriptor());
@@ -33,41 +44,40 @@
                     }
                 }
             } else {
-                OSSLog.logDebug("[initUploadId] - mUploadFilePath : " + uploadFilePath);
-                fileMd5 = BinaryUtil.calculateMd5Str(uploadFilePath);
+                OSSLog.logDebug("[initUploadId] - mUploadFilePath : " + uploadFilePath!);
+                fileMd5 = BinaryUtil.calculateMd5StrFromPath(uploadFilePath!);
             }
-            OSSLog.logDebug("[initUploadId] - mRequest.getPartSize() : " + request.getPartSize());
-            String recordFileName = BinaryUtil.calculateMd5Str((fileMd5 + request.getBucketName()
-                    + request.getObjectKey() + String.valueOf(request.getPartSize()) + (mCheckCRC64 ? "-crc64" : "")).getBytes());
-            String recordPath = request.getRecordDirectory() + File.separator + recordFileName;
+            OSSLog.logDebug("[initUploadId] - mrequest.partSize : " + '{request.partSize}');
+            String recordFileName = BinaryUtil.calculateMd5StrFromStr((fileMd5 + request.bucketName
+                    + request.objectKey + '${request.partSize}' + (isCheckCRC64 ? "-crc64" : "")));
+            String recordPath = '${request.recordDirectory}' + path.separator + recordFileName;
 
 
-            mRecordFile = File(recordPath);
-            if (mRecordFile.exists()) {
-                BufferedReader br = BufferedReader(new FileReader(mRecordFile));
-                mUploadId = br.readLine();
+            recordFile = File(recordPath);
+            if (recordFile!.existsSync()) {
+                BufferedReader br = BufferedReader(FileReader(recordFile));
+                uploadId = br.readLine();
                 br.close();
             }
 
-            OSSLog.logDebug("[initUploadId] - mUploadId : " + mUploadId);
+            OSSLog.logDebug("[initUploadId] - uploadId : $uploadId" );
 
-            if (!OSSUtils.isEmptyString(mUploadId)) {
-                if (mCheckCRC64) {
-                    String filePath = request.getRecordDirectory() + File.separator + mUploadId;
+            if (uploadId.notNullOrEmpty) {
+                if (isCheckCRC64) {
+                    String filePath = '${request.recordDirectory}' + path.separator + '$uploadId';
                     File crc64Record = File(filePath);
-                    if (crc64Record.exists()) {
+                    if (crc64Record.existsSync()) {
                         FileInputStream fs = FileInputStream(crc64Record);//创建文件字节输出流对象
                         ObjectInputStream ois = ObjectInputStream(fs);
 
                         try {
-                            recordCrc64 = (Map<Integer, int>) ois.readObject();
-                            crc64Record.delete();
-                        } catch (ClassNotFoundException e) {
+                            recordCrc64 =  ois.readObject();
+                            crc64Record.deleteSync();
+                        } on ClassNotFoundException catch ( e) {
                             OSSLog.logThrowable2Local(e);
                         } finally {
-                            if (ois != null)
-                                ois.close();
-                            crc64Record.delete();
+                                ois?.close();
+                            crc64Record.deleteSync();
                         }
                     }
                 }
@@ -77,143 +87,146 @@
 
 
                 do{
-                    ListPartsRequest listParts = ListPartsRequest(request.getBucketName(), request.getObjectKey(), mUploadId);
+                    ListPartsRequest listParts = ListPartsRequest(request.bucketName, request.objectKey, uploadId!);
                     if (nextPartNumberMarker > 0){
-                        listParts.setPartNumberMarker(nextPartNumberMarker);
+                        listParts.partNumberMarker = nextPartNumberMarker;
                     }
 
                     OSSAsyncTask<ListPartsResult> task = operation.listParts(listParts, null);
                     try {
-                        ListPartsResult result = task.getResult();
-                        isTruncated = result.isTruncated();
-                        nextPartNumberMarker = result.getNextPartNumberMarker();
+                        ListPartsResult result = await task.getResult();
+                        isTruncated = result.isTruncated;
+                        nextPartNumberMarker = result.nextPartNumberMarker;
                         List<PartSummary> parts = result.getParts();
                         int partSize = partAttr[0];
                         int partTotalNumber = partAttr[1];
-                        for (int i = 0; i < parts.size(); i++) {
-                            PartSummary part = parts.get(i);
-                            PartETag partETag = PartETag(part.getPartNumber(), part.getETag());
-                            partETag.setPartSize(part.getSize());
+                        for (int i = 0; i < parts.length; i++) {
+                            PartSummary part = parts[i];
+                            PartETag partETag = PartETag(part.partNumber, part.eTag);
+                            partETag.partSize = (part.size);
 
-                            if (recordCrc64 != null && recordCrc64.size() > 0) {
-                                if (recordCrc64.containsKey(partETag.getPartNumber())) {
-                                    partETag.setCRC64(recordCrc64.get(partETag.getPartNumber()));
+                            if (recordCrc64 != null && recordCrc64.isNotEmpty) {
+                                if (recordCrc64.containsKey(partETag.partNumber)) {
+                                    partETag.crc64 = recordCrc64[partETag.partNumber];
                                 }
                             }
-                            OSSLog.logDebug("[initUploadId] -  " + i + " part.getPartNumber() : " + part.getPartNumber());
-                            OSSLog.logDebug("[initUploadId] -  " + i + " part.getSize() : " + part.getSize());
+                            OSSLog.logDebug("[initUploadId] -  $i"  " part.partNumber : ${part.partNumber}");
+                            OSSLog.logDebug("[initUploadId] -  $i" " part.size : $part.size}");
 
 
-                            bool isTotal = part.getPartNumber() == partTotalNumber;
+                            bool isTotal = part.partNumber == partTotalNumber;
 
-                            if (isTotal && part.getSize() != mLastPartSize){
-                                throw OSSClientException("current part size " + part.getSize() + " setting is inconsistent with PartSize : " + partSize + " or lastPartSize : " + mLastPartSize);
+                            if (isTotal && part.size != lastPartSize){
+                                throw OSSClientException("current part size " '${part.size}' " setting is inconsistent with PartSize : " '$partSize' " or lastPartSize : $lastPartSize" );
                             }
 
-                            if (!isTotal && part.getSize() != partSize){
-                                throw OSSClientException("current part size " + part.getSize() + " setting is inconsistent with PartSize : " + partSize + " or lastPartSize : " + mLastPartSize);
+                            if (!isTotal && part.size != partSize){
+                                throw OSSClientException("current part size "  '${part.size}'  " setting is inconsistent with PartSize : "  '$partSize'  " or lastPartSize : $lastPartSize");
                             }
 
-//                            if (part.getPartNumber() == partTotalNumber){
-//                                if (part.getSize() != mLastPartSize){
-//                                    throw OSSClientException("current part size " + partSize + " setting is inconsistent with PartSize : " + mPartAttr[0] + " or lastPartSize : " + mLastPartSize);
+//                            if (part.partNumber == partTotalNumber){
+//                                if (part.size != lastPartSize){
+//                                    throw OSSClientException("current part size " + partSize + " setting is inconsistent with PartSize : " + mPartAttr[0] + " or lastPartSize : " + lastPartSize);
 //                                }
 //                            }else{
-//                                if (part.getSize() != partSize){
-//                                    throw OSSClientException("current part size " + partSize + " setting is inconsistent with PartSize : " + mPartAttr[0] + " or lastPartSize : " + mLastPartSize);
+//                                if (part.size != partSize){
+//                                    throw OSSClientException("current part size " + partSize + " setting is inconsistent with PartSize : " + mPartAttr[0] + " or lastPartSize : " + lastPartSize);
 //                                }
 //                            }
 
                             partETags.add(partETag);
-                            mUploadedLength += part.getSize();
-                            mAlreadyUploadIndex.add(part.getPartNumber());
+                            uploadedLength += part.size;
+                            alreadyUploadIndex.add(part.partNumber);
                         }
-                    } catch (OSSServiceException e) {
+                    } on OSSServiceException catch ( e) {
                         isTruncated = false;
-                        if (e.getStatusCode() == 404) {
-                            mUploadId = null;
+                        if (e.statusCode == HttpStatus.notFound) {
+                            uploadId = null;
                         } else {
-                            throw e;
+                            rethrow;
                         }
-                    } catch (OSSClientException e) {
+                    }on OSSClientException catch ( e) {
                         isTruncated = false;
-                        throw e;
+                        rethrow;
                     }
                     task.waitUntilFinished();
                 }while (isTruncated);
 
             }
 
-            if (!mRecordFile.exists() && !mRecordFile.createNewFile()) {
-                throw OSSClientException("Can't create file at path: " + mRecordFile.getAbsolutePath()
+            if (!recordFile!.existsSync()) {
+
+              try{
+                recordFile!.createSync();
+              }catch(e){
+                throw OSSClientException("Can't create file at path: " + recordFile.path
                         + "\nPlease make sure the directory exist!");
+              }
             }
         }
 
-        if (OSSUtils.isEmptyString(mUploadId)) {
+        if (uploadId.isNullOrEmpty) {
             InitiateMultipartUploadRequest init = InitiateMultipartUploadRequest(
-                    request.getBucketName(), request.getObjectKey(), request.getMetadata());
+                    request.bucketName, request.objectKey, request.metadata);
 
-            InitiateMultipartUploadResult initResult = operation.initMultipartUpload(init, null).getResult();
+            InitiateMultipartUploadResult initResult = await operation.initMultipartUpload(init, null).getResult();
 
-            mUploadId = initResult.getUploadId();
+            uploadId = initResult.uploadId;
 
-            if (mRecordFile != null) {
-                BufferedWriter bw = BufferedWriter(new FileWriter(mRecordFile));
-                bw.write(mUploadId);
+            if (recordFile != null) {
+                BufferedWriter bw = BufferedWriter(FileWriter(recordFile));
+                bw.write(uploadId);
                 bw.close();
             }
         }
 
-        request.setUploadId(mUploadId);
+        request.uploadId = (uploadId);
     }
 
     @override
-     ResumableUploadResult doMultipartUpload()  {
+     ResumableUploadResult? doMultipartUpload()  {
 
-        int tempUploadedLength = mUploadedLength;
+        int tempUploadedLength = uploadedLength;
         checkCancel();
 //        int[] mPartAttr = int[2];
 //        checkPartSize(mPartAttr);
         int readByte = partAttr[0];
         final int partNumber = partAttr[1];
 
-        if (partETags.size() > 0 && mAlreadyUploadIndex.size() > 0) { //revert progress
-            if (mUploadedLength > mFileLength) {
+        if (partETags.isNotEmpty && alreadyUploadIndex.isNotEmpty) { //revert progress
+            if (uploadedLength > fileLength) {
                 throw OSSClientException("The uploading file is inconsistent with before");
             }
 
 //            int firstPartSize = mPartETags.get(0).getPartSize();
 //            OSSLog.logDebug("[initUploadId] - firstPartSize : " + firstPartSize);
-//            if (firstPartSize > 0 && firstPartSize != readByte && firstPartSize < mFileLength) {
+//            if (firstPartSize > 0 && firstPartSize != readByte && firstPartSize < fileLength) {
 //                throw OSSClientException("current part size " + readByte + " setting is inconsistent with before " + firstPartSize);
 //            }
 
-            int revertUploadedLength = mUploadedLength;
+            int revertUploadedLength = uploadedLength;
 
-            if (mSp.getStringValue(mUploadId)).notNullOrEmpty {
-                revertUploadedLength = int.valueOf(mSp.getStringValue(mUploadId));
+            if (sp.getStringValue(uploadId!).notNullOrEmpty) {
+                revertUploadedLength = int.parse(sp.getStringValue(uploadId!));
             }
 
-            if (progressCallback != null) {
-                progressCallback.onProgress(request, revertUploadedLength, mFileLength);
-            }
+                progressCallback?.onProgress(request, revertUploadedLength, fileLength);
 
-            mSp.removeKey(mUploadId);
+            sp.removeKey(uploadId!);
         }
         //已经运行的任务需要添加已经上传的任务数量
-        mRunPartTaskCount = partETags.size();
+        runPartTaskCount = partETags.length;
 
         for (int i = 0; i < partNumber; i++) {
 
-            if (mAlreadyUploadIndex.size() != 0 && mAlreadyUploadIndex.contains(i + 1)) {
+            if (alreadyUploadIndex.isNotEmpty && alreadyUploadIndex.contains(i + 1)) {
                 continue;
             }
 
             if (mPoolExecutor != null) {
                 //need read byte
                 if (i == partNumber - 1) {
-                    readByte = (int) (mFileLength - tempUploadedLength);
+                    readByte = fileLength - tempUploadedLength;
                 }
                 final int byteCount = readByte;
                 final int readIndex = i;
@@ -228,24 +241,20 @@
         }
 
         if (checkWaitCondition(partNumber)) {
-             (mLock) {
-                mLock.wait();
-            }
+            //  (mLock) {
+            //     mLock.wait();
+            // }
         }
 
         checkException();
         //complete sort
-        CompleteMultipartUploadResult completeResult = completeMultipartUploadResult();
-        ResumableUploadResult result = null;
+        CompleteMultipartUploadResult? completeResult = completeMultipartUploadResult();
+        ResumableUploadResult? result;
         if (completeResult != null) {
             result = ResumableUploadResult(completeResult);
         }
-        if (mRecordFile != null) {
-            mRecordFile.delete();
-        }
-        if (mCRC64RecordFile != null) {
-            mCRC64RecordFile.delete();
-        }
+            recordFile?.deleteSync();
+            crc64RecordFile?.deleteSync();
 
         releasePool();
         return result;
@@ -254,27 +263,25 @@
     @override
      void checkException()  {
         if (context.cancellationHandler.isCancelled) {
-            if (request.deleteUploadOnCancelling()) {
+            if (request.deleteUploadOnCancelling) {
                 abortThisUpload();
-                if (mRecordFile != null) {
-                    mRecordFile.delete();
-                }
+                    recordFile?.deleteSync();
             } else {
-                if (partETags != null && partETags.size() > 0 && mCheckCRC64 && request.getRecordDirectory() != null) {
-                    Map<Integer, int> maps = HashMap<Integer, int>();
-                    for (PartETag eTag : partETags) {
-                        maps[eTag.getPartNumber()] = eTag.getCRC64();
+                if (partETags != null && partETags.isNotEmpty && isCheckCRC64 && request.recordDirectory != null) {
+                    Map<int, String?> maps = {};
+                    for (PartETag eTag in partETags) {
+                        maps[eTag.partNumber] = eTag.crc64;
                     }
-                    ObjectOutputStream oot = null;
+                    ObjectOutputStream? oot = null;
                     try {
-                        String filePath = request.getRecordDirectory() + File.separator + mUploadId;
-                        mCRC64RecordFile = File(filePath);
-                        if (!mCRC64RecordFile.exists()) {
-                            mCRC64RecordFile.createNewFile();
+                        String filePath = '${request.recordDirectory}' + path.separator + '$uploadId';
+                        crc64RecordFile = File(filePath);
+                        if (!crc64RecordFile!.existsSync()) {
+                            crc64RecordFile!.createSync();
                         }
-                        oot = ObjectOutputStream(new FileOutputStream(mCRC64RecordFile));
+                        oot = ObjectOutputStream(FileOutputStream(crc64RecordFile));
                         oot.writeObject(maps);
-                    } catch (OSSIOException e) {
+                    } on OSSIOException catch ( e) {
                         OSSLog.logThrowable2Local(e);
                     } finally {
                         if (oot != null) {
@@ -289,37 +296,35 @@
 
     @override
      void abortThisUpload() {
-        if (mUploadId != null) {
+        if (uploadId != null) {
             AbortMultipartUploadRequest abort = AbortMultipartUploadRequest(
-                    request.getBucketName(), request.getObjectKey(), mUploadId);
+                    request.bucketName, request.objectKey, uploadId!);
             operation.abortMultipartUpload(abort, null).waitUntilFinished();
         }
     }
 
     @override
      void processException(Exception e) {
-         (mLock) {
             partExceptionCount++;
             uploadException = e;
             OSSLog.logThrowable2Local(e);
             if (context.cancellationHandler.isCancelled) {
-                if (!mIsCancel) {
-                    mIsCancel = true;
+                if (!isCancel) {
+                    isCancel = true;
                     mLock.notify();
                 }
             }
-            if (partETags.size() == (mRunPartTaskCount - partExceptionCount)) {
+            if (partETags.length == (runPartTaskCount - partExceptionCount)) {
                 notifyMultipartThread();
             }
-        }
     }
 
     @override
      void uploadPartFinish(PartETag partETag)  {
         if (context.cancellationHandler.isCancelled) {
-            if (!mSp.contains(mUploadId)) {
-                mSp.setStringValue(mUploadId, String.valueOf(mUploadedLength));
-                onProgressCallback(request, mUploadedLength, mFileLength);
+            if (!sp.contains(uploadId!)) {
+                sp.setStringValue(uploadId!, '$uploadedLength');
+                onProgressCallback(request, uploadedLength, fileLength);
             }
         }
     }

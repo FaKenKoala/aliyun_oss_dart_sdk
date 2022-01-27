@@ -250,7 +250,7 @@ class OSSClient implements OSS {
   }
 
   @override
-  OSSAsyncTask<DeleteMultipleObjectResult> asyncDeleteMultipleObject(
+  OSSAsyncTask<DeleteMultipleObjectResult>? asyncDeleteMultipleObject(
       DeleteMultipleObjectRequest request,
       OSSCompletedCallback<DeleteMultipleObjectRequest,
               DeleteMultipleObjectResult>
@@ -259,7 +259,7 @@ class OSSClient implements OSS {
   }
 
   @override
-  Future<DeleteMultipleObjectResult> deleteMultipleObject(
+  Future<DeleteMultipleObjectResult?> deleteMultipleObject(
       DeleteMultipleObjectRequest request) {
     return mOss.deleteMultipleObject(request);
   }

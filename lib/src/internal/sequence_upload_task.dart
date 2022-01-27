@@ -22,7 +22,7 @@ class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadRequest,
 
   SequenceUploadTask(
       ResumableUploadRequest request,
-      OSSCompletedCallback<ResumableUploadRequest, ResumableUploadResult>
+      OSSCompletedCallback<ResumableUploadRequest, ResumableUploadResult>?
           completedCallback,
       ExecutionContext context,
       InternalRequestOperation apiOperation)

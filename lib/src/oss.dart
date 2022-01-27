@@ -59,7 +59,7 @@ abstract class OSS {
 
   /// Asynchronously delete multiple objects
 
-  OSSAsyncTask<DeleteMultipleObjectResult> asyncDeleteMultipleObject(
+  OSSAsyncTask<DeleteMultipleObjectResult>? asyncDeleteMultipleObject(
       DeleteMultipleObjectRequest request,
       OSSCompletedCallback<DeleteMultipleObjectRequest,
               DeleteMultipleObjectResult>
@@ -67,7 +67,7 @@ abstract class OSS {
 
   /// delete multiple objects
 
-  Future<DeleteMultipleObjectResult> deleteMultipleObject(
+  Future<DeleteMultipleObjectResult?> deleteMultipleObject(
       DeleteMultipleObjectRequest request);
 
   /// Asynchronously append the file

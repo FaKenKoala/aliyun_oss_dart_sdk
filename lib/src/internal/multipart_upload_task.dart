@@ -8,7 +8,7 @@ class MultipartUploadTask extends BaseMultipartUploadTask<MultipartUploadRequest
         CompleteMultipartUploadResult> implements Callable<CompleteMultipartUploadResult> {
 
      MultipartUploadTask(InternalRequestOperation operation, MultipartUploadRequest request,
-                               OSSCompletedCallback<MultipartUploadRequest, CompleteMultipartUploadResult> completedCallback,
+                               OSSCompletedCallback<MultipartUploadRequest, CompleteMultipartUploadResult>? completedCallback,
                                ExecutionContext context) :
         super(operation, request, completedCallback, context);
     

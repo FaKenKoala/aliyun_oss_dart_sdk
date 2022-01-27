@@ -1,5 +1,10 @@
 
- class NetworkProgressHelper {
+ import 'package:aliyun_oss_dart_sdk/src/internal/lib_internal.dart';
+
+import 'execution_context.dart';
+import 'lib_network.dart';
+
+class NetworkProgressHelper {
 
     /**
      * process response progress
@@ -28,6 +33,6 @@
                                                                       int contentLength,
                                                                       String contentType,
                                                                       ExecutionContext context) {
-        return ProgressTouchableRequestBody(input, contentLength, contentType, context);
+        return ProgressTouchableRequestBody(input, contentLength, contentType);
     }
 }

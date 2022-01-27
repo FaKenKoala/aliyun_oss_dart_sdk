@@ -301,21 +301,22 @@ class OSSImpl implements OSS {
   }
 
   @override
-  OSSAsyncTask<DeleteMultipleObjectResult> asyncDeleteMultipleObject(
+  OSSAsyncTask<DeleteMultipleObjectResult>? asyncDeleteMultipleObject(
       DeleteMultipleObjectRequest request,
       OSSCompletedCallback<DeleteMultipleObjectRequest,
               DeleteMultipleObjectResult>
           completedCallback) {
+            \
     return internalRequestOperation.deleteMultipleObject(
         request, completedCallback);
   }
 
   @override
-  Future<DeleteMultipleObjectResult> deleteMultipleObject(
+  Future<DeleteMultipleObjectResult?> deleteMultipleObject(
       DeleteMultipleObjectRequest request) {
     return internalRequestOperation
         .deleteMultipleObject(request, null)
-        .getResult();
+        ?.getResult() ?? Future.value(null);
   }
 
   @override

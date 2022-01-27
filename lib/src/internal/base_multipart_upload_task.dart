@@ -83,11 +83,11 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
     }
 
     @override
-     Result call()  {
+     Result? call()  {
         try {
             checkInitData();
             initMultipartUploadId();
-            Result result = doMultipartUpload();
+            Result? result = doMultipartUpload();
 
                 completedCallback?.onSuccess(request, result);
             return result;
@@ -146,7 +146,7 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
         }
     }
 
-     void uploadPart(int readIndex, int byteCount, int partNumber) {
+     void uploadPart(int readIndex, int byteCount, int partNumber) async{
 
         RandomAccessFile? raf;
         InputStream? inputStream;
@@ -181,7 +181,7 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
             uploadPart.partContent = (partContent);
             uploadPart.md5Digest = (BinaryUtil.calculateBase64Md5(partContent));
             uploadPart.crc64Config = (request.crc64Config);
-            UploadPartResult uploadPartResult = operation.syncUploadPart(uploadPart);
+            UploadPartResult uploadPartResult = await operation.syncUploadPart(uploadPart);
             //check isComplete
                 PartETag partETag = PartETag(uploadPart.partNumber, uploadPartResult.eTag);
                 partETag.partSize = byteCount;
@@ -230,7 +230,7 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
       void processException(Exception e);
 
     /// complete multipart upload
-     CompleteMultipartUploadResult? completeMultipartUploadResult()  {
+     Future<CompleteMultipartUploadResult?> completeMultipartUploadResult()  async{
         //complete sort
         CompleteMultipartUploadResult? completeResult;
         if (partETags.isNotEmpty) {
@@ -259,7 +259,7 @@ if (key !=(OSSHeaders.storageClass)) {
             }
 
             complete.crc64Config = request.crc64Config;
-            completeResult = operation.syncCompleteMultipartUpload(complete);
+            completeResult = await operation.syncCompleteMultipartUpload(complete);
         }
         uploadedLength = 0;
         return completeResult;

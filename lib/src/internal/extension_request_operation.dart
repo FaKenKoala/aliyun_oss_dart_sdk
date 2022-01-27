@@ -42,7 +42,7 @@ class ExtensionRequestOperation {
      void abortResumableUpload(ResumableUploadRequest request)  {
         setCRC64(request);
 
-        if (request.getRecordDirectory().notNullOrEmpty) {
+        if (request.recordDirectory.notNullOrEmpty) {
             String? uploadFilePath = request.uploadFilePath;
             String? fileMd5;
             if (uploadFilePath != null) {
@@ -59,7 +59,7 @@ class ExtensionRequestOperation {
             }
             String recordFileName = BinaryUtil.calculateMd5Str(utf8.encode(fileMd5 + request.bucketName
                     + request.objectKey + "${request.partSize}"));
-            String recordPath = "${request.getRecordDirectory()}/$recordFileName";
+            String recordPath = "${request.recordDirectory}/$recordFileName";
             File recordFile = File(recordPath);
 
             if (recordFile.existsSync()) {

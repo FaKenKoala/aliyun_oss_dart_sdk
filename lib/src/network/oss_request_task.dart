@@ -11,7 +11,6 @@ import 'package:aliyun_oss_dart_sdk/src/internal/response_parsers.dart'
 import 'package:http/http.dart';
 
 import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
-import 'execution_context.dart';
 import 'lib_network.dart';
 
 class OSSRequestTask<T extends OSSResult> implements Callable<T> {
@@ -107,7 +106,7 @@ class OSSRequestTask<T extends OSSResult> implements Callable<T> {
               parcelFileDescriptor = context
                   .getApplicationContext()
                   .getContentResolver()
-                  .openFileDescriptor(message.getUploadUri(), "r");
+                  .openFileDescriptor(message.uploadUri, "r");
               length = parcelFileDescriptor.getStatSize();
             } finally {
               if (parcelFileDescriptor != null) {
@@ -130,7 +129,7 @@ class OSSRequestTask<T extends OSSResult> implements Callable<T> {
             requestBuilder = requestBuilder.method(
                 message.method.toString(),
                 NetworkProgressHelper.addProgressRequestBody(
-                    inputStream, length, contentType, context));
+                    inputStream, length, contentType!, context));
           } else if (stringBody != null) {
             requestBuilder = requestBuilder.method(
                 message.method.toString(),
@@ -138,7 +137,7 @@ class OSSRequestTask<T extends OSSResult> implements Callable<T> {
                     MediaType.parse(contentType), utf8.encode(stringBody)));
           } else {
             requestBuilder = requestBuilder.method(
-                message.method.toString(), RequestBody.create(null, byte[0]));
+                message.method.toString(), RequestBody.create(null, []));
           }
           break;
         case HttpMethod.get:

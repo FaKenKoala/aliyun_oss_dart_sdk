@@ -34,7 +34,7 @@ class ProgressTouchableResponseBody<T extends OSSRequest> extends ResponseBody {
 
      Source source(Source source) {
         return ForwardingSource(source) {
-             int totalBytesRead = 0L;
+             int totalBytesRead = 0;
 
             @override
              int read(Buffer sink, int byteCount)  {
