@@ -203,7 +203,7 @@ class RequestMessage extends HttpMessage {
     String baseURL = scheme + "://" + urlHost;
     String? queryString = OSSUtils.paramToQueryString(parameters);
 
-    if (queryString.nullOrEmpty) {
+    if (queryString.isNullOrEmpty) {
       return baseURL;
     } else {
       return "$baseURL?$queryString";
@@ -223,7 +223,7 @@ class RequestMessage extends HttpMessage {
       portString = '$port';
     }
 
-    if (originHost.nullOrEmpty) {
+    if (originHost.isNullOrEmpty) {
       String url = endpoint.toString();
       OSSLog.logDebug("endpoint url : " + url);
 //            originHost = url.substring((scheme + "://").length(),url.length());
@@ -265,7 +265,7 @@ class RequestMessage extends HttpMessage {
         }
       } else if (OSSUtils.isValidateIP(originHost)) {
         // ip address
-        if (ipWithHeader.nullOrEmpty) {
+        if (ipWithHeader.isNullOrEmpty) {
           isPathStyle = true;
         } else {
           addHeader(HttpHeaders.host, ipWithHeader!);
@@ -301,7 +301,7 @@ class RequestMessage extends HttpMessage {
 
     OSSLog.logDebug(printReq.toString());
 
-    if (queryString.nullOrEmpty) {
+    if (queryString.isNullOrEmpty) {
       return baseURL;
     } else {
       return "$baseURL?$queryString";

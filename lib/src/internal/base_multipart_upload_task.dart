@@ -41,7 +41,7 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
      int partExceptionCount = 0;
      int runPartTaskCount = 0;
      int uploadedLength = 0;
-     bool checkCRC64 = false;
+     bool isCheckCRC64 = false;
      Request request;
      OSSCompletedCallback<Request, Result>? completedCallback;
      OSSProgressCallback<Request>? progressCallback;
@@ -50,11 +50,11 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
      int lastPartSize = 0;//最后一个分片的大小
      Uri? uploadUri;
 
-     BaseMultipartUploadTask(this. operation, this.request,
+     BaseMultipartUploadTask(this.operation, this.request,
                                    this.completedCallback,
                                    this.context) {
         progressCallback = request.progressCallback as OSSProgressCallback<Request>?;
-        checkCRC64 = (request.crc64Config == CRC64Config.yes);
+        isCheckCRC64 = (request.crc64Config == CRC64Config.yes);
     }
 
     /// abort upload
@@ -64,7 +64,7 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
       void initMultipartUploadId() ;
 
     /// do multipart upload task
-      Result doMultipartUpload() ;
+      Result? doMultipartUpload() ;
 
     /// check is or not cancel
      void checkCancel()  {
@@ -185,7 +185,7 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
             //check isComplete
                 PartETag partETag = PartETag(uploadPart.partNumber, uploadPartResult.eTag);
                 partETag.partSize = byteCount;
-                if (checkCRC64) {
+                if (isCheckCRC64) {
                     partETag.crc64 = uploadPartResult.clientCRC;
                 }
 

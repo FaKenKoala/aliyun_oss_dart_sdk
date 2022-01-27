@@ -370,7 +370,7 @@ class OSSUtils {
   }
 
   static bool isOssOriginHost(String host) {
-    if (host.nullOrEmpty) {
+    if (host.isNullOrEmpty) {
       return false;
     }
     for (String suffix in OSSConstants.ossOrignHost) {

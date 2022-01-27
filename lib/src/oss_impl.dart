@@ -45,7 +45,7 @@ class OSSImpl implements OSS {
     this.conf = (conf ?? ClientConfiguration.getDefaultConf());
 
     internalRequestOperation =
-        InternalRequestOperation.endpoint(endpointUri, credentialProvider, this.conf);
+        InternalRequestOperation.endpoint(endpointUri!, credentialProvider, this.conf!);
     extensionRequestOperation =
         ExtensionRequestOperation(internalRequestOperation);
   }
@@ -53,7 +53,7 @@ class OSSImpl implements OSS {
   OSSImpl(this.credentialProvider, ClientConfiguration? conf) {
     this.conf = (conf ?? ClientConfiguration.getDefaultConf());
     internalRequestOperation =
-        InternalRequestOperation(credentialProvider, this.conf);
+        InternalRequestOperation(credentialProvider, this.conf!);
     extensionRequestOperation =
         ExtensionRequestOperation(internalRequestOperation);
   }
@@ -72,7 +72,7 @@ class OSSImpl implements OSS {
   }
 
   @override
-  OSSAsyncTask<CreateBucketResult> asyncCreateBucket(
+  OSSAsyncTask<CreateBucketResult>? asyncCreateBucket(
       CreateBucketRequest request,
       OSSCompletedCallback<CreateBucketRequest, CreateBucketResult>
           completedCallback) {
@@ -80,8 +80,8 @@ class OSSImpl implements OSS {
   }
 
   @override
-  Future<CreateBucketResult> createBucket(CreateBucketRequest request) {
-    return internalRequestOperation.createBucket(request, null).getResult();
+  Future<CreateBucketResult>? createBucket(CreateBucketRequest request) {
+    return internalRequestOperation.createBucket(request, null)?.getResult();
   }
 
   @override
@@ -124,7 +124,7 @@ class OSSImpl implements OSS {
   }
 
   @override
-  OSSAsyncTask<PutBucketRefererResult> asyncPutBucketReferer(
+  OSSAsyncTask<PutBucketRefererResult>? asyncPutBucketReferer(
       PutBucketRefererRequest request,
       OSSCompletedCallback<PutBucketRefererRequest, PutBucketRefererResult>
           completedCallback) {
@@ -133,8 +133,8 @@ class OSSImpl implements OSS {
   }
 
   @override
-  Future<PutBucketRefererResult> putBucketReferer(PutBucketRefererRequest request) {
-    return internalRequestOperation.putBucketReferer(request, null).getResult();
+  Future<PutBucketRefererResult>? putBucketReferer(PutBucketRefererRequest request) {
+    return internalRequestOperation.putBucketReferer(request, null)?.getResult();
   }
 
   @override
@@ -170,12 +170,12 @@ class OSSImpl implements OSS {
   }
 
   @override
-  Future<PutBucketLoggingResult> putBucketLogging(PutBucketLoggingRequest request) {
-    return internalRequestOperation.putBucketLogging(request, null).getResult();
+  Future<PutBucketLoggingResult>? putBucketLogging(PutBucketLoggingRequest request) {
+    return internalRequestOperation.putBucketLogging(request, null)?.getResult();
   }
 
   @override
-  OSSAsyncTask<PutBucketLoggingResult> asyncPutBucketLogging(
+  OSSAsyncTask<PutBucketLoggingResult>? asyncPutBucketLogging(
       PutBucketLoggingRequest request,
       OSSCompletedCallback<PutBucketLoggingRequest, PutBucketLoggingResult>
           completedCallback) {
@@ -198,15 +198,14 @@ class OSSImpl implements OSS {
   }
 
   @override
-  Future<PutBucketLifecycleResult> putBucketLifecycle(
+  Future<PutBucketLifecycleResult>? putBucketLifecycle(
       PutBucketLifecycleRequest request) {
     return internalRequestOperation
-        .putBucketLifecycle(request, null)
-        .getResult();
+        .putBucketLifecycle(request, null)?.getResult();
   }
 
   @override
-  OSSAsyncTask<PutBucketLifecycleResult> asyncPutBucketLifecycle(
+  OSSAsyncTask<PutBucketLifecycleResult>? asyncPutBucketLifecycle(
       PutBucketLifecycleRequest request,
       OSSCompletedCallback<PutBucketLifecycleRequest, PutBucketLifecycleResult>
           completedCallback) {
@@ -470,7 +469,7 @@ class OSSImpl implements OSS {
   @override
   void updateCredentialProvider(OSSCredentialProvider credentialProvider) {
     this.credentialProvider = credentialProvider;
-    internalRequestOperation.setCredentialProvider(credentialProvider);
+    internalRequestOperation.credentialProvider  = credentialProvider;
   }
 
   @override

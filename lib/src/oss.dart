@@ -136,14 +136,14 @@ abstract class OSS {
 
   /// Asynchronously create bucket
 
-  OSSAsyncTask<CreateBucketResult> asyncCreateBucket(
+  OSSAsyncTask<CreateBucketResult>? asyncCreateBucket(
       CreateBucketRequest request,
       OSSCompletedCallback<CreateBucketRequest, CreateBucketResult>
           completedCallback);
 
   /// Synchronously create bucket
 
-  Future<CreateBucketResult> createBucket(CreateBucketRequest request);
+  Future<CreateBucketResult>? createBucket(CreateBucketRequest request);
 
   /// Asynchronously delete bucket
 
@@ -185,14 +185,14 @@ abstract class OSS {
 
   /// Asynchronously put bucket referer
 
-  OSSAsyncTask<PutBucketRefererResult> asyncPutBucketReferer(
+  OSSAsyncTask<PutBucketRefererResult>? asyncPutBucketReferer(
       PutBucketRefererRequest request,
       OSSCompletedCallback<PutBucketRefererRequest, PutBucketRefererResult>
           completedCallback);
 
   /// Synchronously put bucket referer
 
-  Future<PutBucketRefererResult> putBucketReferer(
+  Future<PutBucketRefererResult>? putBucketReferer(
       PutBucketRefererRequest request);
 
   /// Synchronously delete bucket logging
@@ -210,12 +210,12 @@ abstract class OSS {
 
   /// Synchronously put bucket logging
 
-  Future<PutBucketLoggingResult> putBucketLogging(
+  Future<PutBucketLoggingResult>? putBucketLogging(
       PutBucketLoggingRequest request);
 
   /// Asynchronously delete bucket logging
 
-  OSSAsyncTask<PutBucketLoggingResult> asyncPutBucketLogging(
+  OSSAsyncTask<PutBucketLoggingResult>? asyncPutBucketLogging(
       PutBucketLoggingRequest request,
       OSSCompletedCallback<PutBucketLoggingRequest, PutBucketLoggingResult>
           completedCallback);
@@ -241,12 +241,12 @@ abstract class OSS {
 
   /// Synchronously put bucket lifecycle
 
-  Future<PutBucketLifecycleResult> putBucketLifecycle(
+  Future<PutBucketLifecycleResult>? putBucketLifecycle(
       PutBucketLifecycleRequest request);
 
   /// Asynchronously put bucket lifecycle
 
-  OSSAsyncTask<PutBucketLifecycleResult> asyncPutBucketLifecycle(
+  OSSAsyncTask<PutBucketLifecycleResult>? asyncPutBucketLifecycle(
       PutBucketLifecycleRequest request,
       OSSCompletedCallback<PutBucketLifecycleRequest, PutBucketLifecycleResult>
           completedCallback);

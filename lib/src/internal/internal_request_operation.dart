@@ -4,6 +4,7 @@ import 'package:aliyun_oss_dart_sdk/src/callback/oss_completed_callback.dart';
 import 'package:aliyun_oss_dart_sdk/src/client_configuration.dart';
 import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/lib_common.dart';
+import 'package:aliyun_oss_dart_sdk/src/exception/lib_exception.dart';
 import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
 import 'package:aliyun_oss_dart_sdk/src/network/lib_network.dart';
 import 'package:aliyun_oss_dart_sdk/src/service_exception.dart';
@@ -20,8 +21,8 @@ class InternalRequestOperation {
                     return Thread(r, "oss-android-api-thread");
                 }
             });
-      Uri endpoint;
-     Uri service;
+      late Uri endpoint;
+     late Uri service;
      OSSCredentialProvider credentialProvider;
      int maxRetryCount = OSSConstants.defaultRetryCount;
      ClientConfiguration conf;
@@ -35,17 +36,17 @@ class InternalRequestOperation {
                 .hostnameVerifier(HostnameVerifier() {
                     @override
                      bool verify(String hostname, SSLSession session) {
-                        return HttpsURLConnection.getDefaultHostnameVerifier().verify(endpoint.host, session);
+                        return HttpsURLConnection.defaultHostnameVerifier.verify(endpoint.host, session);
                     }
                 });
 
         if (conf != null) {
             Dispatcher dispatcher = Dispatcher();
-            dispatcher.setMaxRequests(conf.getMaxConcurrentRequest());
+            dispatcher.maxRequests = conf.maxConcurrentRequest;
 
-            builder.connectTimeout(conf.getConnectionTimeout(), TimeUnit.MILLISECONDS)
-                    .readTimeout(conf.getSocketTimeout(), TimeUnit.MILLISECONDS)
-                    .writeTimeout(conf.getSocketTimeout(), TimeUnit.MILLISECONDS)
+            builder.connectTimeout(conf.connectionTimeout, TimeUnit.MILLISECONDS)
+                    .readTimeout(conf.socketTimeout, TimeUnit.MILLISECONDS)
+                    .writeTimeout(conf.socketTimeout, TimeUnit.MILLISECONDS)
                     .dispatcher(dispatcher);
 
             if (conf.proxyHost != null && conf.proxyPort != 0) {
@@ -73,17 +74,17 @@ class InternalRequestOperation {
                 .hostnameVerifier(HostnameVerifier() {
                     @override
                      bool verify(String hostname, SSLSession session) {
-                        return HttpsURLConnection.getDefaultHostnameVerifier().verify(service.getHost(), session);
+                        return HttpsURLConnection.defaultHostnameVerifier.verify(service.host, session);
                     }
                 });
 
         if (conf != null) {
             Dispatcher dispatcher = Dispatcher();
-            dispatcher.setMaxRequests(conf.getMaxConcurrentRequest());
+            dispatcher.maxRequests = conf.maxConcurrentRequest;
 
-            builder.connectTimeout(conf.getConnectionTimeout(), TimeUnit.MILLISECONDS)
-                    .readTimeout(conf.getSocketTimeout(), TimeUnit.MILLISECONDS)
-                    .writeTimeout(conf.getSocketTimeout(), TimeUnit.MILLISECONDS)
+            builder.connectTimeout(conf.connectionTimeout, TimeUnit.MILLISECONDS)
+                    .readTimeout(conf.socketTimeout, TimeUnit.MILLISECONDS)
+                    .writeTimeout(conf.socketTimeout, TimeUnit.MILLISECONDS)
                     .dispatcher(dispatcher);
 
             if (conf.proxyHost != null && conf.proxyPort != 0) {
@@ -129,11 +130,11 @@ class InternalRequestOperation {
 
 
         if (completedCallback != null) {
-            executionContext.completedCallback = _OSSCompletedCallback(checkCRC64(request, result));
+            executionContext.completedCallback = _OSSCompletedCallback(completedCallback);
         }
 
-        if (request.getRetryCallback() != null) {
-            executionContext.setRetryCallback(request.getRetryCallback());
+        if (request.retryCallback != null) {
+            executionContext.retryCallback = request.retryCallback;
         }
 
         executionContext.progressCallback = request.progressCallback;
@@ -152,7 +153,7 @@ class InternalRequestOperation {
         requestMessage.method = HttpMethod.put;
         requestMessage.bucketName = request.bucketName;
         if (request.bucketACL != null) {
-            requestMessage.headers[OSSHeaders.OSS_CANNED_ACL] = request.getBucketACL().toString();
+            requestMessage.headers[OSSHeaders.ossCannedAcl] = request.bucketACL.toString();
         }
         try {
             Map<String, String> configures = <String,String>{};
@@ -477,7 +478,7 @@ class InternalRequestOperation {
         RequestMessage requestMessage = RequestMessage();
         requestMessage.isAuthorizationRequired=request.isAuthorizationRequired;
         requestMessage.endpoint = endpoint;
-        requestMessage.method = HttpMethod.HEAD;
+        requestMessage.method = HttpMethod.head;
         requestMessage.bucketName = request.bucketName;
         requestMessage.objectKey = request.objectKey;
 
@@ -504,27 +505,25 @@ class InternalRequestOperation {
         requestMessage.bucketName = request.bucketName;
         requestMessage.objectKey = request.objectKey;
 
-        if (request.getRange() != null) {
-            requestMessage.headers[OSSHeaders.RANGE] = request.getRange().toString();
+        if (request.range != null) {
+            requestMessage.headers[HttpHeaders.range] = request.range.toString();
         }
 
-        if (request.getxOssProcess() != null) {
-            requestMessage.parameters[RequestParameters.xOSSProcess] = request.getxOssProcess();
+        if (request.xOssProcess != null) {
+            requestMessage.parameters[RequestParameters.xOSSProcess] = request.xOssProcess!;
         }
 
         canonicalizeRequestMessage(requestMessage, request);
 
-        if (request.getRequestHeaders() != null) {
-            for (Map.Entry<String, String> entry : request.getRequestHeaders().entrySet()) {
-                requestMessage.headers[entry.getKey()] = entry.getValue();
-            }
-        }
+        request.requestHeaders?.forEach((key, value) { 
+          requestMessage.headers[key] = value;
+        });
 
         ExecutionContext<GetObjectRequest, GetObjectResult> executionContext = ExecutionContext(request);
         if (completedCallback != null) {
             executionContext.completedCallback = completedCallback;
         }
-        executionContext.progressCallback = request.getProgressListener();
+        executionContext.progressCallback = request.progressListener;
         ResponseParser<GetObjectResult> parser = GetObjectResponseParser();
 
         Callable<GetObjectResult> callable = OSSRequestTask<GetObjectResult>(requestMessage, parser, executionContext, maxRetryCount);
@@ -565,8 +564,8 @@ class InternalRequestOperation {
         requestMessage.isAuthorizationRequired=request.isAuthorizationRequired;
         requestMessage.endpoint = endpoint;
         requestMessage.method = HttpMethod.put;
-        requestMessage.bucketName(request.getDestinationBucketName());
-        requestMessage.setObjectKey(request.getDestinationKey());
+        requestMessage.bucketName = request.destinationBucketName;
+        requestMessage.objectKey = request.destinationKey;
 
         OSSUtils.populateCopyObjectHeaders(request, requestMessage.headers);
 
@@ -606,7 +605,7 @@ class InternalRequestOperation {
         return OSSAsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }
 
-     OSSAsyncTask<DeleteMultipleObjectResult> deleteMultipleObject(
+     OSSAsyncTask<DeleteMultipleObjectResult>? deleteMultipleObject(
             DeleteMultipleObjectRequest request, OSSCompletedCallback<DeleteMultipleObjectRequest, DeleteMultipleObjectResult>? completedCallback) {
         RequestMessage requestMessage = RequestMessage();
         Map<String, String> query = <String,String>{};
@@ -618,10 +617,10 @@ class InternalRequestOperation {
         requestMessage.bucketName = request.bucketName;
         requestMessage.parameters = query;
         try {
-            List<int> bodyBytes = requestMessage.deleteMultipleObjectRequestBodyMarshall(request.getObjectKeys(), request.getQuiet());
-            if (bodyBytes != null && bodyBytes.length > 0) {
-                requestMessage.headers[OSSHeaders.contentMd5] = BinaryUtil.calculateBase64Md5(bodyBytes);
-                requestMessage.headers[OSSHeaders.CONTENT_LENGTH] = String.valueOf(bodyBytes.length);
+            List<int> bodyBytes = requestMessage.deleteMultipleObjectRequestBodyMarshall(request.objectKeys, request.isQuiet);
+            if (bodyBytes != null && bodyBytes.isNotEmpty) {
+                requestMessage.headers[HttpHeaders.contentMd5] = BinaryUtil.calculateBase64Md5(bodyBytes);
+                requestMessage.headers[HttpHeaders.contentLength] = '${bodyBytes.length}';
             }
         } on UnsupportedEncodingException catch ( e) {
             e.printStackTrace();
@@ -647,7 +646,7 @@ class InternalRequestOperation {
         RequestMessage requestMessage = RequestMessage();
         requestMessage.isAuthorizationRequired=request.isAuthorizationRequired;
         requestMessage.method = HttpMethod.get;
-        requestMessage.setService(service);
+        requestMessage.service = service;
         requestMessage.endpoint = endpoint; //设置假Endpoint
 
         canonicalizeRequestMessage(requestMessage, request);
@@ -761,7 +760,7 @@ class InternalRequestOperation {
             CompleteMultipartUploadRequest request) async {
         CompleteMultipartUploadResult result = await completeMultipartUpload(request, null).getResult();
         if (result.serverCRC != null) {
-            int crc64 = calcObjectCRCFromParts(request.partETags);
+            String crc64 = calcObjectCRCFromParts(request.partETags);
             result.clientCRC = crc64;
         }
         checkCRC64(request, result);
@@ -779,7 +778,7 @@ class InternalRequestOperation {
         requestMessage.objectKey = request.objectKey;
         requestMessage.stringBody = OSSUtils.buildXMLFromPartEtagList(request.partETags);
 
-        requestMessage.parameters[RequestParameters.uploadId] = request.uploadId;
+        requestMessage.parameters[RequestParameters.uploadId] = request.uploadId ??'';
 
         if (request.callbackParam != null) {
             requestMessage.headers["x-oss-callback"] = OSSUtils.populateMapToBase64JsonString(request.callbackParam ?? {});
@@ -794,7 +793,7 @@ class InternalRequestOperation {
 
         ExecutionContext<CompleteMultipartUploadRequest, CompleteMultipartUploadResult> executionContext = ExecutionContext(request);
         if (completedCallback != null) {
-            executionContext.completedCallback = 
+            executionContext.completedCallback = _OSSCompletedCallback2(completedCallback);
         }
         ResponseParser<CompleteMultipartUploadResult> parser = CompleteMultipartUploadResponseParser();
 
@@ -840,20 +839,20 @@ class InternalRequestOperation {
 
         requestMessage.parameters[RequestParameters.uploadId] = request.uploadId;
 
-        Integer maxParts = request.getMaxParts();
+        int maxParts = request.maxParts;
         if (maxParts != null) {
             if (!OSSUtils.checkParamRange(maxParts, 0, true, LIST_PART_MAX_RETURNS, true)) {
-                throw ArgumentError("MaxPartsOutOfRange: " + LIST_PART_MAX_RETURNS);
+                throw ArgumentError("MaxPartsOutOfRange: $LIST_PART_MAX_RETURNS");
             }
-            requestMessage.parameters[RequestParameters.MAX_PARTS] = maxParts.toString();
+            requestMessage.parameters[RequestParameters.maxParts] = maxParts.toString();
         }
 
-        Integer partNumberMarker = request.getPartNumberMarker();
+        int partNumberMarker = request.partNumberMarker;
         if (partNumberMarker != null) {
             if (!OSSUtils.checkParamRange(partNumberMarker, 0, false, MAX_PART_NUMBER, true)) {
-                throw ArgumentError("PartNumberMarkerOutOfRange: " + MAX_PART_NUMBER);
+                throw ArgumentError("PartNumberMarkerOutOfRange: $MAX_PART_NUMBER");
             }
-            requestMessage.parameters[RequestParameters.PART_NUMBER_MARKER] = partNumberMarker.toString();
+            requestMessage.parameters[RequestParameters.partNumberMarker] = partNumberMarker.toString();
         }
 
         canonicalizeRequestMessage(requestMessage, request);
@@ -878,7 +877,7 @@ class InternalRequestOperation {
         requestMessage.method = HttpMethod.get;
         requestMessage.bucketName = request.bucketName;
 
-        requestMessage.parameters[RequestParameters.SUBRESOURCE_UPLOADS] = "";
+        requestMessage.parameters[RequestParameters.subresourceUploads] = "";
 
         OSSUtils.populateListMultipartUploadsRequestParameters(request, requestMessage.parameters);
 
@@ -911,11 +910,11 @@ class InternalRequestOperation {
                 proxyHost = android.net.Proxy.getHost(applicationContext);
             }
 
-            String confProxyHost = conf.proxyHost;
-            if (confProxyHost).notNullOrEmpty {
-                proxyHost = confProxyHost;
+            String? confProxyHost = conf.proxyHost;
+            if (confProxyHost.notNullOrEmpty) {
+                proxyHost = confProxyHost!;
             }
-return proxyHost.nullOrEmpty;
+return proxyHost.isNullOrEmpty;
         }
         return false;
     }
@@ -927,37 +926,37 @@ return proxyHost.nullOrEmpty;
             header[HttpHeaders.date] = DateUtil.currentFixedSkewedTimeInRFC822Format();
         }
 
-        if (message.getMethod() == HttpMethod.post || message.getMethod() == HttpMethod.put) {
-            if (header[HttpHeaders.contentType].nullOrEmpty) {
+        if (message.method == HttpMethod.post || message.method == HttpMethod.put) {
+            if (header[HttpHeaders.contentType].isNullOrEmpty) {
                 String determineContentType = OSSUtils.determineContentType(null,
-                        message.getUploadFilePath(), message.objectKey);
+                        message.uploadFilePath, message.objectKey);
                 header[HttpHeaders.contentType] = determineContentType;
             }
         }
 
         // When the HTTP proxy is set, httpDNS is not enabled.
-        message.setHttpDnsEnable(checkIfHttpDnsAvailable(conf.isHttpDnsEnable()));
-        message.setCredentialProvider(credentialProvider);
-        message.setPathStyleAccessEnable(conf.isPathStyleAccessEnable());
-        message.setCustomPathPrefixEnable(conf.isCustomPathPrefixEnable());
+        message.httpDnsEnable = checkIfHttpDnsAvailable(conf.httpDnsEnable);
+        message.credentialProvider = credentialProvider;
+        message.pathStyleAccessEnable = conf.pathStyleAccessEnable;
+        message.customPathPrefixEnable = conf.customPathPrefixEnable;
 
         // set ip with header
-        message.setIpWithHeader(conf.getIpWithHeader());
+        message.ipWithHeader = conf.ipWithHeader;
 
-        message.headers[HttpHeaders.userAgent] = VersionInfoUtils.getUserAgent(conf.getCustomUserMark());
+        message.headers[HttpHeaders.userAgent] = VersionInfoUtils.getUserAgent(conf.userAgentMark);
 
-        if (message.headers.containsKey(HttpHeaders.range) || messageparameters.containsKey(RequestParameters.xOSSProcess)) {
+        if (message.headers.containsKey(HttpHeaders.range) || message.parameters.containsKey(RequestParameters.xOSSProcess)) {
             //if contain range or x-oss-process , then don't crc64
-            message.setCheckCRC64(false);
+            message.checkCRC64 = false;
         }
 
         //  cloud user could have special endpoint and we need to differentiate it with the CName here.
-        message.setIsInCustomCnameExcludeList(OSSUtils.isInCustomCnameExcludeList(endpoint.getHost(), conf.getCustomCnameExcludeList()));
+        message.isInCustomCnameExcludeList = OSSUtils.isInCustomCnameExcludeList(endpoint.host, conf.customCnameExcludeList);
 
-        bool checkCRC64 = request.getCRC64() != OSSRequest.CRC64Config.NULL
-                ? (request.getCRC64() == OSSRequest.CRC64Config.YES ? true : false) : conf.isCheckCRC64();
-        message.setCheckCRC64(checkCRC64);
-        request.setCRC64(checkCRC64 ? OSSRequest.CRC64Config.YES : OSSRequest.CRC64Config.NO);
+        bool checkCRC64 = request.crc64Config != CRC64Config.$null
+                ? (request.crc64Config == CRC64Config.yes ? true : false) : conf.checkCRC64;
+        message.checkCRC64 = checkCRC64;
+        request.crc64Config = checkCRC64 ? CRC64Config.yes : CRC64Config.no;
     }
 
       
@@ -1148,7 +1147,7 @@ class _OSSCompletedCallback extends OSSCompletedCallback<PutObjectRequest, PutOb
             try {
                 OSSUtils.checkChecksum(result.clientCRC, result.serverCRC, result.requestId);
             } on InconsistentException catch ( e) {
-                throw OSSClientException(e.getMessage(), e);
+                throw OSSClientException(e);
             }
         }
     }

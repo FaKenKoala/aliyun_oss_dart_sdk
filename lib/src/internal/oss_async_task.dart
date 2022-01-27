@@ -19,9 +19,9 @@ class OSSAsyncTask<T extends OSSResult> {
     });
   }
 
-  static OSSAsyncTask wrapRequestTask<T extends OSSResult>(
+  static OSSAsyncTask<T> wrapRequestTask<T extends OSSResult>(
       Future<T> future, ExecutionContext context) {
-    OSSAsyncTask asynTask = OSSAsyncTask._(future, context);
+    OSSAsyncTask<T> asynTask = OSSAsyncTask._(future, context);
     return asynTask;
   }
 

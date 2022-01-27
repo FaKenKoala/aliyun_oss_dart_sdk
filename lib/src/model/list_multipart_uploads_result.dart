@@ -44,10 +44,10 @@ class ListMultipartUploadsResult extends OSSResult {
     return _commonPrefixes;
   }
 
-  void setCommonPrefixes(List<String> commonPrefixes) {
+  void setCommonPrefixes(List<String>? commonPrefixes) {
     _commonPrefixes
       ..clear()
-      ..addAll(commonPrefixes);
+      ..addAll(commonPrefixes ?? []);
   }
 
   void addCommonPrefix(String commonPrefix) {
@@ -59,61 +59,61 @@ class ListMultipartUploadsResult extends OSSResult {
     MultipartUpload? upload;
     bool isCommonPrefixes = false;
     XmlPullParser parser = Xml.newPullParser();
-    parser.setI[responseMessage.getContent()] = "utf-8";
+    parser.setInput(responseMessage.content, "utf-8");
     int eventType = parser.getEventType();
     while (eventType != XmlPullParser.END_DOCUMENT) {
       switch (eventType) {
         case XmlPullParser.START_TAG:
           String name = parser.getName();
-          if ("Bucket".equals(name)) {
-            setBucketName(parser.nextText());
-          } else if ("Delimiter".equals(name)) {
-            setDelimiter(parser.nextText());
-          } else if ("Prefix".equals(name)) {
+          if ("Bucket" == name) {
+            bucketName = parser.nextText();
+          } else if ("Delimiter" == name) {
+            delimiter = parser.nextText();
+          } else if ("Prefix" == name) {
             if (isCommonPrefixes) {
               String commonPrefix = parser.nextText();
-              if (!OSSUtils.isEmptyString(commonPrefix)) {
+              if (commonPrefix.notNullOrEmpty) {
                 addCommonPrefix(commonPrefix);
               }
             } else {
-              setPrefix(parser.nextText());
+              prefix = parser.nextText();
             }
-          } else if ("MaxUploads".equals(name)) {
-            String maxUploads = parser.nextText();
-            if (!OSSUtils.isEmptyString(maxUploads)) {
-              setMaxUploads(Integer.valueOf(maxUploads));
+          } else if ("MaxUploads" == name) {
+            String? maxUploadStr = parser.nextText();
+            if (maxUploadStr.notNullOrEmpty) {
+              maxUploads = int.parse(maxUploadStr!);
             }
-          } else if ("IsTruncated".equals(name)) {
-            String isTruncated = parser.nextText();
-            if (!OSSUtils.isEmptyString(isTruncated)) {
-              setTruncated(bool.valueOf(isTruncated));
+          } else if ("IsTruncated" == name) {
+            String? truncated = parser.nextText();
+            if (truncated.notNullOrEmpty) {
+              isTruncated = truncated!.equalsIgnoreCase('true');
             }
-          } else if ("KeyMarker".equals(name)) {
-            setKeyMarker(parser.nextText());
-          } else if ("UploadIdMarker".equals(name)) {
-            setUploadIdMarker(parser.nextText());
-          } else if ("NextKeyMarker".equals(name)) {
-            setNextKeyMarker(parser.nextText());
-          } else if ("NextUploadIdMarker".equals(name)) {
-            setNextUploadIdMarker(parser.nextText());
-          } else if ("Upload".equals(name)) {
+          } else if ("KeyMarker" == name) {
+            keyMarker = parser.nextText();
+          } else if ("UploadIdMarker" == name) {
+            uploadIdMarker = parser.nextText();
+          } else if ("NextKeyMarker" == name) {
+            nextKeyMarker = parser.nextText();
+          } else if ("NextUploadIdMarker" == name) {
+            nextUploadIdMarker = parser.nextText();
+          } else if ("Upload" == name) {
             upload = MultipartUpload();
-          } else if ("Key".equals(name)) {
-            upload.setKey(parser.nextText());
-          } else if ("UploadId".equals(name)) {
-            upload.setUploadId(parser.nextText());
-          } else if ("Initiated".equals(name)) {
-            upload.setInitiated(DateUtil.parseIso8601Date(parser.nextText()));
-          } else if ("StorageClass".equals(name)) {
-            upload.setStorageClass(parser.nextText());
-          } else if ("CommonPrefixes".equals(name)) {
+          } else if ("Key" == name) {
+            upload?.key = parser.nextText();
+          } else if ("UploadId" == name) {
+            upload?.uploadId = parser.nextText();
+          } else if ("Initiated" == name) {
+            upload?.initiated = DateUtil.parseIso8601Date(parser.nextText());
+          } else if ("StorageClass" == name) {
+            upload?.storageClass = parser.nextText();
+          } else if ("CommonPrefixes" == name) {
             isCommonPrefixes = true;
           }
           break;
         case XmlPullParser.END_TAG:
-          if ("Upload".equals(parser.getName())) {
+          if ("Upload" == parser.getName()) {
             uploadList.add(upload);
-          } else if ("CommonPrefixes".equals(parser.getName())) {
+          } else if ("CommonPrefixes" == parser.getName()) {
             isCommonPrefixes = false;
           }
           break;

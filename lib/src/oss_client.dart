@@ -32,7 +32,7 @@ class OSSClient implements OSS {
   }
 
   @override
-  OSSAsyncTask<CreateBucketResult> asyncCreateBucket(
+  OSSAsyncTask<CreateBucketResult>? asyncCreateBucket(
       CreateBucketRequest request,
       OSSCompletedCallback<CreateBucketRequest, CreateBucketResult>
           completedCallback) {
@@ -40,7 +40,7 @@ class OSSClient implements OSS {
   }
 
   @override
-  Future<CreateBucketResult> createBucket(CreateBucketRequest request) {
+  Future<CreateBucketResult>? createBucket(CreateBucketRequest request) {
     return mOss.createBucket(request);
   }
 
@@ -84,7 +84,7 @@ class OSSClient implements OSS {
   }
 
   @override
-  OSSAsyncTask<PutBucketRefererResult> asyncPutBucketReferer(
+  OSSAsyncTask<PutBucketRefererResult>? asyncPutBucketReferer(
       PutBucketRefererRequest request,
       OSSCompletedCallback<PutBucketRefererRequest, PutBucketRefererResult>
           completedCallback) {
@@ -92,7 +92,7 @@ class OSSClient implements OSS {
   }
 
   @override
-  Future<PutBucketRefererResult> putBucketReferer(
+  Future<PutBucketRefererResult>? putBucketReferer(
       PutBucketRefererRequest request) {
     return mOss.putBucketReferer(request);
   }
@@ -127,13 +127,13 @@ class OSSClient implements OSS {
   }
 
   @override
-  Future<PutBucketLoggingResult> putBucketLogging(
+  Future<PutBucketLoggingResult>? putBucketLogging(
       PutBucketLoggingRequest request) {
     return mOss.putBucketLogging(request);
   }
 
   @override
-  OSSAsyncTask<PutBucketLoggingResult> asyncPutBucketLogging(
+  OSSAsyncTask<PutBucketLoggingResult>? asyncPutBucketLogging(
       PutBucketLoggingRequest request,
       OSSCompletedCallback<PutBucketLoggingRequest, PutBucketLoggingResult>
           completedCallback) {
@@ -155,13 +155,13 @@ class OSSClient implements OSS {
   }
 
   @override
-  Future<PutBucketLifecycleResult> putBucketLifecycle(
+  Future<PutBucketLifecycleResult>? putBucketLifecycle(
       PutBucketLifecycleRequest request) {
     return mOss.putBucketLifecycle(request);
   }
 
   @override
-  OSSAsyncTask<PutBucketLifecycleResult> asyncPutBucketLifecycle(
+  OSSAsyncTask<PutBucketLifecycleResult>? asyncPutBucketLifecycle(
       PutBucketLifecycleRequest request,
       OSSCompletedCallback<PutBucketLifecycleRequest, PutBucketLifecycleResult>
           completedCallback) {

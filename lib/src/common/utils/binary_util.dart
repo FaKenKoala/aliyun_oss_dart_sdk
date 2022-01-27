@@ -34,6 +34,10 @@ class BinaryUtil {
     return getMd5Str(calculateMd5(binaryData));
   }
 
+  static String calculateMd5StrFromStr(String binaryData) {
+    return getMd5Str(calculateMd5(utf8.encode(binaryData)));
+  }
+
   /// calculate md5 for file and string back
   static String calculateMd5StrFromPath(String filePath) {
     return getMd5Str(calculateMd5FromFile(filePath));

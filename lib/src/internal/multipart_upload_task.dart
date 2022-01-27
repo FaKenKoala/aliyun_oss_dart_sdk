@@ -9,23 +9,23 @@ class MultipartUploadTask extends BaseMultipartUploadTask<MultipartUploadRequest
 
      MultipartUploadTask(InternalRequestOperation operation, MultipartUploadRequest request,
                                OSSCompletedCallback<MultipartUploadRequest, CompleteMultipartUploadResult> completedCallback,
-                               ExecutionContext context) {
+                               ExecutionContext context) :
         super(operation, request, completedCallback, context);
-    }
+    
 
     @override
-     void initMultipartUploadId()  {
+     void initMultipartUploadId()  async{
         InitiateMultipartUploadRequest init = InitiateMultipartUploadRequest(
                 request.bucketName, request.objectKey, request.metadata);
 
-        InitiateMultipartUploadResult initResult = operation.initMultipartUpload(init, null).getResult();
+        InitiateMultipartUploadResult initResult = await operation.initMultipartUpload(init, null).getResult();
 
-        mUploadId = initResult.getUploadId();
-        request.setUploadId(mUploadId);
+        uploadId = initResult.uploadId;
+        request.uploadId = uploadId;
     }
 
     @override
-     CompleteMultipartUploadResult doMultipartUpload()  {
+     CompleteMultipartUploadResult? doMultipartUpload()  {
         checkCancel();
         int readByte = partAttr[0];
         final int partNumber = partAttr[1];
@@ -35,7 +35,7 @@ class MultipartUploadTask extends BaseMultipartUploadTask<MultipartUploadRequest
             if (mPoolExecutor != null) {
                 //need read byte
                 if (i == partNumber - 1) {
-                    readByte = (int) (mFileLength - currentLength);
+                    readByte = fileLength - currentLength;
                 }
                 final int byteCount = readByte;
                 final int readIndex = i;
@@ -57,7 +57,7 @@ class MultipartUploadTask extends BaseMultipartUploadTask<MultipartUploadRequest
         }
         checkException();
         //complete sort
-        CompleteMultipartUploadResult completeResult = completeMultipartUploadResult();
+        CompleteMultipartUploadResult? completeResult = completeMultipartUploadResult();
 
         releasePool();
         return completeResult;
@@ -65,16 +65,16 @@ class MultipartUploadTask extends BaseMultipartUploadTask<MultipartUploadRequest
 
     @override
      void abortThisUpload() {
-        if (mUploadId != null) {
+        if (uploadId != null) {
             AbortMultipartUploadRequest abort = AbortMultipartUploadRequest(
-                    request.getBucketName(), request.getObjectKey(), mUploadId);
+                    request.bucketName, request.objectKey, uploadId!);
             operation.abortMultipartUpload(abort, null).waitUntilFinished();
         }
     }
 
     @override
      void processException(Exception e) {
-            mPartExceptionCount++;
+            partExceptionCount++;
             if (uploadException == null) {
                 uploadException = e;
                 mLock.notify();

@@ -7,11 +7,11 @@ class VersionInfoUtils {
      * UA sample : aliyun-sdk-java/2.0.5(Windows 7/6.1/amd64;1.7.0_55)/oss-import
      */
   static String getUserAgent(String? customInfo) {
-    if (customInfo.nullOrEmpty) {
+    if (customInfo.isNullOrEmpty) {
       userAgent = "aliyun-sdk-dart/" + getVersion() + getSystemInfo();
     }
 
-    if (customInfo.nullOrEmpty) {
+    if (customInfo.isNullOrEmpty) {
       return userAgent!;
     } else {
       return "$userAgent/$customInfo";
@@ -38,7 +38,7 @@ class VersionInfoUtils {
     String ua = customUA.toString();
     OSSLog.logDebug("user agent : " + ua);
 
-    if (ua.nullOrEmpty) {
+    if (ua.isNullOrEmpty) {
       String propertyUA = deviceInfo.httpAgent;
       ua = propertyUA.replaceAll("[^\\p{ASCII}]", "?");
     }

@@ -1,33 +1,35 @@
 
- class ProgressTouchableResponseBody<T extends OSSRequest> extends ResponseBody {
+ import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
+import 'package:aliyun_oss_dart_sdk/src/network/lib_network.dart';
 
-     final ResponseBody mResponseBody;
-     OSSProgressCallback mProgressListener;
-     BufferedSource mBufferedSource;
-     T request;
+class ProgressTouchableResponseBody<T extends OSSRequest> extends ResponseBody {
 
-     ProgressTouchableResponseBody(ResponseBody responseBody, ExecutionContext context) {
-        this.mResponseBody = responseBody;
-        this.mProgressListener = context.getProgressCallback();
-        this.request = (T) context.getRequest();
-    }
+     final ResponseBody responseBody;
+     OSSProgressCallback progressListener;
+     BufferedSource bufferedSource;
+    final  T request;
+
+     ProgressTouchableResponseBody(this. responseBody, ExecutionContext context) :
+        progressListener = context.progressCallback,
+        request =  context.request as T;
+    
 
     @override
      MediaType contentType() {
-        return mResponseBody.contentType();
+        return responseBody.contentType();
     }
 
     @override
      int contentLength() {
-        return mResponseBody.contentLength();
+        return responseBody.contentLength();
     }
 
     @override
      BufferedSource source() {
-        if (mBufferedSource == null) {
-            mBufferedSource = Okio.buffer(source(mResponseBody.source()));
+        if (bufferedSource == null) {
+            bufferedSource = Okio.buffer(source(responseBody.source()));
         }
-        return mBufferedSource;
+        return bufferedSource;
     }
 
      Source source(Source source) {
@@ -39,8 +41,8 @@
                 int bytesRead = super.read(sink, byteCount);
                 totalBytesRead += bytesRead != -1 ? bytesRead : 0;
                 //callback
-                if (mProgressListener != null && bytesRead != -1 && totalBytesRead != 0) {
-                    mProgressListener.onProgress(request, totalBytesRead, mResponseBody.contentLength());
+                if (progressListener != null && bytesRead != -1 && totalBytesRead != 0) {
+                    progressListener.onProgress(request, totalBytesRead, responseBody.contentLength());
                 }
                 return bytesRead;
             }

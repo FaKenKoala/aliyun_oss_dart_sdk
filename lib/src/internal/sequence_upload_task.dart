@@ -1,376 +1,410 @@
+import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/exception/lib_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/service_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/task_cancel_exception.dart';
+import 'package:path/path.dart' as path;
+import 'dart:io';
 
- class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadRequest,
-        ResumableUploadResult> implements Callable<ResumableUploadResult> {
+import 'package:aliyun_oss_dart_sdk/src/callback/lib_callback.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/lib_common.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
+import 'package:aliyun_oss_dart_sdk/src/network/lib_network.dart';
 
-     File mRecordFile;
-     List<Integer> mAlreadyUploadIndex = [];
-     int mFirstPartSize;
-     OSSSharedPreferences mSp;
-     File mCRC64RecordFile;
+import 'lib_internal.dart';
 
-     SequenceUploadTask(ResumableUploadRequest request,
-                              OSSCompletedCallback<ResumableUploadRequest, ResumableUploadResult> completedCallback,
-                              ExecutionContext context, InternalRequestOperation apiOperation) {
+class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadRequest,
+    ResumableUploadResult> implements Callable<ResumableUploadResult> {
+  File? recordFile;
+  List<int> alreadyUploadIndex = [];
+  int firstPartSize = 0;
+  OSSSharedPreferences sp;
+  File? crc64RecordFile;
+
+  SequenceUploadTask(
+      ResumableUploadRequest request,
+      OSSCompletedCallback<ResumableUploadRequest, ResumableUploadResult>
+          completedCallback,
+      ExecutionContext context,
+      InternalRequestOperation apiOperation)
+      : sp = OSSSharedPreferences.instance(context.getApplicationContext()),
         super(apiOperation, request, completedCallback, context);
-        mSp = OSSSharedPreferences.instance(context.getApplicationContext());
-    }
 
-    @override
-     void initMultipartUploadId()  {
+  @override
+  void initMultipartUploadId() async {
+    Map<int, String?> recordCrc64 = {};
 
-        Map<Integer, int> recordCrc64 = null;
+    if (request.recordDirectory.notNullOrEmpty) {
+      String? fileMd5;
+      if (uploadUri != null) {
+        ParcelFileDescriptor parcelFileDescriptor = context
+            .getApplicationContext()
+            .getContentResolver()
+            .openFileDescriptor(uploadUri, "r");
+        try {
+          fileMd5 = BinaryUtil.calculateMd5Str(
+              parcelFileDescriptor.getFileDescriptor());
+        } finally {
+          if (parcelFileDescriptor != null) {
+            parcelFileDescriptor.close();
+          }
+        }
+      } else {
+        fileMd5 = BinaryUtil.calculateMd5StrFromPath(uploadFilePath!);
+      }
+      String recordFileName = BinaryUtil.calculateMd5StrFromStr((fileMd5 +
+          request.bucketName +
+          request.objectKey +
+          '$request.partSize}' +
+          (isCheckCRC64 ? "-crc64" : "") +
+          "-sequence"));
+      String recordPath =
+          '${request.recordDirectory}' + path.separator + recordFileName;
 
-        if (!OSSUtils.isEmptyString(request.getRecordDirectory())) {
-            String fileMd5 = null;
-            if (uploadUri != null) {
-                ParcelFileDescriptor parcelFileDescriptor = context.getApplicationContext().getContentResolver().openFileDescriptor(uploadUri, "r");
-                try {
-                    fileMd5 = BinaryUtil.calculateMd5Str(parcelFileDescriptor.getFileDescriptor());
-                } finally {
-                    if (parcelFileDescriptor != null) {
-                        parcelFileDescriptor.close();
-                    }
+      recordFile = File(recordPath);
+      if (recordFile!.existsSync()) {
+        BufferedReader br = BufferedReader(FileReader(recordFile));
+        uploadId = br.readLine();
+        br.close();
+        OSSLog.logDebug(
+            "sequence [initUploadId] - Found record file, uploadid: $uploadId");
+      }
+
+      if (uploadId.notNullOrEmpty) {
+        if (isCheckCRC64) {
+          String filePath =
+              '$request.recordDirectory}' + path.separator + uploadId!;
+          File crc64Record = File(filePath);
+          if (crc64Record.existsSync()) {
+            FileInputStream fs = FileInputStream(crc64Record); //创建文件字节输出流对象
+            ObjectInputStream ois = ObjectInputStream(fs);
+
+            try {
+              recordCrc64 = ois.readObject();
+              crc64Record.delete();
+            } on ClassNotFoundException catch (e) {
+              OSSLog.logThrowable2Local(e);
+            } finally {
+              if (ois != null) {
+                ois.close();
+              }
+              crc64Record.delete();
+            }
+          }
+        }
+
+        bool isTruncated = false;
+        int nextPartNumberMarker = 0;
+
+        do {
+          ListPartsRequest listParts = ListPartsRequest(
+              request.bucketName, request.objectKey, uploadId!);
+          if (nextPartNumberMarker > 0) {
+            listParts.partNumberMarker = nextPartNumberMarker;
+          }
+
+          OSSAsyncTask<ListPartsResult> task =
+              operation.listParts(listParts, null);
+
+          try {
+            ListPartsResult result = await task.getResult();
+            isTruncated = result.isTruncated;
+            nextPartNumberMarker = result.nextPartNumberMarker;
+            List<PartSummary> parts = result.getParts();
+
+            for (int i = 0; i < parts.length; i++) {
+              PartSummary part = parts[i];
+              PartETag partETag = PartETag(part.partNumber, part.eTag);
+              partETag.partSize = part.size;
+
+              if (recordCrc64 != null && recordCrc64.isNotEmpty) {
+                if (recordCrc64.containsKey(partETag.partNumber)) {
+                  partETag.crc64 = recordCrc64[partETag.partNumber];
                 }
+              }
+
+              partETags.add(partETag);
+              uploadedLength += part.size;
+              alreadyUploadIndex.add(part.partNumber);
+              if (i == 0) {
+                firstPartSize = part.size;
+              }
+            }
+          } on OSSServiceException catch (e) {
+            isTruncated = false;
+            if (e.statusCode == HttpStatus.notFound) {
+              uploadId = null;
             } else {
-                fileMd5 = BinaryUtil.calculateMd5Str(uploadFilePath);
+              rethrow;
             }
-            String recordFileName = BinaryUtil.calculateMd5Str((fileMd5 + request.getBucketName()
-                    + request.getObjectKey() + String.valueOf(request.getPartSize()) + (mCheckCRC64 ? "-crc64" : "") + "-sequence").getBytes());
-            String recordPath = request.getRecordDirectory() + File.separator + recordFileName;
-
-            mRecordFile = File(recordPath);
-            if (mRecordFile.exists()) {
-                BufferedReader br = BufferedReader(new FileReader(mRecordFile));
-                mUploadId = br.readLine();
-                br.close();
-                OSSLog.logDebug("sequence [initUploadId] - Found record file, uploadid: " + mUploadId);
-            }
-
-            if (!OSSUtils.isEmptyString(mUploadId)) {
-                if (mCheckCRC64) {
-                    String filePath = request.getRecordDirectory() + File.separator + mUploadId;
-                    File crc64Record = File(filePath);
-                    if (crc64Record.exists()) {
-                        FileInputStream fs = FileInputStream(crc64Record);//创建文件字节输出流对象
-                        ObjectInputStream ois = ObjectInputStream(fs);
-
-                        try {
-                            recordCrc64 = (Map<Integer, int>) ois.readObject();
-                            crc64Record.delete();
-                        } catch (ClassNotFoundException e) {
-                            OSSLog.logThrowable2Local(e);
-                        } finally {
-                            if (ois != null)
-                                ois.close();
-                            crc64Record.delete();
-                        }
-                    }
-                }
-
-                bool isTruncated = false;
-                int nextPartNumberMarker = 0;
-
-                do {
-                    ListPartsRequest listParts = ListPartsRequest(request.getBucketName(), request.getObjectKey(), mUploadId);
-                    if (nextPartNumberMarker > 0){
-                        listParts.setPartNumberMarker(nextPartNumberMarker);
-                    }
-
-                    OSSAsyncTask<ListPartsResult> task = operation.listParts(listParts, null);
-
-                    try {
-
-                        ListPartsResult result = task.getResult();
-                        isTruncated = result.isTruncated();
-                        nextPartNumberMarker = result.getNextPartNumberMarker();
-                        List<PartSummary> parts = result.getParts();
-
-                        for (int i = 0; i < parts.size(); i++) {
-                            PartSummary part = parts.get(i);
-                            PartETag partETag = PartETag(part.getPartNumber(), part.getETag());
-                            partETag.setPartSize(part.getSize());
-
-                            if (recordCrc64 != null && recordCrc64.size() > 0) {
-                                if (recordCrc64.containsKey(partETag.getPartNumber())) {
-                                    partETag.setCRC64(recordCrc64.get(partETag.getPartNumber()));
-                                }
-                            }
-
-                            partETags.add(partETag);
-                            mUploadedLength += part.getSize();
-                            mAlreadyUploadIndex.add(part.getPartNumber());
-                            if (i == 0) {
-                                mFirstPartSize = part.getSize();
-                            }
-                        }
-                    } catch (OSSServiceException e) {
-                        isTruncated = false;
-                        if (e.getStatusCode() == 404) {
-                            mUploadId = null;
-                        } else {
-                            throw e;
-                        }
-                    } catch (OSSClientException e) {
-                        isTruncated = false;
-                        throw e;
-                    }
-                    task.waitUntilFinished();
-
-                }while (isTruncated);
-            }
-
-            if (!mRecordFile.exists() && !mRecordFile.createNewFile()) {
-                throw OSSClientException("Can't create file at path: " + mRecordFile.getAbsolutePath()
-                        + "\nPlease make sure the directory exist!");
-            }
-        }
-
-        if (OSSUtils.isEmptyString(mUploadId)) {
-            InitiateMultipartUploadRequest init = InitiateMultipartUploadRequest(
-                    request.getBucketName(), request.getObjectKey(), request.getMetadata());
-            init.isSequential = true;
-            InitiateMultipartUploadResult initResult = operation.initMultipartUpload(init, null).getResult();
-
-            mUploadId = initResult.getUploadId();
-
-            if (mRecordFile != null) {
-                BufferedWriter bw = BufferedWriter(new FileWriter(mRecordFile));
-                bw.write(mUploadId);
-                bw.close();
-            }
-        }
-
-        request.setUploadId(mUploadId);
+          } on OSSClientException catch (e) {
+            isTruncated = false;
+            rethrow;
+          }
+          task.waitUntilFinished();
+        } while (isTruncated);
+      }
+      if (!recordFile!.existsSync()) {
+        recordFile!.createSync();
+      }
+      if (!recordFile!.existsSync()) {
+        throw OSSClientException(
+            "Can't create file at path: ${recordFile!.path}" +
+                "\nPlease make sure the directory exist!");
+      }
     }
 
-    @override
-     ResumableUploadResult doMultipartUpload()  {
+    if (uploadId.isNullOrEmpty) {
+      InitiateMultipartUploadRequest init = InitiateMultipartUploadRequest(
+          request.bucketName, request.objectKey, request.metadata);
+      init.isSequential = true;
+      InitiateMultipartUploadResult initResult =
+          await operation.initMultipartUpload(init, null).getResult();
 
-        int tempUploadedLength = mUploadedLength;
+      uploadId = initResult.uploadId;
 
-        checkCancel();
+      if (recordFile != null) {
+        BufferedWriter bw = BufferedWriter(FileWriter(recordFile));
+        bw.write(uploadId);
+        bw.close();
+      }
+    }
+
+    request.uploadId = uploadId;
+  }
+
+  @override
+  ResumableUploadResult? doMultipartUpload() {
+    int tempUploadedLength = uploadedLength;
+
+    checkCancel();
 
 //        int[] mPartAttr = int[2];
 //        checkPartSize(mPartAttr);
 
-        int readByte = partAttr[0];
-        final int partNumber = partAttr[1];
+    int readByte = partAttr[0];
+    final int partNumber = partAttr[1];
 
-        if (partETags.size() > 0 && mAlreadyUploadIndex.size() > 0) { //revert progress
-            if (mUploadedLength > mFileLength) {
-                throw OSSClientException("The uploading file is inconsistent with before");
-            }
+    if (partETags.isNotEmpty && alreadyUploadIndex.isNotEmpty) {
+      //revert progress
+      if (uploadedLength > fileLength) {
+        throw OSSClientException(
+            "The uploading file is inconsistent with before");
+      }
 
-            if (mFirstPartSize != readByte) {
-                throw OSSClientException("The part size setting is inconsistent with before");
-            }
+      if (firstPartSize != readByte) {
+        throw OSSClientException(
+            "The part size setting is inconsistent with before");
+      }
 
-            int revertUploadedLength = mUploadedLength;
+      int revertUploadedLength = uploadedLength;
 
-            if (mSp.getStringValue(mUploadId)).notNullOrEmpty {
-                revertUploadedLength = int.valueOf(mSp.getStringValue(mUploadId));
-            }
+      if (sp.getStringValue(uploadId!).notNullOrEmpty) {
+        revertUploadedLength = int.parse(sp.getStringValue(uploadId!));
+      }
 
-            if (progressCallback != null) {
-                progressCallback.onProgress(request, revertUploadedLength, mFileLength);
-            }
+      progressCallback?.onProgress(request, revertUploadedLength, fileLength);
 
-            mSp.removeKey(mUploadId);
-        }
-
-        for (int i = 0; i < partNumber; i++) {
-
-            if (mAlreadyUploadIndex.size() != 0 && mAlreadyUploadIndex.contains(i + 1)) {
-                continue;
-            }
-
-            //need read byte
-            if (i == partNumber - 1) {
-                readByte = (int) (mFileLength - tempUploadedLength);
-            }
-            OSSLog.logDebug("upload part readByte : " + readByte);
-            int byteCount = readByte;
-            int readIndex = i;
-            tempUploadedLength += byteCount;
-            uploadPart(readIndex, byteCount, partNumber);
-            //break immediately for sequence upload
-            if (uploadException != null){
-                break;
-            }
-        }
-
-        checkException();
-        //complete sort
-        CompleteMultipartUploadResult completeResult = completeMultipartUploadResult();
-        ResumableUploadResult result = null;
-        if (completeResult != null) {
-            result = ResumableUploadResult(completeResult);
-        }
-        if (mRecordFile != null) {
-            mRecordFile.delete();
-        }
-        if (mCRC64RecordFile != null) {
-            mCRC64RecordFile.delete();
-        }
-        return result;
+      sp.removeKey(uploadId!);
     }
 
-     void uploadPart(int readIndex, int byteCount, int partNumber) {
+    for (int i = 0; i < partNumber; i++) {
+      if (alreadyUploadIndex.isNotEmpty && alreadyUploadIndex.contains(i + 1)) {
+        continue;
+      }
 
-        RandomAccessFile raf = null;
-        InputStream inputStream = null;
-        BufferedInputStream bufferedInputStream = null;
-        UploadPartRequest uploadPartRequest = null;
-        try {
-
-            if (context.cancellationHandler.isCancelled) {
-                return;
-            }
-
-            mRunPartTaskCount++;
-
-            preUploadPart(readIndex, byteCount, partNumber);
-            int skip = readIndex * request.getPartSize();
-            List<int> partContent = byte[byteCount];
-
-            if (uploadUri != null) {
-                inputStream = context.getApplicationContext().getContentResolver().openInputStream(uploadUri);
-                bufferedInputStream = BufferedInputStream(inputStream);
-                bufferedInputStream.skip(skip);
-                bufferedInputStream.read(partContent, 0, byteCount);
-            } else {
-                raf = RandomAccessFile(mUploadFile, "r");
-
-                raf.seek(skip);
-                raf.readFully(partContent, 0, byteCount);
-            }
-
-            uploadPartRequest = UploadPartRequest(
-                    request.getBucketName(), request.getObjectKey(), mUploadId, readIndex + 1);
-            uploadPartRequest.setPartContent(partContent);
-            uploadPartRequest.setMd5Digest(BinaryUtil.calculateBase64Md5(partContent));
-            uploadPartRequest.setCRC64(request.getCRC64());
-            UploadPartResult uploadPartResult = operation.syncUploadPart(uploadPartRequest);
-            //check isComplete，throw exception when error occur
-            PartETag partETag = PartETag(uploadPartRequest.getPartNumber(), uploadPartResult.getETag());
-            partETag.setPartSize(byteCount);
-            if (mCheckCRC64) {
-                partETag.setCRC64(uploadPartResult.getClientCRC());
-            }
-
-            partETags.add(partETag);
-            mUploadedLength += byteCount;
-
-            uploadPartFinish(partETag);
-
-            if (context.cancellationHandler.isCancelled) {
-                //cancel immediately for sequence upload
-                TaskCancelException e = TaskCancelException("sequence upload task cancel");
-                throw OSSClientException(e.getMessage(), e, true);
-            } else {
-                onProgressCallback(request, mUploadedLength, mFileLength);
-            }
-        } catch (OSSServiceException e) {
-            // it is not necessary to throw 409 PartAlreadyExist exception out
-            if (e.getStatusCode() != 409) {
-                processException(e);
-            } else {
-                PartETag partETag = PartETag(uploadPartRequest.getPartNumber(), e.getPartEtag());
-                partETag.setPartSize(uploadPartRequest.getPartContent().length);
-                if (mCheckCRC64) {
-                    List<int> partContent = uploadPartRequest.getPartContent();
-                    ByteArrayInputStream byteArrayInputStream = ByteArrayInputStream(partContent);
-                    CheckedInputStream checkedInputStream = CheckedInputStream(byteArrayInputStream, new CRC64());
-
-                    partETag.setCRC64(checkedInputStream.getChecksum().getValue());
-                }
-
-                partETags.add(partETag);
-                mUploadedLength += byteCount;
-            }
-        } catch ( e) {
-            processException(e);
-        } finally {
-            try {
-                if (raf != null)
-                    raf.close();
-                if (inputStream != null)
-                    inputStream.close();
-                if (bufferedInputStream != null)
-                    bufferedInputStream.close();
-            } catch (OSSIOException e) {
-                OSSLog.logThrowable2Local(e);
-            }
-        }
+      //need read byte
+      if (i == partNumber - 1) {
+        readByte = fileLength - tempUploadedLength;
+      }
+      OSSLog.logDebug("upload part readByte : $readByte");
+      int byteCount = readByte;
+      int readIndex = i;
+      tempUploadedLength += byteCount;
+      uploadPart(readIndex, byteCount, partNumber);
+      //break immediately for sequence upload
+      if (uploadException != null) {
+        break;
+      }
     }
 
-
-    @override
-     void checkException()  {
-        if (context.cancellationHandler.isCancelled) {
-            if (request.deleteUploadOnCancelling()) {
-                abortThisUpload();
-                if (mRecordFile != null) {
-                    mRecordFile.delete();
-                }
-            } else {
-                if (partETags != null && partETags.size() > 0 && mCheckCRC64 && request.getRecordDirectory() != null) {
-                    Map<Integer, int> maps = HashMap<Integer, int>();
-                    for (PartETag eTag : partETags) {
-                        maps[eTag.getPartNumber()] = eTag.getCRC64();
-                    }
-                    ObjectOutputStream oot = null;
-                    try {
-                        String filePath = request.getRecordDirectory() + File.separator + mUploadId;
-                        mCRC64RecordFile = File(filePath);
-                        if (!mCRC64RecordFile.exists()) {
-                            mCRC64RecordFile.createNewFile();
-                        }
-                        oot = ObjectOutputStream(new FileOutputStream(mCRC64RecordFile));
-                        oot.writeObject(maps);
-                    } catch (OSSIOException e) {
-                        OSSLog.logThrowable2Local(e);
-                    } finally {
-                        if (oot != null) {
-                            oot.close();
-                        }
-                    }
-                }
-            }
-        }
-        super.checkException();
+    checkException();
+    //complete sort
+    CompleteMultipartUploadResult? completeResult =
+        completeMultipartUploadResult();
+    ResumableUploadResult? result;
+    if (completeResult != null) {
+      result = ResumableUploadResult(completeResult);
     }
+    recordFile?.delete();
+    crc64RecordFile?.delete();
+    return result;
+  }
 
-    @override
-     void abortThisUpload() {
-        if (mUploadId != null) {
-            AbortMultipartUploadRequest abort = AbortMultipartUploadRequest(
-                    request.getBucketName(), request.getObjectKey(), mUploadId);
-            operation.abortMultipartUpload(abort, null).waitUntilFinished();
-        }
-    }
+  @override
+  void uploadPart(int readIndex, int byteCount, int partNumber) async {
+    RandomAccessFile? raf;
+    InputStream? inputStream;
+    BufferedInputStream? bufferedInputStream;
+    UploadPartRequest? uploadPartRequest;
+    try {
+      if (context.cancellationHandler.isCancelled) {
+        return;
+      }
 
-    @override
-     void processException(Exception e) {
-//        mPartExceptionCount++;
-        if (uploadException == null || !e.getMessage().equals(uploadException.getMessage())) {
-            uploadException = e;
+      runPartTaskCount++;
+
+      preUploadPart(readIndex, byteCount, partNumber);
+      int skip = readIndex * request.partSize;
+      List<int> partContent = List.filled(byteCount, 0);
+
+      if (uploadUri != null) {
+        inputStream = context
+            .getApplicationContext()
+            .getContentResolver()
+            .openInputStream(uploadUri);
+        bufferedInputStream = BufferedInputStream(inputStream);
+        bufferedInputStream.skip(skip);
+        bufferedInputStream.read(partContent, 0, byteCount);
+      } else {
+        raf = RandomAccessFile(uploadFile, "r");
+
+        raf.seek(skip);
+        raf.readFully(partContent, 0, byteCount);
+      }
+
+      uploadPartRequest = UploadPartRequest(
+          request.bucketName, request.objectKey, uploadId, readIndex + 1);
+      uploadPartRequest.partContent = partContent;
+      uploadPartRequest.md5Digest = BinaryUtil.calculateBase64Md5(partContent);
+      uploadPartRequest.crc64Config = request.crc64Config;
+      UploadPartResult uploadPartResult =
+          await operation.syncUploadPart(uploadPartRequest);
+      //check isComplete，throw exception when error occur
+      PartETag partETag =
+          PartETag(uploadPartRequest.partNumber, uploadPartResult.eTag);
+      partETag.partSize = byteCount;
+      if (isCheckCRC64) {
+        partETag.crc64 = uploadPartResult.clientCRC;
+      }
+
+      partETags.add(partETag);
+      uploadedLength += byteCount;
+
+      uploadPartFinish(partETag);
+
+      if (context.cancellationHandler.isCancelled) {
+        //cancel immediately for sequence upload
+        TaskCancelException e =
+            TaskCancelException("sequence upload task cancel");
+        throw OSSClientException(e, true);
+      } else {
+        onProgressCallback(request, uploadedLength, fileLength);
+      }
+    } on OSSServiceException catch (e) {
+      // it is not necessary to throw 409 PartAlreadyExist exception out
+      if (e.statusCode != HttpStatus.conflict) {
+        processException(e);
+      } else {
+        PartETag partETag = PartETag(uploadPartRequest!.partNumber, e.partEtag);
+        partETag.partSize = uploadPartRequest.partContent.length;
+        if (isCheckCRC64) {
+          List<int> partContent = uploadPartRequest.partContent;
+          ByteArrayInputStream byteArrayInputStream =
+              ByteArrayInputStream(partContent);
+          CheckedInputStream checkedInputStream =
+              CheckedInputStream(byteArrayInputStream, OSSCRC64());
+
+          partETag.crc64 = checkedInputStream.checksum.value;
         }
+
+        partETags.add(partETag);
+        uploadedLength += byteCount;
+      }
+    } catch (e) {
+      processException(e as Exception);
+    } finally {
+      try {
+        if (raf != null) {
+          raf.close();
+        }
+        if (inputStream != null) {
+          inputStream.close();
+        }
+        if (bufferedInputStream != null) {
+          bufferedInputStream.close();
+        }
+      } on OSSIOException catch (e) {
         OSSLog.logThrowable2Local(e);
-        if (context.cancellationHandler.isCancelled) {
-            if (!mIsCancel) {
-                mIsCancel = true;
-            }
-        }
+      }
     }
+  }
 
-    @override
-     void uploadPartFinish(PartETag partETag)  {
-        if (context.cancellationHandler.isCancelled) {
-            if (!mSp.contains(mUploadId)) {
-                mSp.setStringValue(mUploadId, String.valueOf(mUploadedLength));
-                onProgressCallback(request, mUploadedLength, mFileLength);
+  @override
+  void checkException() {
+    if (context.cancellationHandler.isCancelled) {
+      if (request.deleteUploadOnCancelling) {
+        abortThisUpload();
+        recordFile?.delete();
+      } else {
+        if (partETags != null &&
+            partETags.isNotEmpty &&
+            isCheckCRC64 &&
+            request.recordDirectory != null) {
+          Map<int, String?> maps = <int, String?>{};
+          for (PartETag eTag in partETags) {
+            maps[eTag.partNumber] = eTag.crc64;
+          }
+          ObjectOutputStream? oot;
+          try {
+            String filePath =
+                '${request.recordDirectory}' + path.separator + uploadId!;
+            crc64RecordFile = File(filePath);
+            if (!crc64RecordFile!.existsSync()) {
+              crc64RecordFile?.createSync();
             }
+            oot = ObjectOutputStream(FileOutputStream(crc64RecordFile));
+            oot.writeObject(maps);
+          } on OSSIOException catch (e) {
+            OSSLog.logThrowable2Local(e);
+          } finally {
+            if (oot != null) {
+              oot.close();
+            }
+          }
         }
+      }
     }
+    super.checkException();
+  }
+
+  @override
+  void abortThisUpload() {
+    if (uploadId != null) {
+      AbortMultipartUploadRequest abort = AbortMultipartUploadRequest(
+          request.bucketName, request.objectKey, uploadId!);
+      operation.abortMultipartUpload(abort, null).waitUntilFinished();
+    }
+  }
+
+  @override
+  void processException(Exception e) {
+//        mPartExceptionCount++;
+    uploadException = e;
+    OSSLog.logThrowable2Local(e);
+    if (context.cancellationHandler.isCancelled) {
+      if (!isCancel) {
+        isCancel = true;
+      }
+    }
+  }
+
+  @override
+  void uploadPartFinish(PartETag partETag) {
+    if (context.cancellationHandler.isCancelled) {
+      if (!sp.contains(uploadId!)) {
+        sp.setStringValue(uploadId!, '$uploadedLength');
+        onProgressCallback(request, uploadedLength, fileLength);
+      }
+    }
+  }
 }

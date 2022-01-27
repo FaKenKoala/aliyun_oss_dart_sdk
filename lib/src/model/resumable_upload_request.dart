@@ -20,7 +20,7 @@ class ResumableUploadRequest extends MultipartUploadRequest {
     this.recordDirectory = recordDirectory;
   }
 
-  String? getRecordDirectory() {
+  String? get recordDirectory {
     return _recordDirectory;
   }
 

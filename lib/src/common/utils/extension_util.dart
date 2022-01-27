@@ -1,6 +1,6 @@
 extension StringNullX on String? {
-  bool get nullOrEmpty => this?.isEmpty ?? true;
-  bool get notNullOrEmpty => !nullOrEmpty;
+  bool get isNullOrEmpty => this?.isEmpty ?? true;
+  bool get notNullOrEmpty => !isNullOrEmpty;
 
   bool equalsIgnoreCase(String match) {
     return this?.toLowerCase() == match.toLowerCase();

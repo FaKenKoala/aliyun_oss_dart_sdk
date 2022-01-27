@@ -13,7 +13,7 @@ class ClientConfiguration {
   final List<String> _customCnameExcludeList = [];
   String? proxyHost;
   int proxyPort = 0;
-  String? mUserAgentMark;
+  String? userAgentMark;
   bool httpDnsEnable = true;
   bool checkCRC64 = false; //crc64 default false
   String? ipWithHeader;
