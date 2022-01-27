@@ -16,8 +16,8 @@ class GetObjectResult extends OSSResult {
   @override
   String? get clientCRC {
     if (objectContent != null &&
-        (objectContent is CheckCRC64DownloadInputStream)) {
-      return objectContent.cli();
+        objectContent is CheckCRC64DownloadInputStream) {
+      return (objectContent as CheckCRC64DownloadInputStream).clientCRC64;
     }
     return super.clientCRC;
   }

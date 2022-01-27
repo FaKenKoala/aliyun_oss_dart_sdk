@@ -299,7 +299,7 @@
     @override
      void processException(Exception e) {
          (mLock) {
-            mPartExceptionCount++;
+            partExceptionCount++;
             uploadException = e;
             OSSLog.logThrowable2Local(e);
             if (context.cancellationHandler.isCancelled) {
@@ -308,7 +308,7 @@
                     mLock.notify();
                 }
             }
-            if (partETags.size() == (mRunPartTaskCount - mPartExceptionCount)) {
+            if (partETags.size() == (mRunPartTaskCount - partExceptionCount)) {
                 notifyMultipartThread();
             }
         }

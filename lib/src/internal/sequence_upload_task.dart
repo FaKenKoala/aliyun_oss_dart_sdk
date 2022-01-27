@@ -266,7 +266,7 @@ class SequenceUploadTask extends BaseMultipartUploadTask<ResumableUploadRequest,
         bufferedInputStream.skip(skip);
         bufferedInputStream.read(partContent, 0, byteCount);
       } else {
-        raf = RandomAccessFile(uploadFile, "r");
+        raf = uploadFile!.openSync();
 
         raf.seek(skip);
         raf.readFully(partContent, 0, byteCount);

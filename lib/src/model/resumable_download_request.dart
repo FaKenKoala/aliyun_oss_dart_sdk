@@ -22,7 +22,7 @@ class ResumableDownloadRequest extends OSSRequest {
 
   int partSize = 256 * 1024;
 
-  Map<String, String>? requestHeader;
+  Map<String, String> requestHeader = {};
 
   ResumableDownloadRequest(
       this.bucketName, this.objectKey, this.downloadToFilePath,

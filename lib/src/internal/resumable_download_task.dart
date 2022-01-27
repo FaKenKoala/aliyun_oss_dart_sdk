@@ -1,43 +1,51 @@
 
- import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
 
+import 'dart:io';
+
+import 'package:aliyun_oss_dart_sdk/src/callback/lib_callback.dart';
+import 'package:aliyun_oss_dart_sdk/src/client_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/common/lib_common.dart';
+import 'package:aliyun_oss_dart_sdk/src/exception/lib_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/internal/lib_internal.dart';
+import 'package:aliyun_oss_dart_sdk/src/model/lib_model.dart';
+import 'package:aliyun_oss_dart_sdk/src/network/lib_network.dart';
+import 'package:aliyun_oss_dart_sdk/src/service_exception.dart';
+import 'package:aliyun_oss_dart_sdk/src/task_cancel_exception.dart';
+import 'package:collection/collection.dart';
+import 'package:path/path.dart' as path;
 class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         Result extends ResumableDownloadResult> implements Callable<Result> {
-     final int CPU_SIZE = Runtime.getRuntime().availableProcessors() * 2;
-     final int MAX_CORE_POOL_SIZE = CPU_SIZE < 5 ? CPU_SIZE : 5;
-     final int MAX_IMUM_POOL_SIZE = CPU_SIZE;
+     final int CPU_SIZE = Platform.numberOfProcessors *  2;
+     final int MAX_CORE_POOL_SIZE = Platform.numberOfProcessors * 2 < 5 ? Platform.numberOfProcessors * 2 : 5;
+     final int MAX_IMUM_POOL_SIZE = Platform.numberOfProcessors * 2;
      final int KEEP_ALIVE_TIME = 3000;
      final int MAX_QUEUE_SIZE = 5000;
-     ThreadPoolExecutor mPoolExecutor =
-            ThreadPoolExecutor(MAX_CORE_POOL_SIZE, MAX_IMUM_POOL_SIZE, KEEP_ALIVE_TIME,
-                    TimeUnit.MILLISECONDS, ArrayBlockingQueue<Runnable>(MAX_QUEUE_SIZE), new ThreadFactory() {
-                @override
-                 Thread newThread(Runnable runnable) {
-                    return Thread(runnable, "oss-android-multipart-thread");
-                }
-            });
+    //  ThreadPoolExecutor mPoolExecutor =
+    //         ThreadPoolExecutor(MAX_CORE_POOL_SIZE, MAX_IMUM_POOL_SIZE, KEEP_ALIVE_TIME,
+    //                 TimeUnit.MILLISECONDS, ArrayBlockingQueue<Runnable>(MAX_QUEUE_SIZE), ThreadFactory() {
+    //             @override
+    //              Thread newThread(Runnable runnable) {
+    //                 return Thread(runnable, "oss-android-multipart-thread");
+    //             }
+    //         });
      ResumableDownloadRequest mRequest;
      InternalRequestOperation mOperation;
-     OSSCompletedCallback mCompletedCallback;
-     ExecutionContext mContext;
-     OSSProgressCallback mProgressCallback;
-     CheckPoint mCheckPoint;
-     Object mLock = Object();
-     Exception mDownloadException;
-     int completedPartSize;
-     int downloadPartSize;
-     int mPartExceptionCount;
-     String checkpointPath;
+     OSSCompletedCallback? completedCallback;
+     ExecutionContext context;
+     OSSProgressCallback? progressCallback;
+     late CheckPoint checkPoint;
+     Object lock = Object();
+     Exception? downloadException;
+     int completedPartSize = 0;
+     int downloadPartSize = 0;
+     int partExceptionCount = 0;
+     String? checkpointPath;
 
-    ResumableDownloadTask(InternalRequestOperation operation,
-                          ResumableDownloadRequest request,
-                          OSSCompletedCallback completedCallback,
-                          ExecutionContext context) {
-        this.mRequest = request;
-        this.mOperation = operation;
-        this.mCompletedCallback = completedCallback;
-        this.mContext = context;
-        this.mProgressCallback = request.getProgressListener();
+    ResumableDownloadTask(this.mOperation,
+                          this.mRequest,
+                          this.completedCallback,
+                          this.context) {
+        progressCallback = mRequest.progressListener;
     }
 
 
@@ -46,49 +54,43 @@ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         try {
             checkInitData();
             ResumableDownloadResult result = doMultipartDownload();
-            if (mCompletedCallback != null) {
-                mCompletedCallback.onSuccess(mRequest, result);
-            }
-            return (Result) result;
-        } catch (OSSServiceException e) {
-            if (mCompletedCallback != null) {
-                mCompletedCallback.onFailure(mRequest, null, e);
-            }
-            throw e;
+                completedCallback?.onSuccess(mRequest, result);
+            return result as Result;
+        } on OSSServiceException catch ( e) {
+                completedCallback?.onFailure(mRequest, null, e);
+            rethrow;
         } catch ( e) {
             OSSClientException temp;
-            if (e instanceof OSSClientException) {
-                temp = (OSSClientException) e;
+            if (e is OSSClientException) {
+                temp =  e;
             } else {
-                temp = OSSClientException(e.toString(), e);
+                temp = OSSClientException(e);
             }
-            if (mCompletedCallback != null) {
-                mCompletedCallback.onFailure(mRequest, temp, null);
-            }
+                completedCallback?.onFailure(mRequest, temp, null);
             throw temp;
         }
     }
 
-     void checkInitData()  {
+     void checkInitData()  async{
 
-        if (mRequest.getRange() != null && !mRequest.getRange().checkIsValid()) {
+        if (mRequest.range != null && !mRequest.range!.checkIsValid()) {
             throw OSSClientException("Range is invalid");
-        };
-        String recordFileName = BinaryUtil.calculateMd5Str((mRequest.getBucketName() + mRequest.getObjectKey()
-                + String.valueOf(mRequest.getPartSize()) + (mRequest.getCRC64() == OSSRequest.CRC64Config.YES ? "-crc64" : "")).getBytes());
-        checkpointPath = mRequest.getCheckPointFilePath() + File.separator + recordFileName;
+        }
+        String recordFileName = BinaryUtil.calculateMd5StrFromStr((mRequest.bucketName + mRequest.objectKey
+                + '${mRequest.partSize}' + (mRequest.crc64Config == CRC64Config.yes ? "-crc64" : "")));
+        checkpointPath = '${mRequest.checkPointFilePath}' + path.separator + recordFileName;
 
-        mCheckPoint = CheckPoint();
+        checkPoint = CheckPoint();
 
-        if (mRequest.getEnableCheckPoint()) {
+        if (mRequest.enableCheckPoint) {
             try {
-                mCheckPoint.load(checkpointPath);
+                checkPoint.load(checkpointPath!);
             } catch ( e) {
-                removeFile(checkpointPath);
+                removeFile(checkpointPath!);
                 removeFile(mRequest.getTempFilePath());
             }
-            if (!mCheckPoint.isValid(mOperation)) {
-                removeFile(checkpointPath);
+            if (!(await checkPoint.isValid(mOperation))) {
+                removeFile(checkpointPath!);
                 removeFile(mRequest.getTempFilePath());
 
                 initCheckPoint();
@@ -102,23 +104,28 @@ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         bool flag = false;
         File file = File(filePath);
 
-        if (file.isFile() && file.exists()) {
-            flag = file.delete();
+        if (file.existsSync()) {
+          try{
+             file.deleteSync();
+             flag=true;
+          }catch(e){
+            flag = false;
+          }
         }
 
         return flag;
     }
 
-     void initCheckPoint()  {
-        FileStat fileStat = FileStat.getFileStat(mOperation, mRequest.getBucketName(), mRequest.getObjectKey());
-        Range range = correctRange(mRequest.getRange(), fileStat.fileLength);
-        int downloadSize = range.getEnd() - range.getBegin();
+     void initCheckPoint()  async{
+        FileStat fileStat = await FileStat.getFileStat(mOperation, mRequest.bucketName, mRequest.objectKey);
+        Range range = correctRange(mRequest.range, fileStat.fileLength);
+        int downloadSize = range.end - range.begin;
         createFile(mRequest.getTempFilePath(), downloadSize);
 
-        mCheckPoint.bucketName = mRequest.getBucketName();
-        mCheckPoint.objectKey = mRequest.getObjectKey();
-        mCheckPoint.fileStat = fileStat;
-        mCheckPoint.parts = splitFile(range, mCheckPoint.fileStat.fileLength, mRequest.getPartSize());
+        checkPoint..bucketName = mRequest.bucketName
+        ..objectKey = mRequest.objectKey
+        ..fileStat = fileStat
+        ..parts = splitFile(range, checkPoint.fileStat.fileLength, mRequest.partSize);
     }
 
      ResumableDownloadResult doMultipartDownload()  {
@@ -128,23 +135,23 @@ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         final DownloadFileResult result = DownloadFileResult();
         result.partResults = [];
 
-        for (final DownloadPart part : mCheckPoint.parts) {
+        for (final DownloadPart part in checkPoint.parts) {
             checkException();
             if (mPoolExecutor != null && !part.isCompleted) {
                 mPoolExecutor.execute(Runnable() {
                     @override
                      void run() {
                         downloadPart(result, part);
-                        Log.i("partResults", "start: " + part.start + ", end: " + part.end);
+                        Log.i("partResults", "start: ${part.start}, end: ${part.end}");
                     }
                 });
             } else {
                 DownloadPartResult partResult = DownloadPartResult();
                 partResult.partNumber = part.partNumber;
-                partResult.requestId = mCheckPoint.fileStat.requestId;
+                partResult.requestId = checkPoint.fileStat?.requestId;
                 partResult.length = part.length;
-                if (mRequest.getCRC64() == OSSRequest.CRC64Config.YES) {
-                    partResult.clientCRC = part.crc;
+                if (mRequest.crc64Config == CRC64Config.yes) {
+                    partResult.clientCRC = part?.crc64;
                 }
                 result.partResults.add(partResult);
                 downloadPartSize += 1;
@@ -152,53 +159,49 @@ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
             }
         }
         // Wait for all tasks to be completed
-        if (checkWaitCondition(mCheckPoint.parts.size())) {
-             (mLock) {
-                mLock.wait();
-            }
+        if (checkWaitCondition(checkPoint.parts.length)) {
+            //  (mLock) {
+            //     mLock.wait();
+            // }
         }
         checkException();
-        Collections.sort(result.partResults, Comparator<DownloadPartResult>() {
-            @override
-             int compare(DownloadPartResult downloadPartResult, DownloadPartResult t1) {
-                return downloadPartResult.partNumber - t1.partNumber;
-            }
-        });
-        if (mRequest.getCRC64() == OSSRequest.CRC64Config.YES && mRequest.getRange() == null) {
-            int clientCRC = calcObjectCRCFromParts(result.partResults);
-            resumableDownloadResult.setClientCRC(clientCRC);
+        result.partResults.sort((p0, p1) => p0.partNumber.compareTo(p1.partNumber));
+
+        if (mRequest.crc64Config == CRC64Config.yes && mRequest.range == null) {
+            String? clientCRC = calcObjectCRCFromParts(result.partResults);
+            resumableDownloadResult.clientCRC = clientCRC;
             try {
-                OSSUtils.checkChecksum(clientCRC, mCheckPoint.fileStat.serverCRC, result.partResults.get(0).requestId);
-            } catch (InconsistentException e) {
-                removeFile(checkpointPath);
+                OSSUtils.checkChecksum(clientCRC, checkPoint.fileStat.serverCRC, result.partResults[0].requestId);
+            } on InconsistentException catch ( e) {
+                removeFile(checkpointPath!);
                 removeFile(mRequest.getTempFilePath());
-                throw e;
+                rethrow;
             }
         }
-        removeFile(checkpointPath);
+        removeFile(checkpointPath!);
 
         File fromFile = File(mRequest.getTempFilePath());
-        File toFile = File(mRequest.getDownloadToFilePath());
+        File toFile = File(mRequest.downloadToFilePath);
         moveFile(fromFile, toFile);
 
-        resumableDownloadResult.setServerCRC(mCheckPoint.fileStat.serverCRC);
-        resumableDownloadResult.setMetadata(result.metadata);
-        resumableDownloadResult.setRequestId(result.partResults.get(0).requestId);
-        resumableDownloadResult.setStatusCode(200);
+        resumableDownloadResult..serverCRC = checkPoint.fileStat.serverCRC
+        ..metadata = result.metadata
+        ..requestId = result.partResults[0].requestId
+        ..statusCode = HttpStatus.ok;
 
         return resumableDownloadResult;
     }
 
-     static int calcObjectCRCFromParts(List<DownloadPartResult> partResults) {
-        int crc = 0;
+     static String? calcObjectCRCFromParts(List<DownloadPartResult> partResults) {
+        String? crc;
 
-        for (DownloadPartResult partResult : partResults) {
+        for (DownloadPartResult partResult in partResults) {
             if (partResult.clientCRC == null || partResult.length <= 0) {
                 return null;
             }
             crc = CRC64.combine(crc, partResult.clientCRC, partResult.length);
         }
-        return int(crc);
+        return crc;
     }
 
      List<DownloadPart> splitFile(Range range, int fileSize, int partSize) {
@@ -214,10 +217,10 @@ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
             parts.add(part);
             return parts;
         }
-        int start = range.getBegin();
-        int size = range.getEnd() - range.getBegin();
+        int start = range.begin;
+        int size = range.end - range.begin;
 
-        int count = size / partSize;
+        int count = size ~/ partSize;
         if (size % partSize > 0) {
             count += 1;
         }
@@ -239,97 +242,91 @@ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         return parts;
     }
 
-     Range correctRange(Range range, int totalSize) {
+     Range correctRange(Range? range, int totalSize) {
         int start = 0;
         int size = totalSize;
         if (range != null) {
-            start = range.getBegin();
-            if (range.getBegin() == -1) {
+            start = range.begin;
+            if (range.begin == -1) {
                 start = 0;
             }
-            size = range.getEnd() - range.getBegin();
-            if (range.getEnd() == -1) {
+            size = range.end - range.begin;
+            if (range.end == -1) {
                 size = totalSize - start;
             }
         }
         return Range(start, start + size);
     }
 
-     void downloadPart(DownloadFileResult downloadResult, DownloadPart part) {
+     void downloadPart(DownloadFileResult downloadResult, DownloadPart part) async{
 
-        RandomAccessFile output = null;
-        InputStream content = null;
+        RandomAccessFile? output;
+        InputStream? content;
         try {
 
-            if (mContext.cancellationHandler.isCancelled) {
+            if (context.cancellationHandler.isCancelled) {
                 mPoolExecutor.getQueue().clear();
             }
 
             downloadPartSize += 1;
 
-            output = RandomAccessFile(mRequest.getTempFilePath(), "rw");
+            output = File(mRequest.getTempFilePath()).openSync();
             output.seek(part.fileStart);
 
-            Map<String, String> requestHeader = mRequest.getRequestHeader();
+            Map<String, String> requestHeader = mRequest.requestHeader;
 
-            GetObjectRequest request = GetObjectRequest(mRequest.getBucketName(), mRequest.getObjectKey());
-            request.setRange(Range(part.start, part.end));
-            request.setRequestHeaders(requestHeader);
-            GetObjectResult result =  mOperation.getObject(request, null).getResult();
+            GetObjectRequest request = GetObjectRequest(mRequest.bucketName, mRequest.objectKey);
+            request.range = Range(part.start, part.end);
+            request.requestHeaders = requestHeader;
+            GetObjectResult result =  await mOperation.getObject(request, null).getResult();
 
-            content = result.getObjectContent();
+            content = result.objectContent;
 
-            List<int> buffer = byte[(int)(part.length)];
+            List<int> buffer = List.filled(part.length, 0);
             int readLength = 0;
-            if (mRequest.getCRC64() == OSSRequest.CRC64Config.YES) {
-                content = CheckedInputStream(content, new CRC64());
+            if (mRequest.crc64Config == CRC64Config.yes) {
+                content = CheckedInputStream(content, OSSCRC64());
             }
 
             while ((readLength = content.read(buffer)) != -1) {
                 output.write(buffer, 0, (int) readLength);
             }
 
-             (mLock) {
 
                 DownloadPartResult partResult = DownloadPartResult();
                 partResult.partNumber = part.partNumber;
-                partResult.requestId = result.getRequestId();
-                partResult.length = result.getContentLength();
-                if (mRequest.getCRC64() == OSSRequest.CRC64Config.YES) {
-                    int clientCRC = ((CheckedInputStream)content).getChecksum().getValue();
+                partResult.requestId = result.requestId;
+                partResult.length = result.contentLength;
+                if (mRequest.crc64Config == CRC64Config.yes) {
+                    String clientCRC = (content as CheckedInputStream).checksum.value;
                     partResult.clientCRC = clientCRC;
 
-                    part.crc = clientCRC;
+                    part.crc64 = clientCRC;
                 }
                 downloadResult.partResults.add(partResult);
-                if (downloadResult.metadata == null) {
-                    downloadResult.metadata = result.getMetadata();
-                }
+                downloadResult.metadata ??= result.metadata;
 
                 completedPartSize += 1;
 
-                if (mContext.cancellationHandler.isCancelled) {
+                if (context.cancellationHandler.isCancelled) {
                     // Cancel after the last task is completed
-                    if (downloadPartSize == completedPartSize - mPartExceptionCount) {
+                    if (downloadPartSize == completedPartSize - partExceptionCount) {
                         checkCancel();
                     }
                 } else {
                     // After all tasks are completed, wake up the thread where the doMultipartDownload method is located
-                    if (mCheckPoint.parts.size() == (completedPartSize - mPartExceptionCount)) {
+                    if (checkPoint.parts.length == (completedPartSize - partExceptionCount)) {
                         notifyMultipartThread();
                     }
-                    mCheckPoint.update(part.partNumber, true);
-                    if (mRequest.getEnableCheckPoint()) {
-                        mCheckPoint.dump(checkpointPath);
+                    checkPoint.update(part.partNumber, true);
+                    if (mRequest.enableCheckPoint) {
+                        checkPoint.dump(checkpointPath!);
                     }
-                    Range range = correctRange(mRequest.getRange(), mCheckPoint.fileStat.fileLength);
-                    if (mProgressCallback != null) {
-                        mProgressCallback.onProgress(mRequest, mCheckPoint.downloadLength, range.getEnd() - range.getBegin());
-                    }
+                    Range range = correctRange(mRequest.range, checkPoint.fileStat!.fileLength);
+                        progressCallback?.onProgress(mRequest, checkPoint.downloadLength, range.end - range.begin);
                 }
-            }
         } catch ( e) {
-            processException(e);
+            processException(e as Exception);
         } finally {
             try {
                 if (output != null) {
@@ -338,7 +335,7 @@ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
                 if (content != null) {
                     content.close();
                 }
-            } catch (OSSIOException e) {
+            } catch ( e) {
                 OSSLog.logThrowable2Local(e);
             }
         }
@@ -346,10 +343,10 @@ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
 
      void createFile(String filePath, int length)  {
         File file = File(filePath);
-        RandomAccessFile accessFile = null;
+        RandomAccessFile? accessFile;
 
         try {
-            accessFile = RandomAccessFile(file, "rw");
+            accessFile = file.openSync(mode: FileMode.write);
             accessFile.setLength(length);
         } finally {
             if (accessFile != null) {
@@ -360,20 +357,22 @@ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
 
      void moveFile(File fromFile, File toFile)  {
 
-        bool rename = fromFile.renameTo(toFile);
-        if (!rename) {
+        try{
+        fromFile.renameSync(toFile.path);
+        }catch(e){
             Log.i("moveFile", "rename");
-            InputStream ist = null;
-            OutputStream ost = null;
+            InputStream? ist ;
+            OutputStream? ost ;
             try {
                 ist = FileInputStream(fromFile);
                 ost = FileOutputStream(toFile);
                 copyFile(ist, ost);
-                if (!fromFile.delete()) {
-                    throw OSSIOException("Failed to delete original file '" + fromFile + "'");
-                }
-            } catch (FileNotFoundException e) {
-                throw e;
+                fromFile.deleteSync();
+                // if (!fromFile.delete()) {
+                //     throw OSSIOException("Failed to delete original file '" + fromFile + "'");
+                // }
+            } catch ( e) {
+                rethrow;
             } finally {
                 if (ist != null) {
                     ist.close();
@@ -386,7 +385,7 @@ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
     }
 
      void copyFile(InputStream ist, OutputStream ost)  {
-        List<int> buffer = byte[4096];
+        List<int> buffer = List.filled(4096, 0);
         int byteCount;
         while ((byteCount = ist.read(buffer)) != -1) {
             ost.write(buffer, 0, byteCount);
@@ -394,18 +393,16 @@ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
     }
 
      void notifyMultipartThread() {
-        mLock.notify();
-        mPartExceptionCount = 0;
+        // lock.notify();
+        partExceptionCount = 0;
     }
 
      void processException(Exception e) {
-         (mLock) {
-            mPartExceptionCount++;
-            if (mDownloadException == null) {
-                mDownloadException = e;
-                mLock.notify();
+            partExceptionCount++;
+            if (downloadException == null) {
+                downloadException = e;
+                // mLock.notify();
             }
-        }
     }
 
      void releasePool() {
@@ -416,17 +413,14 @@ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
     }
 
      void checkException()  {
-        if (mDownloadException != null) {
+        if (downloadException != null) {
             releasePool();
-            if (mDownloadException instanceof OSSIOException) {
-                throw (OSSIOException) mDownloadException;
-            } else if (mDownloadException instanceof OSSServiceException) {
-                throw (OSSServiceException) mDownloadException;
-            } else if (mDownloadException instanceof OSSClientException) {
-                throw (OSSClientException) mDownloadException;
+            if (downloadException is OSSIOException || downloadException is OSSServiceException || 
+            downloadException is OSSClientException) {
+                throw downloadException!;
             } else {
                 OSSClientException clientException =
-                        OSSClientException(mDownloadException.getMessage(), mDownloadException);
+                        OSSClientException(downloadException);
                 throw clientException;
             }
         }
@@ -440,74 +434,71 @@ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
     }
 
      void checkCancel()  {
-        if (mContext.cancellationHandler.isCancelled) {
+        if (context.cancellationHandler.isCancelled) {
             TaskCancelException e = TaskCancelException("Resumable download cancel");
-            throw OSSClientException(e.getMessage(), e, true);
+            throw OSSClientException(e);
         }
     }
+        }
 
-    static class DownloadPart implements Serializable {
-         static final int serialVersionUID = -3506020776131733942L;
+    class DownloadPart  {
 
-         int partNumber;
-         int start; // start index;
-         int end; // end index;
-         bool isCompleted; // flag of part download finished or not;
-         int length; // length of part
-         int fileStart; // start index of file
-         int crc; // part crc.
+         int partNumber = 0;
+         int start = -1; // start index;
+         int end = -1; // end index;
+         bool isCompleted = false; // flag of part download finished or not;
+         int length = 0; // length of part
+         int fileStart = 0; // start index of file
+         String? crc64; // part crc.
 
         @override
-         int hashCode() {
+        bool operator ==(Object other) {
+          return identical(this, other) || other is DownloadPart && other.partNumber == partNumber && other.isCompleted == isCompleted && other.end == end && other.start == start 
+          && other.crc64 == crc64;
+        }
+        @override
+         int get hashCode {
             final int prime = 31;
             int result = 1;
             result = prime * result + partNumber;
             result = prime * result + (isCompleted ? 1231 : 1237);
-            result = prime * result + (int) (end ^ (end >>> 32));
-            result = prime * result + (int) (start ^ (start >>> 32));
-            result = prime * result + (int) (crc ^ (crc >>> 32));
+            result = prime * result +  (end ^ (end >>> 32));
+            result = prime * result + (start ^ (start >>> 32));
+            // result = prime * result +  (crc64 ^ (crc64 >>> 32));
+            result = prime * result + (crc64?.hashCode ?? 0);
             return result;
         }
     }
 
-    static class CheckPoint implements Serializable {
+    class CheckPoint {
 
-         static final int serialVersionUID = -8470273912385636504L;
 
-         int md5;
-         String downloadFile;
-         String bucketName;
-         String objectKey;
-         FileStat fileStat;
-         List<DownloadPart> parts;
-         int downloadLength;
+         int md5 = 0;
+         String? downloadFile;
+         String? bucketName;
+         String? objectKey;
+         late FileStat fileStat;
+         List<DownloadPart> parts = [];
+         int downloadLength = 0;
 
-        /**
-         * Loads the checkpoint data from the checkpoint file.
-         */
+        /// Loads the checkpoint data from the checkpoint file.
           void load(String cpFile)  {
-            FileInputStream fileIn = null;
-            ObjectInputStream in = null;
+            FileInputStream? fileIn = null;
+            ObjectInputStream? objIn = null;
             try {
                 fileIn = FileInputStream(cpFile);
-                in = ObjectInputStream(fileIn);
-                CheckPoint dcp = (CheckPoint) in.readObject();
+                objIn = ObjectInputStream(fileIn);
+                CheckPoint dcp =  objIn.readObject() as CheckPoint;
                 assign(dcp);
             } finally {
-                if (in != null) {
-                    in.close();
-                }
-                if (fileIn != null) {
-                    fileIn.close();
-                }
+                    objIn?.close();
+                    fileIn?.close();
             }
         }
 
-        /**
-         * Writes the checkpoint data to the checkpoint file.
-         */
+        /// Writes the checkpoint data to the checkpoint file.
           void dump(String cpFile)  {
-            this.md5 = hashCode();
+            md5 = hashCode;
             FileOutputStream fileOut = null;
             ObjectOutputStream outStream = null;
             try {
@@ -524,36 +515,32 @@ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
             }
         }
 
-        /**
-         * Updates the part's download status.
-         *
-         * @throws OSSIOException
-         */
+        /// Updates the part's download status.
+        ///
+        /// @throws OSSIOException
           void update(int index, bool completed)  {
-            parts.get(index).isCompleted = completed;
-            downloadLength += parts.get(index).length;
+            parts[index].isCompleted = completed;
+            downloadLength += parts[index].length;
         }
 
-        /**
-         * Check if the object matches the checkpoint information.
-         */
-          bool isValid(InternalRequestOperation operation)  {
+        /// Check if the object matches the checkpoint information.
+          Future<bool> isValid(InternalRequestOperation operation)  async{
             // Compare magic and md5 of checkpoint
-            if (this.md5 != hashCode()) {
+            if (md5 != hashCode) {
                 return false;
             }
 
-            FileStat fileStat = FileStat.getFileStat(operation, bucketName, objectKey);
+            FileStat fStat = await FileStat.getFileStat(operation, bucketName, objectKey);
 
             // Object's size, last modified time or ETAG are not same as the one
             // in the checkpoint.
-            if (this.fileStat.lastModified == null) {
-                if (this.fileStat.fileLength != fileStat.fileLength || !this.fileStat.eTag.equals(fileStat.eTag)) {
+            if (fileStat.lastModified == null) {
+                if (fileStat.fileLength != fStat.fileLength || fileStat.eTag!=fStat.eTag) {
                     return false;
                 }
             } else {
-                if (this.fileStat.fileLength != fileStat.fileLength || !this.fileStat.lastModified.equals(fileStat.lastModified)
-                        || !this.fileStat.eTag.equals(fileStat.eTag)) {
+                if (fileStat.fileLength != fStat.fileLength || fileStat.lastModified!=fStat.lastModified
+                        || fileStat.eTag!=fStat.eTag) {
                     return false;
                 }
             }
@@ -561,76 +548,82 @@ class ResumableDownloadTask<Requst extends ResumableDownloadRequest,
         }
 
         @override
-         int hashCode() {
+        bool operator ==(Object other) {
+          return identical(this, other) || other is CheckPoint && other.bucketName == bucketName && other.downloadFile == downloadFile && other.objectKey == objectKey && other.fileStat == fileStat && DeepCollectionEquality().equals(other.parts, parts) && other.downloadLength == downloadLength;
+        }
+        @override
+         int get hashCode {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((bucketName == null) ? 0 : bucketName.hashCode());
-            result = prime * result + ((downloadFile == null) ? 0 : downloadFile.hashCode());
-            result = prime * result + ((objectKey == null) ? 0 : objectKey.hashCode());
-            result = prime * result + ((fileStat == null) ? 0 : fileStat.hashCode());
-            result = prime * result + ((parts == null) ? 0 : parts.hashCode());
-            result = prime * result + (int) (downloadLength ^ (downloadLength >>> 32));
+            result = prime * result + (bucketName?.hashCode ?? 0);
+            result = prime * result + (downloadFile?.hashCode ?? 0);
+            result = prime * result + (objectKey?.hashCode ?? 0);
+            result = prime * result + (fileStat?.hashCode ?? 0);
+            result = prime * result + (parts.hashCode);
+            result = prime * result + (downloadLength ^ (downloadLength >>> 32));
             return result;
         }
 
          void assign(CheckPoint dcp) {
-            this.md5 = dcp.md5;
-            this.downloadFile = dcp.downloadFile;
-            this.bucketName = dcp.bucketName;
-            this.objectKey = dcp.objectKey;
-            this.fileStat = dcp.fileStat;
-            this.parts = dcp.parts;
-            this.downloadLength = dcp.downloadLength;
+            md5 = dcp.md5;
+            downloadFile = dcp.downloadFile;
+            bucketName = dcp.bucketName;
+            objectKey = dcp.objectKey;
+            fileStat = dcp.fileStat;
+            parts = dcp.parts;
+            downloadLength = dcp.downloadLength;
         }
     }
 
-    static class FileStat implements Serializable {
+    class FileStat  {
 
-         static final int serialVersionUID = 3896323364904643963L;
+         int fileLength = 0;
+         String? md5;
+         DateTime? lastModified;
+         String? eTag;
+         String? serverCRC;
+         String? requestId;
 
-         int fileLength;
-         String md5;
-         Date lastModified;
-         String etag;
-         int serverCRC;
-         String requestId;
-
-         static FileStat getFileStat(InternalRequestOperation operation, String bucketName, String objectKey)  {
+         static Future<FileStat> getFileStat(InternalRequestOperation operation, String? bucketName, String? objectKey)  async {
             HeadObjectRequest request = HeadObjectRequest(bucketName, objectKey);
-            HeadObjectResult result = operation.headObject(request, null).getResult();
+            HeadObjectResult result = await operation.headObject(request, null).getResult();
 
-            FileStat fileStat = FileStat();
-            fileStat.fileLength = result.getMetadata().getContentLength();
-            fileStat.eTag = result.getMetadata().getETag();
-            fileStat.lastModified = result.getMetadata().getLastModified();
-            fileStat.serverCRC = result.getServerCRC();
-            fileStat.requestId = result.getRequestId();
+            FileStat fileStat = FileStat()
+            ..fileLength = result.metadata.getContentLength()
+            ..eTag = result.metadata.getETag()
+            ..lastModified = result.metadata.getLastModified()
+            ..serverCRC = result.serverCRC
+            ..requestId = result.requestId;
 
             return fileStat;
         }
 
         @override
-         int hashCode() {
+        bool operator ==(Object other) {
+          return identical(this, other) || other is FileStat && other.eTag == eTag && other.lastModified == lastModified && other.fileLength == fileLength;
+        }
+
+        @override
+         int get hashCode {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((etag == null) ? 0 : etag.hashCode());
-            result = prime * result + ((lastModified == null) ? 0 : lastModified.hashCode());
-            result = prime * result + (int) (fileLength ^ (fileLength >>> 32));
+            result = prime * result + (eTag?.hashCode ?? 0 );
+            result = prime * result + (lastModified?.hashCode ?? 0 );
+            result = prime * result + (fileLength ^ (fileLength >>> 32));
             return result;
         }
     }
 
-    static class DownloadPartResult {
+    class DownloadPartResult {
 
-         int partNumber;
-         String requestId;
-         int clientCRC;
-         int length;
+         int partNumber = 0;
+         String? requestId;
+         String? clientCRC;
+         int length = 0;
     }
 
     class DownloadFileResult extends OSSResult {
 
-         List<DownloadPartResult> partResults;
-         ObjectMetadata metadata;
+         List<DownloadPartResult> partResults = [];
+         ObjectMetadata? metadata;
     }
-}

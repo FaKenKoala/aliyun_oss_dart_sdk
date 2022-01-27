@@ -1,4 +1,3 @@
-import 'package:crclib/catalog.dart';
 
 import 'package:aliyun_oss_dart_sdk/src/common/utils/crc64.dart';
 import 'package:aliyun_oss_dart_sdk/src/common/utils/oss_utils.dart';
@@ -43,7 +42,7 @@ class CheckCRC64DownloadInputStream extends CheckedInputStream {
 }
 
 class CheckedInputStream extends InputStream {
-  final InputStream inStream;
+  final InputStream? inStream;
   final OSSCRC64 checksum;
   CheckedInputStream(this.inStream, this.checksum);
 }

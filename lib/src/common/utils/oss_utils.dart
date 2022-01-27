@@ -177,7 +177,7 @@ class OSSUtils {
     for (PartETag partETag in partETagList) {
       builder.write("<Part>\n");
       builder.write("<PartNumber>" '${partETag.partNumber}' "</PartNumber>\n");
-      builder.write("<ETag>" + partETag.eTag + "</ETag>\n");
+      builder.write("<ETag>" + "${partETag.eTag}" + "</ETag>\n");
       builder.write("</Part>\n");
     }
     builder.write("</CompleteMultipartUpload>\n");
