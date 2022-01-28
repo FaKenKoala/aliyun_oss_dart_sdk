@@ -10,8 +10,8 @@ class ProgressTouchableRequestBody<T extends OSSRequest> extends RequestBody {
   InputStream inputStream;
   final String contentType;
   final int contentLength;
-  OSSProgressCallback callback;
-  T request;
+  OSSProgressCallback? callback;
+  late T request;
 
   ProgressTouchableRequestBody(
       this.inputStream, this.contentLength, this.contentType);
@@ -36,7 +36,7 @@ class ProgressTouchableRequestBody<T extends OSSRequest> extends RequestBody {
       sink.flush();
 
       if (callback != null && total != 0) {
-        callback.onProgress(request, total, contentLength);
+        callback?.onProgress(request, total, contentLength);
       }
     }
     if (source != null) {

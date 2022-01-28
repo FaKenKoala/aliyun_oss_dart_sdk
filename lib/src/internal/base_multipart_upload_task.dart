@@ -64,7 +64,7 @@ abstract class BaseMultipartUploadTask<Request extends MultipartUploadRequest,
       void initMultipartUploadId() ;
 
     /// do multipart upload task
-      Result? doMultipartUpload() ;
+      Future<Result?> doMultipartUpload() ;
 
     /// check is or not cancel
      void checkCancel()  {
@@ -300,8 +300,6 @@ if (key !=(OSSHeaders.storageClass)) {
     }
 
     /// check part size
-    ///
-    /// @param partAttr
      void checkPartSize(List<int> partAttr) {
         int partSize = request.partSize;
         OSSLog.logDebug("[checkPartSize] - fileLength : $fileLength");

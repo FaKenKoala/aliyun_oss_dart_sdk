@@ -25,7 +25,7 @@ class MultipartUploadTask extends BaseMultipartUploadTask<MultipartUploadRequest
     }
 
     @override
-     CompleteMultipartUploadResult? doMultipartUpload()  {
+     Future<CompleteMultipartUploadResult?> doMultipartUpload()  async{
         checkCancel();
         int readByte = partAttr[0];
         final int partNumber = partAttr[1];
@@ -57,7 +57,7 @@ class MultipartUploadTask extends BaseMultipartUploadTask<MultipartUploadRequest
         }
         checkException();
         //complete sort
-        CompleteMultipartUploadResult? completeResult = completeMultipartUploadResult();
+        CompleteMultipartUploadResult? completeResult = await completeMultipartUploadResult();
 
         releasePool();
         return completeResult;

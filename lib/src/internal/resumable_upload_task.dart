@@ -184,7 +184,7 @@ class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUploadRequest
     }
 
     @override
-     ResumableUploadResult? doMultipartUpload()  {
+     Future<ResumableUploadResult?> doMultipartUpload()  async{
 
         int tempUploadedLength = uploadedLength;
         checkCancel();
@@ -248,7 +248,7 @@ class ResumableUploadTask extends BaseMultipartUploadTask<ResumableUploadRequest
 
         checkException();
         //complete sort
-        CompleteMultipartUploadResult? completeResult = completeMultipartUploadResult();
+        CompleteMultipartUploadResult? completeResult = await completeMultipartUploadResult();
         ResumableUploadResult? result;
         if (completeResult != null) {
             result = ResumableUploadResult(completeResult);

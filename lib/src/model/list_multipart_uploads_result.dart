@@ -112,7 +112,7 @@ class ListMultipartUploadsResult extends OSSResult {
           break;
         case XmlPullParser.END_TAG:
           if ("Upload" == parser.getName()) {
-            uploadList.add(upload);
+            uploadList.add(upload!);
           } else if ("CommonPrefixes" == parser.getName()) {
             isCommonPrefixes = false;
           }

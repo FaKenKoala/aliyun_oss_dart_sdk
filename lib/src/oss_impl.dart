@@ -44,8 +44,8 @@ class OSSImpl implements OSS {
 
     this.conf = (conf ?? ClientConfiguration.getDefaultConf());
 
-    internalRequestOperation =
-        InternalRequestOperation.endpoint(endpointUri!, credentialProvider, this.conf!);
+    internalRequestOperation = InternalRequestOperation.endpoint(
+        endpointUri!, credentialProvider, this.conf!);
     extensionRequestOperation =
         ExtensionRequestOperation(internalRequestOperation);
   }
@@ -133,12 +133,16 @@ class OSSImpl implements OSS {
   }
 
   @override
-  Future<PutBucketRefererResult>? putBucketReferer(PutBucketRefererRequest request) {
-    return internalRequestOperation.putBucketReferer(request, null)?.getResult();
+  Future<PutBucketRefererResult>? putBucketReferer(
+      PutBucketRefererRequest request) {
+    return internalRequestOperation
+        .putBucketReferer(request, null)
+        ?.getResult();
   }
 
   @override
-  Future<GetBucketRefererResult> getBucketReferer(GetBucketRefererRequest request) {
+  Future<GetBucketRefererResult> getBucketReferer(
+      GetBucketRefererRequest request) {
     return internalRequestOperation.getBucketReferer(request, null).getResult();
   }
 
@@ -170,8 +174,11 @@ class OSSImpl implements OSS {
   }
 
   @override
-  Future<PutBucketLoggingResult>? putBucketLogging(PutBucketLoggingRequest request) {
-    return internalRequestOperation.putBucketLogging(request, null)?.getResult();
+  Future<PutBucketLoggingResult>? putBucketLogging(
+      PutBucketLoggingRequest request) {
+    return internalRequestOperation
+        .putBucketLogging(request, null)
+        ?.getResult();
   }
 
   @override
@@ -184,7 +191,8 @@ class OSSImpl implements OSS {
   }
 
   @override
-  Future<GetBucketLoggingResult> getBucketLogging(GetBucketLoggingRequest request) {
+  Future<GetBucketLoggingResult> getBucketLogging(
+      GetBucketLoggingRequest request) {
     return internalRequestOperation.getBucketLogging(request, null).getResult();
   }
 
@@ -201,7 +209,8 @@ class OSSImpl implements OSS {
   Future<PutBucketLifecycleResult>? putBucketLifecycle(
       PutBucketLifecycleRequest request) {
     return internalRequestOperation
-        .putBucketLifecycle(request, null)?.getResult();
+        .putBucketLifecycle(request, null)
+        ?.getResult();
   }
 
   @override
@@ -306,7 +315,6 @@ class OSSImpl implements OSS {
       OSSCompletedCallback<DeleteMultipleObjectRequest,
               DeleteMultipleObjectResult>
           completedCallback) {
-            \
     return internalRequestOperation.deleteMultipleObject(
         request, completedCallback);
   }
@@ -315,8 +323,9 @@ class OSSImpl implements OSS {
   Future<DeleteMultipleObjectResult?> deleteMultipleObject(
       DeleteMultipleObjectRequest request) {
     return internalRequestOperation
-        .deleteMultipleObject(request, null)
-        ?.getResult() ?? Future.value(null);
+            .deleteMultipleObject(request, null)
+            ?.getResult() ??
+        Future.value(null);
   }
 
   @override
@@ -470,7 +479,7 @@ class OSSImpl implements OSS {
   @override
   void updateCredentialProvider(OSSCredentialProvider credentialProvider) {
     this.credentialProvider = credentialProvider;
-    internalRequestOperation.credentialProvider  = credentialProvider;
+    internalRequestOperation.credentialProvider = credentialProvider;
   }
 
   @override
@@ -499,7 +508,8 @@ class OSSImpl implements OSS {
   }
 
   @override
-  Future<ResumableUploadResult> resumableUpload(ResumableUploadRequest request) {
+  Future<ResumableUploadResult> resumableUpload(
+      ResumableUploadRequest request) {
     return extensionRequestOperation.resumableUpload(request, null).getResult();
   }
 
@@ -517,7 +527,8 @@ class OSSImpl implements OSS {
   }
 
   @override
-  Future<String> presignConstrainedObjectURLWithRequest(GeneratePresignedUrlRequest request) {
+  Future<String> presignConstrainedObjectURLWithRequest(
+      GeneratePresignedUrlRequest request) {
     return ObjectURLPresigner(endpointUri!, credentialProvider, conf!)
         .presignConstrainedURLWithRequest(request);
   }
@@ -554,7 +565,8 @@ class OSSImpl implements OSS {
   }
 
   @override
-  Future<TriggerCallbackResult> triggerCallback(TriggerCallbackRequest request) {
+  Future<TriggerCallbackResult> triggerCallback(
+      TriggerCallbackRequest request) {
     return internalRequestOperation.asyncTriggerCallback(request);
   }
 
